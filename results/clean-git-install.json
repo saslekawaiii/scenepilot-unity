@@ -1,0 +1,21 @@
+{
+  "unity": "6000.3.27f1",
+  "timestamp": "2026-10-30T21:51:43.1068750Z",
+  "second_demo_has_unique_path": true,
+  "first_demo_preserved": true,
+  "build_scene_order_and_enabled_flags_preserved": true,
+  "two_npcs": true,
+  "terrain_assets_resolved": true,
+  "regenerate_updates_alphamap": true,
+  "task_routes_and_knowledge_valid": true,
+  "first_scene": "Assets/WorldWeaverDemo/WorldWeaverDemo.unity",
+  "second_scene": "Assets/WorldWeaverDemo/WorldWeaverDemo 1.unity",
+  "success": true,
+  "archive": "deliverables/com.worldweaver.toolkit-1.0.0.tgz",
+  "sha256": "26522080b34dcbfce4cba2dbfbda344105775ddfa01dbf82fed5b2381940c349",
+  "batch_exit_code": 0,
+  "source": "git",
+  "fresh_project": true,
+  "compiler_error_count": 0,
+  "git_url": "https://github.com/saslekawaiii/worldweaver-thesis.git?path=/Packages/com.worldweaver.toolkit#f35977e6884682bebc270655853f9cd488399528"
+}

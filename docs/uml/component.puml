@@ -1,7 +1,8 @@
 @startuml
 skinparam defaultFontName Arial
 skinparam shadowing false
-left to right direction
+skinparam defaultFontSize 16
+top to bottom direction
 package "WorldWeaver.Editor" {
  [WorldWeaverWindow] as UI
  [TerrainAuthoring] as Author
@@ -12,10 +13,10 @@ package "WorldWeaver.Runtime" {
  [NpcPipeline] as Pipeline
  [ModelRouter] as Router
  [LocalProvider] as Local
- [OpenAICompatibleProvider] as Cloud
+ [OpenAICompatible\nProvider] as Cloud
  [RagIndex] as RAG
- [OllamaEmbeddingProvider] as Embedding
- [InMemoryVectorStore] as Vector
+ [OllamaEmbedding\nProvider] as Embedding
+ [InMemory\nVectorStore] as Vector
  [ActionDispatcher] as Actions
  [TerrainGenerator] as Generator
 }
@@ -32,6 +33,11 @@ RAG --> Embedding
 RAG --> Vector
 Router --> Local
 Router --> Cloud
-Actions --> [Inventory]
-Actions --> [NavMeshAgent]
+[Inventory] as Inventory
+[NavMeshAgent] as Nav
+Actions --> Inventory
+Actions --> Nav
+Embedding -down[hidden]-> Vector
+Local -down[hidden]-> Cloud
+Inventory -down[hidden]-> Nav
 @enduml

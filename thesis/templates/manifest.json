@@ -1,0 +1,31 @@
+{
+  "file": "official-title.docx",
+  "sha256": "7bdb804346650358e5d7afb53018ae3d11abdbeb1ffc72d87a487f803a271afd",
+  "source": "https://www.vstu.ru/obrazovanie/umu/blanki/poyasnitelnaya_zapiska_k_vrb_md_titul_2019.doc",
+  "catalog": "https://www.vstu.ru/obrazovanie/umu/blanki/",
+  "normalization": "Official DOC converted to DOCX before authoring; retained source unchanged",
+  "editable_paragraph_slots": [
+    4,
+    5,
+    10,
+    12,
+    13,
+    14,
+    18,
+    20,
+    22,
+    38
+  ],
+  "body_layout": {
+    "paper": "A4",
+    "font": "Times New Roman",
+    "size_pt": 14,
+    "line_spacing": 1.5,
+    "margins_mm": [
+      20,
+      15,
+      20,
+      30
+    ]
+  }
+}

@@ -1,32 +1,43 @@
 @startuml
 skinparam defaultFontName Arial
+skinparam defaultFontSize 16
 skinparam shadowing false
+skinparam nodesep 18
+skinparam ranksep 30
 top to bottom direction
-rectangle "Игрок / разработчик" as User
+rectangle "Игрок /\nразработчик" as User
+rectangle "Ollama\nembeddings" as Embed
 rectangle "LLM API" as LLM
-rectangle "Ollama embeddings" as Embed
+rectangle "Игрок" as UserOut
 usecase "1\nСбор контекста" as Context
 usecase "2\nRetrieval" as Retrieval
 usecase "3\nМаршрутизация\nи запрос" as Route
 usecase "4\nВалидация\nи действие" as Validate
 usecase "5\nГенерация\nTerrain" as Terrain
-database "Знания и память\nScope + MemoryKind" as Knowledge
-database "Состояние сцены\nInventory и NavMesh" as World
-database "PipelineTrace" as Trace
+database "D1 Знания\nи память" as Knowledge
+database "D2 Сцена\n(чтение)" as WorldIn
+database "D2 Сцена\n(запись)" as WorldOut
+database "D1 Память\n(запись)" as MemoryOut
+database "D3 Trace" as Trace
 User --> Context : реплика / цель
 User --> Route : описание Terrain
-World --> Context : компактное состояние
-Context --> Retrieval : запрос и scope
-Knowledge --> Retrieval : фрагменты и векторы
-Retrieval <--> Embed : текст / embedding
+WorldIn -left-> Context : состояние
+Context --> Retrieval
+Knowledge -right-> Retrieval : фрагменты /\nвекторы
+Retrieval <-right-> Embed
 Retrieval --> Route : top k
-Route <--> LLM : messages / JSON
+Route <-right-> LLM : messages / JSON
 Route --> Validate : NpcDecision
-Validate --> World : разрешённые изменения
-Validate --> Knowledge : события и разговор
-Validate --> User : speech / ошибка
 Route --> Terrain : TerrainSpec
-Terrain --> World : heightmap
-Validate --> Trace : факт исполнения
-Route --> Trace : модель и задержка
+Validate --> WorldOut : допустимые\nизменения
+Terrain --> WorldOut : heightmap
+Validate --> MemoryOut : разговор /\nсобытия
+Validate -right-> UserOut : speech /\nошибка
+Validate --> Trace : исполнение
+legend bottom
+ D1 и D2 повторены для чтения и записи в те же хранилища.
+ Контекст передаёт в retrieval запрос и scope.
+ Embeddings: текст в Ollama, вектор обратно в retrieval.
+ Маршрут и задержки также сохраняются в D3.
+endlegend
 @enduml

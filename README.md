@@ -103,3 +103,12 @@ python3 -m venv .private/analysis-env
 `Packages/com.worldweaver.toolkit` — UPM runtime, Editor и тесты; `UnityProject` — demo; `thesis` — редактируемый текст; `docs/uml` — PlantUML, PNG и SVG; `docs/research` — первичные источники, аналоги и сравнение с опубликованными ВКР; `results` — исходные ответы, протоколы и графики; `deliverables` — документы, презентация и архивы.
 
 Архитектурные решения сохранены в `docs/adr`. `PROGRESS.md` содержит состояние итоговой проверки. Неизвестные данные руководителя и утверждения оставлены для заполнения после согласования с кафедрой.
+
+
+## Пересборка документов
+
+Редактируемый текст находится в `thesis/*.md`. Для DOCX нужны Python 3, `python-docx` и Pillow; выполните `python3 scripts/build_documents.py`. Официальный исходный титул и его контрольная сумма находятся в `thesis/templates`. Для готового PDF необходим отдельный DOCX-рендерер; в поставленной версии использован документный runtime Codex. Оглавление строится в два прохода по фактической карте страниц PDF; изменение текста требует повторного расчёта `scripts/map_document_pages.py` и повторного рендера.
+
+Исходник PPTX — `scripts/build_presentation.mjs`, повторный импорт/рендер — `scripts/verify_presentation.mjs`. Они используют библиотеку Artifact Tool из среды Codex, а не общедоступный npm-пакет. Если runtime расположен иначе, задайте `WW_ARTIFACT_RUNTIME` (каталог `dependencies` с `node` и `python`) и `WW_PRESENTATIONS_SKILL` (каталог skill `presentations` с `container_tools`). Готовый PPTX можно редактировать обычным редактором презентаций без этой среды.
+
+`python3 scripts/package_delivery.py` формирует архив исходников и Git bundle из чистого зафиксированного состояния Git; параметры и SHA256 записываются в `deliverables/Состав_поставки.json`.

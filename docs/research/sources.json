@@ -73,14 +73,15 @@
   },
   {
     "id": 7,
-    "title": "Inworld Controller Unity Runtime",
+    "title": "Character Studio deprecation and Agent Runtime",
     "author": "Inworld AI",
     "year": "2026",
-    "url": "https://dev.docs.inworld.ai/Unity/runtime/runtime-reference/InworldController",
-    "conclusion": "Модули LLM, речи, embeddings и knowledge в Unity runtime",
+    "url": "https://docs.inworld.ai/character-studio-deprecation",
+    "conclusion": "Legacy Character Studio закрыта; Unity Agent Runtime предлагает character templates, знания, память, LLM и речевые компоненты",
     "section": "1.5",
-    "accessed": "2026-10-30",
-    "http_status": "URLError"
+    "accessed": "2026-10-31",
+    "http_status": 200,
+    "resolved_url": "https://docs.inworld.ai/character-studio-deprecation"
   },
   {
     "id": 8,
@@ -275,15 +276,15 @@
   },
   {
     "id": 24,
-    "title": "Unity Test Framework 1.1",
+    "title": "Unity Test Framework introduction Unity 6.3",
     "author": "Unity Technologies",
     "year": "2026",
-    "url": "https://docs.unity3d.com/Packages/com.unity.test-framework@1.1/manual/index.html",
-    "conclusion": "EditMode/PlayMode и запуск автоматических испытаний",
+    "url": "https://docs.unity3d.com/6000.3/Documentation/Manual/test-framework/test-framework-introduction.html",
+    "conclusion": "EditMode/PlayMode и запуск автоматических испытаний; установленный package 1.6.0",
     "section": "4.2",
-    "accessed": "2026-10-30",
+    "accessed": "2026-10-31",
     "http_status": 200,
-    "resolved_url": "https://docs.unity3d.com/Packages/com.unity.test-framework@1.1/manual/index.html"
+    "resolved_url": "https://docs.unity.com/en-us/engine/6000.3/manual/programming-environment/test-framework-introduction"
   },
   {
     "id": 25,
