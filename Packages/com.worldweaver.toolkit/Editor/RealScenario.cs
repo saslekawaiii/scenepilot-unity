@@ -18,6 +18,7 @@ namespace WorldWeaver.Editor
         private static void Begin(string provider)
         {
             if (EditorApplication.isPlaying) throw new InvalidOperationException("Exit Play Mode first.");
+            if (!Application.isBatchMode && !UnityEditor.SceneManagement.EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
             if (File.Exists("Assets/WorldWeaverDemo/WorldWeaverDemo.unity")) UnityEditor.SceneManagement.EditorSceneManager.OpenScene("Assets/WorldWeaverDemo/WorldWeaverDemo.unity"); else DemoBuilder.Create();
             SessionState.SetString("WorldWeaverScenario", provider);
             EditorApplication.playModeStateChanged -= OnPlay; EditorApplication.playModeStateChanged += OnPlay;

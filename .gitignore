@@ -19,3 +19,7 @@ __pycache__/
 **/MemoryCache/
 
 /UnityLocalEvaluation/
+
+.chart-data-*/
+deliverables/*.bundle
+deliverables/*.zip

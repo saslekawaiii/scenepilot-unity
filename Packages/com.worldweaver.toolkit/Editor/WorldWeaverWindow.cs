@@ -28,6 +28,28 @@ namespace WorldWeaver.Editor
         [MenuItem("Tools/Intelligent World Toolkit")]
         [MenuItem("Tools/WorldWeaver/Open Toolkit")]
         public static void ShowWindow() { GetWindow<WorldWeaverWindow>("WorldWeaver").minSize = new Vector2(490, 580); }
+        // Menu alternatives make IMGUI views reachable through native keyboard menus.
+        [MenuItem("Tools/WorldWeaver/Views/World")] private static void WorldView() => OpenView(0);
+        [MenuItem("Tools/WorldWeaver/Views/Character")] private static void CharacterView() => OpenView(1);
+        [MenuItem("Tools/WorldWeaver/Views/Knowledge")] private static void KnowledgeView() => OpenView(2);
+        [MenuItem("Tools/WorldWeaver/Views/Models")] private static void ModelsView() => OpenView(3);
+        [MenuItem("Tools/WorldWeaver/Views/Debug")] private static void TraceView() => OpenView(4);
+        private static void OpenView(int index)
+        {
+            ShowWindow(); var window = GetWindow<WorldWeaverWindow>();
+            var selected = Selection.activeGameObject ? Selection.activeGameObject.GetComponent<IntelligentNPC>() : null;
+            if (!selected && GameObject.Find("Merchant")) selected = GameObject.Find("Merchant").GetComponent<IntelligentNPC>();
+            if (selected) { window.npc = selected; Selection.activeGameObject = selected.gameObject; }
+            window.SelectTab(index);
+        }
+        [MenuItem("Tools/WorldWeaver/Frame Demo Terrain")]
+        private static void FrameTerrain()
+        {
+            var terrain = UnityEngine.Object.FindFirstObjectByType<GeneratedTerrain>();
+            if (!terrain) return; Selection.activeGameObject = terrain.gameObject;
+            var view = SceneView.lastActiveSceneView;
+            if (view) { view.FrameSelected(); view.Focus(); }
+        }
         private void OnEnable()
         {
             EditorApplication.update += Repaint;
@@ -144,7 +166,10 @@ namespace WorldWeaver.Editor
             if (!routes) return; Inspect(routes);
             foreach (var task in new[] { ModelTask.Terrain, ModelTask.Dialogue, ModelTask.Planning })
             {
-                var profile = routes.Resolve(task); GUILayout.Space(8); GUILayout.Label(task + " / " + profile.Model, EditorStyles.boldLabel);
+                ModelProfile profile;
+                try { profile = routes.Resolve(task); }
+                catch (InvalidOperationException) { EditorGUILayout.HelpBox(task + ": assign a Model Profile to this route.", MessageType.Warning); continue; }
+                GUILayout.Space(8); GUILayout.Label(task + " / " + profile.Model, EditorStyles.boldLabel);
                 GUILayout.Label(profile.Provider + " · " + profile.Endpoint, EditorStyles.wordWrappedMiniLabel);
                 if (!string.IsNullOrEmpty(profile.ApiKeyEnvironmentVariable)) GUILayout.Label(profile.ApiKeyEnvironmentVariable + ": " + (string.IsNullOrEmpty(Environment.GetEnvironmentVariable(profile.ApiKeyEnvironmentVariable)) ? "missing" : "available"));
                 using (new EditorGUI.DisabledScope(busy)) if (GUILayout.Button("Health check " + task)) Run(async () => { using (var provider = profile.CreateProvider()) status = await provider.HealthAsync(operation.Token) ? "Model is available." : "Endpoint reachable, model not listed."; });

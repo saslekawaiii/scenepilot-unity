@@ -87,7 +87,8 @@ namespace WorldWeaver
                         if (trace.Validation.Executed.Count > 0)
                             await rag.RememberAsync(npc.CharacterId, "Выполнены действия: " + string.Join(", ", trace.Validation.Executed), MemoryKind.Episodic, token);
                     }
-                    catch (ProviderException error) { trace.Error = "Action completed, memory indexing failed: " + error.Message; }
+                    catch (OperationCanceledException) { trace.Error = "Decision finished; memory indexing cancelled."; }
+                    catch (ProviderException error) { trace.Error = "Decision finished; memory indexing failed: " + error.Message; }
                 }
             }
             catch (OperationCanceledException) { trace.Error = "Cancelled."; throw; }

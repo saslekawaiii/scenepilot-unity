@@ -68,6 +68,22 @@ namespace WorldWeaver.Tests
         [Test] public void ProviderAcceptsLoopback() { Keep(ScriptableObject.CreateInstance<ModelProfile>()).Validate(); }
         [Test] public void RouterSeparatesTasks() { var routes = Keep(ScriptableObject.CreateInstance<OrchestratorProfile>()); var a = Keep(ScriptableObject.CreateInstance<ModelProfile>()); var b = Keep(ScriptableObject.CreateInstance<ModelProfile>()); routes.Dialogue = a; routes.Planning = b; Assert.AreSame(a, routes.Resolve(ModelTask.Dialogue)); Assert.AreSame(b, routes.Resolve(ModelTask.Planning)); Assert.Throws<InvalidOperationException>(() => routes.Resolve(ModelTask.Terrain)); }
         [UnityTest] public IEnumerator MockPipelineRetrievesValidatesAndTransfers() => Await(MockPipeline());
+        [UnityTest] public IEnumerator CancellationAfterCommitRetainsExecutedDecision() => Await(CancelAfterCommit());
+        private async Task CancelAfterCommit()
+        {
+            var npc = Npc(out var player);
+            using (var cancellation = new CancellationTokenSource())
+            using (var pipeline = new NpcPipeline(new FixedRouter(JsonConvert.SerializeObject(Decision(1))), new RagIndex(new CancelAfterTransferEmbedding(player, cancellation)), new ActionDispatcher()))
+            {
+                var trace = await pipeline.RunAsync(npc, "Дай кристалл", ModelTask.Dialogue, true, cancellation.Token);
+                Assert.IsTrue(cancellation.IsCancellationRequested);
+                Assert.IsTrue(trace.Validation.Accepted);
+                Assert.AreEqual(1, player.Count("Crystal"));
+                Assert.AreEqual(9, npc.GetComponent<Inventory>().Count("Crystal"));
+                Assert.AreEqual("Вот кристалл.", trace.Speech);
+                StringAssert.Contains("memory indexing cancelled", trace.Error);
+            }
+        }
         private async Task MockPipeline()
         {
             var npc = Npc(out var p); npc.Knowledge = Keep(ScriptableObject.CreateInstance<KnowledgeBase>()); npc.Knowledge.Documents = VillageKnowledge.Documents();
@@ -91,6 +107,20 @@ namespace WorldWeaver.Tests
     {
         public string Identity => "test-only";
         public Task<float[]> EmbedAsync(string text, bool query, CancellationToken token) { token.ThrowIfCancellationRequested(); return Task.FromResult(new[] { 1f, 0f }); }
+        public void Dispose() { }
+    }
+    public sealed class CancelAfterTransferEmbedding : IEmbeddingProvider
+    {
+        private readonly Inventory player;
+        private readonly CancellationTokenSource cancellation;
+        public string Identity => "test-cancel-after-commit";
+        public CancelAfterTransferEmbedding(Inventory player, CancellationTokenSource cancellation) { this.player = player; this.cancellation = cancellation; }
+        public Task<float[]> EmbedAsync(string text, bool query, CancellationToken token)
+        {
+            if (player.Count("Crystal") > 0) cancellation.Cancel();
+            token.ThrowIfCancellationRequested();
+            return Task.FromResult(new[] { 1f, 0f });
+        }
         public void Dispose() { }
     }
     public sealed class FixedRouter : IModelRouter

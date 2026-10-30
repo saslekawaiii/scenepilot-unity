@@ -46,8 +46,11 @@ namespace WorldWeaver.Editor
             RenderSettings.ambientLight = new Color(.62f, .69f, .74f); RenderSettings.fog = true; RenderSettings.fogColor = new Color(.57f, .68f, .72f); RenderSettings.fogDensity = .002f;
             var camera = new GameObject("Main Camera").AddComponent<Camera>(); camera.tag = "MainCamera"; camera.transform.position = new Vector3(50, 58, -78); camera.transform.LookAt(new Vector3(18, 11, -12)); camera.fieldOfView = 53; camera.backgroundColor = new Color(.55f, .7f, .78f); camera.clearFlags = CameraClearFlags.SolidColor;
             var ui = new GameObject("Dialogue").AddComponent<DemoDialogue>(); ui.Merchant = npc; ui.PlayerInventory = playerInventory; ui.LocalRoutes = localRoutes; ui.CloudRoutes = cloudRoutes;
-            EditorSceneManager.SaveScene(scene, folder + "/WorldWeaverDemo.unity");
-            EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(folder + "/WorldWeaverDemo.unity", true) }; AssetDatabase.SaveAssets();
+            string scenePath = AssetDatabase.GenerateUniqueAssetPath(folder + "/WorldWeaverDemo.unity");
+            EditorSceneManager.SaveScene(scene, scenePath);
+            var buildScenes = new List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);
+            buildScenes.Add(new EditorBuildSettingsScene(scenePath, true));
+            EditorBuildSettings.scenes = buildScenes.ToArray(); AssetDatabase.SaveAssets();
             WorldWeaverWindow.ShowWindow(); Selection.activeGameObject = merchant;
         }
         private static GameObject Shape(string name, PrimitiveType type, Vector3 position, Vector3 scale, Color color, string folder)

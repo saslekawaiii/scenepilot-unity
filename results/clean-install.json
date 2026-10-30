@@ -1,18 +1,20 @@
 {
   "unity": "6000.3.27f1",
+  "timestamp": "2026-10-30T21:47:32.5525150Z",
+  "second_demo_has_unique_path": true,
+  "first_demo_preserved": true,
+  "build_scene_order_and_enabled_flags_preserved": true,
+  "two_npcs": true,
+  "terrain_assets_resolved": true,
+  "regenerate_updates_alphamap": true,
+  "task_routes_and_knowledge_valid": true,
+  "first_scene": "Assets/WorldWeaverDemo/WorldWeaverDemo.unity",
+  "second_scene": "Assets/WorldWeaverDemo/WorldWeaverDemo 1.unity",
+  "success": true,
   "archive": "deliverables/com.worldweaver.toolkit-1.0.0.tgz",
-  "sha256": "098eb4ed06b7fde20dd8940988bb37311c5681aa4f4b89865d51984c06905846",
-  "dependency": {
-    "version": "file:/Users/kirillkovalenko/Documents/ChatGPT/Диплом/deliverables/com.worldweaver.toolkit-1.0.0.tgz",
-    "depth": 0,
-    "source": "local-tarball",
-    "dependencies": {
-      "com.unity.nuget.newtonsoft-json": "3.2.1"
-    }
-  },
-  "new_library": true,
+  "sha256": "26522080b34dcbfce4cba2dbfbda344105775ddfa01dbf82fed5b2381940c349",
   "batch_exit_code": 0,
-  "demo_scene_created": true,
-  "compiler_error_count": 0,
-  "note": "Fresh project imported local tarball and executed DemoBuilder.Create; inference verified separately in real-integration-unity6.xml."
+  "source": "local-tarball",
+  "fresh_project": true,
+  "compiler_error_count": 0
 }

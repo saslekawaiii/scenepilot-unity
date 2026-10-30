@@ -28,14 +28,7 @@ namespace WorldWeaver.Editor
                 AssetDatabase.CreateAsset(layers[i], AssetDatabase.GenerateUniqueAssetPath(folder + "/Layer" + i + ".terrainlayer"));
             }
             data.terrainLayers = layers;
-            int n = 64; data.alphamapResolution = n; var alpha = new float[n, n, 3];
-            for (int z = 0; z < n; z++) for (int x = 0; x < n; x++)
-            {
-                float h = data.GetInterpolatedHeight(x / (float)(n - 1), z / (float)(n - 1)) / spec.height;
-                float snow = Mathf.Clamp01((h - .7f) * 5), rock = Mathf.Clamp01((h - .38f) * 3) * (1 - snow);
-                alpha[z, x, 0] = 1 - rock - snow; alpha[z, x, 1] = rock; alpha[z, x, 2] = snow;
-            }
-            data.SetAlphamaps(0, 0, alpha);
+            ApplyAlphamap(data, spec);
             var water = GameObject.CreatePrimitive(PrimitiveType.Plane); water.name = "Water"; Undo.RegisterCreatedObjectUndo(water, "Create water");
             water.transform.SetParent(go.transform); water.transform.localPosition = new Vector3(spec.width / 2, spec.waterLevel * spec.height, spec.length / 2);
             water.transform.localScale = new Vector3(spec.width / 10, 1, spec.length / 10);
@@ -44,13 +37,28 @@ namespace WorldWeaver.Editor
             material.SetFloat("_Glossiness", .88f); AssetDatabase.CreateAsset(material, AssetDatabase.GenerateUniqueAssetPath(folder + "/Water.mat")); water.GetComponent<Renderer>().sharedMaterial = material;
             AssetDatabase.SaveAssets(); Selection.activeGameObject = go; return terrain;
         }
+        private static void ApplyAlphamap(TerrainData data, TerrainSpec spec)
+        {
+            // Custom layers authored by a consumer retain their own texture policy.
+            if (data.terrainLayers.Length != 3) return;
+            int n = 64; data.alphamapResolution = n; var alpha = new float[n, n, 3];
+            for (int z = 0; z < n; z++) for (int x = 0; x < n; x++)
+            {
+                float h = data.GetInterpolatedHeight(x / (float)(n - 1), z / (float)(n - 1)) / spec.height;
+                float snow = Mathf.Clamp01((h - .7f) * 5), rock = Mathf.Clamp01((h - .38f) * 3) * (1 - snow);
+                alpha[z, x, 0] = 1 - rock - snow; alpha[z, x, 1] = rock; alpha[z, x, 2] = snow;
+            }
+            data.SetAlphamaps(0, 0, alpha);
+        }
         public static void Regenerate(GeneratedTerrain owned, TerrainSpec spec)
         {
             spec.Validate(); var terrain = owned.GetComponent<Terrain>(); if (!terrain) return;
             Undo.RegisterCompleteObjectUndo(terrain.terrainData, "Regenerate Terrain");
+            Undo.RegisterCompleteObjectUndo(terrain.terrainData.alphamapTextures, "Regenerate Terrain textures");
             Undo.RecordObject(owned, "Update TerrainSpec"); Undo.RecordObject(owned.transform, "Resize Terrain");
             terrain.terrainData.heightmapResolution = spec.resolution; terrain.terrainData.size = new Vector3(spec.width, spec.height, spec.length);
             terrain.terrainData.SetHeights(0, 0, TerrainGenerator.Generate(spec));
+            ApplyAlphamap(terrain.terrainData, spec);
             owned.Specification = spec; owned.transform.position = new Vector3(-spec.width / 2, 0, -spec.length / 2);
             var water = owned.transform.Find("Water");
             if (water) { Undo.RecordObject(water, "Resize water"); water.localPosition = new Vector3(spec.width / 2, spec.waterLevel * spec.height, spec.length / 2); water.localScale = new Vector3(spec.width / 10, 1, spec.length / 10); }
