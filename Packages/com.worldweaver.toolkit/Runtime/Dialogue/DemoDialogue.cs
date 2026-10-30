@@ -36,7 +36,7 @@ namespace WorldWeaver
             if (GUILayout.Button("Запросить самостоятельное решение", GUILayout.Height(32))) Send(true);
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Local Ollama")) Switch(LocalRoutes);
-            if (GUILayout.Button("Cloud OpenAI")) Switch(CloudRoutes);
+            if (GUILayout.Button("Free Cloud")) Switch(CloudRoutes);
             GUILayout.EndHorizontal();
             GUI.enabled = true;
             GUILayout.Label(status, small);

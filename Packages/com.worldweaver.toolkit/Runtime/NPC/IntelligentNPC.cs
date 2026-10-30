@@ -96,7 +96,7 @@ namespace WorldWeaver
             State = action == "Follow" ? NpcState.Following : NpcState.Moving;
         }
         public void StopMovement()
-        { follow = null; var agent = GetComponent<NavMeshAgent>(); if (agent && agent.isOnNavMesh) { agent.isStopped = true; agent.ResetPath(); } State = NpcState.Waiting; }
+        { follow = null; var agent = GetComponent<NavMeshAgent>(); if (agent && agent.isOnNavMesh) { agent.ResetPath(); agent.isStopped = true; } State = NpcState.Waiting; }
         public void ClearMemory() { if (!Busy) pipeline?.ClearMemory(); }
         public async Task ReindexAsync(CancellationToken token) { if (Busy) throw new InvalidOperationException("NPC is busy."); await Services.ReindexAsync(this, token); }
         public void ReleaseServices() { pipeline?.Dispose(); pipeline = null; }

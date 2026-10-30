@@ -17,3 +17,5 @@ artifacts/qa/
 *.pid
 __pycache__/
 **/MemoryCache/
+
+/UnityLocalEvaluation/

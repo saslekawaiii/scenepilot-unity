@@ -31,13 +31,13 @@ namespace WorldWeaver
                         using (var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, timeout.Token))
                         {
                             int status = (int)response.StatusCode;
-                            bool retry = status == 429 || status == 408 || status >= 500;
+                            bool retry = status == 429 || status == 408 || status >= 500 || status == 402 && response.Headers.RetryAfter != null;
                             if (!response.IsSuccessStatusCode)
                             {
                                 if (retry && attempt < retries)
                                 {
                                     var delay = response.Headers.RetryAfter?.Delta ?? TimeSpan.FromMilliseconds(500 * (1 << attempt));
-                                    await Task.Delay(TimeSpan.FromSeconds(Math.Min(10, Math.Max(.1, delay.TotalSeconds))), token);
+                                    await Task.Delay(TimeSpan.FromSeconds(Math.Min(60, Math.Max(.1, delay.TotalSeconds))), token);
                                     continue;
                                 }
                                 throw new ProviderException("Provider HTTP " + status + ". Check model, credentials and endpoint.", status, retry);
@@ -52,7 +52,10 @@ namespace WorldWeaver
                                     if (memory.Length + length > 2 * 1024 * 1024) throw new ProviderException("Provider response too large.");
                                     memory.Write(buffer, 0, length);
                                 }
-                                return JObject.Parse(Encoding.UTF8.GetString(memory.ToArray()), new JsonLoadSettings { DuplicatePropertyNameHandling = DuplicatePropertyNameHandling.Error });
+                                var root = JToken.Parse(Encoding.UTF8.GetString(memory.ToArray()), new JsonLoadSettings { DuplicatePropertyNameHandling = DuplicatePropertyNameHandling.Error });
+                                if (root is JObject obj) return obj;
+                                if (root is JArray array) return new JObject { ["data"] = array };
+                                throw new JsonException("Expected a JSON object or array.");
                             }
                         }
                     }

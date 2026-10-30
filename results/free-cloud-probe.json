@@ -1,0 +1,27 @@
+{
+  "status": 200,
+  "seconds": 2.995484083890915,
+  "result": {
+    "id": "pllns_84cef75de59603e31381ffc34240cb92",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\"speech\":\"Готов\",\"actions\":[]}",
+          "tool_calls": []
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "created": 1793391256,
+    "model": "gpt-oss-20b",
+    "object": "chat.completion",
+    "usage": {
+      "prompt_tokens": 89,
+      "completion_tokens": 55,
+      "total_tokens": 144
+    },
+    "user_tier": "anonymous"
+  }
+}

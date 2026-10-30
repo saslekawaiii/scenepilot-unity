@@ -45,7 +45,7 @@ namespace WorldWeaver
         }
         private static string Fingerprint(IntelligentNPC npc)
         { return TextChunker.Digest(npc.CharacterId + (npc.Knowledge ? JsonConvert.SerializeObject(npc.Knowledge.Documents) : "")); }
-        public async Task<PipelineTrace> RunAsync(IntelligentNPC npc, string input, ModelTask task, bool useRag, CancellationToken token)
+        public async Task<PipelineTrace> RunAsync(IntelligentNPC npc, string input, ModelTask task, bool useRag, CancellationToken token, bool remember = true)
         {
             if (string.IsNullOrWhiteSpace(input) || input.Length > 3000) throw new ArgumentException("Input must contain 1 to 3000 characters.");
             var trace = new PipelineTrace { Character = npc.CharacterId, Input = input, Route = task.ToString() };
@@ -77,7 +77,7 @@ namespace WorldWeaver
                 // Nothing asynchronous may interleave validation and mutation on the Unity main thread.
                 trace.Validation = actions.Execute(npc, decision);
                 trace.Speech = trace.Validation.Accepted ? decision.speech : "Предложенное действие отклонено: " + trace.Validation.Reason;
-                if (useRag)
+                if (useRag && remember)
                 {
                     try
                     {

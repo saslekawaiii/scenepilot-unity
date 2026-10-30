@@ -1,0 +1,242 @@
+[
+  {
+    "resolution": 65,
+    "seed": 42,
+    "elapsed_ms": 4.0143,
+    "identical": true
+  },
+  {
+    "resolution": 65,
+    "seed": 43,
+    "elapsed_ms": 2.1927,
+    "identical": true
+  },
+  {
+    "resolution": 65,
+    "seed": 44,
+    "elapsed_ms": 2.2296,
+    "identical": true
+  },
+  {
+    "resolution": 65,
+    "seed": 45,
+    "elapsed_ms": 2.2581,
+    "identical": true
+  },
+  {
+    "resolution": 65,
+    "seed": 46,
+    "elapsed_ms": 2.2414,
+    "identical": true
+  },
+  {
+    "resolution": 65,
+    "seed": 47,
+    "elapsed_ms": 2.2512,
+    "identical": true
+  },
+  {
+    "resolution": 65,
+    "seed": 48,
+    "elapsed_ms": 3.6403,
+    "identical": true
+  },
+  {
+    "resolution": 65,
+    "seed": 49,
+    "elapsed_ms": 2.2316,
+    "identical": true
+  },
+  {
+    "resolution": 65,
+    "seed": 50,
+    "elapsed_ms": 2.2232,
+    "identical": true
+  },
+  {
+    "resolution": 65,
+    "seed": 51,
+    "elapsed_ms": 2.233,
+    "identical": true
+  },
+  {
+    "resolution": 129,
+    "seed": 42,
+    "elapsed_ms": 8.7538,
+    "identical": true
+  },
+  {
+    "resolution": 129,
+    "seed": 43,
+    "elapsed_ms": 8.6102,
+    "identical": true
+  },
+  {
+    "resolution": 129,
+    "seed": 44,
+    "elapsed_ms": 8.7562,
+    "identical": true
+  },
+  {
+    "resolution": 129,
+    "seed": 45,
+    "elapsed_ms": 8.7396,
+    "identical": true
+  },
+  {
+    "resolution": 129,
+    "seed": 46,
+    "elapsed_ms": 8.713,
+    "identical": true
+  },
+  {
+    "resolution": 129,
+    "seed": 47,
+    "elapsed_ms": 8.7567,
+    "identical": true
+  },
+  {
+    "resolution": 129,
+    "seed": 48,
+    "elapsed_ms": 8.5879,
+    "identical": true
+  },
+  {
+    "resolution": 129,
+    "seed": 49,
+    "elapsed_ms": 8.5492,
+    "identical": true
+  },
+  {
+    "resolution": 129,
+    "seed": 50,
+    "elapsed_ms": 8.7222,
+    "identical": true
+  },
+  {
+    "resolution": 129,
+    "seed": 51,
+    "elapsed_ms": 8.5433,
+    "identical": true
+  },
+  {
+    "resolution": 257,
+    "seed": 42,
+    "elapsed_ms": 35.7304,
+    "identical": true
+  },
+  {
+    "resolution": 257,
+    "seed": 43,
+    "elapsed_ms": 34.5215,
+    "identical": true
+  },
+  {
+    "resolution": 257,
+    "seed": 44,
+    "elapsed_ms": 33.8654,
+    "identical": true
+  },
+  {
+    "resolution": 257,
+    "seed": 45,
+    "elapsed_ms": 34.5228,
+    "identical": true
+  },
+  {
+    "resolution": 257,
+    "seed": 46,
+    "elapsed_ms": 33.9162,
+    "identical": true
+  },
+  {
+    "resolution": 257,
+    "seed": 47,
+    "elapsed_ms": 33.9237,
+    "identical": true
+  },
+  {
+    "resolution": 257,
+    "seed": 48,
+    "elapsed_ms": 33.9226,
+    "identical": true
+  },
+  {
+    "resolution": 257,
+    "seed": 49,
+    "elapsed_ms": 34.8888,
+    "identical": true
+  },
+  {
+    "resolution": 257,
+    "seed": 50,
+    "elapsed_ms": 33.8902,
+    "identical": true
+  },
+  {
+    "resolution": 257,
+    "seed": 51,
+    "elapsed_ms": 37.0288,
+    "identical": true
+  },
+  {
+    "resolution": 513,
+    "seed": 42,
+    "elapsed_ms": 135.941,
+    "identical": true
+  },
+  {
+    "resolution": 513,
+    "seed": 43,
+    "elapsed_ms": 137.8323,
+    "identical": true
+  },
+  {
+    "resolution": 513,
+    "seed": 44,
+    "elapsed_ms": 136.0788,
+    "identical": true
+  },
+  {
+    "resolution": 513,
+    "seed": 45,
+    "elapsed_ms": 135.7019,
+    "identical": true
+  },
+  {
+    "resolution": 513,
+    "seed": 46,
+    "elapsed_ms": 136.2848,
+    "identical": true
+  },
+  {
+    "resolution": 513,
+    "seed": 47,
+    "elapsed_ms": 135.7894,
+    "identical": true
+  },
+  {
+    "resolution": 513,
+    "seed": 48,
+    "elapsed_ms": 136.4446,
+    "identical": true
+  },
+  {
+    "resolution": 513,
+    "seed": 49,
+    "elapsed_ms": 136.2575,
+    "identical": true
+  },
+  {
+    "resolution": 513,
+    "seed": 50,
+    "elapsed_ms": 136.1818,
+    "identical": true
+  },
+  {
+    "resolution": 513,
+    "seed": 51,
+    "elapsed_ms": 135.9732,
+    "identical": true
+  }
+]

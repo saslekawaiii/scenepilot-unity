@@ -14,14 +14,14 @@ namespace WorldWeaver.Editor
         {
             if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+            PlayerSettings.runInBackground = true;
             const string folder = "Assets/WorldWeaverDemo"; Directory.CreateDirectory(folder); AssetDatabase.Refresh();
             var terrain = TerrainAuthoring.Create(new TerrainSpec(), folder);
             var local = Profile(folder, "Local", ProviderKind.Ollama, "http://127.0.0.1:11434", "qwen3.5:2b", "");
-            var cloud = Profile(folder, "CloudDialogue", ProviderKind.OpenAICompatible, "https://api.openai.com/v1", "gpt-4.1-mini", "OPENAI_API_KEY");
-            var fast = Profile(folder, "CloudFast", ProviderKind.OpenAICompatible, "https://api.openai.com/v1", "gpt-4.1-nano", "OPENAI_API_KEY");
+            var cloud = Profile(folder, "FreeCloud", ProviderKind.Pollinations, "https://text.pollinations.ai", "openai-fast", ""); cloud.StrictSchema = false; cloud.TimeoutSeconds = 120; cloud.Retries = 2;
             var groq = Profile(folder, "Groq", ProviderKind.Groq, "https://api.groq.com/openai/v1", "openai/gpt-oss-120b", "GROQ_API_KEY");
             var localRoutes = Routes(folder, "LocalRoutes", local, local, local);
-            var cloudRoutes = Routes(folder, "CloudRoutes", fast, cloud, fast);
+            var cloudRoutes = Routes(folder, "CloudRoutes", local, cloud, local);
             var knowledge = ScriptableObject.CreateInstance<KnowledgeBase>();
             knowledge.Documents = VillageKnowledge.Documents(); Save(knowledge, folder + "/VillageKnowledge.asset");
             var plaza = Shape("Market Square", PrimitiveType.Cube, new Vector3(28, 14, -25), new Vector3(35, 1, 28), new Color(.54f, .49f, .38f), folder);

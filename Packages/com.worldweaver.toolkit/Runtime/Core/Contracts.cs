@@ -8,7 +8,7 @@ namespace WorldWeaver
 {
     /// <summary>Independent inference routes. Validation always runs deterministically.</summary>
     public enum ModelTask { Terrain, Dialogue, Planning }
-    public enum ProviderKind { Groq, OpenAICompatible, Ollama }
+    public enum ProviderKind { Groq, OpenAICompatible, Ollama, Pollinations }
 
     public sealed class ChatMessage
     {

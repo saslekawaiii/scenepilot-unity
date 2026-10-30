@@ -18,7 +18,7 @@ namespace WorldWeaver.Tests
             Assert.IsTrue(report.Accepted, report.Reason); var start = obj.transform.position;
             yield return new WaitForSeconds(1); Assert.Greater(Vector3.Distance(start, obj.transform.position), .2f); Assert.AreEqual(NpcState.Moving, npc.State);
             var follow = new ActionDispatcher().Execute(npc, new NpcDecision { speech = "Следую", actions = new[] { new ActionCommand { type = "Follow", target = "House", item = "", amount = 0 } } });
-            Assert.IsTrue(follow.Accepted); Assert.AreEqual(NpcState.Following, npc.State); npc.StopMovement(); Assert.IsTrue(agent.isStopped);
+            Assert.IsTrue(follow.Accepted, follow.Reason + " position=" + obj.transform.position + " onMesh=" + agent.isOnNavMesh); Assert.AreEqual(NpcState.Following, npc.State); npc.StopMovement(); Assert.IsTrue(agent.isStopped);
             Object.Destroy(obj); Object.Destroy(target); Object.Destroy(navObject); Object.Destroy(floor); yield return null;
         }
         [UnityTest] public IEnumerator GiveItemInPlayMode()
