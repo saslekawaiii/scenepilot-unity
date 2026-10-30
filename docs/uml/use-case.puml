@@ -1,0 +1,25 @@
+@startuml
+left to right direction
+skinparam defaultFontName Arial
+skinparam shadowing false
+actor "Разработчик" as Developer
+actor "Игрок" as Player
+rectangle WorldWeaver {
+ usecase "Настроить маршруты моделей" as Routes
+ usecase "Создать Terrain по описанию" as Terrain
+ usecase "Настроить личность NPC" as Author
+ usecase "Индексировать знания" as Index
+ usecase "Вести свободный диалог" as Talk
+ usecase "Выбрать автономное действие" as Plan
+ usecase "Проверить и исполнить действие" as Act
+ usecase "Исследовать pipeline" as Trace
+}
+Developer --> Routes
+Developer --> Terrain
+Developer --> Author
+Developer --> Index
+Developer --> Trace
+Player --> Talk
+Talk ..> Act : <<include>>
+Plan ..> Act : <<include>>
+@enduml

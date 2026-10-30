@@ -1,0 +1,18 @@
+{
+  "unity": "6000.3.27f1",
+  "archive": "deliverables/com.worldweaver.toolkit-1.0.0.tgz",
+  "sha256": "098eb4ed06b7fde20dd8940988bb37311c5681aa4f4b89865d51984c06905846",
+  "dependency": {
+    "version": "file:/Users/kirillkovalenko/Documents/ChatGPT/Диплом/deliverables/com.worldweaver.toolkit-1.0.0.tgz",
+    "depth": 0,
+    "source": "local-tarball",
+    "dependencies": {
+      "com.unity.nuget.newtonsoft-json": "3.2.1"
+    }
+  },
+  "new_library": true,
+  "batch_exit_code": 0,
+  "demo_scene_created": true,
+  "compiler_error_count": 0,
+  "note": "Fresh project imported local tarball and executed DemoBuilder.Create; inference verified separately in real-integration-unity6.xml."
+}

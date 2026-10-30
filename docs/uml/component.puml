@@ -1,0 +1,37 @@
+@startuml
+skinparam defaultFontName Arial
+skinparam shadowing false
+left to right direction
+package "WorldWeaver.Editor" {
+ [WorldWeaverWindow] as UI
+ [TerrainAuthoring] as Author
+ [DemoBuilder] as Demo
+}
+package "WorldWeaver.Runtime" {
+ [IntelligentNPC] as NPC
+ [NpcPipeline] as Pipeline
+ [ModelRouter] as Router
+ [LocalProvider] as Local
+ [OpenAICompatibleProvider] as Cloud
+ [RagIndex] as RAG
+ [OllamaEmbeddingProvider] as Embedding
+ [InMemoryVectorStore] as Vector
+ [ActionDispatcher] as Actions
+ [TerrainGenerator] as Generator
+}
+UI --> Author
+UI --> NPC
+UI --> Router
+Demo --> NPC
+Author --> Generator
+NPC --> Pipeline
+Pipeline --> RAG
+Pipeline --> Router
+Pipeline --> Actions
+RAG --> Embedding
+RAG --> Vector
+Router --> Local
+Router --> Cloud
+Actions --> [Inventory]
+Actions --> [NavMeshAgent]
+@enduml

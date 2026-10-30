@@ -33,6 +33,10 @@ namespace WorldWeaver.Editor
                 {
                     var demo = GameObject.Find("Dialogue").GetComponent<DemoDialogue>();
                     var routes = mode == "cloud" ? demo.CloudRoutes : demo.LocalRoutes;
+                    // The QA study uses 2B, independently of the larger interactive demo model.
+                    routes = UnityEngine.Object.Instantiate(routes);
+                    routes.Dialogue = UnityEngine.Object.Instantiate(routes.Dialogue);
+                    if (mode != "cloud") routes.Dialogue.Model = "qwen3.5:2b";
                     npc.Models = routes;
                     using (var pipeline = new NpcPipeline(new ModelRouter(routes), new RagIndex(new OllamaEmbeddingProvider(routes.EmbeddingEndpoint, routes.EmbeddingModel)), new ActionDispatcher()))
                     foreach (var scenario in dataset.Take(limit))

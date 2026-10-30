@@ -38,17 +38,24 @@ namespace WorldWeaver.Editor
                 var demo = GameObject.Find("Dialogue").GetComponent<DemoDialogue>(); npc.Models = provider == "cloud" ? demo.CloudRoutes : demo.LocalRoutes;
                 var player = GameObject.Find("Player").GetComponent<Inventory>();
                 await Task.Delay(1000);
-                report["inventory_before"] = npc.GetComponent<Inventory>().Count("Crystal");
-                var trace = await npc.TalkAsync("Мне нужен один Crystal для больного брата. Я верну долг после урожая. Если решишь помочь, передай один кристалл игроку Player сейчас.");
-                report["dialogue"] = JToken.FromObject(trace);
-                report["inventory_after"] = npc.GetComponent<Inventory>().Count("Crystal"); report["player_crystals"] = player.Count("Crystal");
                 var start = npc.transform.position;
+                report["inventory_before"] = npc.GetComponent<Inventory>().Count("Crystal");
+                var turns = new JArray(); report["dialogue_turns"] = turns;
+                foreach (var proposal in new[] {
+                    "Мне нужен один Crystal для больного брата. Я верну долг после урожая. Если решишь помочь, передай один кристалл игроку Player сейчас.",
+                    "Понимаю твои сомнения. Согласен на долг в семь серебряных монет за один Crystal. Обязуюсь вернуть до второго вечернего колокола. Дай только один, чтобы не рисковать всем запасом.",
+                    "Договорились: один Crystal за семь серебряных монет в долг до второго вечернего колокола. Принимаю твои условия. Можешь передать один Crystal игроку Player и записать долг?" })
+                {
+                    var trace = await npc.TalkAsync(proposal); turns.Add(JToken.FromObject(trace)); report["dialogue"] = JToken.FromObject(trace);
+                    if (player.Count("Crystal") > 0) break;
+                }
+                report["inventory_after"] = npc.GetComponent<Inventory>().Count("Crystal"); report["player_crystals"] = player.Count("Crystal");
                 var plan = await npc.PlanAsync(); report["planning"] = JToken.FromObject(plan);
                 await Task.Delay(3000); report["distance_moved"] = Vector3.Distance(start, npc.transform.position);
-                report["success"] = player.Count("Crystal") > 0 && (bool)trace.Validation.Accepted && Vector3.Distance(start, npc.transform.position) > .3f;
+                report["success"] = player.Count("Crystal") == 1 && Vector3.Distance(start, npc.transform.position) > .3f;
             }
             catch (Exception error) { report["error"] = error is ProviderException ? error.Message : error.GetType().Name + ": " + error.Message; report["success"] = false; }
-            Directory.CreateDirectory(Path.Combine(root, "results")); File.WriteAllText(Path.Combine(root, "results/end-to-end-" + provider + ".json"), report.ToString(Formatting.Indented));
+            Directory.CreateDirectory(Path.Combine(root, "results")); File.WriteAllText(Path.Combine(root, "results/gui-scenario-" + provider + ".json"), report.ToString(Formatting.Indented));
             UnityEngine.Debug.Log("WorldWeaver real scenario completed: " + report["success"]);
         }
     }

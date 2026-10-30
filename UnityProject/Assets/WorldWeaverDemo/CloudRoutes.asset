@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8700680bee875411c917cbb537cec265, type: 3}
-  m_Name: CloudRoutes
+  m_Name: CloudRoutes 1
   m_EditorClassIdentifier: WorldWeaver.Runtime::WorldWeaver.OrchestratorProfile
-  Terrain: {fileID: 11400000, guid: 59a0cc80aede648a08276e555b6a7871, type: 2}
-  Dialogue: {fileID: 11400000, guid: b6f9d0564af8c4372943e7018df741a4, type: 2}
-  Planning: {fileID: 11400000, guid: 59a0cc80aede648a08276e555b6a7871, type: 2}
+  Terrain: {fileID: 11400000, guid: b1fb45270c3f8497ba759edad36eb2f8, type: 2}
+  Dialogue: {fileID: 11400000, guid: 3641d7e40ffae4df99069814116fd371, type: 2}
+  Planning: {fileID: 11400000, guid: 1641a81af738c44258a095bb604c732d, type: 2}
   EmbeddingEndpoint: http://127.0.0.1:11434
   EmbeddingModel: embeddinggemma

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1e66f22f3e7dd4d2ba77a68e4a82af64, type: 3}
-  m_Name: VillageKnowledge
+  m_Name: VillageKnowledge 1
   m_EditorClassIdentifier: WorldWeaver.Runtime::WorldWeaver.KnowledgeBase
   Documents:
   - Id: village

@@ -1,0 +1,51 @@
+@startuml
+skinparam defaultFontName Arial
+skinparam shadowing false
+hide empty members
+class IntelligentNPC {
+ CharacterId
+ Models : OrchestratorProfile
+ TalkAsync()
+ PlanAsync()
+}
+class NpcPipeline {
+ RunAsync()
+ ReindexAsync()
+}
+interface IModelRouter {
+ CompleteAsync(task, request)
+}
+class ModelRouter
+interface ILLMProvider {
+ CompleteAsync()
+ HealthAsync()
+}
+class LocalProvider
+class OpenAICompatibleProvider
+class RagIndex {
+ RetrieveAsync()
+ RememberAsync()
+}
+interface IVectorStore
+interface IEmbeddingProvider
+class ActionDispatcher {
+ Register(action)
+ Execute(npc, decision)
+}
+interface IGameAction {
+ Identifier
+ Validate()
+ Execute()
+}
+IntelligentNPC *-- NpcPipeline
+NpcPipeline --> IModelRouter
+IModelRouter <|.. ModelRouter
+ModelRouter o-- ILLMProvider
+ILLMProvider <|.. LocalProvider
+ILLMProvider <|.. OpenAICompatibleProvider
+NpcPipeline *-- RagIndex
+RagIndex --> IVectorStore
+RagIndex --> IEmbeddingProvider
+NpcPipeline *-- ActionDispatcher
+ActionDispatcher o-- IGameAction
+@enduml

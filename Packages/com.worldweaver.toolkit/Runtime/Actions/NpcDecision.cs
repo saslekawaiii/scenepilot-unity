@@ -38,15 +38,18 @@ namespace WorldWeaver
             var expected = new HashSet<string>(fields, StringComparer.Ordinal);
             if (!expected.SetEquals(value.Properties().Select(p => p.Name))) throw new ArgumentException("Decision fields do not match the contract.");
         }
-        public static JObject Schema()
+        public static JObject Schema(IEnumerable<string> allowedActions = null)
         {
-            return JObject.Parse(@"{
+            var schema = JObject.Parse(@"{
               'type':'object','additionalProperties':false,'required':['speech','actions'],
               'properties':{'speech':{'type':'string'},'actions':{'type':'array','items':{
                 'type':'object','additionalProperties':false,'required':['type','target','item','amount'],
                 'properties':{'type':{'type':'string'},'target':{'type':'string'},'item':{'type':'string'},'amount':{'type':'integer'}}
               }}}
             }");
+            var allowed = (allowedActions ?? new[] { "Talk", "Wait", "GiveItem", "TakeItem", "MoveTo", "Follow", "Flee", "Interact" }).Distinct().ToArray();
+            schema["properties"]["actions"]["items"]["properties"]["type"]["enum"] = JArray.FromObject(allowed);
+            return schema;
         }
     }
 }

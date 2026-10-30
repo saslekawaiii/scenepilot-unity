@@ -1,0 +1,32 @@
+@startuml
+skinparam defaultFontName Arial
+skinparam shadowing false
+top to bottom direction
+rectangle "Игрок / разработчик" as User
+rectangle "LLM API" as LLM
+rectangle "Ollama embeddings" as Embed
+usecase "1\nСбор контекста" as Context
+usecase "2\nRetrieval" as Retrieval
+usecase "3\nМаршрутизация\nи запрос" as Route
+usecase "4\nВалидация\nи действие" as Validate
+usecase "5\nГенерация\nTerrain" as Terrain
+database "Знания и память\nScope + MemoryKind" as Knowledge
+database "Состояние сцены\nInventory и NavMesh" as World
+database "PipelineTrace" as Trace
+User --> Context : реплика / цель
+User --> Route : описание Terrain
+World --> Context : компактное состояние
+Context --> Retrieval : запрос и scope
+Knowledge --> Retrieval : фрагменты и векторы
+Retrieval <--> Embed : текст / embedding
+Retrieval --> Route : top k
+Route <--> LLM : messages / JSON
+Route --> Validate : NpcDecision
+Validate --> World : разрешённые изменения
+Validate --> Knowledge : события и разговор
+Validate --> User : speech / ошибка
+Route --> Terrain : TerrainSpec
+Terrain --> World : heightmap
+Validate --> Trace : факт исполнения
+Route --> Trace : модель и задержка
+@enduml

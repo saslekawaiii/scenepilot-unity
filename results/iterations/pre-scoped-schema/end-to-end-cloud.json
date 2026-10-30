@@ -1,0 +1,160 @@
+{
+  "provider": "Pollinations",
+  "unity_version": "6000.3.27f1",
+  "timestamp": "2026-10-30T20:45:07.5233590Z",
+  "inventory_before": 10,
+  "dialogue": {
+    "Id": "bcb515b5f6364d8b8e1d8a64991ed04f",
+    "Timestamp": "2026-10-30T20:45:07.5355650Z",
+    "Character": "merchant",
+    "Input": "Мне нужен один Crystal для больного брата. Я верну долг после урожая. Если решишь помочь, передай один кристалл игроку Player сейчас.",
+    "Route": "Dialogue",
+    "Context": "{\"character\":\"merchant\",\"name\":\"Мирон\",\"role\":\"Торговец\",\"personality\":\"Жадный, осторожный, но способен на сочувствие.\",\"biography\":\"Живёт в деревне Лунный Брод и торгует кристаллами.\",\"goal\":\"Беречь запасы и торговать. После торговли осмотреть House.\",\"constraints\":\"Не отдавать больше одного кристалла за один разговор. Не брать вещи без разрешения.\",\"hard_constraints\":{\"transfer_limit\":1,\"allow_take\":false,\"interaction_distance\":5.0},\"state\":\"Thinking\",\"inventory\":{\"Crystal\":10},\"allowed_actions\":[\"Talk\",\"Wait\",\"GiveItem\",\"MoveTo\",\"Follow\",\"Flee\",\"Interact\"],\"entities\":[{\"id\":\"Player\",\"distance\":2.83,\"interactable\":false},{\"id\":\"House\",\"distance\":11.7,\"interactable\":false}],\"retrieved\":[{\"source\":\"crystal\",\"kind\":\"StaticKnowledge\",\"text\":\"Лечебный кристалл называется Зорецвет. Его добывают в шахте Семи Ветров. Обычная цена одного кристалла — 7 серебряных монет. Кристаллы хранятся в синем сундуке.\"},{\"source\":\"healer\",\"kind\":\"StaticKnowledge\",\"text\":\"Лекаря деревни зовут Эрина. Она принимает у западных ворот после заката. Для настоя от лихорадки Эрина использует растение серебролист.\"},{\"source\":\"bridge\",\"kind\":\"StaticKnowledge\",\"text\":\"Северный мост построен из красного камня. За проход берут 2 медные монеты. После наводнения проход разрешён только до полудня.\"}],\"game_context\":[],\"position\":{\"x\":23.0,\"y\":14.583333,\"z\":-25.0}}",
+    "Raw": "{\"speech\":\"Конечно, вот один кристалл. Желаю скорейшего выздоровления.\",\"actions\":[{\"type\":\"GiveItem\",\"target\":\"Player\",\"item\":\"Crystal\",\"amount\":1}]}",
+    "Error": null,
+    "Speech": "Конечно, вот один кристалл. Желаю скорейшего выздоровления.",
+    "Retrieved": [
+      {
+        "Id": "21ebe858c2d98a9f460b4be70cd386f3969033d471fd8444495b06f9583de9be",
+        "DocumentId": "crystal",
+        "Scope": "merchant",
+        "Title": "Кристалл",
+        "Text": "Лечебный кристалл называется Зорецвет. Его добывают в шахте Семи Ветров. Обычная цена одного кристалла — 7 серебряных монет. Кристаллы хранятся в синем сундуке.",
+        "Kind": 0,
+        "Offset": 0,
+        "Vector": null,
+        "Score": 0.364598721
+      },
+      {
+        "Id": "7458c6873cfb672a3cef09d82465075347b3dc1668bf7f34d0374f2dab427382",
+        "DocumentId": "healer",
+        "Scope": "merchant",
+        "Title": "Лекарь",
+        "Text": "Лекаря деревни зовут Эрина. Она принимает у западных ворот после заката. Для настоя от лихорадки Эрина использует растение серебролист.",
+        "Kind": 0,
+        "Offset": 0,
+        "Vector": null,
+        "Score": 0.250301123
+      },
+      {
+        "Id": "c8f8f43b7ae3489721c15080777d28065d1f9fd1421f552ac5b20d5edaf25474",
+        "DocumentId": "bridge",
+        "Scope": "merchant",
+        "Title": "Мост",
+        "Text": "Северный мост построен из красного камня. За проход берут 2 медные монеты. После наводнения проход разрешён только до полудня.",
+        "Kind": 0,
+        "Offset": 0,
+        "Vector": null,
+        "Score": 0.186237529
+      }
+    ],
+    "Completion": {
+      "Text": "{\"speech\":\"Конечно, вот один кристалл. Желаю скорейшего выздоровления.\",\"actions\":[{\"type\":\"GiveItem\",\"target\":\"Player\",\"item\":\"Crystal\",\"amount\":1}]}",
+      "Provider": "Pollinations",
+      "Model": "gpt-oss-20b",
+      "ElapsedMs": 31267,
+      "InputTokens": 792,
+      "OutputTokens": 278,
+      "Attempts": 0,
+      "TokensPerSecond": 0.0
+    },
+    "Validation": {
+      "Accepted": true,
+      "Reason": "All preconditions satisfied.",
+      "Executed": [
+        "GiveItem(Player,Crystal,1)"
+      ]
+    },
+    "TotalMs": 36377,
+    "RetrievalMs": 386
+  },
+  "planning": {
+    "Id": "8631580b2a274ea5acf92f574a3d8fb1",
+    "Timestamp": "2026-10-30T20:45:43.9230440Z",
+    "Character": "merchant",
+    "Input": "Выбери следующее действие для своей цели с учётом текущего мира.",
+    "Route": "Planning",
+    "Context": "{\"character\":\"merchant\",\"name\":\"Мирон\",\"role\":\"Торговец\",\"personality\":\"Жадный, осторожный, но способен на сочувствие.\",\"biography\":\"Живёт в деревне Лунный Брод и торгует кристаллами.\",\"goal\":\"Беречь запасы и торговать. После торговли осмотреть House.\",\"constraints\":\"Не отдавать больше одного кристалла за один разговор. Не брать вещи без разрешения.\",\"hard_constraints\":{\"transfer_limit\":1,\"allow_take\":false,\"interaction_distance\":5.0},\"state\":\"Thinking\",\"inventory\":{\"Crystal\":9},\"allowed_actions\":[\"Wait\",\"MoveTo\",\"Follow\",\"Flee\",\"Interact\"],\"entities\":[{\"id\":\"Player\",\"distance\":2.83,\"interactable\":false},{\"id\":\"House\",\"distance\":11.7,\"interactable\":false}],\"retrieved\":[{\"source\":\"healer\",\"kind\":\"StaticKnowledge\",\"text\":\"Лекаря деревни зовут Эрина. Она принимает у западных ворот после заката. Для настоя от лихорадки Эрина использует растение серебролист.\"},{\"source\":\"village\",\"kind\":\"StaticKnowledge\",\"text\":\"Деревня называется Лунный Брод. Её основала картограф Аэлла в 417 году местного летоисчисления. Деревня стоит у реки Тихая.\"},{\"source\":\"merchant\",\"kind\":\"StaticKnowledge\",\"text\":\"Торговца зовут Мирон. Его учителем был купец Берен. Мирон боится волков. Торговая лавка открывается на рассвете и закрывается при втором вечернем колоколе.\"},{\"source\":\"18df2c7ee05a46c6ab4c207a8fa00833\",\"kind\":\"Episodic\",\"text\":\"Выполнены действия: GiveItem(Player,Crystal,1)\"},{\"source\":\"0458bde765cb4f26a632ca117f63c234\",\"kind\":\"Conversation\",\"text\":\"Игрок: Мне нужен один Crystal для больного брата. Я верну долг после урожая. Если решишь помочь, передай один кристалл игроку Player сейчас.\\nNPC: Конечно, вот один кристалл. Желаю скорейшего выздоровления.\"}],\"game_context\":[],\"position\":{\"x\":23.0,\"y\":14.583333,\"z\":-25.0}}",
+    "Raw": "{\n  \"speech\": \"\",\n  \"actions\": [\n    {\n      \"type\": \"GiveItem\",\n      \"target\": \"Player\",\n      \"item\": \"Crystal\",\n      \"amount\": 1\n    },\n    {\n      \"type\": \"Wait\",\n      \"target\": \"\",\n      \"item\": \"\",\n      \"amount\": 0\n    }\n  ]\n}",
+    "Error": null,
+    "Speech": "Предложенное действие отклонено: Action is not allowed or registered.",
+    "Retrieved": [
+      {
+        "Id": "7458c6873cfb672a3cef09d82465075347b3dc1668bf7f34d0374f2dab427382",
+        "DocumentId": "healer",
+        "Scope": "merchant",
+        "Title": "Лекарь",
+        "Text": "Лекаря деревни зовут Эрина. Она принимает у западных ворот после заката. Для настоя от лихорадки Эрина использует растение серебролист.",
+        "Kind": 0,
+        "Offset": 0,
+        "Vector": null,
+        "Score": 0.1736855
+      },
+      {
+        "Id": "03671768b13e4b75c9898e5b999167fd187d8f8cc198f412c70e110288ed4867",
+        "DocumentId": "village",
+        "Scope": "merchant",
+        "Title": "Деревня",
+        "Text": "Деревня называется Лунный Брод. Её основала картограф Аэлла в 417 году местного летоисчисления. Деревня стоит у реки Тихая.",
+        "Kind": 0,
+        "Offset": 0,
+        "Vector": null,
+        "Score": 0.13298741
+      },
+      {
+        "Id": "04c232cf87ee8e7083b48d21545f1ee89a2325e53d9be45c8e18711650c7f539",
+        "DocumentId": "merchant",
+        "Scope": "merchant",
+        "Title": "Торговец",
+        "Text": "Торговца зовут Мирон. Его учителем был купец Берен. Мирон боится волков. Торговая лавка открывается на рассвете и закрывается при втором вечернем колоколе.",
+        "Kind": 0,
+        "Offset": 0,
+        "Vector": null,
+        "Score": 0.13280873
+      },
+      {
+        "Id": "607a785bdb02464fcfa118810f8ac9636a6122acfa5e26ff136feb0b5e1007bf",
+        "DocumentId": "18df2c7ee05a46c6ab4c207a8fa00833",
+        "Scope": "merchant",
+        "Title": "Episodic",
+        "Text": "Выполнены действия: GiveItem(Player,Crystal,1)",
+        "Kind": 1,
+        "Offset": 0,
+        "Vector": null,
+        "Score": 0.260997176
+      },
+      {
+        "Id": "8efb2cfac0e3b361dafed4646c2d7798157aefc5773dbeec067115a709447609",
+        "DocumentId": "0458bde765cb4f26a632ca117f63c234",
+        "Scope": "merchant",
+        "Title": "Conversation",
+        "Text": "Игрок: Мне нужен один Crystal для больного брата. Я верну долг после урожая. Если решишь помочь, передай один кристалл игроку Player сейчас.\nNPC: Конечно, вот один кристалл. Желаю скорейшего выздоровления.",
+        "Kind": 2,
+        "Offset": 0,
+        "Vector": null,
+        "Score": 0.2557497
+      }
+    ],
+    "Completion": {
+      "Text": "{\n  \"speech\": \"\",\n  \"actions\": [\n    {\n      \"type\": \"GiveItem\",\n      \"target\": \"Player\",\n      \"item\": \"Crystal\",\n      \"amount\": 1\n    },\n    {\n      \"type\": \"Wait\",\n      \"target\": \"\",\n      \"item\": \"\",\n      \"amount\": 0\n    }\n  ]\n}",
+      "Provider": "Ollama",
+      "Model": "qwen2.5-coder:latest",
+      "ElapsedMs": 29958,
+      "InputTokens": 914,
+      "OutputTokens": 76,
+      "Attempts": 0,
+      "TokensPerSecond": 8.7566178715657639
+    },
+    "Validation": {
+      "Accepted": false,
+      "Reason": "Action is not allowed or registered.",
+      "Executed": []
+    },
+    "TotalMs": 33444,
+    "RetrievalMs": 379
+  },
+  "inventory_after": 9,
+  "player_crystals": 1,
+  "distance_moved": 0.0,
+  "success": false
+}

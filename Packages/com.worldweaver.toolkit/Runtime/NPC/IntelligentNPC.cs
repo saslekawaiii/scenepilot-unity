@@ -24,6 +24,7 @@ namespace WorldWeaver
         public List<WorldEntity> KnownEntities = new List<WorldEntity>();
         public MonoBehaviour[] ContextSources = Array.Empty<MonoBehaviour>();
         public string[] AllowedActions = { "Talk", "Wait", "GiveItem", "MoveTo", "Follow", "Flee", "Interact" };
+        public string[] PlanningActions = { "MoveTo", "Follow", "Flee", "Wait", "Interact" };
         [Range(1, 20)] public int TopK = 3;
         [Range(1, 100)] public int MaxTransferPerDecision = 1;
         [Range(1, 20)] public float InteractionDistance = 5;
@@ -66,7 +67,7 @@ namespace WorldWeaver
                 try
                 {
                     var trace = await Services.RunAsync(this, input, task, UseRag, linked.Token);
-                    LastSpeech = trace.Speech;
+                    if (!string.IsNullOrWhiteSpace(trace.Speech)) LastSpeech = trace.Speech;
                     if (State == NpcState.Thinking) State = NpcState.Idle;
                     return trace;
                 }

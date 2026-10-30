@@ -1,0 +1,58 @@
+[
+  {
+    "model": "qwen3.5:2b",
+    "details": {
+      "parent_model": "model.gguf",
+      "format": "gguf",
+      "family": "qwen35",
+      "families": [
+        "qwen35"
+      ],
+      "parameter_size": "1.9B",
+      "quantization_level": "Q8_0"
+    },
+    "capabilities": [
+      "completion",
+      "vision",
+      "tools",
+      "thinking"
+    ],
+    "parameters": "presence_penalty               1.5\ntemperature                    1\ntop_k                          20\ntop_p                          0.95"
+  },
+  {
+    "model": "embeddinggemma",
+    "details": {
+      "parent_model": "embeddinggemma:300m-bf16",
+      "format": "gguf",
+      "family": "gemma3",
+      "families": [
+        "gemma3"
+      ],
+      "parameter_size": "307.58M",
+      "quantization_level": "BF16"
+    },
+    "capabilities": [
+      "embedding"
+    ],
+    "parameters": "num_batch                      2048\nnum_ctx                        2048"
+  },
+  {
+    "model": "qwen2.5-coder:latest",
+    "details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "qwen2",
+      "families": [
+        "qwen2"
+      ],
+      "parameter_size": "7.6B",
+      "quantization_level": "Q4_K_M"
+    },
+    "capabilities": [
+      "completion",
+      "tools",
+      "insert"
+    ],
+    "parameters": null
+  }
+]

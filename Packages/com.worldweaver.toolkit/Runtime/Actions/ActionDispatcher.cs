@@ -47,7 +47,7 @@ namespace WorldWeaver
         }
         public void Register(IGameAction action)
         { if (action == null || string.IsNullOrWhiteSpace(action.Identifier)) throw new ArgumentException("Action ID required."); registry[action.Identifier] = action; }
-        public ActionReport Execute(IntelligentNPC npc, NpcDecision decision)
+        public ActionReport Execute(IntelligentNPC npc, NpcDecision decision, IEnumerable<string> allowedOverride = null)
         {
             if (decision?.actions == null || decision.actions.Length > 4) return new ActionReport { Reason = "Invalid action batch." };
             var entities = new Dictionary<string, WorldEntity>(StringComparer.Ordinal);
@@ -58,6 +58,7 @@ namespace WorldWeaver
                 entities.Add(entity.Id, entity);
             }
             var context = new ActionContext { Npc = npc, Entities = entities, Allowed = new HashSet<string>(npc.AllowedActions, StringComparer.Ordinal) };
+            if (allowedOverride != null) context.Allowed.IntersectWith(allowedOverride);
             long transferred = 0; int locomotion = 0;
             foreach (var command in decision.actions)
             {
