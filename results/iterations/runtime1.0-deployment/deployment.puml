@@ -1,0 +1,31 @@
+@startuml
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam defaultFontSize 16
+top to bottom direction
+node "Apple M4 / macOS / 16 GB" {
+ node "Unity 6000.3.27f1" as EditorNode {
+  artifact "WorldWeaver UPM" as Toolkit
+  artifact "Demo scene" as Scene
+  database "InMemoryVectorStore" as Index
+ }
+ node "Ollama 0.32.6 / Metal" as OllamaNode {
+  artifact "Qwen3.5 2B\nTerrain / QA baseline" as Qwen
+  artifact "Qwen2.5 Coder 7.6B\nDialogue / Planning demo" as Coder
+  artifact "EmbeddingGemma 300M" as Gemma
+  Qwen -[hidden]down-> Coder
+  Coder -[hidden]down-> Gemma
+ }
+ EditorNode -[hidden]down-> OllamaNode
+}
+cloud "Pollinations Classic API\nGPT OSS 20B\nанонимно, интервал 31 с" as Free
+Scene --> Toolkit
+Toolkit --> Index
+Toolkit --> OllamaNode : loopback HTTP\n/api/chat, /api/embed
+Toolkit --> Free : HTTPS\n/openai
+legend bottom
+Ключи не требуются для проверенной demo.
+OpenAI/Groq адаптеры получают ключи
+только из окружения процесса.
+endlegend
+@enduml

@@ -1,0 +1,16 @@
+{
+  "capturedUtc": "2026-10-31T11:55:23.273890+00:00",
+  "stage": "tarball-and-static-source-audit",
+  "preflight_success": true,
+  "package_version": "1.1.0",
+  "minimum_unity": "6000.3",
+  "archive": "deliverables/com.worldweaver.toolkit-1.1.0.tgz",
+  "sha256": "c947ef22e027760cadf9595ea0dedabef207ad53f5ada4d873032448257cbb08",
+  "archive_file_count": 122,
+  "all_archived_files_match_current_source": true,
+  "issues": [],
+  "unity_started": false,
+  "fresh_consumer_created": false,
+  "consumer_unity_status": "deferred_until_main_9B_acceptance_finishes",
+  "reason": "Main model inference remains active; measured swap use 14324.81 MiB on 16 GiB system. No second Editor started."
+}

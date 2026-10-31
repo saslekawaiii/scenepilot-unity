@@ -130,6 +130,7 @@ def table(doc,lines,title,number):
     total=16.5
     if cells[0][:2]==['ID','Вопрос']:widths=[1.8,8,6.7]
     elif len(cells[0])==3 and cells[0][0]=='ID':widths=[1.8,5.2,9.5]
+    elif len(cells[0])==4 and cells[0][0]=='№':widths=[.9,4.4,8.8,2.4]
     elif len(cells[0])==4 and cells[0][0]=='Код':widths=[1.7,4.9,4.8,5.1]
     elif len(cells[0])==5 and cells[0][0]=='Маршрут':widths=[5.2,1.8,3.5,3.4,2.6]
     elif len(cells[0])==4 and cells[0][0]=='Показатель':widths=[5.5,3.667,3.667,3.666]
@@ -189,7 +190,9 @@ def render_markdown(doc,text,counters,headings,break_chapters=True):
             from PIL import Image
             with Image.open(p) as im:w,h=im.size
             # Crop the real dialogue pane natively in DrawingML; preserve the source PNG.
-            crops={'play-dialogue.png':(.174,.145,.435,.14),'toolkit-world.png':(0,.06,.40,.02)}
+            crops={'play-dialogue.png':(.174,.145,.435,.14),'toolkit-world.png':(0,.06,.40,.02),
+                   'chat-npc-play-reply.png':(.504,.149,.192,.143),
+                   'chat-scene-result.png':(.1653,.1269,.1810,.1269)}
             crop=crops.get(p.name)
             ratio=(w*(1-crop[0]-crop[2]))/(h*(1-crop[1]-crop[3])) if crop else w/h
             width=min(16.2,19.5*ratio);pr=doc.add_paragraph();pr.alignment=WD_ALIGN_PARAGRAPH.CENTER;pr.paragraph_format.keep_with_next=True
@@ -208,12 +211,6 @@ def render_markdown(doc,text,counters,headings,break_chapters=True):
 
 def bibliography():
     data=json.loads((ROOT/'docs/research/sources.json').read_text());text='# СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ\n\n'
-    data += [
-        {'id':35,'author':'Kyzr O.','title':'Procedural Generation of Outdoor Scenes Bachelor Thesis','year':'2023','url':'https://dcgi.fel.cvut.cz/en/theses/2023/kyzrondr/','accessed':'2026-10-31'},
-        {'id':36,'author':'Marcher F.','title':'Procedural Terrain Generation Tool in Unity Master Thesis DOI 10.3217/rb5eq-fv649','year':'2024','url':'https://repository.tugraz.at/publications/rb5eq-fv649','accessed':'2026-10-31'},
-        {'id':37,'author':'Wakeford O. R. J.','title':'Procedural Terrain Generation with Fixed Points Bachelor Thesis','year':'2025','url':'https://dspace.cuni.cz/handle/20.500.11956/202622','accessed':'2026-10-31'},
-        {'id':38,'author':'Aslan P.','title':'Understanding LLMs for Game NPCs An Exploration of Opportunities Master Thesis','year':'2024','url':'https://kth.diva-portal.org/smash/get/diva2%3A1938971/FULLTEXT01.pdf','accessed':'2026-10-31'},
-    ]
     for r in data:
         accessed=r.get('accessed','2026-10-30');parts=accessed.split('-');accessed='.'.join(reversed(parts)) if len(parts)==3 else accessed
         author=r['author'].rstrip('.')
@@ -260,7 +257,9 @@ def main():
     for text in texts:render_markdown(doc,text,counters,headings)
     render_markdown(doc,bibliography(),counters,headings)
     render_markdown(doc,appendices,counters,headings)
-    statistics_run.text=f" с., {counters['figures']} рис., {counters['tables']} табл., 38 источников, 4 приложения."
+    source_count=len(json.loads((ROOT/'docs/research/sources.json').read_text()))
+    source_word='источник' if source_count%10==1 and source_count%100!=11 else 'источника' if source_count%10 in (2,3,4) and source_count%100 not in (12,13,14) else 'источников'
+    statistics_run.text=f" с., {counters['figures']} рис., {counters['tables']} табл., {source_count} {source_word}, 4 приложения."
     # Preserve the template's opaque source parts; new body styles and footer are intentional.
     settings=doc.settings.element
     update=OxmlElement('w:updateFields');update.set(qn('w:val'),'true');settings.append(update)

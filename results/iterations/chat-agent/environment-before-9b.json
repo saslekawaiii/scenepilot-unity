@@ -1,0 +1,88 @@
+{
+  "capturedUtc": "2026-10-31T10:19:19.345760+00:00",
+  "ollamaVersion": "0.32.6",
+  "models": [
+    {
+      "name": "qwen3.5:2b",
+      "model": "qwen3.5:2b",
+      "modified_at": "2026-10-30T23:14:14.441101136+03:00",
+      "size": 2683396812,
+      "digest": "0689d44085e06d165161a8a9a1731344278cfb5aade63a3c3dbdb48ab54b130a",
+      "details": {
+        "parent_model": "model.gguf",
+        "format": "gguf",
+        "family": "qwen35",
+        "families": [
+          "qwen35"
+        ],
+        "parameter_size": "1.9B",
+        "quantization_level": "Q8_0",
+        "context_length": 262144,
+        "embedding_length": 2048
+      },
+      "capabilities": [
+        "completion",
+        "tools",
+        "thinking",
+        "vision"
+      ]
+    },
+    {
+      "name": "embeddinggemma:latest",
+      "model": "embeddinggemma:latest",
+      "modified_at": "2026-10-30T23:11:26.773849021+03:00",
+      "size": 621875917,
+      "digest": "85462619ee721b466c5927d109d4cb765861907d5417b9109caebc4e614679f1",
+      "details": {
+        "parent_model": "embeddinggemma:300m-bf16",
+        "format": "gguf",
+        "family": "gemma3",
+        "families": [
+          "gemma3"
+        ],
+        "parameter_size": "307.58M",
+        "quantization_level": "BF16",
+        "context_length": 2048,
+        "embedding_length": 768
+      },
+      "capabilities": [
+        "embedding"
+      ]
+    },
+    {
+      "name": "qwen2.5-coder:latest",
+      "model": "qwen2.5-coder:latest",
+      "modified_at": "2026-08-02T04:42:41.965718008+03:00",
+      "size": 4683087561,
+      "digest": "dae161e27b0e90dd1856c8bb3209201fd6736d8eb66298e75ed87571486f4364",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen2",
+        "families": [
+          "qwen2"
+        ],
+        "parameter_size": "7.6B",
+        "quantization_level": "Q4_K_M",
+        "context_length": 32768,
+        "embedding_length": 3584
+      },
+      "capabilities": [
+        "completion",
+        "tools",
+        "insert"
+      ]
+    }
+  ],
+  "agentSourceHashes": {
+    "Packages/com.worldweaver.toolkit/Editor/Assistant/ChatController.cs": "4740c9dcae69b85ca4f48b277b1d663bce3c65baaa172487aeda4a8e4aad651f",
+    "Packages/com.worldweaver.toolkit/Editor/Assistant/WorldWeaverChatWindow.cs": "087dc0a082b0fa25b8477a5de528fd629f44279757eeee6c0c0d8470fe57e567",
+    "Packages/com.worldweaver.toolkit/Editor/Assistant/SceneToolExecutor.cs": "7628564f04e8a19be35896997bccc41e0c6b0f49cae3829f09154d7703241cbc",
+    "Packages/com.worldweaver.toolkit/Editor/Assistant/ScriptDrafts.cs": "1d3ce69646f57541b0bdd8a3bccafb9ea8e454288260c4d94504d3c39bf8e8ec",
+    "Packages/com.worldweaver.toolkit/Editor/Assistant/ChatHistoryStore.cs": "96da9befc5cabdb07cb979901ff47fd14d4b2df8a038bb41681cf108d8f53f9c",
+    "Packages/com.worldweaver.toolkit/Editor/Assistant/ChatCodeAcceptanceRunner.cs": "b2cd3d0584e9a58268b0bcd972857e061801ea3646cc79e9cfb89897704119ae",
+    "Packages/com.worldweaver.toolkit/Editor/Assistant/ChatAcceptanceRunner.cs": "6d3e82c9f262dbd7c82a552391099ef2a4be52fad9b8bd6db724a7780089984c",
+    "Packages/com.worldweaver.toolkit/Editor/Assistant/WorldComposer.cs": "f8de7c4ead6ea9da8d17cc2eac3e4b79d5ba9d1ff05421558b943df11316900e",
+    "Packages/com.worldweaver.toolkit/Editor/Assistant/AssistantContracts.cs": "6fadbedfa2311384723eb6ea1712f55713e787ec6348eef09a1b1ebb515cc2a5"
+  }
+}

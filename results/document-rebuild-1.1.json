@@ -1,0 +1,23 @@
+{
+  "capturedUtc": "2026-10-31T13:49:40.644762+00:00",
+  "temporaryInputRoot": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/rebuild-1.1-s16sbck6",
+  "inputs": "Only public source directories thesis/docs/results/figures and scripts/build_documents.py copied; no source .private tree or Git data",
+  "setupNote": "First harness omitted tracked results/figures and failed with missingquality.png; added the actual public chart inputs before this successful rebuild. No source change.",
+  "buildExitCode": 0,
+  "artifacts": {
+    "ВКР_WorldWeaver.docx": {
+      "releaseSha256": "e61c4e741d04e93cd9718c47b4b45bbe0370d2690a180fe129730f4881168a52",
+      "identicalOoxmlPartCount": 30,
+      "differentParts": [],
+      "allPartsIdentical": true
+    },
+    "Техническое_задание_WorldWeaver.docx": {
+      "releaseSha256": "86dd97efb010eec53621309f1880118f665d35c982b0fce9079e6dfb58839ae9",
+      "identicalOoxmlPartCount": 18,
+      "differentParts": [],
+      "allPartsIdentical": true
+    }
+  },
+  "success": true,
+  "comparison": "Uncompressed OOXML parts compared byte for byte; ZIP timestamps ignored."
+}

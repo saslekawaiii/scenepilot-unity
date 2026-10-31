@@ -1,156 +1,1445 @@
 {
-  "timestamp_utc": "2026-10-30T22:08:05.651568+00:00",
+  "schema_version": "worldweaver-document-qa.v2",
+  "timestamp_utc": "2026-10-31T13:53:42.225564+00:00",
   "success": true,
+  "status": "PASS with disclosed nonblocking diagram readability caveat",
   "artifacts": {
     "ВКР_WorldWeaver.docx": {
       "path": "deliverables/ВКР_WorldWeaver.docx",
-      "sha256": "80986ade29bbb496fdbbfdeb2e56e5db9a91aefe952587e85bbfbb8527fd4534",
-      "bytes": 1517904
-    },
-    "Техническое_задание_WorldWeaver.docx": {
-      "path": "deliverables/Техническое_задание_WorldWeaver.docx",
-      "sha256": "db1b1cd36d9d63c4059e9abb1c3b1759cd3496cb762df8e82d8c651fde37e267",
-      "bytes": 45585
+      "sha256": "e61c4e741d04e93cd9718c47b4b45bbe0370d2690a180fe129730f4881168a52",
+      "bytes": 2065724
     },
     "ВКР_WorldWeaver.pdf": {
       "path": "deliverables/ВКР_WorldWeaver.pdf",
-      "sha256": "9842793adce1a01d8b501ece61ffe033ddeb2dccb86f92559036287d6e5144b2",
-      "bytes": 2149105
+      "sha256": "a4900008ce1db9342b4b3a93e80d537c7d869197ccb14804fc192c5e22fd4d47",
+      "bytes": 3286027
+    },
+    "Техническое_задание_WorldWeaver.docx": {
+      "path": "deliverables/Техническое_задание_WorldWeaver.docx",
+      "sha256": "86dd97efb010eec53621309f1880118f665d35c982b0fce9079e6dfb58839ae9",
+      "bytes": 52144
     },
     "Техническое_задание_WorldWeaver.pdf": {
       "path": "deliverables/Техническое_задание_WorldWeaver.pdf",
-      "sha256": "b3e4880f11b8fef0c56da1bfb593eedd9e7ab04ac4545f0ee9d0a61f902ba2ed",
-      "bytes": 167241
+      "sha256": "386fc297dc8d7dc95c48dafdc9aa678c721518700e5a2cbce30effd294f9b0ba",
+      "bytes": 338015
     }
   },
   "pages": {
-    "thesis": 77,
-    "technical_specification": 9
+    "thesis": 117,
+    "technical_specification": 15
   },
   "thesis_structure": {
-    "figures": 16,
-    "tables": 13,
-    "references": 38,
+    "pages": 117,
+    "figures": 18,
+    "tables": 16,
+    "references": 41,
     "appendices": 4,
     "native_omml_equations": 3,
-    "toc_entries": 44
+    "native_picture_crops": 4,
+    "toc_entries": 45
+  },
+  "structural_checks": {
+    "official_template_unchanged": true,
+    "template_opaque_parts": {
+      "docProps/app.xml": true,
+      "_rels/.rels": true,
+      "word/theme/theme1.xml": true,
+      "word/fontTable.xml": true,
+      "word/numbering.xml": true
+    },
+    "cover_paragraph_count": 39,
+    "cover_paragraph_formatting_changes": [],
+    "native_math_count": 3,
+    "native_picture_crop_count": 4,
+    "unexpanded_placeholders": [],
+    "bookmarks": 51,
+    "style_fonts": {
+      "WWBody": {
+        "ascii": "Times New Roman",
+        "hAnsi": "Times New Roman",
+        "eastAsia": "Times New Roman",
+        "halfPoints": 28
+      },
+      "WWHeading1": {
+        "ascii": "Times New Roman",
+        "hAnsi": "Times New Roman",
+        "eastAsia": "Times New Roman",
+        "halfPoints": 28
+      },
+      "WWHeading2": {
+        "ascii": "Times New Roman",
+        "hAnsi": "Times New Roman",
+        "eastAsia": "Times New Roman",
+        "halfPoints": 28
+      },
+      "WWCaption": {
+        "ascii": "Times New Roman",
+        "hAnsi": "Times New Roman",
+        "eastAsia": "Times New Roman",
+        "halfPoints": 24
+      },
+      "WWTable": {
+        "ascii": "Times New Roman",
+        "hAnsi": "Times New Roman",
+        "eastAsia": "Times New Roman",
+        "halfPoints": 22
+      },
+      "WWTOC": {
+        "ascii": "Times New Roman",
+        "hAnsi": "Times New Roman",
+        "eastAsia": "Times New Roman",
+        "halfPoints": 24
+      },
+      "WWCode": {
+        "ascii": "Times New Roman",
+        "hAnsi": "Times New Roman",
+        "eastAsia": "Times New Roman",
+        "halfPoints": 20
+      }
+    },
+    "public_page_map_matches_final_pdf": true,
+    "toc_entries": 45,
+    "toc_mismatches": [],
+    "broken_internal_links": [],
+    "genuine_screenshot_original_bytes": {
+      "chat-npc-play-reply.png": true,
+      "chat-scene-result.png": true,
+      "chat-welcome.png": true
+    },
+    "num_pages_field_cache": [
+      "117"
+    ],
+    "figure_captions": 18,
+    "table_captions": 16,
+    "template_render_diff_reuse": {
+      "approved_diff": ".private/qa-v1.1-tnr-template/diff-page-1.png",
+      "approved_page1_sha": "dbad18a6a93d30b1ae0f2c4ac0d5edc2062b24f65b7ab90eaedea5d35a8f8710",
+      "final_page1_sha": "dbad18a6a93d30b1ae0f2c4ac0d5edc2062b24f65b7ab90eaedea5d35a8f8710",
+      "identical": true,
+      "diff_personally_opened": true
+    },
+    "render_page_counts": {
+      "thesis_pdf": 117,
+      "tz_pdf": 15
+    },
+    "pdf_fonts": {
+      "thesis_pdf": {
+        "/BAAAAA+TimesNewRomanPSMT": {
+          "embedded": true
+        },
+        "/CAAAAA+TimesNewRomanPSMT": {
+          "embedded": true
+        },
+        "/DAAAAA+TimesNewRomanPSMT": {
+          "embedded": true
+        },
+        "/EAAAAA+TimesNewRomanPS-BoldMT": {
+          "embedded": true
+        },
+        "/FAAAAA+TimesNewRomanPSMT": {
+          "embedded": true
+        },
+        "/GAAAAA+TimesNewRomanPSMT": {
+          "embedded": true
+        },
+        "/HAAAAA+TimesNewRomanPS-BoldMT": {
+          "embedded": true
+        },
+        "/IAAAAA+TimesNewRomanPSMT": {
+          "embedded": true
+        },
+        "/JAAAAA+LiberationSerif-Italic": {
+          "embedded": true
+        },
+        "/KAAAAA+OpenSymbol": {
+          "embedded": true
+        },
+        "/LAAAAA+LiberationSerif": {
+          "embedded": true
+        },
+        "/MAAAAA+LinuxLibertineG": {
+          "embedded": true
+        }
+      },
+      "tz_pdf": {
+        "/BAAAAA+TimesNewRomanPSMT": {
+          "embedded": true
+        },
+        "/CAAAAA+TimesNewRomanPSMT": {
+          "embedded": true
+        },
+        "/DAAAAA+TimesNewRomanPSMT": {
+          "embedded": true
+        },
+        "/EAAAAA+TimesNewRomanPS-BoldMT": {
+          "embedded": true
+        },
+        "/FAAAAA+TimesNewRomanPS-BoldMT": {
+          "embedded": true
+        },
+        "/GAAAAA+TimesNewRomanPSMT": {
+          "embedded": true
+        }
+      }
+    },
+    "tnr_a_to_b_changed_png_pages": [
+      26,
+      105,
+      112
+    ],
+    "tz_docx_identical_to_b_render_input": true
   },
   "toc_actual_pdf_pages_verified": true,
   "all_pages_visually_inspected": true,
-  "visual_review": [
-    {
-      "reviewer": "compare_theses",
-      "pages": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10,
-        11,
-        12,
-        13,
-        14,
-        15,
-        16,
-        17,
-        18,
-        19,
-        20,
-        21,
-        22,
-        23,
-        24,
-        25,
-        26,
-        27,
-        28
-      ],
-      "render": ".private/qa-thesis-v8",
-      "final_page_3_opened_separately": true,
-      "other_pages_pixel_identical_to_final": true,
-      "result": "PASS"
+  "visual_review": {
+    "method": "All 117 thesis and 15 specification pages individually opened in fresh Times New Roman render A. Final B changed only 26/105/112, individually reopened; other 114 exact PNG hashes match reviewed A. No Liberation Serif render carried forward.",
+    "thesis": [
+      {
+        "page": 1,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "dbad18a6a93d30b1ae0f2c4ac0d5edc2062b24f65b7ab90eaedea5d35a8f8710",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "finalPngSha256": "dbad18a6a93d30b1ae0f2c4ac0d5edc2062b24f65b7ab90eaedea5d35a8f8710",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 2,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "d3bbbe3dbfa94557e2fef1318eae2461089c7e5bfe38f0fe9c17500ca73e7f6f",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "finalPngSha256": "d3bbbe3dbfa94557e2fef1318eae2461089c7e5bfe38f0fe9c17500ca73e7f6f",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 3,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "3653199e4ec9fd95186f00f8f950c26f67d4d697779ebe3fd680435dc92ed772",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "finalPngSha256": "3653199e4ec9fd95186f00f8f950c26f67d4d697779ebe3fd680435dc92ed772",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 4,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "ad15d1ad287151c414b811dafa0422cd38d0c52ebb18bfa97684c25d20cda053",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "finalPngSha256": "ad15d1ad287151c414b811dafa0422cd38d0c52ebb18bfa97684c25d20cda053",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 5,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "507285d8c8f08b911d30272192ec25cbdae93844be03b5eda9e6bd4b0cbe9900",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "finalPngSha256": "507285d8c8f08b911d30272192ec25cbdae93844be03b5eda9e6bd4b0cbe9900",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 6,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "837defbabd64cf92de2ffe5f82417b191ace316231078ed23b5cb521703b39c9",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "finalPngSha256": "837defbabd64cf92de2ffe5f82417b191ace316231078ed23b5cb521703b39c9",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 7,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "0fa32cfc0c0412625a1ad37de20838668a8e1a320b99fa6c2defe2d84c59b3d8",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "finalPngSha256": "0fa32cfc0c0412625a1ad37de20838668a8e1a320b99fa6c2defe2d84c59b3d8",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 8,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "4ee1529d8b4d7e894180045bdb11dc36e2783ba65885e906520a018edf70612e",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "finalPngSha256": "4ee1529d8b4d7e894180045bdb11dc36e2783ba65885e906520a018edf70612e",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 9,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "fef549b1f8b0252bfa6389290ee42ffa1980ddfda9263b5ba4b6d747aee8251b",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "finalPngSha256": "fef549b1f8b0252bfa6389290ee42ffa1980ddfda9263b5ba4b6d747aee8251b",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 10,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "912e018a49e3174567307ea515f11dbbbb53e110a4b4b99bdf60d5c22848beff",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "finalPngSha256": "912e018a49e3174567307ea515f11dbbbb53e110a4b4b99bdf60d5c22848beff",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 11,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "6c43e895e69812ac3a0e939b43c3ea306ad951e46fb260c4841aed436d163b9e",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "finalPngSha256": "6c43e895e69812ac3a0e939b43c3ea306ad951e46fb260c4841aed436d163b9e",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 12,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "8a5f81bbedda2a0aa98827dba8b765b8e2883f8059526ada2a26984ae5881546",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "finalPngSha256": "8a5f81bbedda2a0aa98827dba8b765b8e2883f8059526ada2a26984ae5881546",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 13,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "a5a11aaaef15a6b18f1d914956079c2554f2c0153c5d75cc47f38378d87300ef",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "finalPngSha256": "a5a11aaaef15a6b18f1d914956079c2554f2c0153c5d75cc47f38378d87300ef",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 14,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "441ee52fced31b2e3efba995a63535a9af4632d1a113a1640f360a4697d0cb5a",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "finalPngSha256": "441ee52fced31b2e3efba995a63535a9af4632d1a113a1640f360a4697d0cb5a",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 15,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "e1619b5cac4da0f740150e29124af1aa53875c5583c5450be603d99d62eee307",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "finalPngSha256": "e1619b5cac4da0f740150e29124af1aa53875c5583c5450be603d99d62eee307",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 16,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "dbc5de4b307935cf11ae08d07d00c0b43b196f704a24ef5432cfa498afb03583",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "finalPngSha256": "dbc5de4b307935cf11ae08d07d00c0b43b196f704a24ef5432cfa498afb03583",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 17,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "29314d01072dc655e752a2aa8f1135c7b919c4937783cadec290275d344d7653",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "finalPngSha256": "29314d01072dc655e752a2aa8f1135c7b919c4937783cadec290275d344d7653",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 18,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "1e376090232860af5144c5c53163df3561b38cec7d5171a86c2f3e66556a1f37",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "finalPngSha256": "1e376090232860af5144c5c53163df3561b38cec7d5171a86c2f3e66556a1f37",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 19,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "5950302ee5d37cf4807027897208b73907f3dea742f705fe09428f201ab05404",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "finalPngSha256": "5950302ee5d37cf4807027897208b73907f3dea742f705fe09428f201ab05404",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 20,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "6b8296b42d5b1bd8c21fdab057e3b31e37afeeb3ab040a0d6564cc341d63a3c8",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "finalPngSha256": "6b8296b42d5b1bd8c21fdab057e3b31e37afeeb3ab040a0d6564cc341d63a3c8",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 21,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "36af4882bafaa95b51f637ad37eb41cf3e21b69e7bb6b12a3c15e751b4daecd3",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "36af4882bafaa95b51f637ad37eb41cf3e21b69e7bb6b12a3c15e751b4daecd3",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 22,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "f91ba81de93a8ee40e8e98ab8a2fa4098983d2d3aae79879cba06b115c107432",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "f91ba81de93a8ee40e8e98ab8a2fa4098983d2d3aae79879cba06b115c107432",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 23,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "07762f8a1f65ddcbfa5e806a08ddca6fe99aaa2ef9ffe58e18beb616b9d3aa4f",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "07762f8a1f65ddcbfa5e806a08ddca6fe99aaa2ef9ffe58e18beb616b9d3aa4f",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 24,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "f9e56cfec79a69d68842e04a2eb929d76dbbb66493f5054711f2b3cf8bae96a2",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "f9e56cfec79a69d68842e04a2eb929d76dbbb66493f5054711f2b3cf8bae96a2",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 25,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "467105ffd5633bae2d5e04c827a7d0349d89ee31f62eab937e0dc5de12ef41a8",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "467105ffd5633bae2d5e04c827a7d0349d89ee31f62eab937e0dc5de12ef41a8",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 26,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "fa23e3e65ae9e4501a4d1728746eddd3cc433c5c6d37a45a7a391aebf7b8bbea",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "6d512a87ce57d4f85e586ad93e55e5aea3c7a7f6c33c475078fcdaba140f0a77",
+        "method": "fresh_final_TNR_B_page_individually_opened_by_root",
+        "result": "PASS"
+      },
+      {
+        "page": 27,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "df184757b6359c18c86f502029e82b95b06e95a7da6b98b5d9ac872f56352cbb",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "df184757b6359c18c86f502029e82b95b06e95a7da6b98b5d9ac872f56352cbb",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 28,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "daa7ef2bf33719e6a311e1a99517541fa0f8f0147686ef792c20bd155fd20971",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "daa7ef2bf33719e6a311e1a99517541fa0f8f0147686ef792c20bd155fd20971",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 29,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "85685eaea11231eb13037c2bae29fe9c15038557dda409f3276bf5f7d4da807f",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "85685eaea11231eb13037c2bae29fe9c15038557dda409f3276bf5f7d4da807f",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 30,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "c83412f2866a7efb0a4927e70e58f78e475b0a2ef6cb00c2160038fbdc4e3e8c",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "c83412f2866a7efb0a4927e70e58f78e475b0a2ef6cb00c2160038fbdc4e3e8c",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 31,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "65aea0ea7c91fdd395c0237f4e74c312e1ac95789a0fbcd8d4f2b316cec4c9d1",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "65aea0ea7c91fdd395c0237f4e74c312e1ac95789a0fbcd8d4f2b316cec4c9d1",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 32,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "a9cb54e0c37d74d29501a780dadcdd59b04fc1b75dc29abcdb759449518883d8",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "a9cb54e0c37d74d29501a780dadcdd59b04fc1b75dc29abcdb759449518883d8",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 33,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "698fd7a6cf100ca319ca4c9a41c7cf688da7a240d4c955a5efcdbd8dc2417ab0",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "698fd7a6cf100ca319ca4c9a41c7cf688da7a240d4c955a5efcdbd8dc2417ab0",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 34,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "a70dfcf23f7775872dbb2127d8693a550d449ae4010c20b29b89cda4299ec085",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "a70dfcf23f7775872dbb2127d8693a550d449ae4010c20b29b89cda4299ec085",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 35,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "9e4c60a1a64e4d778da0fc3fc1943d346a4c867f3e6980e57a3e25cd28d0a2ca",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "9e4c60a1a64e4d778da0fc3fc1943d346a4c867f3e6980e57a3e25cd28d0a2ca",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 36,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "41aab7b18c8a97b4ff02f6751e9201b6dd0b51dbf966a7bd156aa94c6fcbb24a",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "41aab7b18c8a97b4ff02f6751e9201b6dd0b51dbf966a7bd156aa94c6fcbb24a",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 37,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "568fab1c13dbe5f17e13a56ff8161dd74437bd834552cc7623aef16a9303b920",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "568fab1c13dbe5f17e13a56ff8161dd74437bd834552cc7623aef16a9303b920",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 38,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "84685c8bf3ccd798f3c1c2e143a55a0089f1570adbf8ed310397142ac4ef3675",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "84685c8bf3ccd798f3c1c2e143a55a0089f1570adbf8ed310397142ac4ef3675",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 39,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "5541688fa35a6d3669af33da1a6daec772ff635eab9c8b6c635f96218bdb20fe",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "5541688fa35a6d3669af33da1a6daec772ff635eab9c8b6c635f96218bdb20fe",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 40,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "0b43be927ea42c2153ce65826132dc52c967228c146742bbc524d83fb6dbde25",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "0b43be927ea42c2153ce65826132dc52c967228c146742bbc524d83fb6dbde25",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 41,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "e1a3bf0d4984278aeee457096e9ae0f4d983acb0211d491d7d3b06aad1255e3f",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "e1a3bf0d4984278aeee457096e9ae0f4d983acb0211d491d7d3b06aad1255e3f",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 42,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "bb04f9dd976ed4d34d3b3d5d56a3b895d59125b0dda02c156844df93fba2aa51",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "bb04f9dd976ed4d34d3b3d5d56a3b895d59125b0dda02c156844df93fba2aa51",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 43,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "85672bc6cea44107f0cde3ae062200e7025a5d20d2d5c4d621fab06dcbb4a7c8",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "85672bc6cea44107f0cde3ae062200e7025a5d20d2d5c4d621fab06dcbb4a7c8",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 44,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "ebad98844dc17524cdda923d9b9621955f7bfc7f22d78913d1f3535250dac6dd",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "ebad98844dc17524cdda923d9b9621955f7bfc7f22d78913d1f3535250dac6dd",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 45,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "fdf702ce4b87412bd7cce095e26d6ecb9961b6bc96248274caf7f953de6f910c",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "fdf702ce4b87412bd7cce095e26d6ecb9961b6bc96248274caf7f953de6f910c",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 46,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "e393695b558e4994ed03d15696e4a6b70e2826dcb2af9c8966c8ac51f2b5ebb7",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "e393695b558e4994ed03d15696e4a6b70e2826dcb2af9c8966c8ac51f2b5ebb7",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 47,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "765f80239ee1b8aafeab63d0f9a4961cd0d21898c5a4918467be0d866151823f",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "765f80239ee1b8aafeab63d0f9a4961cd0d21898c5a4918467be0d866151823f",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 48,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "61c1e37498ae8afa672fc0980d953dcbbcb31a113f00dea868aaf2be55123f17",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "61c1e37498ae8afa672fc0980d953dcbbcb31a113f00dea868aaf2be55123f17",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 49,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "d3709aa5caeb1ba3a5e54640d94f2140508f92bf3d79fe7152cc55894f2ac02e",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "d3709aa5caeb1ba3a5e54640d94f2140508f92bf3d79fe7152cc55894f2ac02e",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 50,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "36c83ff4f1609c8ee3dc38f5f44710c1805555b56270fbcd8eb35d0fc6e8e12d",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "36c83ff4f1609c8ee3dc38f5f44710c1805555b56270fbcd8eb35d0fc6e8e12d",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 51,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "bfa5f1f6e140098a2831c6c9cd51a5463c31a703e73f71ee7ac60bea121c31f0",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "bfa5f1f6e140098a2831c6c9cd51a5463c31a703e73f71ee7ac60bea121c31f0",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 52,
+        "reviewer": "compare_theses independent visual QA",
+        "reviewedPngSha256": "6f10b767cede5ba125f5704dd1b66a688fe90ebfcf4bf9d9591df37b8e91eb29",
+        "sourceReceiptSha256": "20619528d4cfdfa46d86e1638f2050d64a81980e7f850a046d7f735ed88e7fdb",
+        "finalPngSha256": "6f10b767cede5ba125f5704dd1b66a688fe90ebfcf4bf9d9591df37b8e91eb29",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 53,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "e0647bef7b5218415e29cc1436dbf91ba5fc8c678aa11e140d16b93e2990ab63",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "e0647bef7b5218415e29cc1436dbf91ba5fc8c678aa11e140d16b93e2990ab63",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 54,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "b1f113b24b0e5c6b8787e278462c84cf9ceb0965d3233c62870a13cc8ee40f30",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "b1f113b24b0e5c6b8787e278462c84cf9ceb0965d3233c62870a13cc8ee40f30",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 55,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "031194b066340277e37e6a886d4a4a09d19a433d2d7da50715e325dd9814283f",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "031194b066340277e37e6a886d4a4a09d19a433d2d7da50715e325dd9814283f",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 56,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "25bc71986abc202fa7f98fa931b12ccf9f10561d4cbef06474c6beb9303b408f",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "25bc71986abc202fa7f98fa931b12ccf9f10561d4cbef06474c6beb9303b408f",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 57,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "ca9b5f611e5f600f31b693deb32d1b140a9b8cb46a4753b49fb193dd6e01d41b",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "ca9b5f611e5f600f31b693deb32d1b140a9b8cb46a4753b49fb193dd6e01d41b",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 58,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "1819952800e512165767265de514049cf39565214856cd3e347aa6511ff8aead",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "1819952800e512165767265de514049cf39565214856cd3e347aa6511ff8aead",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 59,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "198a7b803d9008202687dcffae9ec7d1236eaca16d16728633da3e67d91cc734",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "198a7b803d9008202687dcffae9ec7d1236eaca16d16728633da3e67d91cc734",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 60,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "5ba42693e3b39f2c72a48870d931529b68e4b464fc87999782b01e4c917f881f",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "5ba42693e3b39f2c72a48870d931529b68e4b464fc87999782b01e4c917f881f",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 61,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "542a756a76d2938dceb4967c8cd3511837d9a383c0717fe8353d94cfcde7649a",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "542a756a76d2938dceb4967c8cd3511837d9a383c0717fe8353d94cfcde7649a",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 62,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "50adbec31bac334a188606e6ebced76471d5690a7c858d90ec0b1d585a494a82",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "50adbec31bac334a188606e6ebced76471d5690a7c858d90ec0b1d585a494a82",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 63,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "90d46cea66a2557e4e77ca175e3820cecede4f4b32c9aa59e83743a58b4065cb",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "90d46cea66a2557e4e77ca175e3820cecede4f4b32c9aa59e83743a58b4065cb",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 64,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "b31ce6bbdc3bd935fa172982c9e261b2d513051ad12e7aaa5dcd592a02573246",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "b31ce6bbdc3bd935fa172982c9e261b2d513051ad12e7aaa5dcd592a02573246",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 65,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "97bdea3946368b3e1c57dd945947231e9865d3cc025f92524e2dff9d2135202c",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "97bdea3946368b3e1c57dd945947231e9865d3cc025f92524e2dff9d2135202c",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 66,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "1dd9b833d91288bf29d11007d65c5f02840f52e74f5a6418065f15acf40f6b7c",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "1dd9b833d91288bf29d11007d65c5f02840f52e74f5a6418065f15acf40f6b7c",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 67,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "76961ab5ae26fdfb16fe6dc3073ec78d7902a152c5a7f805a67bd5f0ae9286c8",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "76961ab5ae26fdfb16fe6dc3073ec78d7902a152c5a7f805a67bd5f0ae9286c8",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 68,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "c830feaa938f6bb60c6236f9a82b4a2e5587965667d6a92b9b0f592ff4757015",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "c830feaa938f6bb60c6236f9a82b4a2e5587965667d6a92b9b0f592ff4757015",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 69,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "c92792005a1d2408d45c3d5ec887c2826487778f9268a25767b3054a77207daf",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "c92792005a1d2408d45c3d5ec887c2826487778f9268a25767b3054a77207daf",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 70,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "edbe38c61acf31c3e02d15b44e7da9ceb055024b6c84b6ec2107632add63e7c5",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "edbe38c61acf31c3e02d15b44e7da9ceb055024b6c84b6ec2107632add63e7c5",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 71,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "22b82cd7978c4e7b322ee5a50ed38a4f5efcb36aee0a8ae889abda537be94580",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "22b82cd7978c4e7b322ee5a50ed38a4f5efcb36aee0a8ae889abda537be94580",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 72,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "e0b1b842fa3ddccb1e83f2eb08d646ed09a6f89ca2b85385fb290a3d2660cc81",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "e0b1b842fa3ddccb1e83f2eb08d646ed09a6f89ca2b85385fb290a3d2660cc81",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 73,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "b45d3dfe2b2bcd98e1befee4ff51f1e5f6816a70aea6bb11461c57d67b6f8547",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "b45d3dfe2b2bcd98e1befee4ff51f1e5f6816a70aea6bb11461c57d67b6f8547",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 74,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "3537ffe73994c68bac8f5f3843f2c544a1d7ba9906a834d45514fd0a81d91f3e",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "3537ffe73994c68bac8f5f3843f2c544a1d7ba9906a834d45514fd0a81d91f3e",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 75,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "db30b9ba936be2cca4e8c49f18815c329ae515b2a82ee02ead34628bdd3c67c3",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "db30b9ba936be2cca4e8c49f18815c329ae515b2a82ee02ead34628bdd3c67c3",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 76,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "911097086acf53f66648c426cb64e44b9662e6b8ff99d9c1a777276fd0b00c5e",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "911097086acf53f66648c426cb64e44b9662e6b8ff99d9c1a777276fd0b00c5e",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 77,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "4325b31d99e8ee32b7a6f67f4079fd6ce8963fab31e3e7edd73643d8ee3c3fc8",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "4325b31d99e8ee32b7a6f67f4079fd6ce8963fab31e3e7edd73643d8ee3c3fc8",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 78,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "472d0b179a269f78fdbf1f90c8cf34197684ddccd9bd5650cea85a4fcadf7266",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "472d0b179a269f78fdbf1f90c8cf34197684ddccd9bd5650cea85a4fcadf7266",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 79,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "4b81de6a75ca6f2de84910fe06c025fbebce912ca25dd0b648700e23dfb4b76a",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "4b81de6a75ca6f2de84910fe06c025fbebce912ca25dd0b648700e23dfb4b76a",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 80,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "a83928174b54e41b19e96d1d9889353ff061215b2f358b07d9018af43ef9341b",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "a83928174b54e41b19e96d1d9889353ff061215b2f358b07d9018af43ef9341b",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 81,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "68819fa81e97e0cdd850a8ce91cf55eafd4c97eda354ab2d85814f834b00dfec",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "68819fa81e97e0cdd850a8ce91cf55eafd4c97eda354ab2d85814f834b00dfec",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 82,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "cb85c0f60b134f8f00c536bcae7e40f91cfd7a5de96c4b28ee1296e352d277f5",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "cb85c0f60b134f8f00c536bcae7e40f91cfd7a5de96c4b28ee1296e352d277f5",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 83,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "12dbddc77d369668152a64bbdc57a0abf9413137684aba975372c03a0963b9c9",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "12dbddc77d369668152a64bbdc57a0abf9413137684aba975372c03a0963b9c9",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 84,
+        "reviewer": "/root/presentation",
+        "reviewedPngSha256": "05a267d4c55cfecadf2acea5d1b53758fb08c497e441efa34f3b95b513a3f1c1",
+        "sourceReceiptSha256": "63c09ca20826e47f652ebf810f98c11414ff7dcb1238445641798490ff1ea6d7",
+        "finalPngSha256": "05a267d4c55cfecadf2acea5d1b53758fb08c497e441efa34f3b95b513a3f1c1",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 85,
+        "reviewer": "root",
+        "reviewedPngSha256": "6f4c74d1e859fb496349d74aa537a9355ca3ed302fd3a8e23cfdeb455fcf95b3",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "6f4c74d1e859fb496349d74aa537a9355ca3ed302fd3a8e23cfdeb455fcf95b3",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 86,
+        "reviewer": "root",
+        "reviewedPngSha256": "f4717477d734c568d9ffb44efdc96f5fdbef04c13177bf47c7656bb9771528a8",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "f4717477d734c568d9ffb44efdc96f5fdbef04c13177bf47c7656bb9771528a8",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 87,
+        "reviewer": "root",
+        "reviewedPngSha256": "f199fcf6b4cf65a0a878b635bdf8b645abeb83930576d001272ec419608ce8e7",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "f199fcf6b4cf65a0a878b635bdf8b645abeb83930576d001272ec419608ce8e7",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 88,
+        "reviewer": "root",
+        "reviewedPngSha256": "c7fdd383d35025b52d10291771526c9e4e865d11d704104cba4619bb4010e252",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "c7fdd383d35025b52d10291771526c9e4e865d11d704104cba4619bb4010e252",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 89,
+        "reviewer": "root",
+        "reviewedPngSha256": "bf122d2458d8ccfbb0b27527fd71228d3a4a59a0865264120a8f62c0401d67cf",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "bf122d2458d8ccfbb0b27527fd71228d3a4a59a0865264120a8f62c0401d67cf",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 90,
+        "reviewer": "root",
+        "reviewedPngSha256": "903a9f83b8f20ad7b8d967292c89fbc963864edd6856e8976b9ed1edd7f23fc4",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "903a9f83b8f20ad7b8d967292c89fbc963864edd6856e8976b9ed1edd7f23fc4",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 91,
+        "reviewer": "root",
+        "reviewedPngSha256": "0a7f2550122a71a3412b8c244e1eb9cad281441b7575aa9b36d880b96fa60df2",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "0a7f2550122a71a3412b8c244e1eb9cad281441b7575aa9b36d880b96fa60df2",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 92,
+        "reviewer": "root",
+        "reviewedPngSha256": "bfa830608da4ae8bceb9f927b6e0254436af1d12f999c4e0bf13e6cd41a601e0",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "bfa830608da4ae8bceb9f927b6e0254436af1d12f999c4e0bf13e6cd41a601e0",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 93,
+        "reviewer": "root",
+        "reviewedPngSha256": "b151cf4882fb43b3f1e7cdd131c5baa6640f8eb966e7d82f4d95bc84295985c1",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "b151cf4882fb43b3f1e7cdd131c5baa6640f8eb966e7d82f4d95bc84295985c1",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 94,
+        "reviewer": "root",
+        "reviewedPngSha256": "e2cc828513ac7ab4f88f5300e14ec25f1a0e0c71b850b966d0acfc18b323f8ad",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "e2cc828513ac7ab4f88f5300e14ec25f1a0e0c71b850b966d0acfc18b323f8ad",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 95,
+        "reviewer": "root",
+        "reviewedPngSha256": "f30c5c9aa2e5f5591f20416c71296d422a1dddbffbbfef7270038c1c7a619402",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "f30c5c9aa2e5f5591f20416c71296d422a1dddbffbbfef7270038c1c7a619402",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 96,
+        "reviewer": "root",
+        "reviewedPngSha256": "e03252b5c2c83e927fc94ab8120a7df40e9770fa3af8c3212353b7bac374e726",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "e03252b5c2c83e927fc94ab8120a7df40e9770fa3af8c3212353b7bac374e726",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 97,
+        "reviewer": "root",
+        "reviewedPngSha256": "ea3c8341066ffce61f64e4f06424ad6bb22d2c957c305807e5625b9174e16ffe",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "ea3c8341066ffce61f64e4f06424ad6bb22d2c957c305807e5625b9174e16ffe",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 98,
+        "reviewer": "root",
+        "reviewedPngSha256": "d202188be6979333f030bb6a94173cd60dc178098d245535ebd9fc58afd93fdf",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "d202188be6979333f030bb6a94173cd60dc178098d245535ebd9fc58afd93fdf",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 99,
+        "reviewer": "root",
+        "reviewedPngSha256": "6f98997d15717c824d8dbeb96bbf25d6e555f4c5cd1ec83982406b61dc13c2aa",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "6f98997d15717c824d8dbeb96bbf25d6e555f4c5cd1ec83982406b61dc13c2aa",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 100,
+        "reviewer": "root",
+        "reviewedPngSha256": "ec5b2753f59459b8c84f2699ffffb1cd183c446505f0209825a368d9853851b4",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "ec5b2753f59459b8c84f2699ffffb1cd183c446505f0209825a368d9853851b4",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 101,
+        "reviewer": "root",
+        "reviewedPngSha256": "a3f83051d567a4c7eb9040468656e0815658e527bb306442a9a26eedca4a06fa",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "a3f83051d567a4c7eb9040468656e0815658e527bb306442a9a26eedca4a06fa",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 102,
+        "reviewer": "root",
+        "reviewedPngSha256": "280d73e16e14fa3afc112792af310b6ee54f7033529073d24f08a88913d5a063",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "280d73e16e14fa3afc112792af310b6ee54f7033529073d24f08a88913d5a063",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 103,
+        "reviewer": "root",
+        "reviewedPngSha256": "482cd9d9bf74540f057d7f4b0780cc79b11fce36b253548ebea329b4a7abf8b9",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "482cd9d9bf74540f057d7f4b0780cc79b11fce36b253548ebea329b4a7abf8b9",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 104,
+        "reviewer": "root",
+        "reviewedPngSha256": "1d69853899ee4f6d0ac550d71a2fb6d47afdc29dabdb7c81e7aee91c634b72b6",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "1d69853899ee4f6d0ac550d71a2fb6d47afdc29dabdb7c81e7aee91c634b72b6",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 105,
+        "reviewer": "root",
+        "reviewedPngSha256": "010f4ed3061f3229e16872eaea71eec8f97dcc93d503400f8e5f2bd808e2c996",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "96450c9b04ab941c59fd9d52b88d3ec7664ddbd25a614a9c78988ea3eabdacd0",
+        "method": "fresh_final_TNR_B_page_individually_opened_by_root",
+        "result": "PASS"
+      },
+      {
+        "page": 106,
+        "reviewer": "root",
+        "reviewedPngSha256": "6d232ae41de32d40b404f55c14b61b1469e8cb9a59ef65f8bb67ae4a31878fbc",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "6d232ae41de32d40b404f55c14b61b1469e8cb9a59ef65f8bb67ae4a31878fbc",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 107,
+        "reviewer": "root",
+        "reviewedPngSha256": "e1ad7a9168482eb8c268dbf9e2d168c68fd099933792841c3aa135b94aa19961",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "e1ad7a9168482eb8c268dbf9e2d168c68fd099933792841c3aa135b94aa19961",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 108,
+        "reviewer": "root",
+        "reviewedPngSha256": "b096cc1a3f42d3240653b0da4b6b14eb994d86eb4c5fcfac8f452759ac2c7731",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "b096cc1a3f42d3240653b0da4b6b14eb994d86eb4c5fcfac8f452759ac2c7731",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 109,
+        "reviewer": "root",
+        "reviewedPngSha256": "c9402b28a6db674d81b70f4a6364d44987eece48f1dfe183b0b66884826669c1",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "c9402b28a6db674d81b70f4a6364d44987eece48f1dfe183b0b66884826669c1",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 110,
+        "reviewer": "root",
+        "reviewedPngSha256": "e536b8a81728b1131c76dc14919f08ced93ee7066f79e7bbb2f8d474c1098674",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "e536b8a81728b1131c76dc14919f08ced93ee7066f79e7bbb2f8d474c1098674",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 111,
+        "reviewer": "root",
+        "reviewedPngSha256": "00a60dd1b49752b90ef8ca20397ae3e957e06295e1e9ba51dd883324c96f871b",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "00a60dd1b49752b90ef8ca20397ae3e957e06295e1e9ba51dd883324c96f871b",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 112,
+        "reviewer": "root",
+        "reviewedPngSha256": "bc5dff7410623d2e98d3f7305f849444ed9559f3443c670d575d67018ce34f5a",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "489c73684557f42589405ecae669e63e372594267b0599e83cbb9be695a60a31",
+        "method": "fresh_final_TNR_B_page_individually_opened_by_root",
+        "result": "PASS"
+      },
+      {
+        "page": 113,
+        "reviewer": "root",
+        "reviewedPngSha256": "60c3e7f6d8ad7a324a471edab203cef8ee30b8cf840b772367735b92ffae6ced",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "60c3e7f6d8ad7a324a471edab203cef8ee30b8cf840b772367735b92ffae6ced",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 114,
+        "reviewer": "root",
+        "reviewedPngSha256": "3681d87d2485fb743b7f72ec6fdc4a308b937ee06167f85e9d74c547cf38c09d",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "3681d87d2485fb743b7f72ec6fdc4a308b937ee06167f85e9d74c547cf38c09d",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 115,
+        "reviewer": "root",
+        "reviewedPngSha256": "f5f36aa7d583090775400d204b3f26bbfb07ab9052640c0aaf37e83a566ff25a",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "f5f36aa7d583090775400d204b3f26bbfb07ab9052640c0aaf37e83a566ff25a",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 116,
+        "reviewer": "root",
+        "reviewedPngSha256": "6a5a05d20036fa55f9083ff8b76caecc3bff144bf2b47c91672c3cb78bbe8c32",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "6a5a05d20036fa55f9083ff8b76caecc3bff144bf2b47c91672c3cb78bbe8c32",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      },
+      {
+        "page": 117,
+        "reviewer": "root",
+        "reviewedPngSha256": "a3be508c0e93289085ee54517bfae79804720fa37d2f342b09367428323a0dd6",
+        "sourceReceiptSha256": "2a1c885daa0778bc19d58159daaa3c8a7c3c73e7dfb6011cc8c197629ac444a5",
+        "finalPngSha256": "a3be508c0e93289085ee54517bfae79804720fa37d2f342b09367428323a0dd6",
+        "method": "exact_png_match_to_individually_reviewed_TNR_A",
+        "result": "PASS"
+      }
+    ],
+    "technical_specification": [
+      {
+        "page": 1,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "12c738f9146158ec0fc8e6568366d8855d10a0a495dbb35d82d0eed1683975fb",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "method": "individual_full_page_view_image",
+        "result": "PASS"
+      },
+      {
+        "page": 2,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "fbe755bf947791bf33bbb0d829d81eb04068a42c326874cf1eef72fc508a4c1a",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "method": "individual_full_page_view_image",
+        "result": "PASS"
+      },
+      {
+        "page": 3,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "0de2fdbf3b2d90eda644fcbce3a0efa634bd5703bd20f77efadccbb52198763a",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "method": "individual_full_page_view_image",
+        "result": "PASS"
+      },
+      {
+        "page": 4,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "a6c13a2e3b5069356b85449005e94070d9c03b30561a1a22d7095ba610bb0b0e",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "method": "individual_full_page_view_image",
+        "result": "PASS"
+      },
+      {
+        "page": 5,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "95064234fb3ef72be37033cad45b4a52b3cf3a3937190ff84afe97ba4d6777f1",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "method": "individual_full_page_view_image",
+        "result": "PASS"
+      },
+      {
+        "page": 6,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "f672116fef5446818e6e1814863fedda2452673abe9372225ee4398972d266cf",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "method": "individual_full_page_view_image",
+        "result": "PASS"
+      },
+      {
+        "page": 7,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "da07259f3e728118851c6052303cb9e3f5e8b3b32f0c9881f4470bfb0948b8fb",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "method": "individual_full_page_view_image",
+        "result": "PASS"
+      },
+      {
+        "page": 8,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "5b85199648db205bd26f6f21a6d0b8bad70c53ab5543cb29a9af6ad96c105633",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "method": "individual_full_page_view_image",
+        "result": "PASS"
+      },
+      {
+        "page": 9,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "a87a89a5c60d64b99f4cca670376dd757b486cdefc3f30c6915d9498dec5ce51",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "method": "individual_full_page_view_image",
+        "result": "PASS"
+      },
+      {
+        "page": 10,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "520d19226ee3a85457b05be26b3343e4d857ce5312341ab1016a575b0e7399c7",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "method": "individual_full_page_view_image",
+        "result": "PASS"
+      },
+      {
+        "page": 11,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "cf82ef4e09c254c8949372e34ccf9214cff0976fc725dc977d421e8b1fd5dc1f",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "method": "individual_full_page_view_image",
+        "result": "PASS"
+      },
+      {
+        "page": 12,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "86a27477de319ab5702ef5b5af63d475948bebe5cfaa3af9023c86c951dc5e75",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "method": "individual_full_page_view_image",
+        "result": "PASS"
+      },
+      {
+        "page": 13,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "97fa7623a892fe0721e2ec1bbd6135563be6247bd7cf974dbc9cd0bb7cb2fe61",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "method": "individual_full_page_view_image",
+        "result": "PASS"
+      },
+      {
+        "page": 14,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "72dcd2690e8a8e29661a102a6a8c4d470a5cfc07166fb7c274c2d8b5dba94b9c",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "method": "individual_full_page_view_image",
+        "result": "PASS"
+      },
+      {
+        "page": 15,
+        "reviewer": "thesis_documents",
+        "reviewedPngSha256": "3466082ca95ae4b72066769b8908316705067f229c27da5d1023a6e060ab492a",
+        "sourceReceiptSha256": "1e426f61765915504799f5e2cf5e7f5b7d7ea8ac94c130c7b30207d1fb2897f8",
+        "method": "individual_full_page_view_image",
+        "result": "PASS"
+      }
+    ],
+    "blocking_findings": 0,
+    "resolved_semantic_findings": [
+      {
+        "page": 26,
+        "fix": "FREE_LIMIT-only HTTP402 retry;46s fallback without Retry-After"
+      },
+      {
+        "page": 105,
+        "fix": "AT-19 matches current specification"
+      },
+      {
+        "page": 112,
+        "fix": "Both deterministic PlayMode fixtures match current runner"
+      }
+    ],
+    "nonblocking_findings": [
+      {
+        "page": 61,
+        "figure": 11,
+        "note": "Dense legacy state diagram labels need PDF zoom; source SVG is supplied. No clipping. Physical print legibility not measured."
+      }
+    ]
+  },
+  "pdf_render": {
+    "receipt": "results/document-pdf-render-1.1.json",
+    "note": "Real Times New Roman embedded for body. Native OMML and five subscript glyphs retain explicitly audited fallback fonts. No system settings or font files changed/distributed."
+  },
+  "rebuild_without_private": {
+    "capturedUtc": "2026-10-31T13:49:40.644762+00:00",
+    "temporaryInputRoot": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/rebuild-1.1-s16sbck6",
+    "inputs": "Only public source directories thesis/docs/results/figures and scripts/build_documents.py copied; no source .private tree or Git data",
+    "setupNote": "First harness omitted tracked results/figures and failed with missingquality.png; added the actual public chart inputs before this successful rebuild. No source change.",
+    "buildExitCode": 0,
+    "artifacts": {
+      "ВКР_WorldWeaver.docx": {
+        "releaseSha256": "e61c4e741d04e93cd9718c47b4b45bbe0370d2690a180fe129730f4881168a52",
+        "identicalOoxmlPartCount": 30,
+        "differentParts": [],
+        "allPartsIdentical": true
+      },
+      "Техническое_задание_WorldWeaver.docx": {
+        "releaseSha256": "86dd97efb010eec53621309f1880118f665d35c982b0fce9079e6dfb58839ae9",
+        "identicalOoxmlPartCount": 18,
+        "differentParts": [],
+        "allPartsIdentical": true
+      }
     },
-    {
-      "reviewer": "thesis_documents",
-      "pages": [
-        29,
-        30,
-        31,
-        32,
-        33,
-        34,
-        35,
-        36,
-        37,
-        38,
-        39,
-        40,
-        41,
-        42,
-        43,
-        44,
-        45,
-        46,
-        47,
-        48,
-        49,
-        50,
-        51,
-        52,
-        53,
-        54,
-        55,
-        56,
-        57,
-        58,
-        59,
-        60,
-        61,
-        62,
-        63,
-        64,
-        65,
-        66,
-        67,
-        68,
-        69,
-        70,
-        71,
-        72,
-        73,
-        74,
-        75,
-        76,
-        77
-      ],
-      "render": ".private/qa-template-final/b_render",
-      "pages_29_34_opened_as_v9_with_identical_final_png_sha256": true,
-      "result": "PASS"
+    "success": true,
+    "comparison": "Uncompressed OOXML parts compared byte for byte; ZIP timestamps ignored."
+  },
+  "text_boundary_audit": {
+    "capturedUtc": "2026-10-31T13:49:59.723456+00:00",
+    "method": "pdfplumber word bounding boxes against body margins30/15mm with3pt tolerance; officialcover excluded. This text-only check does not measure diagram/image readability or replace individual visual review.",
+    "artifacts": {
+      "thesis": {
+        "pdfSha256": "a4900008ce1db9342b4b3a93e80d537c7d869197ccb14804fc192c5e22fd4d47",
+        "pages": 117,
+        "allPagesA4": true,
+        "textWordHorizontalMarginViolationsBeyond3ptTolerance": []
+      },
+      "technical_specification": {
+        "pdfSha256": "386fc297dc8d7dc95c48dafdc9aa678c721518700e5a2cbce30effd294f9b0ba",
+        "pages": 15,
+        "allPagesA4": true,
+        "textWordHorizontalMarginViolationsBeyond3ptTolerance": []
+      }
     },
-    {
-      "reviewer": "thesis_documents",
-      "document": "technical_specification",
-      "pages": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9
-      ],
-      "render": ".private/qa-tz-v8",
-      "all_pages_pixel_identical_to_final": true,
-      "result": "PASS"
-    }
-  ],
+    "passed": true
+  },
   "template": {
     "path": "thesis/templates/official-title.docx",
     "sha256": "7bdb804346650358e5d7afb53018ae3d11abdbeb1ffc72d87a487f803a271afd",
@@ -162,49 +1451,24 @@
       "word/fontTable.xml": true,
       "word/numbering.xml": true
     },
-    "render_diff": ".private/qa-template-final/summary.json",
-    "intentional_differences": [
-      "Filled verified topic, university, programme, author and year slots in a copy of the official title page",
-      "Added a separate body section with annotation, TOC, chapters, references and appendices",
-      "Added body styles, footer, internal TOC links and page-count field"
-    ]
-  },
-  "rebuild_without_private": {
-    "success": true,
-    "private_input_required": false,
-    "temporary_directory": "/var/folders/ht/t7gsmf1s463dpbpjqkht1w6h0000gn/T/worldweaver-documents-repro-_r2qh2h0",
-    "exit_code": 0,
-    "stdout": "DOCX_CREATED {'figures': 16, 'tables': 13}",
-    "documents": {
-      "ВКР_WorldWeaver.docx": {
-        "document_xml_identical": true,
-        "styles_identical": true
-      },
-      "Техническое_задание_WorldWeaver.docx": {
-        "document_xml_identical": true,
-        "styles_identical": true
-      }
-    }
+    "cover_paragraph_count": 39,
+    "cover_formatting_changes": []
   },
   "content_checks": {
-    "unresolved_placeholders": false,
-    "qa_observations": 90,
-    "model_completions": 89,
-    "http_errors": 1,
-    "raw_and_delivered_fact_metrics_distinguished": true,
-    "local_gui_planning_noop_disclosed": true,
-    "single_run_e2e_not_generalized": true
+    "topic_preserved": true,
+    "legacy_1_0_metrics_distinguished": true,
+    "real_provider_runs_separate_from_injected_provider_tests": true,
+    "local7_cloud6_kept_as_raw_scores": true,
+    "no_general_developer_replacement_or_Unity_AI_superiority_claim": true
   },
   "administrative_fields_remaining_blank": [
     "Supervisor name",
-    "Official document designation",
-    "Approval basis and signatures"
+    "Official order and document designation",
+    "Approval signatures"
   ],
   "limitations": [
-    "Local final dialogue speech can disagree with the executed transfer",
-    "Additional local GUI repeat chose permitted no-op instead of movement",
-    "PDF import, voice and persistent memory are outside this version",
-    "No user study of usability or labour savings was conducted",
-    "The official title year 2027 follows the found plan; formal approval remains with the university"
+    "Exact cohort thesis formatting manual was not found; official VolgGTU cover used.",
+    "Native Word pagination and physical printed copy were not independently checked.",
+    "Model results apply to saved versions and conditions; no user usability or labour-saving study."
   ]
 }

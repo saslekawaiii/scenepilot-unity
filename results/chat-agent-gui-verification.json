@@ -1,0 +1,59 @@
+{
+  "observedUtc": "2026-10-31T13:01:29.656510+00:00",
+  "observationType": "Real native Unity GUI, recorded manually through CUA; not a model reliability benchmark",
+  "unityVersion": "6000.3.27f1",
+  "packageSourceCommit": "60192a9c8ca3a4c083e1484253907edbbf0bb52e",
+  "checks": {
+    "newChatDefault9BAndBalanced": true,
+    "modelMenu": [
+      "qwen2.5-coder:latest 7.6B",
+      "qwen3.5:2b 1.9B",
+      "qwen3.5:9b 9.0B",
+      "GPT-OSS free cloud"
+    ],
+    "powerMenu": [
+      "Быстро",
+      "Баланс",
+      "Глубоко"
+    ],
+    "plusMenu": [
+      "Мир",
+      "Персонаж",
+      "Изменить сцену",
+      "Написать скрипт",
+      "Прикрепить контекст выделения"
+    ],
+    "realLocalAcceptanceHistoryOpened": true,
+    "historicalCodeSnapshotExpandedAfterImportAndRevert": true,
+    "worldOpenedAndPlayModeEnteredAndExited": true
+  },
+  "scene": "UnityProject/Assets/WorldWeaverGenerated/Scenes/Лесная_долина_WorldWeaver.unity",
+  "sceneSha256": "8737d8ef5c3acc99ee5f8dca6e1e8299f1309e20dad5522d8a0828fbe5c6a6f8",
+  "worldProvenance": "Save As copy of ChatAcceptance-Local9B-v2.unity via Unity File menu; no model rerun",
+  "npcDialogue": {
+    "character": "Игнат",
+    "question": "Во сколько открываются северные ворота?",
+    "answer": "Северные ворота открываются в шесть утра.",
+    "acceptedStatusVisible": true,
+    "displayedElapsedMs": 51902,
+    "provider": "Ollama localhost",
+    "model": "qwen3.5:9b",
+    "contextTokens": 8192,
+    "maxOutputTokens": 1024,
+    "embeddingModel": "embeddinggemma:latest",
+    "rawPipelineTraceExported": false,
+    "limitation": "One GUI observation; no navigation/path or quantitative model reliability claim"
+  },
+  "screenshots": {
+    "chat-welcome.png": "0222367a83f72ad5457504dac4b7123c641540848233f25a80b9101e14b40231",
+    "chat-plus-menu.png": "d03ab97b37b502040e71f10c095d73d4e7a17d242e6dbc74c0667ab32a3c7deb",
+    "chat-scene-result.png": "72c46198e6a5463d73b54faf97961a5f303c2a88e8ad46b7843c96f93d007688",
+    "chat-npc-play-reply.png": "e8d5be8ad17ae9754b81d1477ae01f0d9b130e57e0cd60d00f47f3a41fce2bc0",
+    "chat-code-history.png": "1d10dc2666f5c5ceea7da64788a038ce74a1cc45e68c9e1102bfa11749242f54"
+  },
+  "evidenceLimitations": [
+    "Screenshots are genuine window captures, not redrawn.",
+    "Runtime dialogue trace was observed in GUI; raw in-memory pipeline trace was not exported.",
+    "Chat history was copied from the actual isolated acceptance session and source import/revert run, not fabricated; object IDs are not persistent across Editor sessions."
+  ]
+}

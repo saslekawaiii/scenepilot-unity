@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "scope": "Synthetic handwritten acceptance fixtures, not LLM-generated results. No import is authorized by this file alone. Root must review both exact UTF-8 code strings and supply both required SHA256 environment variables.",
+  "className": "WorldWeaverJournalRotor",
+  "codeA": "using UnityEngine;\n\npublic class WorldWeaverJournalRotor : MonoBehaviour\n{\n    public const int Revision = 1;\n    public float Speed = 30f;\n\n    private void Update()\n    {\n        transform.Rotate(Vector3.up, Speed * Time.deltaTime);\n    }\n}\n",
+  "codeB": "using UnityEngine;\n\npublic class WorldWeaverJournalRotor : MonoBehaviour\n{\n    public const int Revision = 2;\n    public float Speed = 60f;\n\n    private void Update()\n    {\n        transform.Rotate(Vector3.up, Speed * Time.deltaTime);\n    }\n}\n",
+  "codeASha256": "ca31bd1046c4ac2850447d275021ee3e22f0f639beaea3c2b89027ca884aa350",
+  "codeBSha256": "8a3c4523f62e23f9cb6254316418c892533744b1867108a01595e29440b24a36",
+  "expectedRevisionA": 1,
+  "expectedRevisionB": 2,
+  "expectedSpeedA": 30,
+  "expectedSpeedB": 60,
+  "reviewStatus": "approved-by-root-for-isolated-acceptance-only",
+  "reviewFindings": "Both exact sources inspected: only a MonoBehaviour Y rotation at 30/60 degrees per second and literal revision. No file, network, reflection or Editor APIs. This is a handwritten fixture, not evidence of LLM coding quality."
+}

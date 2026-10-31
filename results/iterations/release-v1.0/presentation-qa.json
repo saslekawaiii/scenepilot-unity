@@ -1,0 +1,25 @@
+{
+  "file": "deliverables/Презентация_WorldWeaver_финал.pptx",
+  "sha256": "aae8683d8db6584b614e200cc426b72309f8dc7e7d4dd75a53ab957c20795767",
+  "slides": 20,
+  "final_import_and_render": true,
+  "all_slides_reviewed_in_base_version": true,
+  "base_version_sha256": "aae8683d8db6584b614e200cc426b72309f8dc7e7d4dd75a53ab957c20795767",
+  "changes_from_base": [
+    "slide 4: 90 QA-запросов",
+    "slide 20: 90 запросов и 40 повторов Terrain"
+  ],
+  "changed_slides_reviewed_again": [
+    4,
+    20
+  ],
+  "independent_root_review": [
+    "final montage",
+    "15 tests",
+    "17 raw/delivered metrics",
+    "20 limitations",
+    "final 4/20 wording"
+  ],
+  "native_powerpoint_opened": false,
+  "visual_findings": []
+}

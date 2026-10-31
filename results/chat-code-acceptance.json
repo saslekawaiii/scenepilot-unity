@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "runner": "WorldWeaver.Editor.Assistant.ChatCodeAcceptanceRunner",
+  "startedUtc": "2026-10-31T10:31:53.333674Z",
+  "unityVersion": "6000.3.27f1",
+  "inputPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/chat-agent-acceptance-cloud.json",
+  "outputPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/chat-code-acceptance.json",
+  "sessionId": "d3e2cccbe9e843fe8905f69169704852",
+  "messageId": "c45c39e29fab4e8e94a8693cbb05bbbe",
+  "reviewHashMatched": true,
+  "reviewedCodeSha256": "aeaa5326b893aab62634a0ba77e5991cb9cca23373d9453c378fcc48fb799d02",
+  "className": "YAxisRotator",
+  "assetPath": "Assets/WorldWeaverGenerated/Scripts/YAxisRotator.cs",
+  "sourceExistedBefore": false,
+  "sourceBeforeSha256": null,
+  "testScenePath": "Assets/WorldWeaverGenerated/CodeAcceptance/4bf7ef14c15343b392ec72a355bb8d86/CodeAcceptance.unity",
+  "events": [
+    {
+      "utc": "2026-10-31T10:31:53.333994Z",
+      "kind": "phase",
+      "phase": "Armed"
+    },
+    {
+      "utc": "2026-10-31T10:31:53.43585Z",
+      "kind": "phase",
+      "phase": "AwaitImportCompilation"
+    },
+    {
+      "utc": "2026-10-31T10:31:53.896682Z",
+      "kind": "compilation_started",
+      "phase": "AwaitImportCompilation"
+    },
+    {
+      "utc": "2026-10-31T10:31:55.530842Z",
+      "kind": "compilation_finished",
+      "phase": "AwaitImportCompilation"
+    },
+    {
+      "utc": "2026-10-31T10:31:56.575348Z",
+      "kind": "phase",
+      "phase": "AwaitRestoreCompilation"
+    },
+    {
+      "utc": "2026-10-31T10:31:56.886721Z",
+      "kind": "compilation_started",
+      "phase": "AwaitRestoreCompilation"
+    },
+    {
+      "utc": "2026-10-31T10:31:57.493983Z",
+      "kind": "compilation_finished",
+      "phase": "AwaitRestoreCompilation"
+    }
+  ],
+  "errors": [],
+  "checks": {
+    "importedFileReadback": true,
+    "compilerHistorySuccess": true,
+    "compilerTypeValid": true,
+    "importCompilationFinished": true,
+    "attachedComponentReadback": true,
+    "ownedFixtureDestroyed": true,
+    "standardRevertConfirmed": true,
+    "sourceRestored": true,
+    "restoreCompilationFinished": true,
+    "restoreCompilerErrorsAbsent": true,
+    "testSceneCleaned": true
+  },
+  "scope": "Reviewed code import/compiler feedback/attach/revert; no new LLM calls.",
+  "phase": "AwaitRestoreCompilation",
+  "phaseDeadlineUtc": "2026-10-31T10:34:56.5752230Z",
+  "fixture": {
+    "scene": "Assets/WorldWeaverGenerated/CodeAcceptance/4bf7ef14c15343b392ec72a355bb8d86/CodeAcceptance.unity",
+    "object": "CodeAcceptanceCube-4bf7ef14c15343b392ec72a355bb8d86",
+    "ownerRunId": "4bf7ef14c15343b392ec72a355bb8d86"
+  },
+  "importCompilerErrors": [],
+  "compilerFeedback": [
+    {
+      "Success": true,
+      "Tool": "compile_scripts",
+      "Summary": "Unity завершила компиляцию без ошибок.",
+      "Target": "Assets/WorldWeaverGenerated/Scripts/YAxisRotator.cs",
+      "Error": "",
+      "CreatedAssets": []
+    }
+  ],
+  "compiledType": "YAxisRotator",
+  "attachResult": {
+    "Success": true,
+    "Tool": "attach_script",
+    "Summary": "Подключён скомпилированный YAxisRotator.",
+    "Target": "CodeAcceptanceCube-4bf7ef14c15343b392ec72a355bb8d86",
+    "Error": null,
+    "CreatedAssets": []
+  },
+  "restoreCompilerErrors": [],
+  "finishedUtc": "2026-10-31T10:31:58.6169130Z",
+  "pendingPlan": null,
+  "sourceAfterSha256": null,
+  "sourceRestoredAtExit": true,
+  "manualCleanupRequired": false,
+  "manualCleanupPaths": [],
+  "standardScriptState": {
+    "Pending": false,
+    "Reverted": true,
+    "Outcome": "Предыдущая версия C# восстановлена.",
+    "files": [
+      "Assets/WorldWeaverGenerated/Scripts/YAxisRotator.cs"
+    ]
+  },
+  "success": true,
+  "passedChecks": 11,
+  "totalChecks": 11
+}

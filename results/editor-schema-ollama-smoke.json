@@ -1,0 +1,6 @@
+{
+  "httpStatus": 400,
+  "errorBody": "{\"error\":\"{\\\"error\\\":{\\\"code\\\":400,\\\"message\\\":\\\"Failed to initialize samplers: failed to parse grammar\\\",\\\"type\\\":\\\"invalid_request_error\\\"}}\"}",
+  "scope": "Local structured decoder probe; no Unity actions executed.",
+  "elapsedMs": 291
+}

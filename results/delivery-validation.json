@@ -1,73 +1,216 @@
 {
-  "timestamp_utc": "2026-10-30T22:09:08.139783+00:00",
+  "schema_version": "worldweaver-delivery-validation.v2",
+  "timestamp_utc": "2026-10-31T13:53:42.225564+00:00",
   "success": true,
+  "success_scope": "Artifact consistency and required engineering checks completed; this does not change failed raw cloud criteria or prove arbitrary-task model reliability.",
   "topic_preserved": true,
+  "package_version": "1.1.0",
+  "package_source_commit": "60192a9c8ca3a4c083e1484253907edbbf0bb52e",
+  "production_CSharp_commit": "60192a9",
   "documents": {
     "receipt": "results/document-qa.json",
+    "receipt_sha256": "f166c9347739b689170ac17d4617e3ddc5a56048d4236f0b6c98e0b24867e4bb",
     "artifact_sha256_verified": true,
-    "thesis_pages": 77,
-    "tz_pages": 9,
-    "toc_entries_verified": 44,
+    "thesis_pages": 117,
+    "tz_pages": 15,
+    "toc_entries_verified": 45,
     "all_pages_visually_inspected": true
   },
   "presentation": {
     "file": "deliverables/Презентация_WorldWeaver_финал.pptx",
-    "sha256": "aae8683d8db6584b614e200cc426b72309f8dc7e7d4dd75a53ab957c20795767",
+    "sha256": "1aeb39d3806ed626af5fc2f28c8dcc024d4240c81c853bf7e7e4585ad08e1c01",
     "slides": 20,
     "validation_findings": 0,
     "validation_warnings": 0,
     "receipt": "results/presentation-validation.json",
     "visual_review": "results/presentation-qa.json",
-    "native_powerpoint_opened": false
+    "native_powerpoint_opened": false,
+    "speech": {
+      "file": "deliverables/Доклад_и_вопросы_WorldWeaver.md",
+      "sha256": "43f5bbbeecdd07735c6172287481dd625975505b5b40edee587a482b92070000",
+      "slide_titles_match": true,
+      "slide_count": 20,
+      "faq_count": 21,
+      "planned_seconds": 455,
+      "timing_is_rehearsal_guidance": true,
+      "spoken_words": 897
+    }
   },
   "unity_tests": {
-    "editmode-unity6.xml": {
-      "passed": "56",
-      "total": "56",
+    "chat-agent-editmode.xml": {
+      "total": "108",
+      "passed": "108",
       "failed": "0",
-      "start-time": "2026-10-30 21:42:29Z",
-      "end-time": "2026-10-30 21:42:32Z"
+      "skipped": "0",
+      "start-time": "2026-10-31 12:47:15Z",
+      "end-time": "2026-10-31 12:47:24Z",
+      "duration": "8.9528737",
+      "sha256": "1bcd8360250d62097492c31b41bc9181cf99f3836acae56eb92c256335447382",
+      "source_revision": "60192a9"
     },
-    "playmode-unity6.xml": {
-      "passed": "2",
-      "total": "2",
+    "chat-agent-playmode.xml": {
+      "total": "3",
+      "passed": "3",
       "failed": "0",
-      "start-time": "2026-10-30 21:47:22Z",
-      "end-time": "2026-10-30 21:47:23Z"
-    },
-    "real-integration-unity6.xml": {
-      "passed": "2",
-      "total": "2",
-      "failed": "0",
-      "start-time": "2026-10-30 21:09:30Z",
-      "end-time": "2026-10-30 21:10:55Z"
-    },
-    "editmode-gui.xml": {
-      "passed": "56",
-      "total": "56",
-      "failed": "0",
-      "start-time": "2026-10-30 22:04:19Z",
-      "end-time": "2026-10-30 22:04:22Z"
+      "skipped": "0",
+      "start-time": "2026-10-31 12:08:09Z",
+      "end-time": "2026-10-31 12:08:10Z",
+      "duration": "1.0567569",
+      "sha256": "209e0e961cd2a3b1bb2823fadfa5c37850f6b92f9f669dad6eb604c8ad035db4",
+      "source_revision": "0aa9bdf"
     }
   },
-  "clean_package_installations": {
-    "clean-install.json": {
+  "per_run_versions": {
+    "local9b-v2": "0aa9bdf (57a37dd documentation checkpoint)",
+    "local9b-v2-code-import": "0aa9bdf",
+    "cloud-v4": "60192a9",
+    "editmode108": "60192a9",
+    "playmode3": "0aa9bdf",
+    "clean-install-1.1.0": "60192a9"
+  },
+  "real_model_conversations": {
+    "results/chat-agent-acceptance-local9b-v2.json": {
+      "modelKey": "ollama:qwen3.5:9b",
+      "power": "Balanced",
+      "startedUtc": "2026-10-31T12:13:25.3999290Z",
+      "finishedUtc": "2026-10-31T12:33:42.0268420Z",
+      "completed": 7,
+      "passed": 7,
+      "failed": 0,
       "success": true,
-      "source": "local-tarball",
-      "fresh_project": true,
-      "compiler_error_count": 0,
-      "timestamp": "2026-10-30T21:47:32.5525150Z"
+      "acceptanceCriteriaVersion": 2,
+      "source_revision": "0aa9bdf",
+      "sha256": "9beccb5cb4fb332141075749a561760238208bc54841091e31e87d1280751936"
     },
-    "clean-git-install.json": {
-      "success": true,
-      "source": "git",
-      "fresh_project": true,
-      "compiler_error_count": 0,
-      "timestamp": "2026-10-30T21:51:43.1068750Z"
+    "results/chat-agent-acceptance-cloud-v4.json": {
+      "modelKey": "pollinations:openai-fast",
+      "power": "Balanced",
+      "startedUtc": "2026-10-31T12:49:58.7549790Z",
+      "finishedUtc": "2026-10-31T12:58:31.0702220Z",
+      "completed": 7,
+      "passed": 6,
+      "failed": 1,
+      "success": false,
+      "acceptanceCriteriaVersion": 2,
+      "source_revision": "60192a9",
+      "sha256": "a622e393aa33fd3f0e3ac06978296865949c45dee4083e5ec7ff637cebf11b13"
     }
   },
-  "actual_unity_screenshots": 10,
-  "secrets_scan": "results/secret-scan.json",
+  "conversation_interpretation": "One sequential conversation per saved final model route. Local-v2 was not rerun after final Classic/read-only changes. Cloud-v4 raw6/7 remains unchanged; separate semantic review does not validate its unsupported all-coordinates statement.",
+  "code_workflow_checks": {
+    "results/chat-code-acceptance.json": {
+      "className": "YAxisRotator",
+      "passedChecks": 11,
+      "totalChecks": 11,
+      "startedUtc": "2026-10-31T10:31:53.333674Z",
+      "finishedUtc": "2026-10-31T10:31:58.6169130Z",
+      "success": true,
+      "sourceRestoredAtExit": true,
+      "manualCleanupRequired": false,
+      "sha256": "46995ba372ec6de8bed2801208c370086b48304226695eae390d3f2455712e73"
+    },
+    "results/chat-code-acceptance-local9b-v2.json": {
+      "className": "WorldWeaverSmoothRotateY",
+      "passedChecks": 11,
+      "totalChecks": 11,
+      "startedUtc": "2026-10-31T12:35:48.774336Z",
+      "finishedUtc": "2026-10-31T12:35:55.2784090Z",
+      "success": true,
+      "sourceRestoredAtExit": true,
+      "manualCleanupRequired": false,
+      "sha256": "6acee5a9a41b8f25f9bc66e21b79a61df85b41ae9ab1b844854e4e244f9c8afa"
+    },
+    "results/chat-code-journal-acceptance.json": {
+      "className": "WorldWeaverJournalRotor",
+      "passedChecks": 34,
+      "totalChecks": 34,
+      "startedUtc": "2026-10-31T11:36:24.00025Z",
+      "finishedUtc": "2026-10-31T11:36:33.3768300Z",
+      "success": true,
+      "sourceRestoredAtExit": true,
+      "manualCleanupRequired": false,
+      "sha256": "addf7c50a6a9085e22fb0d860a78cae4078a6431f12df7c9dc3a412851f8e33d"
+    }
+  },
+  "code_checks_interpretation": "Two separate reviewed LLM scripts each11 checks; journal34 uses synthetic A/B fixtures, not an LLM success rate. Cloud-v4 RotatorY only underwent standalone mcs source review, not Unity import. No angular speed runtime measurement.",
+  "schema": {
+    "receipt": "results/editor-schema-verification.json",
+    "full_passed": 33,
+    "full_total": 33,
+    "decoder_passed": 33,
+    "decoder_total": 33,
+    "tools": 18,
+    "runtime_argument_coverage": "PASS"
+  },
+  "clean_package_installation": {
+    "unity": "6000.3.27f1",
+    "timestamp": "2026-10-31T12:49:25.7727270Z",
+    "second_demo_has_unique_path": true,
+    "first_demo_preserved": true,
+    "build_scene_order_and_enabled_flags_preserved": true,
+    "two_npcs": true,
+    "terrain_assets_resolved": true,
+    "regenerate_updates_alphamap": true,
+    "task_routes_and_knowledge_valid": true,
+    "first_scene": "Assets/WorldWeaverDemo/WorldWeaverDemo.unity",
+    "second_scene": "Assets/WorldWeaverDemo/WorldWeaverDemo 1.unity",
+    "success": true,
+    "chat_stylesheet_imported": true,
+    "chat_schemas_constructed": true,
+    "chat_tool_and_undo_work_in_consumer": true,
+    "package_version": "1.1.0",
+    "archive": "deliverables/com.worldweaver.toolkit-1.1.0.tgz",
+    "sha256": "1c18c63e440979dff909f27aa94da39c32b3c589c8408909d230d0f29af4ed65",
+    "batch_exit_code": 0,
+    "source": "local-tarball",
+    "fresh_project": true,
+    "compiler_error_count": 0,
+    "fresh_project_path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/clean-install-iirp8mag",
+    "resolved_package_path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/clean-install-iirp8mag/Library/PackageCache/com.worldweaver.toolkit@dbe69c6ac87b",
+    "package_source_sha256": "22ca30012173349d72e9799c0fac434a59d5148da16e2fb25a9d3c2f94e2951b",
+    "source_commit": "60192a9c8ca3a4c083e1484253907edbbf0bb52e",
+    "resolved_package_source_file_count": 122,
+    "byte_exact_file_count": 121,
+    "expected_upm_metadata_changes": [
+      {
+        "path": "package.json",
+        "expected_upm_added_fields": [
+          "_fingerprint"
+        ]
+      }
+    ],
+    "resolved_package_matches_current_source": true,
+    "validation_scope": "Fresh package import and consumer scene/Undo/style/schema checks. No LLM inference in the install audit. Cloud acceptance is a separate protocol."
+  },
+  "gui": {
+    "receipt": "results/chat-agent-gui-verification.json",
+    "real_native_Unity": true,
+    "screenshots_bound_by_sha256": 5,
+    "runtime_NPC_dialogue_single_observation": {
+      "character": "Игнат",
+      "question": "Во сколько открываются северные ворота?",
+      "answer": "Северные ворота открываются в шесть утра.",
+      "acceptedStatusVisible": true,
+      "displayedElapsedMs": 51902,
+      "provider": "Ollama localhost",
+      "model": "qwen3.5:9b",
+      "contextTokens": 8192,
+      "maxOutputTokens": 1024,
+      "embeddingModel": "embeddinggemma:latest",
+      "rawPipelineTraceExported": false,
+      "limitation": "One GUI observation; no navigation/path or quantitative model reliability claim"
+    },
+    "scene_reference_audit": {
+      "capturedUtc": "2026-10-31T13:04:48.285283+00:00",
+      "scope": "Serialized asset GUID references under UnityProject/Assets/WorldWeaverGenerated; resolves against project Assets and toolkit package .meta, excludes Unity built-in zero GUIDs",
+      "referencesChecked": 926,
+      "missing": [],
+      "duplicateMetaGuids": {},
+      "passed": true
+    }
+  },
+  "secrets_scan": "results/release-secret-scan-1.1.json",
   "archive_verification_manifest": "deliverables/Состав_поставки.json",
+  "archive_note": "Final source commit, ZIP and bundle checks are recorded by package_delivery.py after the clean final commit/tag; no circular archive hash claim is made here.",
   "known_limits": "PROGRESS.md"
 }

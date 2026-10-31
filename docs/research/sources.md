@@ -1,6 +1,6 @@
 # Проверенные источники
 
-Первичное исследование: 30 октября 2026 года. Отдельные URL уточнены 31 октября. Дата доступа фиксируется в sources.json. HTTP-проверка фиксирует доступность, а не доказывает корректность каждого вывода. Динамические продукты сопоставлялись по опубликованной документации.
+Первичное исследование: 30 октября 2026 года. Отдельные URL уточнены 31 октября. Нумерация 1–41 и даты доступа согласованы с sources.json. HTTP-проверка фиксирует доступность, а не доказывает корректность каждого вывода. Для записей без http_status в каталоге HTTP-статус ниже не присваивается. Динамические продукты сопоставлялись по опубликованной документации.
 
 ## [1] Unity 6000.3.27f1 Release Notes
 
@@ -26,11 +26,11 @@ Unity Technologies. 2026. https://docs.unity3d.com/6000.3/Documentation/ScriptRe
 
 Проверка: 200. Дата: 2026-10-30. Вывод: Построение навигационной сетки из выбранной геометрии. Раздел ВКР: 3.7.
 
-## [5] Configure AI Gateway Assistant 2.9
+## [5] Configure AI Gateway Assistant 2.21
 
-Unity Technologies. 2026. https://docs.unity3d.com/Packages/com.unity.ai.assistant@2.9/manual/integration/ai-gateway-get-started.html
+Unity Technologies. 2026. https://docs.unity3d.com/Packages/com.unity.ai.assistant@2.21/manual/integration/ai-gateway-get-started.html
 
-Проверка: 200. Дата: 2026-10-30. Вывод: Gateway поддерживает сторонних агентов и требует соответствующего доступа организации. Раздел ВКР: 1.5.
+Проверка: 200. Дата: 2026-10-31. Вывод: Gateway направляет запросы сторонним агентам; текущая инструкция отдельно указывает provider credentials и требования к местам организации для этого пути интеграции. Эти условия не распространяются автоматически на отдельные CLI/MCP-продукты. Раздел ВКР: 1.5.
 
 ## [6] Configure character actions
 
@@ -138,7 +138,7 @@ Groq. 2026. https://console.groq.com/docs/structured-outputs
 
 Pollinations. 2026. https://github.com/pollinations/pollinations/blob/master/APIDOCS.md
 
-Проверка: 200. Дата: 2026-10-30. Вывод: Анонимный бесплатный API, GPT-OSS 20B, один текстовый запрос раз в 30 секунд, best effort. Раздел ВКР: 3.4.
+Проверка: 200. Дата: 2026-10-31. Вывод: Анонимный Classic API и GPT-OSS 20B. APIDOCS ещё указывает 30 секунд; действующие пределы 45 секунд и 1500 токенов проверены отдельно по adapter [39] и HTTP FREE_LIMIT. Раздел ВКР: 3.4.
 
 ## [24] Unity Test Framework introduction Unity 6.3
 
@@ -206,3 +206,44 @@ ggml-org. 2026. https://github.com/ggml-org/llama.cpp
 
 Проверка: 200. Дата: 2026-10-30. Вывод: Локальный inference и HTTP server как альтернативный runtime. Раздел ВКР: 2.9.
 
+## [35] Procedural Generation of Outdoor Scenes Bachelor Thesis
+
+Kyzr O. (Ondřej Kyzr). 2023. https://dcgi.fel.cvut.cz/en/theses/2023/kyzrondr/
+
+Дата доступа: 2026-10-31. HTTP-статус в sources.json не зафиксирован. Университетская страница обозначает Bachelor thesis 2023; отдельный результат защиты не установлен. Полный PDF прочитан для сопоставления границ измерений производительности и структуры работы. Подробности и пределы доступа сохранены в comparison-published-theses.md; чужие результаты не используются как измерения WorldWeaver.
+
+## [36] Procedural Terrain Generation Tool in Unity Master Thesis DOI 10.3217/rb5eq-fv649
+
+Marcher F. (Florian Marcher). 2024. https://repository.tugraz.at/publications/rb5eq-fv649
+
+Дата доступа: 2026-10-31. HTTP-статус в sources.json не зафиксирован. DOI: 10.3217/rb5eq-fv649. TU Graz Repository обозначает Masterthesis, Open, сентябрь 2024; оценка и отдельный результат защиты не установлены. Полный PDF прочитан; использован как пример разделения требований, реализации, пользовательской оценки и ограничений исследования. Описание проверки — comparison-published-theses.md.
+
+## [37] Procedural Terrain Generation with Fixed Points Bachelor Thesis
+
+Wakeford O. R. J. (Oliver Richard James Wakeford). 2025. https://dspace.cuni.cz/handle/20.500.11956/202622
+
+Дата доступа: 2026-10-31. HTTP-статус в sources.json не зафиксирован. Университетская запись и отдельный официальный протокол подтверждают защиту 05.09.2025; протокол указывает excellent (1). Прочитаны полный PDF и официальная рецензия; сопоставлены геометрические сценарии и границы субъективной оценки. Точные ссылки на протокол и рецензию, происхождение прочитанного PDF и ограничения сопоставления приведены в comparison-published-theses.md.
+
+## [38] Understanding LLMs for Game NPCs An Exploration of Opportunities Master Thesis
+
+Aslan P. (Porsev Aslan). 2024. https://kth.diva-portal.org/smash/get/diva2%3A1938971/FULLTEXT01.pdf
+
+Дата доступа: 2026-10-31. HTTP-статус в sources.json не зафиксирован. Университетский PDF обозначает магистерскую работу; дата на титуле 16.09.2024. Отдельный протокол защиты и оценка не установлены. Изучены доступные индексированные разделы о методике RAG, результатах и ограничениях; прямое скачивание прерывалось по timeout, полный визуальный аудит не заявляется. Подробности — comparison-published-theses.md.
+
+## [39] Pollinations Classic text adapter: limits and request normalization
+
+Pollinations. 2026. https://github.com/pollinations/pollinations/blob/73311dad9465c7ddd0ceb9cdc0f2ab8b171f6dbb/text.pollinations.ai/cloudflare-cache/src/origin.js
+
+Проверка: 200. Дата: 2026-10-31. Вывод: FREE_INTERVAL_MS=45000, MAX_TOKENS=1500 и преобразование запросов; фактический HTTP FREE_LIMIT подтверждает 45 секунд, несмотря на устаревшее значение APIDOCS. Раздел ВКР: 3.4.
+
+## [40] llama.cpp GBNF Guide JSON Schema conversion and known limitations
+
+ggml-org. 2026. https://github.com/ggml-org/llama.cpp/blob/master/grammars/README.md
+
+Дата доступа: 2026-10-31. HTTP-статус в sources.json не зафиксирован. Первичная документация описывает подмножество JSON Schema, преобразуемое в grammar, и известные ограничения. В частности, minimum/maximum поддерживаются для integer, но не number; допустимый JSON и соблюдение всех диапазонов аргументов проверяются раздельно. Связанные фактические decoder-пробы сохранены в editor-schema-compatibility-smoke.json и native-argument-order-replay.json; наличие ключевого слова в schema не считается доказательством его исполнения backend.
+
+## [41] JSON schema to grammar improvements pull request 5978
+
+ochafik et al.. 2024. https://github.com/ggml-org/llama.cpp/pull/5978
+
+Дата доступа: 2026-10-31. HTTP-статус в sources.json не зафиксирован. Первичная история изменения преобразователя JSON Schema в grammar используется для анализа свойств и порядка полей декодера. Наличие pull request не доказывает конкретную версию vendored llama.cpp в установленной Ollama; влияние порядка в нашей среде проверено отдельным парным replay без выполнения команд Unity.

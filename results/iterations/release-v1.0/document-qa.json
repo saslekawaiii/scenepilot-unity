@@ -1,0 +1,210 @@
+{
+  "timestamp_utc": "2026-10-30T22:08:05.651568+00:00",
+  "success": true,
+  "artifacts": {
+    "ВКР_WorldWeaver.docx": {
+      "path": "deliverables/ВКР_WorldWeaver.docx",
+      "sha256": "80986ade29bbb496fdbbfdeb2e56e5db9a91aefe952587e85bbfbb8527fd4534",
+      "bytes": 1517904
+    },
+    "Техническое_задание_WorldWeaver.docx": {
+      "path": "deliverables/Техническое_задание_WorldWeaver.docx",
+      "sha256": "db1b1cd36d9d63c4059e9abb1c3b1759cd3496cb762df8e82d8c651fde37e267",
+      "bytes": 45585
+    },
+    "ВКР_WorldWeaver.pdf": {
+      "path": "deliverables/ВКР_WorldWeaver.pdf",
+      "sha256": "9842793adce1a01d8b501ece61ffe033ddeb2dccb86f92559036287d6e5144b2",
+      "bytes": 2149105
+    },
+    "Техническое_задание_WorldWeaver.pdf": {
+      "path": "deliverables/Техническое_задание_WorldWeaver.pdf",
+      "sha256": "b3e4880f11b8fef0c56da1bfb593eedd9e7ab04ac4545f0ee9d0a61f902ba2ed",
+      "bytes": 167241
+    }
+  },
+  "pages": {
+    "thesis": 77,
+    "technical_specification": 9
+  },
+  "thesis_structure": {
+    "figures": 16,
+    "tables": 13,
+    "references": 38,
+    "appendices": 4,
+    "native_omml_equations": 3,
+    "toc_entries": 44
+  },
+  "toc_actual_pdf_pages_verified": true,
+  "all_pages_visually_inspected": true,
+  "visual_review": [
+    {
+      "reviewer": "compare_theses",
+      "pages": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ],
+      "render": ".private/qa-thesis-v8",
+      "final_page_3_opened_separately": true,
+      "other_pages_pixel_identical_to_final": true,
+      "result": "PASS"
+    },
+    {
+      "reviewer": "thesis_documents",
+      "pages": [
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68,
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77
+      ],
+      "render": ".private/qa-template-final/b_render",
+      "pages_29_34_opened_as_v9_with_identical_final_png_sha256": true,
+      "result": "PASS"
+    },
+    {
+      "reviewer": "thesis_documents",
+      "document": "technical_specification",
+      "pages": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "render": ".private/qa-tz-v8",
+      "all_pages_pixel_identical_to_final": true,
+      "result": "PASS"
+    }
+  ],
+  "template": {
+    "path": "thesis/templates/official-title.docx",
+    "sha256": "7bdb804346650358e5d7afb53018ae3d11abdbeb1ffc72d87a487f803a271afd",
+    "source_unchanged": true,
+    "preserved_parts_identical": {
+      "docProps/app.xml": true,
+      "_rels/.rels": true,
+      "word/theme/theme1.xml": true,
+      "word/fontTable.xml": true,
+      "word/numbering.xml": true
+    },
+    "render_diff": ".private/qa-template-final/summary.json",
+    "intentional_differences": [
+      "Filled verified topic, university, programme, author and year slots in a copy of the official title page",
+      "Added a separate body section with annotation, TOC, chapters, references and appendices",
+      "Added body styles, footer, internal TOC links and page-count field"
+    ]
+  },
+  "rebuild_without_private": {
+    "success": true,
+    "private_input_required": false,
+    "temporary_directory": "/var/folders/ht/t7gsmf1s463dpbpjqkht1w6h0000gn/T/worldweaver-documents-repro-_r2qh2h0",
+    "exit_code": 0,
+    "stdout": "DOCX_CREATED {'figures': 16, 'tables': 13}",
+    "documents": {
+      "ВКР_WorldWeaver.docx": {
+        "document_xml_identical": true,
+        "styles_identical": true
+      },
+      "Техническое_задание_WorldWeaver.docx": {
+        "document_xml_identical": true,
+        "styles_identical": true
+      }
+    }
+  },
+  "content_checks": {
+    "unresolved_placeholders": false,
+    "qa_observations": 90,
+    "model_completions": 89,
+    "http_errors": 1,
+    "raw_and_delivered_fact_metrics_distinguished": true,
+    "local_gui_planning_noop_disclosed": true,
+    "single_run_e2e_not_generalized": true
+  },
+  "administrative_fields_remaining_blank": [
+    "Supervisor name",
+    "Official document designation",
+    "Approval basis and signatures"
+  ],
+  "limitations": [
+    "Local final dialogue speech can disagree with the executed transfer",
+    "Additional local GUI repeat chose permitted no-op instead of movement",
+    "PDF import, voice and persistent memory are outside this version",
+    "No user study of usability or labour savings was conducted",
+    "The official title year 2027 follows the found plan; formal approval remains with the university"
+  ]
+}

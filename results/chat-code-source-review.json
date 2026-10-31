@@ -1,0 +1,8 @@
+{
+  "reviewedBy": "Codex root source review",
+  "sourceReport": "results/chat-agent-acceptance-cloud.json",
+  "className": "YAxisRotator",
+  "codeSha256": "aeaa5326b893aab62634a0ba77e5991cb9cca23373d9453c378fcc48fb799d02",
+  "observedBehavior": "Only a serialized rotationSpeed default 30 and Update transform.Rotate Y using deltaTime. No external calls or editor initialization.",
+  "decision": "Approved for the isolated compile/attach/revert acceptance test."
+}

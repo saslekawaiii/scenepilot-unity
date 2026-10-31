@@ -9,6 +9,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using WorldWeaver;
 using WorldWeaver.Editor;
+using WorldWeaver.Editor.Assistant;
 
 /// <summary>Consumer-project audit, copied by verify_clean_install.py into a fresh Assets/Editor.</summary>
 public static class InstallAudit
@@ -49,6 +50,19 @@ public static class InstallAudit
             result["second_demo_has_unique_path"] = true; result["first_demo_preserved"] = true; result["build_scene_order_and_enabled_flags_preserved"] = true;
             result["two_npcs"] = true; result["terrain_assets_resolved"] = true; result["regenerate_updates_alphamap"] = true; result["task_routes_and_knowledge_valid"] = true;
             result["first_scene"] = first; result["second_scene"] = second; result["success"] = true;
+            Require(AssetDatabase.LoadAssetAtPath<UnityEngine.UIElements.StyleSheet>(
+                "Packages/com.worldweaver.toolkit/Editor/Assistant/Chat.uss"), "Chat stylesheet was not imported.");
+            Require(EditorToolSchema.CommandSchema() != null && EditorToolSchema.DecoderCommandSchema() != null,
+                "Editor tool schemas could not be built in the consumer project.");
+            var plan = new EditorPlan { reply = "Consumer fixture", complete = true };
+            plan.actions.Add(new EditorCommand { tool = "create_object", name = "ConsumerChatCube",
+                args = new JObject { ["kind"] = "cube", ["on_terrain"] = false } });
+            var batch = SceneToolExecutor.Execute(plan);
+            Require(batch.Success && GameObject.Find("ConsumerChatCube"), "Chat scene tools did not work after tarball import.");
+            Undo.PerformUndo();
+            Require(!GameObject.Find("ConsumerChatCube") && GameObject.Find("Merchant"), "Chat Undo did not preserve existing demo contents.");
+            result["chat_stylesheet_imported"] = true; result["chat_schemas_constructed"] = true;
+            result["chat_tool_and_undo_work_in_consumer"] = true;
         }
         catch (Exception error) { result["success"] = false; result["error"] = error.GetType().Name + ": " + error.Message; exit = 1; }
         string output = Environment.GetEnvironmentVariable("WW_AUDIT_OUTPUT");

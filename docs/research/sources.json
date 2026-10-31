@@ -49,15 +49,15 @@
   },
   {
     "id": 5,
-    "title": "Configure AI Gateway Assistant 2.9",
+    "title": "Configure AI Gateway Assistant 2.21",
     "author": "Unity Technologies",
     "year": "2026",
-    "url": "https://docs.unity3d.com/Packages/com.unity.ai.assistant@2.9/manual/integration/ai-gateway-get-started.html",
-    "conclusion": "Gateway поддерживает сторонних агентов и требует соответствующего доступа организации",
+    "url": "https://docs.unity3d.com/Packages/com.unity.ai.assistant@2.21/manual/integration/ai-gateway-get-started.html",
+    "conclusion": "Gateway routes prompts to third-party agents; current manual lists provider credentials and explicit seat requirements for this integration path. Separate CLI/MCP product conditions must not be generalized from it.",
     "section": "1.5",
-    "accessed": "2026-10-30",
+    "accessed": "2026-10-31",
     "http_status": 200,
-    "resolved_url": "https://docs.unity3d.com/Packages/com.unity.ai.assistant@2.9/manual/integration/ai-gateway-get-started.html"
+    "resolved_url": "https://docs.unity3d.com/Packages/com.unity.ai.assistant@2.21/manual/integration/ai-gateway-get-started.html"
   },
   {
     "id": 6,
@@ -268,9 +268,9 @@
     "author": "Pollinations",
     "year": "2026",
     "url": "https://github.com/pollinations/pollinations/blob/master/APIDOCS.md",
-    "conclusion": "Анонимный бесплатный API, GPT-OSS 20B, один текстовый запрос раз в 30 секунд, best effort",
+    "conclusion": "Анонимный Classic API и GPT-OSS 20B; APIDOCS ещё указывает 30 секунд, но действующие пределы 45 секунд и 1500 токенов проверены отдельно по adapter [39] и HTTP FREE_LIMIT",
     "section": "3.4",
-    "accessed": "2026-10-30",
+    "accessed": "2026-10-31",
     "http_status": 200,
     "resolved_url": "https://github.com/pollinations/pollinations/blob/master/APIDOCS.md"
   },
@@ -405,5 +405,65 @@
     "accessed": "2026-10-30",
     "http_status": 200,
     "resolved_url": "https://github.com/ggml-org/llama.cpp"
+  },
+  {
+    "id": 35,
+    "author": "Kyzr O.",
+    "title": "Procedural Generation of Outdoor Scenes Bachelor Thesis",
+    "year": "2023",
+    "url": "https://dcgi.fel.cvut.cz/en/theses/2023/kyzrondr/",
+    "accessed": "2026-10-31"
+  },
+  {
+    "id": 36,
+    "author": "Marcher F.",
+    "title": "Procedural Terrain Generation Tool in Unity Master Thesis DOI 10.3217/rb5eq-fv649",
+    "year": "2024",
+    "url": "https://repository.tugraz.at/publications/rb5eq-fv649",
+    "accessed": "2026-10-31"
+  },
+  {
+    "id": 37,
+    "author": "Wakeford O. R. J.",
+    "title": "Procedural Terrain Generation with Fixed Points Bachelor Thesis",
+    "year": "2025",
+    "url": "https://dspace.cuni.cz/handle/20.500.11956/202622",
+    "accessed": "2026-10-31"
+  },
+  {
+    "id": 38,
+    "author": "Aslan P.",
+    "title": "Understanding LLMs for Game NPCs An Exploration of Opportunities Master Thesis",
+    "year": "2024",
+    "url": "https://kth.diva-portal.org/smash/get/diva2%3A1938971/FULLTEXT01.pdf",
+    "accessed": "2026-10-31"
+  },
+  {
+    "id": 39,
+    "title": "Pollinations Classic text adapter: limits and request normalization",
+    "author": "Pollinations",
+    "year": "2026",
+    "url": "https://github.com/pollinations/pollinations/blob/73311dad9465c7ddd0ceb9cdc0f2ab8b171f6dbb/text.pollinations.ai/cloudflare-cache/src/origin.js",
+    "conclusion": "Первичный adapter задаёт FREE_INTERVAL_MS=45000, MAX_TOKENS=1500 и преобразование запросов; фактический HTTP FREE_LIMIT отдельно подтверждает 45 секунд, несмотря на устаревшее значение APIDOCS",
+    "section": "3.4",
+    "accessed": "2026-10-31",
+    "http_status": 200,
+    "resolved_url": "https://github.com/pollinations/pollinations/blob/73311dad9465c7ddd0ceb9cdc0f2ab8b171f6dbb/text.pollinations.ai/cloudflare-cache/src/origin.js"
+  },
+  {
+    "id": 40,
+    "author": "ggml-org",
+    "title": "llama.cpp GBNF Guide JSON Schema conversion and known limitations",
+    "year": "2026",
+    "url": "https://github.com/ggml-org/llama.cpp/blob/master/grammars/README.md",
+    "accessed": "2026-10-31"
+  },
+  {
+    "id": 41,
+    "author": "ochafik et al.",
+    "title": "JSON schema to grammar improvements pull request 5978",
+    "year": "2024",
+    "url": "https://github.com/ggml-org/llama.cpp/pull/5978",
+    "accessed": "2026-10-31"
   }
 ]

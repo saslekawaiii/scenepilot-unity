@@ -1,0 +1,8 @@
+{
+  "capturedUtc": "2026-10-31T13:04:48.285283+00:00",
+  "scope": "Serialized asset GUID references under UnityProject/Assets/WorldWeaverGenerated; resolves against project Assets and toolkit package .meta, excludes Unity built-in zero GUIDs",
+  "referencesChecked": 926,
+  "missing": [],
+  "duplicateMetaGuids": {},
+  "passed": true
+}

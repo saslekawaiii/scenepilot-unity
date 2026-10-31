@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "createdUtc": "2026-10-31T12:06:16.250479+00:00",
+  "reviewType": "Independent semantic audit of an immutable completed acceptance record",
+  "originalReport": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/chat-agent-acceptance-local9b.json",
+  "originalReportSha256": "608f6dce511294dbe6b7810fad65acb8e43c9f391738fcd6e7587f2be43c57da",
+  "originalSourceCheckpoint": "35fb6c6",
+  "originalStartedUtc": "2026-10-31T11:38:31.8101730Z",
+  "originalFinishedUtc": "2026-10-31T11:59:20.2573080Z",
+  "originalUnchanged": {
+    "completed": 7,
+    "passed": 7,
+    "failed": 0,
+    "success": true,
+    "criterion": "Original narrow runner. Raw result not modified or relabelled."
+  },
+  "scope": "Read-only raw scene snapshots plus standalone compiler; no model calls and no Unity code imports/execution. This audit does not produce a replacement aggregate success rate. A release claim needs a new run with the stronger geometry criterion.",
+  "caseReviews": [
+    {
+      "number": 1,
+      "originalPassed": true,
+      "independentVerdict": "PASS within observed scene criteria",
+      "basis": "Actual160x160Terrain,12trees,3houses,4rocks,light/camera; no art-quality claim."
+    },
+    {
+      "number": 2,
+      "originalPassed": true,
+      "independentVerdict": "PASS within observed update criteria",
+      "basis": "SameTerrain and world IDs; height24 in data/spec; decoration IDs retained."
+    },
+    {
+      "number": 3,
+      "originalPassed": true,
+      "independentVerdict": "PASS of NPC authoring criteria",
+      "basis": "Actualrole/personality/scoped gatefact and dependencies; no runtimeNPCdialogue test."
+    },
+    {
+      "number": 4,
+      "originalPassed": true,
+      "independentVerdict": "QUALIFIED NARROW PASS",
+      "basis": "ExistingIntelligentNPCGoals changed; other serialized NPC fields unchanged. Patrol preset configured with2points. No proof of real square/gate navigation or PlayMode movement.",
+      "actualPatrolPoints": [
+        [
+          15,
+          8,
+          -40
+        ],
+        [
+          15,
+          8,
+          40
+        ]
+      ],
+      "runtimePreset": "Straight Vector3.MoveTowards; no NavMeshAgent or terrain-conforming route. Separate runtime MoveTo/Follow NavMesh tests do not cover this preset."
+    },
+    {
+      "number": 5,
+      "originalPassed": true,
+      "independentVerdict": "FAIL of terrain-aware light placement",
+      "proof": {
+        "terrainId": -1422,
+        "terrainOriginY": 0.0,
+        "terrainXZBounds": {
+          "x": [
+            -80,
+            80
+          ],
+          "z": [
+            -80,
+            80
+          ]
+        },
+        "terrainHeightMeters": 24.0,
+        "minimumNormalizedHeight": 0.12650308,
+        "wholeTerrainSurfaceLowerBoundY": 3.0360739199999998,
+        "derivation": "originY + normalizedMin * TerrainData.size.y. Terrain/world/group snapshots have translationY0, identityrotation and unitscale. This is a conservative bound, not an exact local SampleHeight.",
+        "newPoints": [
+          {
+            "id": -3978,
+            "position": [
+              -20.0,
+              -6.0,
+              70.0
+            ],
+            "range": 40.0,
+            "insideTerrainXZ": true,
+            "belowWholeTerrainLowerBound": true,
+            "marginBelowWholeTerrainMinimum": 9.03607392
+          },
+          {
+            "id": -3960,
+            "position": [
+              -60.0,
+              -3.0,
+              10.0
+            ],
+            "range": 40.0,
+            "insideTerrainXZ": true,
+            "belowWholeTerrainLowerBound": true,
+            "marginBelowWholeTerrainMinimum": 6.03607392
+          },
+          {
+            "id": -3944,
+            "position": [
+              -20.0,
+              5.0,
+              -30.0
+            ],
+            "range": 40.0,
+            "insideTerrainXZ": true,
+            "belowWholeTerrainLowerBound": false,
+            "marginBelowWholeTerrainMinimum": null
+          }
+        ],
+        "certainlyBuriedPointCount": 2,
+        "thirdPointStatus": "Y5 cannot be classified against its exact local surface from min/max alone."
+      },
+      "criterionGap": "Original runner checks component count/type/color/distinctposition/positiveintensity/range, not local terrain/water clearance or whether range reaches ground."
+    },
+    {
+      "number": 6,
+      "originalPassed": true,
+      "independentVerdict": "PASS of review gate; FAIL of generated C# compile/API and requested rotation semantics",
+      "codeSha256": "152f42b8e3e6d23783502a80d56792a255a6e348161af79fd354b3cd76fd0b4e",
+      "compilerProof": {
+        "compiler": "mcs",
+        "target": "library",
+        "sourcePath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/temp/local9b-original-draft-review/WorldWeaverYRotator.cs",
+        "sourceSha256": "152f42b8e3e6d23783502a80d56792a255a6e348161af79fd354b3cd76fd0b4e",
+        "sourceEqualsExactPendingCode": true,
+        "references": [
+          "/Applications/Unity/Hub/Editor/6000.3.27f1/Unity.app/Contents/Resources/Scripting/Managed/UnityEngine/UnityEngine.CoreModule.dll",
+          "/Applications/Unity/Hub/Editor/6000.3.27f1/Unity.app/Contents/Resources/Scripting/MonoBleedingEdge/lib/mono/4.8-api/Facades/netstandard.dll"
+        ],
+        "exitCode": 1,
+        "stdout": "Compilation failed: 2 error(s), 0 warnings\n",
+        "stderr": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/temp/local9b-original-draft-review/WorldWeaverYRotator.cs(15,19): error CS1502: The best overloaded method match for `UnityEngine.Transform.Rotate(float, float, float)' has some invalid arguments\n/Applications/Unity/Hub/Editor/6000.3.27f1/Unity.app/Contents/Resources/Scripting/Managed/UnityEngine/UnityEngine.CoreModule.dll (Location of the symbol related to previous error)\n/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/temp/local9b-original-draft-review/WorldWeaverYRotator.cs(15,83): error CS1503: Argument `#3' cannot convert `UnityEngine.Space' expression to type `float'\n",
+        "outputAssemblyProduced": false,
+        "controlProbeExitCode": 0,
+        "controlProbeStdout": "",
+        "controlProbeStderr": "",
+        "unityImported": false,
+        "codeExecuted": false,
+        "scope": "Standalone compiler only against installed Unity6 reference assemblies. No Unity Editor, AssetDatabase import, attach, Start or Update execution."
+      },
+      "semanticFinding": "Rotate has no(float,float,Space)overload. The expression also uses radians and division bydeltaTime, rather than degrees-per-second multiplied bydeltaTime. No runtime angularspeed was measured; compile failure prevents execution.",
+      "primaryApiSource": "https://docs.unity.com/en-us/engine/6000.3/script-reference/unityengine/transform/rotate",
+      "primaryTimeSource": "https://docs.unity.com/en-us/engine/6000.3/script-reference/unityengine/time/deltatime",
+      "safetyObserved": "Draft remained pending; first unrequested save_scene rejected; no draft import/attach/source mutation occurred."
+    },
+    {
+      "number": 7,
+      "originalPassed": true,
+      "independentVerdict": "QUALIFIED read-only/model-identity PASS",
+      "basis": "Actualselectedmodel named; scene/script snapshots unchanged and pendingdraft retained. General component/location/factual correctness is not exhaustively scored by keyword criterion."
+    }
+  ],
+  "releaseFollowup": {
+    "status": "PENDING stronger-criteria rerun",
+    "required": "New actual model conversation with placement snapshots/assertions; separately review a new C# source before any real11-check import/compiler/attach/revert acceptance. Existing syntheticjournal34 and oldrealLLM11 are separate evidence, not proofs of this failed draft."
+  }
+}

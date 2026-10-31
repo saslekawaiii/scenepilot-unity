@@ -1,0 +1,73 @@
+{
+  "timestamp_utc": "2026-10-30T22:09:08.139783+00:00",
+  "success": true,
+  "topic_preserved": true,
+  "documents": {
+    "receipt": "results/document-qa.json",
+    "artifact_sha256_verified": true,
+    "thesis_pages": 77,
+    "tz_pages": 9,
+    "toc_entries_verified": 44,
+    "all_pages_visually_inspected": true
+  },
+  "presentation": {
+    "file": "deliverables/Презентация_WorldWeaver_финал.pptx",
+    "sha256": "aae8683d8db6584b614e200cc426b72309f8dc7e7d4dd75a53ab957c20795767",
+    "slides": 20,
+    "validation_findings": 0,
+    "validation_warnings": 0,
+    "receipt": "results/presentation-validation.json",
+    "visual_review": "results/presentation-qa.json",
+    "native_powerpoint_opened": false
+  },
+  "unity_tests": {
+    "editmode-unity6.xml": {
+      "passed": "56",
+      "total": "56",
+      "failed": "0",
+      "start-time": "2026-10-30 21:42:29Z",
+      "end-time": "2026-10-30 21:42:32Z"
+    },
+    "playmode-unity6.xml": {
+      "passed": "2",
+      "total": "2",
+      "failed": "0",
+      "start-time": "2026-10-30 21:47:22Z",
+      "end-time": "2026-10-30 21:47:23Z"
+    },
+    "real-integration-unity6.xml": {
+      "passed": "2",
+      "total": "2",
+      "failed": "0",
+      "start-time": "2026-10-30 21:09:30Z",
+      "end-time": "2026-10-30 21:10:55Z"
+    },
+    "editmode-gui.xml": {
+      "passed": "56",
+      "total": "56",
+      "failed": "0",
+      "start-time": "2026-10-30 22:04:19Z",
+      "end-time": "2026-10-30 22:04:22Z"
+    }
+  },
+  "clean_package_installations": {
+    "clean-install.json": {
+      "success": true,
+      "source": "local-tarball",
+      "fresh_project": true,
+      "compiler_error_count": 0,
+      "timestamp": "2026-10-30T21:47:32.5525150Z"
+    },
+    "clean-git-install.json": {
+      "success": true,
+      "source": "git",
+      "fresh_project": true,
+      "compiler_error_count": 0,
+      "timestamp": "2026-10-30T21:51:43.1068750Z"
+    }
+  },
+  "actual_unity_screenshots": 10,
+  "secrets_scan": "results/secret-scan.json",
+  "archive_verification_manifest": "deliverables/Состав_поставки.json",
+  "known_limits": "PROGRESS.md"
+}

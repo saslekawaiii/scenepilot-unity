@@ -24,3 +24,5 @@ __pycache__/
 deliverables/*.bundle
 deliverables/*.zip
 deliverables/Состав_поставки.json
+
+~$*

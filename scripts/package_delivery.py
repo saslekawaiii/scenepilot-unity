@@ -30,16 +30,25 @@ def main():
         if '.private' in parts or '.git' in parts or Path(name).name == '.env':
             raise SystemExit('Excluded local material is tracked: ' + name)
     # The supplied package must match the reviewed source, byte for byte.
-    with tarfile.open(OUT / 'com.worldweaver.toolkit-1.0.0.tgz') as package:
-        for member in package.getmembers():
+    version = json.loads((ROOT / 'Packages/com.worldweaver.toolkit/package.json').read_text())['version']
+    with tarfile.open(OUT / f'com.worldweaver.toolkit-{version}.tgz') as package:
+        members = package.getmembers()
+        actual_files = {member.name for member in members if member.isfile()}
+        package_root = ROOT / 'Packages/com.worldweaver.toolkit'
+        expected_files = {'package/' + path.relative_to(package_root).as_posix()
+                          for path in package_root.rglob('*')
+                          if path.is_file() and path.name != '.DS_Store'}
+        if actual_files != expected_files or len(actual_files) != sum(member.isfile() for member in members):
+            raise SystemExit('Package file list differs from source or contains duplicate entries.')
+        for member in members:
             if member.isfile():
-                source = ROOT / 'Packages/com.worldweaver.toolkit' / Path(member.name).relative_to('package')
+                source = package_root / Path(member.name).relative_to('package')
                 if package.extractfile(member).read() != source.read_bytes():
                     raise SystemExit('Package differs from source: ' + str(source))
     files = [{'path': name, 'bytes': (ROOT / name).stat().st_size,
               'sha256': digest(ROOT / name)} for name in names]
     timestamp = int(git('show', '-s', '--format=%ct', 'HEAD').decode().strip())
-    manifest = {'source_commit': sha, 'files': files, 'file_count': len(files),
+    manifest = {'source_commit': sha, 'package_version': version, 'files': files, 'file_count': len(files),
                 'note': 'Source archive excludes .private, model weights, caches, secrets and third-party thesis PDFs.'}
     bundle = OUT / 'WorldWeaver-repository.bundle'
     subprocess.run(['git', 'bundle', 'create', str(bundle), '--all'], cwd=ROOT, check=True)
@@ -61,7 +70,8 @@ def main():
             raise SystemExit('ZIP integrity failed.')
     outputs = [{'path': 'deliverables/' + path.name, 'bytes': path.stat().st_size,
                 'sha256': digest(path)} for path in sorted(OUT.iterdir())
-               if path.is_file() and path.name != 'Состав_поставки.json']
+               if path.is_file() and path.name != 'Состав_поставки.json'
+               and not path.name.startswith('~$') and not path.name.endswith('_резерв.zip')]
     manifest['outputs'] = outputs
     manifest['verified'] = {'zip_crc': True, 'git_bundle': True, 'package_matches_source': True}
     (OUT / 'Состав_поставки.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\n')

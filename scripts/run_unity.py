@@ -34,7 +34,7 @@ def main():
             env['WW_REAL_TESTS'] = '1'
             args += ['-testFilter', 'WorldWeaver.Tests.RealProviderIntegration']
         elif a.mode == 'play':
-            args += ['-testFilter', 'WorldWeaver.Tests.NavigationTests']
+            args += ['-testFilter', 'WorldWeaver.Tests.NavigationTests;WorldWeaver.Tests.AssistantBehaviorTests']
     elif a.mode == 'evaluate':
         env['WW_EVAL_PROVIDER'] = a.provider
         args += ['-executeMethod', 'WorldWeaver.Editor.ResearchRunner.Run']
