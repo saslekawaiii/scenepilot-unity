@@ -1,0 +1,34 @@
+@startuml
+skinparam defaultFontName Arial
+skinparam shadowing false
+skinparam defaultFontSize 16
+skinparam maxMessageSize 18
+hide footbox
+actor Player
+participant "Intelligent\nNPC" as NPC
+participant "Npc\nPipeline" as Pipeline
+participant RagIndex as RAG
+participant "Model\nRouter" as Router
+participant "ILLM\nProvider" as Provider
+participant "Action\nDispatcher" as Actions
+participant Inventory
+Player -> NPC : TalkAsync\n(input)
+NPC -> Pipeline : RunAsync\n(Dialogue)
+Pipeline -> RAG : RetrieveAsync\n(scope, topK)
+RAG --> Pipeline : scoped chunks
+Pipeline -> Router : CompleteAsync\n(Dialogue, request)
+Router -> Provider : CompleteAsync\n(request)
+Provider --> Pipeline : CompletionResult
+Pipeline -> Pipeline : NpcDecision.Parse
+Pipeline -> Actions : Execute\n(npc, decision)
+Actions -> Actions : permissions, target,\nprojected inventory
+alt all preconditions pass
+ Actions -> Inventory : Transfer\n(Crystal, 1)
+ Inventory --> Actions : success
+else rejected
+ Actions --> Pipeline : reason,\nno inventory mutation
+end
+Pipeline -> RAG : RememberAsync
+Pipeline --> NPC : PipelineTrace
+NPC --> Player : validated speech,\nactual state
+@enduml

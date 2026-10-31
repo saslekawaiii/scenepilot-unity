@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "kind": "reviewed-source-patch-focused-verification",
+  "unity": "6000.3.27f1",
+  "total": 4,
+  "passed": 4,
+  "failed": 0,
+  "started_utc": "2026-10-31 21:04:08Z",
+  "ended_utc": "2026-10-31 21:04:09Z",
+  "xml_sha256": "82143a362662a6b3c903be578304d2994597914a416c9db964fe871687bf9e64",
+  "source_sha256": {
+    "Editor/Assistant/AgentSourcePatches.cs": "52b58c070512eb8650294d169d8ca272c647ff8450d98889b6b2035682424050",
+    "Tests/EditMode/AgentSourcePatchTests.cs": "6d70a290ee360dd3639be0716540cffa4dc7b8e6cc754bb93df6e1c516a32e84",
+    "Editor/Assistant/AgentCheckpoints.cs": "13b3873c6e55656037738e1b568e454e33211d1ff5035f6b7246152048dd6819"
+  },
+  "actual_compiler_evidence": {
+    "types": [
+      "WWSourcePatchProbeA",
+      "WWSourcePatchProbeB"
+    ],
+    "compiled_values_after_patch": [
+      11,
+      22
+    ],
+    "compiled_values_after_checkpoint_restore": [
+      1,
+      2
+    ],
+    "bom_and_crlf_bytes_preserved": true,
+    "file_count": 2,
+    "compiler_confirmed_success": true
+  },
+  "tests": [
+    {
+      "name": "AmbiguousOverlappingMatchIsRejected",
+      "result": "Passed"
+    },
+    {
+      "name": "NonUtf8AndOversizedUtf8ReplacementFailBeforeWriting",
+      "result": "Passed"
+    },
+    {
+      "name": "SecondFileConflictRejectsEntireBatchBeforeFirstWrite",
+      "result": "Passed"
+    },
+    {
+      "name": "ZZReviewedTwoFilePatchCompilesPreservesBytesAndCheckpointRestores",
+      "result": "Passed"
+    }
+  ],
+  "limitations": [
+    "exactly two authored fixture source files; not arbitrary LLM code correctness",
+    "write I/O failure not fault-injected; two-file validation conflict tested before any write",
+    "frozen v1.1 Editor baseline plus reviewed helper files; root integration separate"
+  ]
+}

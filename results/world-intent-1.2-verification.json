@@ -1,0 +1,64 @@
+{
+  "recorded_utc": "2026-10-31T22:44:19.966528+00:00",
+  "snapshot_receipt": "results/integration-1.2-snapshot-sixth.json",
+  "snapshot_content_tree_sha256": "ae723ac0d7e15b205ea491823ac1feadeb9d5275a9fb9b8b8387baadf9011f0c",
+  "production_files": {
+    "Editor/Assistant/AgentTaskSchema.cs": "285428f54f5c47504e0e3988bec9cc6b889ed34d662a0f396b02139a17026b3a",
+    "Editor/Assistant/ChatController.Agent.cs": "3b667abb85f9a998fb2344eba61e2afb8c80152ad3e09891294f6c7a00c4fffe"
+  },
+  "test_file": {
+    "path": "Tests/EditMode/AgentTaskSchemaTests.cs",
+    "sha256": "bb9e41895e041f4b94080df14bd8eda4251926f3c0231bf72f8491a3fc64940d"
+  },
+  "focused_actual_unity": {
+    "unity_exit_code": 0,
+    "passed": 139,
+    "failed": 0,
+    "duration_seconds": "10.0367177",
+    "xml": "results/world-intent-1.2-focused.xml",
+    "xml_sha256": "e015b3b71e25f172579d38e05f894be1efb776e69b66da6f4eeced439d7d850c",
+    "log": "results/world-intent-1.2-focused.log",
+    "log_sha256": "5ebbdc33ff4f50248783435ec8f5a668128fb4c10bc4d37e6e22f1695344d3a2",
+    "fixture_counts": {
+      "AgentPromptContextTests": 22,
+      "AgentTaskSchemaTests": 50,
+      "AgentTaskWorkflowTests": 45,
+      "ChatControllerTests": 22
+    }
+  },
+  "actual_seven_prompt_world_creation": [
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+  ],
+  "new_regression_case_count": 33,
+  "behavior": [
+    "AgentTaskSchema and SelectTools share DirectWorldCreation; no second generic create-anywhere/world-anywhere predicate.",
+    "Finite RU/EN direct-object grammar: verb, zero to six explicitly permitted modifiers, direct world noun, Unicode token boundaries.",
+    "Location prepositions are not modifiers, and immediately negated creation matches are ignored.",
+    "Adding NPC/lights/trees inside an existing world keeps ordinary action capacity and creation tools.",
+    "New world with NPC retains create_npc; initial macro is single-action, following scoped round has ordinary capacity.",
+    "Ask permission gates, host checks, mutation executor and checkpoint behavior unchanged.",
+    "Actual controller/executor test applies three Point lights in one batch with injected provider and no new world."
+  ],
+  "limitations": [
+    "Finite high-precision heuristic, not a general language parser. Unrecognized wording follows ordinary tool selection; it is not a refusal.",
+    "Injected provider integration proves controller/executor behavior, not real model planning quality.",
+    "No external inference or paid API in these tests."
+  ],
+  "full_suite_followup": "results/integration-1.2-sixth-summary.json",
+  "full_suite_actual_unity": {
+    "receipt": "results/integration-1.2-sixth-summary.json",
+    "editmode_passed": 300,
+    "playmode_passed": 9,
+    "failed": 0,
+    "unity_exit_codes": [
+      0,
+      0
+    ]
+  }
+}

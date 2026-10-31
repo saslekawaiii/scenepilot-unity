@@ -1,0 +1,94 @@
+{
+  "schema": 1,
+  "kind": "focused-gameplay-behavioral-tests",
+  "unity": "6000.3.27f1",
+  "package_snapshot": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/gameplay-test-project/Packages/com.worldweaver.toolkit",
+  "llm_inference": false,
+  "edit": {
+    "report": "results/gameplay-editor-focused.xml",
+    "sha256": "66962677dfd7877961984390face94628886f6e90196a5904b74283acfda37c3",
+    "total": 3,
+    "passed": 3,
+    "failed": 0,
+    "start_time": "2026-10-31 20:45:21Z",
+    "end_time": "2026-10-31 20:45:22Z",
+    "cases": [
+      {
+        "name": "AnchoredLightRetainsClearanceAfterWaterAndHeightChange",
+        "result": "Passed"
+      },
+      {
+        "name": "PrefabScriptsRequireExplicitReviewAndOriginalAssetIsUntouched",
+        "result": "Passed"
+      },
+      {
+        "name": "VillageHasConnectedEntrancesAndSurvivesSceneReload",
+        "result": "Passed"
+      }
+    ]
+  },
+  "play": {
+    "report": "results/gameplay-play-focused.xml",
+    "sha256": "ebff1d32b5f2d488b484acbe037c532f0dd0ab591e5fede0c2a3ecbe8f982bc4",
+    "total": 6,
+    "passed": 6,
+    "failed": 0,
+    "start_time": "2026-10-31 20:45:48Z",
+    "end_time": "2026-10-31 20:45:52Z",
+    "cases": [
+      {
+        "name": "PatrolPathCanShrinkWhileRunning",
+        "result": "Passed"
+      },
+      {
+        "name": "GiveItemInPlayMode",
+        "result": "Passed"
+      },
+      {
+        "name": "MoveAndFollowUseNavMesh",
+        "result": "Passed"
+      },
+      {
+        "name": "DeliveryInventoryRewardAndScopedMemorySurviveDiskReload",
+        "result": "Passed"
+      },
+      {
+        "name": "NamedPatrolUsesCompletePathAroundObstacle",
+        "result": "Passed"
+      },
+      {
+        "name": "UnreachablePatrolDoesNotMoveThroughEmptySpace",
+        "result": "Passed"
+      }
+    ]
+  },
+  "source_sha256": {
+    "Runtime/Assistant/GeneratedSceneObject.cs": "0bae6fa4784134e659502a2dc8129baaeaafaf05b745bee5b28c02b9a67ca1b5",
+    "Runtime/Assistant/SceneBehavior.cs": "e1e52a1ced223b576100ce46b67d4103228976fe59be52d092e887e72a31e1ae",
+    "Runtime/Dialogue/NpcPipeline.cs": "dff518797fb580dc1a2c80ad4a95be816bcea6ecf3c3033360943a3232661ffe",
+    "Runtime/NPC/IntelligentNPC.cs": "a3aba5646fa91ac2e9287f4d5160b0e06bc72cff4b1f5c3fdef40b2bb7bc75a3",
+    "Runtime/RAG/KnowledgeBase.cs": "ef4f156eaff10960c8c063cfd7ea16de552b95ca037f713893a300fdf9c56e39",
+    "Editor/Assistant/WorldGameplayTools.cs": "02bc5f841efc4280d7d5127f71baad07ce5cefd27eccf454c1000e677939be53",
+    "Runtime/World/WorldSaveState.cs": "fa2407820d24314ab21b0c6c6f84f1febdcaec0d601c050ad272630ed00fa105",
+    "Runtime/World/WorldSurfaceAnchor.cs": "72fa825dbdd9a263e8edbedbc1cfdd32415a8d3df966ad88eecd671c3aa77b79",
+    "Runtime/World/WorldNavigation.cs": "c2341174cc593ccda6d53198a2194b7ac309f96af25809b5299ed032505879d9",
+    "Runtime/World/WorldPlace.cs": "74dfae06fea1e7b100773bc90682400599d7f9d2a0325b40aa790efcb23ecc79",
+    "Runtime/World/WorldPlayer.cs": "19f5c6422d117568fec537f71eb2267212bc6e3e627c13ee522acaaec41f8d61",
+    "Runtime/Quests/DeliveryQuest.cs": "878c407aeb39a91f1aa36cfbf3c361ebb432d5bcbd7d3e9dc83014af69aca9b0"
+  },
+  "scope": [
+    "actual Unity NavMesh path around a collider wall",
+    "unreachable islands reject movement",
+    "5-house connected semantic village plus saved scene reload",
+    "letter inventory and one-time reward after actual disk save/load",
+    "per-NPC scoped episodic memory survives save/load",
+    "persistent ground/water light clearance",
+    "existing prefab review preserves source asset"
+  ],
+  "limitations": [
+    "focused frozen package uses stable v1.1 Editor baseline, not root agent integration",
+    "not a reliability test of natural-language planning",
+    "no artistic benchmark or subjective visual score",
+    "no performance/scalability claim"
+  ]
+}

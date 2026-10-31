@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="10" result="Failed(Child)" total="10" passed="7" failed="3" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-10-31 21:36:10Z" end-time="2026-10-31 21:36:13Z" duration="2.6212891">
+  <test-suite type="TestSuite" id="1000" name="UnityProject" fullname="UnityProject" runstate="Runnable" testcasecount="126" result="Failed" site="Child" start-time="2026-10-31 21:36:10Z" end-time="2026-10-31 21:36:13Z" duration="2.621289" total="10" passed="7" failed="3" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1141" name="WorldWeaver.EditMode.dll" fullname="/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/gameplay-test-project/Library/ScriptAssemblies/WorldWeaver.EditMode.dll" runstate="Runnable" testcasecount="126" result="Failed" site="Child" start-time="2026-10-31 21:36:10Z" end-time="2026-10-31 21:36:13Z" duration="2.536398" total="10" passed="7" failed="3" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="46113" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1142" name="WorldWeaver" fullname="WorldWeaver" runstate="Runnable" testcasecount="126" result="Failed" site="Child" start-time="2026-10-31 21:36:10Z" end-time="2026-10-31 21:36:13Z" duration="2.535269" total="10" passed="7" failed="3" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestSuite" id="1143" name="Tests" fullname="WorldWeaver.Tests" runstate="Runnable" testcasecount="126" result="Failed" site="Child" start-time="2026-10-31 21:36:10Z" end-time="2026-10-31 21:36:13Z" duration="2.534378" total="10" passed="7" failed="3" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-suite type="TestFixture" id="1003" name="AgentCheckpointTests" fullname="WorldWeaver.Tests.AgentCheckpointTests" classname="WorldWeaver.Tests.AgentCheckpointTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-10-31 21:36:10Z" end-time="2026-10-31 21:36:12Z" duration="2.207923" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1008" name="CodeSealIncludesMetaAndSurvivesRealCompileDomainReload" fullname="WorldWeaver.Tests.AgentCheckpointTests.CodeSealIncludesMetaAndSurvivesRealCompileDomainReload" methodname="CodeSealIncludesMetaAndSurvivesRealCompileDomainReload" classname="WorldWeaver.Tests.AgentCheckpointTests" runstate="Runnable" seed="598553498" result="Passed" start-time="2026-10-31 21:34:58Z" end-time="2026-10-31 21:36:10Z" duration="72.298404" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1010" name="CorruptBackupFailsBeforeChangingSceneOrFiles" fullname="WorldWeaver.Tests.AgentCheckpointTests.CorruptBackupFailsBeforeChangingSceneOrFiles" methodname="CorruptBackupFailsBeforeChangingSceneOrFiles" classname="WorldWeaver.Tests.AgentCheckpointTests" runstate="Runnable" seed="1514433123" result="Passed" start-time="2026-10-31 21:36:10Z" end-time="2026-10-31 21:36:11Z" duration="0.372512" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1006" name="ManualFileConflictPreservesEveryCurrentChange" fullname="WorldWeaver.Tests.AgentCheckpointTests.ManualFileConflictPreservesEveryCurrentChange" methodname="ManualFileConflictPreservesEveryCurrentChange" classname="WorldWeaver.Tests.AgentCheckpointTests" runstate="Runnable" seed="940364886" result="Passed" start-time="2026-10-31 21:36:11Z" end-time="2026-10-31 21:36:11Z" duration="0.322918" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1007" name="ManualInMemorySceneEditIsAConflictAndUnrelatedFileIsPreserved" fullname="WorldWeaver.Tests.AgentCheckpointTests.ManualInMemorySceneEditIsAConflictAndUnrelatedFileIsPreserved" methodname="ManualInMemorySceneEditIsAConflictAndUnrelatedFileIsPreserved" classname="WorldWeaver.Tests.AgentCheckpointTests" runstate="Runnable" seed="1674991131" result="Passed" start-time="2026-10-31 21:36:11Z" end-time="2026-10-31 21:36:11Z" duration="0.251818" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1009" name="MultipleBatchesRestoreOnlyTheirWriteSetAndPreserveLaterUnrelatedFile" fullname="WorldWeaver.Tests.AgentCheckpointTests.MultipleBatchesRestoreOnlyTheirWriteSetAndPreserveLaterUnrelatedFile" methodname="MultipleBatchesRestoreOnlyTheirWriteSetAndPreserveLaterUnrelatedFile" classname="WorldWeaver.Tests.AgentCheckpointTests" runstate="Runnable" seed="923190396" result="Passed" start-time="2026-10-31 21:36:11Z" end-time="2026-10-31 21:36:12Z" duration="0.414338" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1005" name="SavedSceneDirtyWorkingStateRestoresWithoutChangingItsDiskBytes" fullname="WorldWeaver.Tests.AgentCheckpointTests.SavedSceneDirtyWorkingStateRestoresWithoutChangingItsDiskBytes" methodname="SavedSceneDirtyWorkingStateRestoresWithoutChangingItsDiskBytes" classname="WorldWeaver.Tests.AgentCheckpointTests" runstate="Runnable" seed="1881600983" result="Passed" start-time="2026-10-31 21:36:12Z" end-time="2026-10-31 21:36:12Z" duration="0.317147" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1004" name="UnsavedDirtySceneAssetsAndSourceRestoreAfterReloadingJournal" fullname="WorldWeaver.Tests.AgentCheckpointTests.UnsavedDirtySceneAssetsAndSourceRestoreAfterReloadingJournal" methodname="UnsavedDirtySceneAssetsAndSourceRestoreAfterReloadingJournal" classname="WorldWeaver.Tests.AgentCheckpointTests" runstate="Runnable" seed="1899861622" result="Passed" start-time="2026-10-31 21:36:12Z" end-time="2026-10-31 21:36:12Z" duration="0.363079" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1016" name="AgentTestSceneScopeTests" fullname="WorldWeaver.Tests.AgentTestSceneScopeTests" classname="WorldWeaver.Tests.AgentTestSceneScopeTests" runstate="Runnable" testcasecount="3" result="Failed" site="Child" start-time="2026-10-31 21:36:12Z" end-time="2026-10-31 21:36:13Z" duration="0.318995" total="3" passed="0" failed="3" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <test-case id="1017" name="DirtySavedWorkingCopyAndDiskBytesSurviveStagingAndReload" fullname="WorldWeaver.Tests.AgentTestSceneScopeTests.DirtySavedWorkingCopyAndDiskBytesSurviveStagingAndReload" methodname="DirtySavedWorkingCopyAndDiskBytesSurviveStagingAndReload" classname="WorldWeaver.Tests.AgentTestSceneScopeTests" runstate="Runnable" seed="1752702347" result="Failed" label="Error" start-time="2026-10-31 21:36:12Z" end-time="2026-10-31 21:36:12Z" duration="0.178752" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <failure>
+                <message><![CDATA[System.InvalidOperationException : Дождитесь завершения импорта/компиляции и выйдите из Play Mode.]]></message>
+                <stack-trace><![CDATA[  at WorldWeaver.Editor.Assistant.AgentCheckpoints.Ready (System.Boolean allowCompiling) [0x000e9] in ./Packages/com.worldweaver.toolkit/Editor/Assistant/AgentCheckpoints.cs:44 
+  at WorldWeaver.Editor.Assistant.AgentCheckpoints.Begin (System.String sessionId, System.String messageId) [0x00006] in ./Packages/com.worldweaver.toolkit/Editor/Assistant/AgentCheckpoints.cs:47 
+  at WorldWeaver.Tests.AgentTestSceneScopeTests+<DirtySavedWorkingCopyAndDiskBytesSurviveStagingAndReload>d__7.MoveNext () [0x0011c] in ./Packages/com.worldweaver.toolkit/Tests/EditMode/AgentTestSceneScopeTests.cs:34 
+  at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in ./Library/PackageCache/com.unity.test-framework@bd7f943e9647/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs:44 ]]></stack-trace>
+              </failure>
+              <output><![CDATA[Scene scope checkpoint guard: compiling=True, updating=False, play=False
+]]></output>
+            </test-case>
+            <test-case id="1018" name="LaterManualSceneEditIsPreservedAndOriginalSnapshotRetained" fullname="WorldWeaver.Tests.AgentTestSceneScopeTests.LaterManualSceneEditIsPreservedAndOriginalSnapshotRetained" methodname="LaterManualSceneEditIsPreservedAndOriginalSnapshotRetained" classname="WorldWeaver.Tests.AgentTestSceneScopeTests" runstate="Runnable" seed="753070903" result="Failed" label="Error" start-time="2026-10-31 21:36:12Z" end-time="2026-10-31 21:36:12Z" duration="0.068949" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <failure>
+                <message><![CDATA[System.Reflection.TargetInvocationException : Exception has been thrown by the target of an invocation.
+  ----> System.InvalidOperationException : Дождитесь завершения импорта/компиляции и выйдите из Play Mode.]]></message>
+                <stack-trace><![CDATA[  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00083] in <2a006e6a126e4f7e85a63629ee4f3912>:0 
+  at System.Reflection.MethodBase.Invoke (System.Object obj, System.Object[] parameters) [0x00000] in <2a006e6a126e4f7e85a63629ee4f3912>:0 
+  at WorldWeaver.Tests.AgentTestSceneScopeTests.Call (System.String method, System.Object[] args) [0x00000] in ./Packages/com.worldweaver.toolkit/Tests/EditMode/AgentTestSceneScopeTests.cs:20 
+  at WorldWeaver.Tests.AgentTestSceneScopeTests.Capture () [0x00058] in ./Packages/com.worldweaver.toolkit/Tests/EditMode/AgentTestSceneScopeTests.cs:28 
+  at WorldWeaver.Tests.AgentTestSceneScopeTests+<LaterManualSceneEditIsPreservedAndOriginalSnapshotRetained>d__8.MoveNext () [0x00065] in ./Packages/com.worldweaver.toolkit/Tests/EditMode/AgentTestSceneScopeTests.cs:42 
+  at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in ./Library/PackageCache/com.unity.test-framework@bd7f943e9647/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs:44 
+--InvalidOperationException
+  at WorldWeaver.Editor.Assistant.AgentCheckpoints.Ready (System.Boolean allowCompiling) [0x000e9] in ./Packages/com.worldweaver.toolkit/Editor/Assistant/AgentCheckpoints.cs:44 
+  at WorldWeaver.Editor.Assistant.AgentCheckpoints.BeginTestSceneScope () [0x00000] in ./Packages/com.worldweaver.toolkit/Editor/Assistant/AgentCheckpoints.cs:64 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <2a006e6a126e4f7e85a63629ee4f3912>:0 ]]></stack-trace>
+              </failure>
+              <output><![CDATA[Scene scope guard: compiling=True, updating=False, play=False
+]]></output>
+            </test-case>
+            <test-case id="1019" name="LaterOriginalSceneAssetEditIsNeverOverwritten" fullname="WorldWeaver.Tests.AgentTestSceneScopeTests.LaterOriginalSceneAssetEditIsNeverOverwritten" methodname="LaterOriginalSceneAssetEditIsNeverOverwritten" classname="WorldWeaver.Tests.AgentTestSceneScopeTests" runstate="Runnable" seed="1092468380" result="Failed" label="Error" start-time="2026-10-31 21:36:12Z" end-time="2026-10-31 21:36:13Z" duration="0.068739" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <failure>
+                <message><![CDATA[System.Reflection.TargetInvocationException : Exception has been thrown by the target of an invocation.
+  ----> System.InvalidOperationException : Дождитесь завершения импорта/компиляции и выйдите из Play Mode.]]></message>
+                <stack-trace><![CDATA[  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x00083] in <2a006e6a126e4f7e85a63629ee4f3912>:0 
+  at System.Reflection.MethodBase.Invoke (System.Object obj, System.Object[] parameters) [0x00000] in <2a006e6a126e4f7e85a63629ee4f3912>:0 
+  at WorldWeaver.Tests.AgentTestSceneScopeTests.Call (System.String method, System.Object[] args) [0x00000] in ./Packages/com.worldweaver.toolkit/Tests/EditMode/AgentTestSceneScopeTests.cs:20 
+  at WorldWeaver.Tests.AgentTestSceneScopeTests.Capture () [0x00058] in ./Packages/com.worldweaver.toolkit/Tests/EditMode/AgentTestSceneScopeTests.cs:28 
+  at WorldWeaver.Tests.AgentTestSceneScopeTests+<LaterOriginalSceneAssetEditIsNeverOverwritten>d__9.MoveNext () [0x00067] in ./Packages/com.worldweaver.toolkit/Tests/EditMode/AgentTestSceneScopeTests.cs:48 
+  at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in ./Library/PackageCache/com.unity.test-framework@bd7f943e9647/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs:44 
+--InvalidOperationException
+  at WorldWeaver.Editor.Assistant.AgentCheckpoints.Ready (System.Boolean allowCompiling) [0x000e9] in ./Packages/com.worldweaver.toolkit/Editor/Assistant/AgentCheckpoints.cs:44 
+  at WorldWeaver.Editor.Assistant.AgentCheckpoints.BeginTestSceneScope () [0x00000] in ./Packages/com.worldweaver.toolkit/Editor/Assistant/AgentCheckpoints.cs:64 
+  at (wrapper managed-to-native) System.Reflection.RuntimeMethodInfo.InternalInvoke(System.Reflection.RuntimeMethodInfo,object,object[],System.Exception&)
+  at System.Reflection.RuntimeMethodInfo.Invoke (System.Object obj, System.Reflection.BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x0006a] in <2a006e6a126e4f7e85a63629ee4f3912>:0 ]]></stack-trace>
+              </failure>
+              <output><![CDATA[Scene scope guard: compiling=True, updating=False, play=False
+Saving results to: /Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/checkpoint-with-scene-scope.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

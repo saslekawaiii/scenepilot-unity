@@ -1,0 +1,12 @@
+{
+  "unity": "6000.3.27f1",
+  "utc": "2026-10-31T22:08:45.8453090Z",
+  "packageVersion": "1.2.0",
+  "generatorSources": {
+    "EditorToolSchema.cs": "8ca52de4bfe5b3e81c08dda9036991416984f998a7ae67e9c81f65c43424bc70",
+    "WorldGameplayTools.cs": "5456e7108fb0e97432d8fc620a135b5fc08bf22c43aec86ce7330fc2e0ceea4a",
+    "AgentProjectTools.cs": "89be0bc7557672847e88a2cec8a64f7c3a5402b9f221e615c49664db0b42b374",
+    "AgentSourcePatches.cs": "5314b2a7178f057302e91b3bdc6e68c60b2912c39dbe2e29b83d114a754480bc"
+  },
+  "toolCount": 46
+}

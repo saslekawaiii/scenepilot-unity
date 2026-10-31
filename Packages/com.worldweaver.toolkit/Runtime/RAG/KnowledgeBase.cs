@@ -149,6 +149,13 @@ namespace WorldWeaver
             memory.Enqueue(doc);
             while (memory.Count > 32) { var expired = memory.Dequeue(); store.RemoveDocument(expired.Id, expired.Scope); }
         }
+        public List<KnowledgeDocument> ExportMemory() => memory.Select(d => new KnowledgeDocument { Id=d.Id,Scope=d.Scope,Title=d.Title,Text=d.Text,Kind=d.Kind }).ToList();
+        public void RestoreMemory(IEnumerable<KnowledgeDocument> saved, string scope)
+        {
+            var restored = (saved ?? Enumerable.Empty<KnowledgeDocument>()).ToList();
+            if (restored.Count > 32 || restored.Any(d => d == null || d.Scope != scope || d.Kind == MemoryKind.StaticKnowledge || !Enum.IsDefined(typeof(MemoryKind),d.Kind) || string.IsNullOrWhiteSpace(d.Id) || d.Text == null || d.Text.Length > 900)) throw new ArgumentException("Invalid scoped NPC memory.");
+            memory.Clear(); store.Clear(); foreach (var doc in restored) memory.Enqueue(new KnowledgeDocument { Id=doc.Id,Scope=doc.Scope,Title=doc.Title,Text=doc.Text,Kind=doc.Kind });
+        }
         public void Clear() { store.Clear(); memory.Clear(); }
         public void Dispose() { embedding.Dispose(); }
     }

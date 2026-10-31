@@ -1,34 +1,41 @@
 @startuml
 skinparam defaultFontName Arial
+skinparam defaultFontSize 20
+skinparam ArrowFontSize 18
 skinparam shadowing false
-skinparam defaultFontSize 16
-skinparam maxMessageSize 18
+skinparam ArrowColor #087F86
+skinparam nodesep 24
+skinparam ranksep 30
+
+skinparam BoxPadding 8
 hide footbox
-actor Player
-participant "Intelligent\nNPC" as NPC
-participant "Npc\nPipeline" as Pipeline
-participant RagIndex as RAG
-participant "Model\nRouter" as Router
-participant "ILLM\nProvider" as Provider
-participant "Action\nDispatcher" as Actions
-participant Inventory
-Player -> NPC : TalkAsync\n(input)
-NPC -> Pipeline : RunAsync\n(Dialogue)
-Pipeline -> RAG : RetrieveAsync\n(scope, topK)
-RAG --> Pipeline : scoped chunks
-Pipeline -> Router : CompleteAsync\n(Dialogue, request)
-Router -> Provider : CompleteAsync\n(request)
-Provider --> Pipeline : CompletionResult
-Pipeline -> Pipeline : NpcDecision.Parse
-Pipeline -> Actions : Execute\n(npc, decision)
-Actions -> Actions : permissions, target,\nprojected inventory
-alt all preconditions pass
- Actions -> Inventory : Transfer\n(Crystal, 1)
- Inventory --> Actions : success
-else rejected
- Actions --> Pipeline : reason,\nno inventory mutation
+actor "Автор" as User
+participant "Контроллер" as Agent
+participant "Checkpoint /\nистория" as State
+participant "C# / Unity" as Unity
+participant "Продолжение" as Resume
+User -> Agent : запрос кода
+Agent -> Agent : план модели
+Agent --> User : код / diff
+User -> Agent : Применить
+Agent -> State : Begin; scope
+Agent -> Unity : просмотренный\nимпорт / patch
+Agent -> State : Seal; сохранить\nзадачу ожидания
+Unity -> Unity : импорт / compiler;\ndomain reload
+Unity -> State : compiler feedback
+Resume -> State : загрузить задачу
+Resume -> Resume : Unity завершила\nтекущую проверку
+Resume -> Agent : ResumeAsync()
+Agent -> Unity : сцена / compiler;\nпри необходимости tests
+Unity --> Agent : read-back / XML
+Agent -> Resume : проверить условия
+alt нарушение и бюджет
+  Agent -> Agent : исправление в\nпросмотренном scope
+else нужен просмотр или конец бюджета
+  Agent --> User : итог / нерешённое
 end
-Pipeline -> RAG : RememberAsync
-Pipeline --> NPC : PipelineTrace
-NPC --> Player : validated speech,\nactual state
+note over Agent,Resume
+  До 3 продолжений. PendingPlan требует просмотра.
+  Компиляция не доказывает правильность игры.
+end note
 @enduml

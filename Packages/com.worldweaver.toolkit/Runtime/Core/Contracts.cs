@@ -14,19 +14,25 @@ namespace WorldWeaver
     {
         public readonly string Role;
         public readonly string Content;
-        public ChatMessage(string role, string content) { Role = role; Content = content; }
+        public readonly IReadOnlyList<string> Images;
+        public ChatMessage(string role, string content, IEnumerable<string> images = null)
+        { Role = role; Content = content; Images = images == null ? new List<string>() : new List<string>(images); }
     }
 
     public sealed class CompletionRequest
     {
         public readonly List<ChatMessage> Messages = new List<ChatMessage>();
         public JObject Schema;
+        public bool Stream;
+        public Action<string> OnContentDelta;
+        public Action<string> OnActivity;
     }
 
     public sealed class CompletionResult
     {
         public string Text, Provider, Model;
         public long ElapsedMs;
+        public long FirstTokenMs;
         public int InputTokens, OutputTokens, Attempts;
         public double TokensPerSecond;
     }

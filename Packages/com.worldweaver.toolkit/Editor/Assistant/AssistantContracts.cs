@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 namespace WorldWeaver.Editor.Assistant
 {
     public enum AssistantPower { Fast, Balanced, Deep }
+    public enum AssistantMode { Ask, Plan, Execute }
 
     [Serializable]
     public sealed class ChatSettings
@@ -14,6 +15,11 @@ namespace WorldWeaver.Editor.Assistant
         public string ModelKey = "ollama:qwen3.5:9b";
         public AssistantPower Power = AssistantPower.Balanced;
         public bool AutoApply = true;
+        public AssistantMode Mode = AssistantMode.Execute;
+        public bool UseSkills = true;
+        public bool AutoVerify = true;
+        public int SkillContextBudget = 4000;
+        public List<string> SkillFolders = new List<string>();
     }
 
     [Serializable]
@@ -23,6 +29,9 @@ namespace WorldWeaver.Editor.Assistant
         public ProviderKind Provider;
         public string Endpoint;
         public bool Available;
+        public bool SupportsVision;
+        public string ConnectionId, ApiKeyEnvironmentVariable;
+        public OpenAIResponseMode ResponseMode;
         public override string ToString() => Name;
     }
 
@@ -62,7 +71,7 @@ namespace WorldWeaver.Editor.Assistant
             return result;
         }
 
-        public static JObject Schema(bool typed = true)
+        public static JObject Schema(bool typed = true, IEnumerable<string> allowedTools = null)
         {
             var command = new JObject {
                 ["type"] = "object", ["additionalProperties"] = false,
@@ -71,7 +80,8 @@ namespace WorldWeaver.Editor.Assistant
                     ["target"] = new JObject { ["type"] = "string" }, ["args"] = new JObject { ["type"] = "object" }
                 }, ["required"] = new JArray("tool", "name", "target", "args")
             };
-            if (typed) command = EditorToolSchema.DecoderCommandSchema();
+            if (allowedTools != null) command = EditorToolSchema.Restrict(allowedTools, typed);
+            else if (typed) command = EditorToolSchema.DecoderCommandSchema();
             return new JObject {
                 ["type"] = "object", ["additionalProperties"] = false,
                 ["properties"] = new JObject {
@@ -88,6 +98,7 @@ namespace WorldWeaver.Editor.Assistant
         public bool Success;
         public string Tool, Summary, Target, Error;
         public List<string> CreatedAssets = new List<string>();
+        public Dictionary<string,string> SourceHashes = new Dictionary<string,string>();
     }
 
     [Serializable]
@@ -123,6 +134,10 @@ namespace WorldWeaver.Editor.Assistant
         public List<EditorPlanAttempt> Attempts = new List<EditorPlanAttempt>();
         public EditorPlan PendingPlan;
         public bool IsError;
+        public AgentTaskState Task;
+        public List<ChatAttachment> Attachments = new List<ChatAttachment>();
+        public List<string> Skills = new List<string>();
+        public long FirstTokenMs;
     }
 
     [Serializable]
@@ -133,5 +148,6 @@ namespace WorldWeaver.Editor.Assistant
         public string UpdatedUtc = DateTime.UtcNow.ToString("o");
         public ChatSettings Settings = new ChatSettings();
         public List<AssistantMessage> Messages = new List<AssistantMessage>();
+        public List<DesignNote> DesignMemory = new List<DesignNote>();
     }
 }

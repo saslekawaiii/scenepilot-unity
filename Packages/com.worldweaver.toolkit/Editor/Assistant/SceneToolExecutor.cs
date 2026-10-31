@@ -25,7 +25,7 @@ create_object: name; target optional owned parent. args {kind:cube|sphere|capsul
 scatter_objects: name; target owned world containing terrain (or terrain itself). args {kind:tree|rock|house|cube|sphere|capsule|cylinder|plane,count:1..300,seed?:integer,center?:[x,y,z],size?:[width,length],spacing?:.1..100}. Samples dry terrain, rejects unsuitable slopes, deterministic seed; fails if requested count cannot fit. Produces an owned named group.
 set_transform: target; args {position?:[x,y,z],rotation?:[x,y,z],scale?:[x,y,z]}; at least one. World position/rotation,local scale(.01..100); coordinates bounded ±100000.
 set_material: target; args {color:hex or RGB(A) array,smoothness?:0..1,children?:bool}. Creates a new material and assigns it; never mutates existing shared materials. children defaults false; target must have matching renderer(s).
-set_lighting: target existing Light OR empty to create owned light using name. args {type?:directional|point|spot,intensity?:0..8,color?:color,position?:[x,y,z],rotation?:[x,y,z],range?:.1..500,spot_angle?:1..179,shadows?:bool,on_terrain?:bool}. NEW point/spot lights default on_terrain=true: preserve x/z and any higher y, raise only up to at least3m above terrain and generated water under that x/z. Without terrain under x/z keep position. Existing lights preserve exact position unless on_terrain=true is explicit, including edits with position; false preserves exact xyz. Directional lights are never moved by this option. This is initial placement, not permanent terrain anchoring. Set range large enough to reach the ground from the final height. Does not modify global RenderSettings.
+set_lighting: target existing Light OR empty to create owned light using name. args {type?:directional|point|spot,intensity?:0..8,color?:color,position?:[x,y,z],rotation?:[x,y,z],range?:.1..500,spot_angle?:1..179,shadows?:bool,on_terrain?:bool}. NEW point/spot lights default on_terrain=true: preserve x/z and any higher y, raise only up to at least3m above terrain and generated water under that x/z. Without terrain under x/z keep position. Existing lights preserve exact position unless on_terrain=true is explicit, including edits with position; false preserves exact xyz. Directional lights are never moved by this option. Terrain anchoring is serialized; update_world reanchors these lights above the changed surface/water. Set range large enough to reach the ground from the final height. Does not modify global RenderSettings.
 create_camera: name; target optional owned parent. args {position?:[x,y,z],rotation?:[x,y,z],look_at?:[x,y,z],field_of_view?:10..120,orthographic?:bool,size?:1..1000,enabled?:bool,background?:color}. Never disables existing cameras; explicitly enable only when needed.
 update_npc: target IntelligentNPC; args {role?,personality?,biography?,goals?,constraints?,knowledge?:text|strings,inventory?:object,autonomous?:bool}. Knowledge replacement creates a new scoped asset, leaving any old/shared asset intact. A goal-only change does not require attach_behavior; add physical movement only when the user asks for it.
 attach_behavior: target; args {behavior:rotate|bob|patrol|followplayer,speed?:.01..360,amplitude?:0..10,frequency?:.01..10,axis?:[x,y,z],points?:array of2..32 world vectors,follow_target?:target,stopping_distance?:0..20}. Patrol requires points,followplayer requires explicit follow_target. Real runtime preset components, no arbitrary type names. One SceneBehavior per object; replaces its settings.
@@ -51,6 +51,7 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
         public static GameObject ResolveTarget(string target)
         {
             if(string.IsNullOrWhiteSpace(target))throw new ArgumentException("Explicit target required. Use id:<instanceId> from context.");
+            if(target.StartsWith("owned:",StringComparison.Ordinal)||target.StartsWith("global:",StringComparison.Ordinal))return ProjectContextIndex.ResolveStable(target);
             var objects=SceneObjects().ToArray();
             if(target=="selected") {var selected=Selection.activeGameObject;if(selected&&selected.scene==SceneManager.GetActiveScene())return selected;throw new ArgumentException("Selected object is not in active scene.");}
             if(target.StartsWith("id:",StringComparison.Ordinal)&&int.TryParse(target.Substring(3),out int id))
@@ -78,10 +79,10 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
                 ["objectCount"]=all.Length,["ownedObjectCount"]=all.Count(o=>o.GetComponent<GeneratedSceneObject>()),["listedLimit"]=80,["logicalCounts"]=JObject.FromObject(all.Select(o=>o.GetComponent<GeneratedSceneObject>()).Where(m=>m&&!string.IsNullOrEmpty(m.Kind)&&m.Kind!="part").GroupBy(m=>m.Kind).ToDictionary(g=>g.Key,g=>g.Count())),
                 ["objects"]=new JArray(listed.Select(Inspect)),["currentTerrainSpecification"]=terrain?JObject.FromObject(terrain.Specification):null,
                 ["ownedRoots"]=new JArray(all.Where(o=>o.GetComponent<GeneratedSceneObject>()&&(!o.transform.parent||!o.transform.parent.GetComponent<GeneratedSceneObject>())).Select(o=>new JObject{["target"]=Id(o),["name"]=o.name})),
-                ["capabilities"]=new JArray("create_world","update_world","create_npc","create_object","scatter_objects","set_transform","set_material","set_lighting","create_camera","update_npc","attach_behavior","delete_object","save_scene","inspect_object","search_project","read_script"),
+                ["capabilities"]=new JArray(((JArray)EditorToolSchema.CommandSchema()["anyOf"]).OfType<JObject>().Select(EditorToolSchema.ToolName).Distinct()),
                 ["safety"]=new JObject{["batchGameObjects"]=BatchLimit,["sceneOwnedGameObjects"]=SceneLimit,["readOnlyAssets"]=true,["requiresExplicitSave"]=true}};
         }
-        private static string Id(GameObject go)=>"id:"+go.GetInstanceID();
+        private static string Id(GameObject go)=>ProjectContextIndex.StableTarget(go);
         private static JArray Vec(Vector3 p)=>new JArray(p.x,p.y,p.z);
         private static JObject Inspect(GameObject go)
         {
@@ -155,6 +156,24 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
                 if(command.name.Length>160||command.target.Length>200||command.args.ToString().Length>40000)throw new ArgumentException("Command too large.");
                 if(saved)throw new ArgumentException("save_scene must be the final command.");
                 var a=command.args;VirtualTarget target=null;bool creation=false;int cost=0;
+                if(AgentProjectTools.Handles(command.tool))
+                {
+                    AgentProjectTools.Validate(command,s=>Resolve(s,aliases).Object??throw new ArgumentException("This project operation requires an already existing target; split creations and inspection into separate steps."));
+                    if(AgentProjectTools.IsDeferred(command.tool)&&plan.actions.Count!=1)throw new ArgumentException("Test/build/open-scene operations require a standalone plan.");
+                    continue;
+                }
+                if(WorldGameplayTools.Handles(command.tool))
+                {
+                    WorldGameplayTools.Validate(command,s=>Resolve(s,aliases).Object??throw new ArgumentException("Gameplay target must already exist; use a subsequent step after creating the world."));
+                    cost=WorldGameplayTools.EstimateCost(command);created+=cost;
+                    if(created>BatchLimit||owned+created>SceneLimit)throw new ArgumentException("Gameplay object budget exceeded.");
+                    if(command.tool=="create_village"||command.tool=="instantiate_prefab")
+                    {
+                        if(string.IsNullOrWhiteSpace(command.name)||command.name.Any(c=>char.IsControl(c)||c=='/'||c=='\\')||!names.Add(command.name)||all.Any(o=>o.name==command.name))throw new ArgumentException("Creation name must be unique and contain no path separators.");
+                        var future=new VirtualTarget{Owned=true,Terrain=command.tool=="create_village",Renderer=true};aliases["@"+command.name]=future;aliases[command.name]=future;
+                    }
+                    continue;
+                }
                 switch(command.tool)
                 {
                     case "create_world":
@@ -222,7 +241,9 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
         private static void Parent(EditorCommand command,Dictionary<string,VirtualTarget> aliases)
         {if(!string.IsNullOrEmpty(command.target)&&!Resolve(command.target,aliases).Owned)throw new ArgumentException("Creation parent must be owned WorldWeaver group/world.");}
 
-        public static EditorBatchResult Execute(EditorPlan plan,OrchestratorProfile routes=null)
+        public static bool IsReadOnlyTool(string tool)=>tool=="inspect_object"||tool=="search_project"||tool=="read_script"||WorldGameplayTools.IsReadOnly(tool)||AgentProjectTools.IsReadOnly(tool);
+
+        public static EditorBatchResult Execute(EditorPlan plan,OrchestratorProfile routes=null,AgentExecutionContext executionContext=null)
         {
             var result=new EditorBatchResult();var tx=new SceneBuildTransaction();int undo=-1;
             try
@@ -230,7 +251,7 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
                 Validate(plan);
                 if(plan.actions.Count==0){result.Success=true;result.Summary="Нет редакторских действий.";return result;}
                 if(routes&&plan.actions.Any(a=>a.tool=="create_npc")){routes.Resolve(ModelTask.Dialogue).Validate();routes.Resolve(ModelTask.Planning).Validate();}
-                if(plan.actions.Any(a=>a.tool!="inspect_object"&&a.tool!="search_project"&&a.tool!="read_script")){Undo.IncrementCurrentGroup();undo=Undo.GetCurrentGroup();Undo.SetCurrentGroupName("WorldWeaver assistant batch");result.UndoGroup=undo;}
+                if(plan.actions.Any(a=>!IsReadOnlyTool(a.tool))){Undo.IncrementCurrentGroup();undo=Undo.GetCurrentGroup();Undo.SetCurrentGroupName("WorldWeaver assistant batch");result.UndoGroup=undo;}
                 var aliases=new Dictionary<string,GameObject>(StringComparer.Ordinal);var createdNpcs=new List<IntelligentNPC>();var changedNpcs=new List<IntelligentNPC>();OrchestratorProfile actualRoutes=routes;
                 GameObject group=null;
                 Func<GameObject> getGroup=()=>group?group:group=OwnedGroup(tx);
@@ -238,12 +259,24 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
                 foreach(var command in plan.actions)
                 {
                     int assetStart=tx.Assets.Count;var a=command.args;GameObject go=null;string summary="";
+                    if(AgentProjectTools.Handles(command.tool))
+                    {
+                        result.Results.Add(AgentProjectTools.Execute(command,resolve,executionContext));continue;
+                    }
+                    if(WorldGameplayTools.Handles(command.tool))
+                    {
+                        Transform gameplayParent=null;
+                        if(command.tool=="create_village"||command.tool=="instantiate_prefab")gameplayParent=string.IsNullOrEmpty(command.target)?getGroup().transform:resolve(command.target).transform;
+                        var outcome=WorldGameplayTools.Execute(command,tx,gameplayParent,resolve,routes);go=outcome.Target;summary=outcome.Summary;
+                        if(go&&(command.tool=="create_village"||command.tool=="instantiate_prefab")){aliases["@"+command.name]=go;aliases[command.name]=go;}
+                        result.Results.Add(new EditorCommandResult{Success=true,Tool=command.tool,Target=go?Id(go):command.target,Summary=summary,CreatedAssets=tx.Assets.Skip(assetStart).ToList()});continue;
+                    }
                     Transform parent=null;
                     if(new[]{"create_npc","create_object","create_camera"}.Contains(command.tool))parent=string.IsNullOrEmpty(command.target)?getGroup().transform:resolve(command.target).transform;
                     switch(command.tool)
                     {
                         case "create_world":go=WorldComposer.World(tx,getGroup().transform,command.name,a);summary="Мир создан: рельеф, вода, освещение, камера и окружение.";break;
-                        case "update_world":go=resolve(command.target);UpdateWorld(tx,go,a);summary="Рельеф, материалы земли, вода и положение объектов обновлены.";break;
+                        case "update_world":go=resolve(command.target);UpdateWorld(tx,go,a);WorldGameplayTools.RevalidateAfterTerrainUpdate(tx,go);summary="Рельеф, материалы земли, вода, опорные высоты и навигация обновлены.";break;
                         case "create_npc":
                             if(!getGroup().GetComponent<WorldPlayground>())Undo.AddComponent<WorldPlayground>(getGroup());
                             go=WorldComposer.Npc(tx,parent,command.name,(string)a["role"]??"Житель");Undo.AddComponent<Inventory>(go);var entity=Undo.AddComponent<WorldEntity>(go);entity.Id=command.name;entity.Interactable=true;
@@ -265,6 +298,7 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
                             // New point/spot placement is terrain-aware; edits remain exact unless explicitly opted in.
                             bool alignLight=(bool?)a["on_terrain"]==true||(string.IsNullOrEmpty(command.target)&&(bool?)a["on_terrain"]!=false);
                             bool liftedLight=alignLight&&LiftLightAboveTerrain(light);
+                            if(alignLight)WorldGameplayTools.MarkLightAnchor(light,FindTerrain(go.transform));
                             if(a["intensity"]!=null&&!Mathf.Approximately(light.intensity,(float)a["intensity"]))throw new InvalidOperationException("Light read-back failed.");summary=liftedLight?"Параметры света применены; источник поднят над рельефом и водой с сохранением XZ.":"Параметры источника света применены.";break;
                         case "create_camera":
                             go=tx.Empty(command.name,parent,"camera");var cam=Undo.AddComponent<Camera>(go);ApplyTransform(go,a,null);if(a["look_at"]!=null)go.transform.LookAt(Vector(a["look_at"],"look_at"));cam.fieldOfView=(float?)a["field_of_view"]??50;cam.orthographic=(bool?)a["orthographic"]??false;cam.orthographicSize=(float?)a["size"]??10;cam.farClipPlane=4000;cam.enabled=(bool?)a["enabled"]??!SceneObjects().Select(o=>o.GetComponent<Camera>()).Any(c=>c&&c!=cam&&c.enabled);if(a["background"]!=null){cam.clearFlags=CameraClearFlags.SolidColor;cam.backgroundColor=ColorValue(a["background"]);}summary="Камера создана. Существующие камеры сохранены.";break;
@@ -278,7 +312,7 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
                             if(!EditorSceneManager.SaveScene(SceneManager.GetActiveScene(),path)||!File.Exists(path)||!AssetDatabase.LoadAssetAtPath<SceneAsset>(path))throw new IOException("Scene save/read-back failed.");summary="Сцена сохранена: "+path;break;
                         case "inspect_object":go=resolve(command.target);summary=Inspect(go).ToString(Newtonsoft.Json.Formatting.None);break;
                         case "search_project":summary=new JArray(AssetDatabase.FindAssets((string)a["query"],new[]{"Assets","Packages"}).Take((int?)a["limit"]??20).Select(AssetDatabase.GUIDToAssetPath)).ToString(Newtonsoft.Json.Formatting.None);break;
-                        case "read_script":summary=ChatHistoryStore.Redact(File.ReadAllText((string)a["path"]));break;
+                        case "read_script":string scriptPath=(string)a["path"];summary=new JObject{["path"]=scriptPath,["sha256"]=AgentSourcePatches.SourceHash(scriptPath),["source"]=ChatHistoryStore.Redact(File.ReadAllText(scriptPath))}.ToString(Newtonsoft.Json.Formatting.None);break;
                     }
                     if(go&&new[]{"create_world","create_npc","create_object","scatter_objects","create_camera","set_lighting"}.Contains(command.tool))
                     {aliases["@"+command.name]=go;aliases[command.name]=go;}

@@ -1,0 +1,11 @@
+{
+  "success": false,
+  "phase": "restored",
+  "error": "System.InvalidOperationException: Checkpoint restore failed: После задачи появились ручные изменения. Ничего не восстановлено. Scene working state changed: InitTestScenef4e09e19-b501-4983-9e88-21e26fe1bdda\n  at WorkflowAcceptanceRunner.Tick () [0x00918] in /Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/workflow-test-project/Assets/Editor/WorkflowAcceptanceRunner.cs:114 ",
+  "events": [
+    "Two-file diff reviewed by this explicit test runner; deliberately invalid symbol exercises bounded compile repair.",
+    "Compiler error observed; repair limited to reviewed Health file.",
+    "Successful compiler callback survived reload; request resumed into actual TestRunner job.",
+    "Actual Play damage/death checks pass; final empty model reply accepted only with passing independent evidence."
+  ]
+}

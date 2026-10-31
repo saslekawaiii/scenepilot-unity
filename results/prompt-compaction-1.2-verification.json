@@ -1,0 +1,83 @@
+{
+  "recorded_utc": "2026-10-31T22:32:18.431301+00:00",
+  "snapshot_receipt": "results/integration-1.2-snapshot-fifth-final.json",
+  "snapshot_content_tree_sha256": "a8167089aa205071d0c7d2a8a0d43df804c909a3e07ab318f5bd5354843e04dc",
+  "production_files": {
+    "Editor/Assistant/ChatController.cs": "9144f545b4784c91b6e7527de8789bd73abc6221bd19296504a681955420b6c7",
+    "Editor/Assistant/AgentTasks.cs": "3d5b6d8936d4deb8f6fe81dede505d2a4bc0fd075dee112304aa9f17895a2f20"
+  },
+  "focused_actual_unity": {
+    "unity_exit_code": 0,
+    "passed": 106,
+    "failed": 0,
+    "duration_seconds": "9.2532284",
+    "xml": "results/prompt-compaction-1.2-focused-final.xml",
+    "xml_sha256": "5b10c305a379c5f166390ba1feed8da5732229ff881cd12550d5639dba018b8d",
+    "log": "results/prompt-compaction-1.2-focused-final.log",
+    "log_sha256": "9d0e22bba79e67710129310b3317ebb87a4bedfdf27bb14235f8b177d1692f72"
+  },
+  "projection_character_metrics": {
+    "readback": {
+      "full_host_json_chars": 35509,
+      "model_projection_chars": 2720,
+      "fixture": "WorldWeaver.Tests.AgentPromptContextTests.ReadbackBoundsAssetListsAndRetainsFailuresWithoutChangingFullAudit"
+    },
+    "scene": {
+      "full_host_json_chars": 30000,
+      "model_projection_chars": 3107,
+      "fixture": "WorldWeaver.Tests.AgentPromptContextTests.SceneSummaryAggregatesDecorationsButPreservesScopedCountsAndImportantIdentities"
+    },
+    "task": {
+      "full_host_json_chars": 19217,
+      "model_projection_chars": 1132,
+      "fixture": "WorldWeaver.Tests.AgentPromptContextTests.TaskProjectionKeepsOriginalConstraintsAndAmbiguityWithoutBaselineIdsOrHostMutation"
+    }
+  },
+  "metrics_limitations": [
+    "Before values are full host JSON, not exact former bounded model-prompt text.",
+    "Character counts are UTF-16-compatible for these fixture strings; not tokenizer measurements.",
+    "These deterministic tests establish compaction, retrieval and host-data preservation, not model speed or answer quality. Real prompt-token/latency evidence comes only from a separate inference protocol."
+  ],
+  "behavior": [
+    "Authoritative selected schema replaces redundant all-capabilities list.",
+    "Common tree/house/rock details are aggregated with complete global logicalCounts and task scopeLogicalCounts.",
+    "Selection, unique exact named targets and task scope identities are retained; world/terrain/light/camera prioritized over large NPC collections.",
+    "Fast3000/Balanced4000/Deep6500 scene-character budgets; mandatory identity overflow is explicit rather than silent target loss.",
+    "Model task context retains original request, scope, constraints, ambiguity and indexed check results; full baseline IDs and stable criterion IDs stay in host task.",
+    "Evidence projection is bounded and reports truncation; newest eight task evidence entries are selected.",
+    "Readback <=3000 characters for validated tool payloads, complete counts/status plus limited asset samples and explicit omitted result count.",
+    "Full host task/results/live scene are unchanged; find_scene_objects and inspect_object retrieve omitted data.",
+    "Literal terrain parsing recognizes valley/village and world inflections; allowed qualifiers/nouns bind height to terrain, object/NPC height remains separate.",
+    "No completion shortcut: model review, independent checks and real editor jobs still control task outcome."
+  ],
+  "historical_diagnostics": [
+    {
+      "log": "results/prompt-compaction-1.2-focused.log",
+      "unity_exit_code": 1,
+      "cause": "New test typo TerrainSpec.Width versus existing width, fixed before any tests ran."
+    },
+    {
+      "xml": "results/prompt-compaction-1.2-focused-v2.xml",
+      "passed": 99,
+      "failed": 2,
+      "cause": "New regression tests exposed unsupported singular новое modifier and height subject inserted before numeric value; bounded parsing fixed and final106 passed."
+    },
+    {
+      "xml": "results/prompt-compaction-1.2-focused-v3.xml",
+      "passed": 104,
+      "failed": 0,
+      "note": "Prior height parser version; subsequently strengthened with two NPC/object-in-world negative cases."
+    }
+  ],
+  "full_suite_followup": "results/integration-1.2-fifth-summary.json",
+  "full_suite_actual_unity": {
+    "receipt": "results/integration-1.2-fifth-summary.json",
+    "editmode_passed": 267,
+    "playmode_passed": 9,
+    "failed": 0,
+    "unity_exit_codes": [
+      0,
+      0
+    ]
+  }
+}

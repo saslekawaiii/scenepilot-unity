@@ -36,6 +36,21 @@ namespace WorldWeaver
         public string LastSpeech { get; private set; } = "Готов к разговору.";
         public string LastError { get; private set; }
         public bool Busy { get; private set; }
+        [SerializeField] private List<KnowledgeDocument> persistentMemory = new List<KnowledgeDocument>();
+        public List<KnowledgeDocument> ExportMemory() => pipeline != null ? pipeline.ExportMemory() : new List<KnowledgeDocument>(persistentMemory);
+        public void RestoreMemory(IEnumerable<KnowledgeDocument> saved)
+        {
+            if (Busy) throw new InvalidOperationException("NPC is busy.");
+            var next = new List<KnowledgeDocument>(saved ?? Array.Empty<KnowledgeDocument>());
+            if (next.Count > 32 || next.Exists(d => d == null || d.Scope != CharacterId || d.Kind == MemoryKind.StaticKnowledge || !Enum.IsDefined(typeof(MemoryKind),d.Kind) || d.Text == null || d.Text.Length > 900 || string.IsNullOrWhiteSpace(d.Id))) throw new ArgumentException("Invalid scoped NPC memory.");
+            persistentMemory = next; pipeline?.RestoreMemory(next,CharacterId);
+        }
+        public void RememberEvent(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return;
+            var next = ExportMemory(); next.Add(new KnowledgeDocument { Id=Guid.NewGuid().ToString("N"), Scope=CharacterId,Title="Событие",Kind=MemoryKind.Episodic,Text=text.Substring(0,Math.Min(900,text.Length)) });
+            while (next.Count > 32) next.RemoveAt(0); RestoreMemory(next);
+        }
         private NpcPipeline pipeline;
         private CancellationTokenSource lifetime;
         private WorldEntity follow;
@@ -52,6 +67,7 @@ namespace WorldWeaver
                 {
                     if (!Models) throw new InvalidOperationException("Assign an Orchestrator Profile.");
                     pipeline = new NpcPipeline(new ModelRouter(Models), new RagIndex(new OllamaEmbeddingProvider(Models.EmbeddingEndpoint, Models.EmbeddingModel)), new ActionDispatcher());
+                    pipeline.RestoreMemory(persistentMemory,CharacterId);
                 }
                 return pipeline;
             }
@@ -73,7 +89,7 @@ namespace WorldWeaver
                 }
                 catch (OperationCanceledException) { State = NpcState.Idle; LastError = "Cancelled."; throw; }
                 catch (Exception error) { State = NpcState.Failed; LastError = error is ProviderException || error is ArgumentException ? error.Message : error.GetType().Name; throw; }
-                finally { Busy = false; nextPlan = Time.unscaledTime + PlanningCooldown; if (!this || !isActiveAndEnabled) ReleaseServices(); }
+                finally { if (pipeline != null) persistentMemory = pipeline.ExportMemory(); Busy = false; nextPlan = Time.unscaledTime + PlanningCooldown; if (!this || !isActiveAndEnabled) ReleaseServices(); }
             }
         }
         private async void Update()
@@ -98,8 +114,8 @@ namespace WorldWeaver
         }
         public void StopMovement()
         { follow = null; var agent = GetComponent<NavMeshAgent>(); if (agent && agent.isOnNavMesh) { agent.ResetPath(); agent.isStopped = true; } State = NpcState.Waiting; }
-        public void ClearMemory() { if (!Busy) pipeline?.ClearMemory(); }
+        public void ClearMemory() { if (!Busy) { persistentMemory.Clear(); pipeline?.ClearMemory(); } }
         public async Task ReindexAsync(CancellationToken token) { if (Busy) throw new InvalidOperationException("NPC is busy."); await Services.ReindexAsync(this, token); }
-        public void ReleaseServices() { pipeline?.Dispose(); pipeline = null; }
+        public void ReleaseServices() { if (pipeline != null) persistentMemory = pipeline.ExportMemory(); pipeline?.Dispose(); pipeline = null; }
     }
 }

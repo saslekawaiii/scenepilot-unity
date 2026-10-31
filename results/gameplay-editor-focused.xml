@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="3" result="Passed" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-10-31 20:45:21Z" end-time="2026-10-31 20:45:22Z" duration="1.2939939">
+  <test-suite type="TestSuite" id="1000" name="UnityProject" fullname="UnityProject" runstate="Runnable" testcasecount="111" result="Passed" start-time="2026-10-31 20:45:21Z" end-time="2026-10-31 20:45:22Z" duration="1.293994" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1122" name="WorldWeaver.EditMode.dll" fullname="/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/gameplay-test-project/Library/ScriptAssemblies/WorldWeaver.EditMode.dll" runstate="Runnable" testcasecount="111" result="Passed" start-time="2026-10-31 20:45:21Z" end-time="2026-10-31 20:45:22Z" duration="1.286165" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="30417" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1123" name="WorldWeaver" fullname="WorldWeaver" runstate="Runnable" testcasecount="111" result="Passed" start-time="2026-10-31 20:45:21Z" end-time="2026-10-31 20:45:22Z" duration="1.282575" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1124" name="Tests" fullname="WorldWeaver.Tests" runstate="Runnable" testcasecount="111" result="Passed" start-time="2026-10-31 20:45:21Z" end-time="2026-10-31 20:45:22Z" duration="1.281411" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestFixture" id="1118" name="WorldGameplayEditorTests" fullname="WorldWeaver.Tests.WorldGameplayEditorTests" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-31 20:45:21Z" end-time="2026-10-31 20:45:22Z" duration="1.279562" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1120" name="AnchoredLightRetainsClearanceAfterWaterAndHeightChange" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.AnchoredLightRetainsClearanceAfterWaterAndHeightChange" methodname="AnchoredLightRetainsClearanceAfterWaterAndHeightChange" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" seed="1063720497" result="Passed" start-time="2026-10-31 20:45:21Z" end-time="2026-10-31 20:45:21Z" duration="0.115724" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1121" name="PrefabScriptsRequireExplicitReviewAndOriginalAssetIsUntouched" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.PrefabScriptsRequireExplicitReviewAndOriginalAssetIsUntouched" methodname="PrefabScriptsRequireExplicitReviewAndOriginalAssetIsUntouched" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" seed="1727903917" result="Passed" start-time="2026-10-31 20:45:21Z" end-time="2026-10-31 20:45:21Z" duration="0.096491" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1119" name="VillageHasConnectedEntrancesAndSurvivesSceneReload" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.VillageHasConnectedEntrancesAndSurvivesSceneReload" methodname="VillageHasConnectedEntrancesAndSurvivesSceneReload" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" seed="69107116" result="Passed" start-time="2026-10-31 20:45:21Z" end-time="2026-10-31 20:45:22Z" duration="1.057369" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Saving results to: /Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/gameplay-editor-focused.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

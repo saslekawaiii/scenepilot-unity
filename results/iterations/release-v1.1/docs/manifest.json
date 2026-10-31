@@ -1,0 +1,25 @@
+{
+  "version": "1.1.0",
+  "archivedUtc": "2026-10-31T21:18:02.948213+00:00",
+  "reason": "Preserve pre-1.2 documentation; measured1.1 results are historical and not reassigned to1.2.",
+  "files": [
+    {
+      "originalPath": "README.md",
+      "archivePath": "results/iterations/release-v1.1/docs/README.md",
+      "sha256": "90673a5454490c2d36db75d09b04700249ef0233c6547c49df5cfe72f268d471",
+      "bytes": 27107
+    },
+    {
+      "originalPath": "Packages/com.worldweaver.toolkit/Documentation~/index.md",
+      "archivePath": "results/iterations/release-v1.1/docs/Packages/com.worldweaver.toolkit/Documentation~/index.md",
+      "sha256": "14903e1a17e6999cc6be78b5afd3dd4124fcbba92c0529ed51b6a670eaff6452",
+      "bytes": 11965
+    },
+    {
+      "originalPath": "docs/research/chat-agent-comparison.md",
+      "archivePath": "results/iterations/release-v1.1/docs/docs/research/chat-agent-comparison.md",
+      "sha256": "08c33397149a1ba1a9cddfccc4768928789dd3be1948720159314191cc0693c9",
+      "bytes": 34637
+    }
+  ]
+}

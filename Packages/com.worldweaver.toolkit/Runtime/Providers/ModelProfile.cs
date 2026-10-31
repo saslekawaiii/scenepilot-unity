@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace WorldWeaver
 {
+    public enum OpenAIResponseMode { JsonObject, JsonSchema, Text }
     /// <summary>Public connection parameters. Only the NAME of an environment variable is serialized.</summary>
     [CreateAssetMenu(menuName = "WorldWeaver/Model Profile")]
     public sealed class ModelProfile : ScriptableObject
@@ -17,6 +18,7 @@ namespace WorldWeaver
         [Range(64, 8192)] public int MaxTokens = 768;
         [Range(1024, 32768)] public int ContextWindow = 4096;
         public bool StrictSchema = true;
+        public OpenAIResponseMode ResponseMode = OpenAIResponseMode.JsonObject;
 
         public void Validate()
         {
@@ -25,6 +27,7 @@ namespace WorldWeaver
                 !string.IsNullOrEmpty(uri.UserInfo) || !string.IsNullOrEmpty(uri.Query) || !string.IsNullOrEmpty(uri.Fragment))
                 throw new ArgumentException("Use HTTPS or loopback HTTP, without credentials, query or fragment.");
             if (string.IsNullOrWhiteSpace(Model) || Model.Length > 200) throw new ArgumentException("Model ID is required.");
+            if(!Enum.IsDefined(typeof(OpenAIResponseMode),ResponseMode))throw new ArgumentException("Invalid response mode.");
             if (TimeoutSeconds < 1 || TimeoutSeconds > 300 || Retries < 0 || Retries > 3 ||
                 MaxTokens < 64 || MaxTokens > 8192 || ContextWindow < 1024 || ContextWindow > 32768 || float.IsNaN(Temperature) || Temperature < 0 || Temperature > 2)
                 throw new ArgumentException("Invalid model limits.");

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="6" result="Passed" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-10-31 20:45:48Z" end-time="2026-10-31 20:45:52Z" duration="3.8275638">
+  <test-suite type="TestSuite" id="1017" name="UnityProject" fullname="UnityProject" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-10-31 20:45:48Z" end-time="2026-10-31 20:45:52Z" duration="3.827564" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <test-suite type="Assembly" id="1014" name="WorldWeaver.PlayMode.dll" fullname="/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/gameplay-test-project/Library/ScriptAssemblies/WorldWeaver.PlayMode.dll" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-10-31 20:45:48Z" end-time="2026-10-31 20:45:52Z" duration="3.820783" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="30497" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <test-suite type="TestSuite" id="1015" name="WorldWeaver" fullname="WorldWeaver" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-10-31 20:45:48Z" end-time="2026-10-31 20:45:52Z" duration="3.820381" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1016" name="Tests" fullname="WorldWeaver.Tests" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-10-31 20:45:48Z" end-time="2026-10-31 20:45:52Z" duration="3.817902" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestFixture" id="1002" name="AssistantBehaviorTests" fullname="WorldWeaver.Tests.AssistantBehaviorTests" classname="WorldWeaver.Tests.AssistantBehaviorTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-10-31 20:45:48Z" end-time="2026-10-31 20:45:48Z" duration="0.021863" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1003" name="PatrolPathCanShrinkWhileRunning" fullname="WorldWeaver.Tests.AssistantBehaviorTests.PatrolPathCanShrinkWhileRunning" methodname="PatrolPathCanShrinkWhileRunning" classname="WorldWeaver.Tests.AssistantBehaviorTests" runstate="Runnable" seed="1399616142" result="Passed" start-time="2026-10-31 20:45:48Z" end-time="2026-10-31 20:45:48Z" duration="0.014156" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1004" name="NavigationTests" fullname="WorldWeaver.Tests.NavigationTests" classname="WorldWeaver.Tests.NavigationTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-31 20:45:48Z" end-time="2026-10-31 20:45:49Z" duration="1.021342" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1006" name="GiveItemInPlayMode" fullname="WorldWeaver.Tests.NavigationTests.GiveItemInPlayMode" methodname="GiveItemInPlayMode" classname="WorldWeaver.Tests.NavigationTests" runstate="Runnable" seed="1056432918" result="Passed" start-time="2026-10-31 20:45:48Z" end-time="2026-10-31 20:45:48Z" duration="0.007710" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1005" name="MoveAndFollowUseNavMesh" fullname="WorldWeaver.Tests.NavigationTests.MoveAndFollowUseNavMesh" methodname="MoveAndFollowUseNavMesh" classname="WorldWeaver.Tests.NavigationTests" runstate="Runnable" seed="1922641243" result="Passed" start-time="2026-10-31 20:45:48Z" end-time="2026-10-31 20:45:49Z" duration="1.012751" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1010" name="WorldGameplayTests" fullname="WorldWeaver.Tests.WorldGameplayTests" classname="WorldWeaver.Tests.WorldGameplayTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-31 20:45:49Z" end-time="2026-10-31 20:45:52Z" duration="2.773531" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1013" name="DeliveryInventoryRewardAndScopedMemorySurviveDiskReload" fullname="WorldWeaver.Tests.WorldGameplayTests.DeliveryInventoryRewardAndScopedMemorySurviveDiskReload" methodname="DeliveryInventoryRewardAndScopedMemorySurviveDiskReload" classname="WorldWeaver.Tests.WorldGameplayTests" runstate="Runnable" seed="1700507549" result="Passed" start-time="2026-10-31 20:45:49Z" end-time="2026-10-31 20:45:49Z" duration="0.129654" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1011" name="NamedPatrolUsesCompletePathAroundObstacle" fullname="WorldWeaver.Tests.WorldGameplayTests.NamedPatrolUsesCompletePathAroundObstacle" methodname="NamedPatrolUsesCompletePathAroundObstacle" classname="WorldWeaver.Tests.WorldGameplayTests" runstate="Runnable" seed="1012212296" result="Passed" start-time="2026-10-31 20:45:49Z" end-time="2026-10-31 20:45:51Z" duration="1.942396" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1012" name="UnreachablePatrolDoesNotMoveThroughEmptySpace" fullname="WorldWeaver.Tests.WorldGameplayTests.UnreachablePatrolDoesNotMoveThroughEmptySpace" methodname="UnreachablePatrolDoesNotMoveThroughEmptySpace" classname="WorldWeaver.Tests.WorldGameplayTests" runstate="Runnable" seed="866029289" result="Passed" start-time="2026-10-31 20:45:51Z" end-time="2026-10-31 20:45:52Z" duration="0.700621" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Saving results to: /Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/gameplay-play-focused.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

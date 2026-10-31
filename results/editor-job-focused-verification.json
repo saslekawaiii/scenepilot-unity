@@ -1,0 +1,44 @@
+{
+  "schema": 2,
+  "kind": "actual-public-job-api-and-runtime-rotation-verification",
+  "success": true,
+  "api_success": true,
+  "api_raw_sha256": "b0b7010c583ec8a51f3596cf3d55eecf08fcec46ba68b1c2bf44bf4c0cd09e83",
+  "job_source_sha256": "92338a3c938d6b99b09d9a23932039b7962a49128abe9d4bb09040306da8197e",
+  "scene_scope_source_sha256": "db986be8470e51c6877b11ffff27173fe913c2df54b72a29e0a8fdefeeb8fc83",
+  "api_results": {
+    "edit": {
+      "path": "results/editor-job-api-edit.xml",
+      "sha256": "32511272e033c7b53467c21cc92abb7133049b6b4021d18aad057244beedf5b5"
+    },
+    "play": {
+      "path": "results/editor-job-api-play.xml",
+      "sha256": "974c4858ead7115552db21e5acd2fdf8a7f48e7a27f66b86ef49b8ad44eb0662"
+    },
+    "emptyNegative": {
+      "path": "results/editor-job-api-empty.xml",
+      "sha256": "7f4e80b980b5f9e5ebff5acad17e9e8b46cd287eb1f74bd923fc7e6c4386649c"
+    }
+  },
+  "scene_scope_regression": {
+    "path": "results/schedule-editor-focused.xml",
+    "total": 14,
+    "passed": 14,
+    "includes": "3 actual scene scope conflict/dirty saved scene tests, 7 checkpoint, 4 gameplay Editor"
+  },
+  "rotation_raw_sha256": "7b06e6efe470162bc524610326839b4980802e9768ee9f7b1ef42d108cae03da",
+  "rotation_source_at_runtime_sha256": "92338a3c938d6b99b09d9a23932039b7962a49128abe9d4bb09040306da8197e",
+  "scope": [
+    "public RunTests actual NUnit Edit4/4 and Play6/6",
+    "zero-test filter returns failure",
+    "queued cancellation never starts backend run",
+    "RunFinished is nonterminal until real TestRunner cleanup and exact user scene restore",
+    "dirty untitled object/GUID/RenderSettings/outer checkpoint preserved across real Play domain reload",
+    "actual exact reviewed local9B C# rotation plus stationary negative control"
+  ],
+  "limitations": [
+    "full-project build not executed by this receipt",
+    "running-test cancellation callback path not separately fault-injected",
+    "Framework1.6 internal IsRunning probe is version-bound; missing probe rejects before tests start"
+  ]
+}

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="0" result="Passed" total="0" passed="0" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-10-31 21:26:19Z" end-time="2026-10-31 21:26:19Z" duration="0.0014353">
+  <test-suite type="TestSuite" id="1021" name="UnityProject" fullname="UnityProject" runstate="Runnable" testcasecount="123" result="Passed" start-time="2026-10-31 21:26:19Z" end-time="2026-10-31 21:26:19Z" duration="0.001435" total="0" passed="0" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+  </test-suite>
+</test-run>

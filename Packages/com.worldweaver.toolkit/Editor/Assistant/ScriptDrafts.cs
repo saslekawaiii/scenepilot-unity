@@ -23,6 +23,7 @@ namespace WorldWeaver.Editor.Assistant
         private const string StatePath = "UserSettings/WorldWeaverChatCode.json";
         private const string JournalFolder = "UserSettings/WorldWeaverChatCode";
         private static readonly List<string> errors = new List<string>();
+        private static readonly List<string> compiledAssemblies = new List<string>();
 
         [Serializable] private sealed class FileBackup { public string Path, Before, After, BeforeBytes, BeforeSha256, AfterSha256; public bool Existed; }
         [Serializable] private sealed class State
@@ -40,12 +41,13 @@ attach_script: name=class name of an ALREADY COMPILED WorldWeaver-generated scri
 
         static ScriptDrafts()
         {
-            CompilationPipeline.compilationStarted += _ => errors.Clear();
-            CompilationPipeline.assemblyCompilationFinished += (_, messages) =>
+            CompilationPipeline.compilationStarted += _ => {errors.Clear();compiledAssemblies.Clear();};
+            CompilationPipeline.assemblyCompilationFinished += (assembly, messages) =>
             {
                 if (!Pending) return;
+                if(!messages.Any(m=>m.type==CompilerMessageType.Error))compiledAssemblies.Add(assembly);
                 foreach (var message in messages.Where(m => m.type == CompilerMessageType.Error))
-                    if (errors.Count < 20) errors.Add(message.file + ":" + message.line + " " + message.message);
+                    if (errors.Count < 20) errors.Add(message.file + "(" + message.line + "," + message.column + "): " + message.message);
             };
             CompilationPipeline.compilationFinished += _ => Finish();
             // Recover only an import that was already pending when this domain loaded.
@@ -216,6 +218,7 @@ attach_script: name=class name of an ALREADY COMPILED WorldWeaver-generated scri
             errors.Clear();
             EditorApplication.delayCall += () => { AssetDatabase.Refresh(); CompilationPipeline.RequestScriptCompilation(); };
             return state.Files.Select(file => new EditorCommandResult { Success = true, Tool = "draft_script", Target = file.Path,
+                SourceHashes=new Dictionary<string,string>{{file.Path,file.AfterSha256}},
                 Summary = "C# сохранён после просмотра; итог компиляции появится в чате.", CreatedAssets = new List<string> { file.Path } }).ToList();
         }
 
@@ -258,6 +261,7 @@ attach_script: name=class name of an ALREADY COMPILED WorldWeaver-generated scri
             if (message == null) return;
             message.IsError = !success; message.Status = success ? state.Restoring ? "Код восстановлен" : "Код скомпилирован" : "Нужно проверить код";
             message.Steps.Add(new EditorCommandResult { Success = success, Tool = state.Restoring ? "restore_compile_scripts" : "compile_scripts",
+                SourceHashes=success&&!state.Restoring?AgentCompilationEvidence.Confirm(message,compiledAssemblies):new Dictionary<string,string>(),
                 Target = string.Join(", ", state.Files.Select(f => f.Path)), Summary = state.Outcome, Error = success ? null : state.Outcome });
             store.Save(session);
         }

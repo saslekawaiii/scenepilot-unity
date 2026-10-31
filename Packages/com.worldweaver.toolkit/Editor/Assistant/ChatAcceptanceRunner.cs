@@ -22,6 +22,7 @@ namespace WorldWeaver.Editor.Assistant
     public static class ChatAcceptanceRunner
     {
         private static string ModelKey => Environment.GetEnvironmentVariable("WW_CHAT_MODEL") ?? new ChatSettings().ModelKey;
+        private static AssistantPower Power => Enum.TryParse(Environment.GetEnvironmentVariable("WW_CHAT_POWER"), true, out AssistantPower value) && Enum.IsDefined(typeof(AssistantPower), value) ? value : AssistantPower.Balanced;
         private static bool running;
 
         [MenuItem("Tools/WorldWeaver/Testing/Chat Acceptance")]
@@ -38,7 +39,7 @@ namespace WorldWeaver.Editor.Assistant
                 ["schemaVersion"] = 1, ["runner"] = typeof(ChatAcceptanceRunner).FullName,
                 ["acceptanceCriteriaVersion"] = 2, ["lightCriterion"] = "Three actual orange Points within terrain bounds, at least3m above terrain/water, with range reaching ground; no render-quality claim.",
                 ["startedUtc"] = DateTime.UtcNow.ToString("o"), ["unityVersion"] = Application.unityVersion,
-                ["modelKey"] = ModelKey, ["power"] = AssistantPower.Balanced.ToString(),
+                ["modelKey"] = ModelKey, ["power"] = Power.ToString(),
                 ["providerMode"] = ModelKey.StartsWith("pollinations:", StringComparison.Ordinal) ? "real-free-cloud-inference" : "real-local-inference", ["tests"] = tests,
                 ["capturedReviewOnlyPlans"] = capturedPending,
                 ["scriptReviewGranted"] = false, ["pendingPlansAppliedByRunner"] = 0,
@@ -67,7 +68,7 @@ namespace WorldWeaver.Editor.Assistant
                 controller = new ChatController(historyFolder: history);
                 if (!controller.Models.Any(model => model.Key == ModelKey)) await controller.RefreshModelsAsync();
                 controller.Settings.ModelKey = ModelKey;
-                controller.Settings.Power = AssistantPower.Balanced;
+                controller.Settings.Power = Power;
                 controller.Settings.AutoApply = true;
                 controller.SaveSettings();
                 string sessionId = controller.Current.Id;

@@ -1,0 +1,141 @@
+{
+  "schema": 1,
+  "kind": "custom-chat-model-connections-mock-http-and-real-domain-reload",
+  "success": true,
+  "unity": "6000.3.27f1",
+  "tests": {
+    "path": "results/custom-model-connections-focused.xml",
+    "sha256": "6bff586ed235e23cddd3ede637fbcdb66a4f74e65bb6b9d23cba8be4b3012ac0",
+    "passed": 14,
+    "failed": 0,
+    "cases": [
+      {
+        "name": "CloudImagesAreRejectedBeforeAnyHttpRequest",
+        "result": "Passed"
+      },
+      {
+        "name": "EscapedSessionSecretIsRedactedFromJsonHistoryAndMetadata",
+        "result": "Passed"
+      },
+      {
+        "name": "ExplicitResponseTestIsTheOnlyProbeThatPostsAChatRequest",
+        "result": "Passed"
+      },
+      {
+        "name": "HealthOnlyListsModelsAndCustomDropdownRefreshUsesThatActualServer",
+        "result": "Passed"
+      },
+      {
+        "name": "InvalidUrlsAndCredentialMetadataFailBeforeWriting",
+        "result": "Passed"
+      },
+      {
+        "name": "OllamaEmbeddingOnlyCapabilityDoesNotBecomeAnAvailableChatModel",
+        "result": "Passed"
+      },
+      {
+        "name": "OllamaProxyEndpointAndLocalVisionComeFromActualShowResponse",
+        "result": "Passed"
+      },
+      {
+        "name": "OpenAIEndpointsPreserveExplicitPathsAndNormalizeRoot(\"https://api.example.com\",\"https://api.example.com/v1\")",
+        "result": "Passed"
+      },
+      {
+        "name": "OpenAIEndpointsPreserveExplicitPathsAndNormalizeRoot(\"https://api.example.com/v1/\",\"https://api.example.com/v1\")",
+        "result": "Passed"
+      },
+      {
+        "name": "OpenAIEndpointsPreserveExplicitPathsAndNormalizeRoot(\"https://api.example.com/custom/v1/chat/completions\",\"https://api.example.com/custom/v1\")",
+        "result": "Passed"
+      },
+      {
+        "name": "OpenAIEndpointsPreserveExplicitPathsAndNormalizeRoot(\"https://api.example.com/chat/completions\",\"https://api.example.com\")",
+        "result": "Passed"
+      },
+      {
+        "name": "OpenAIEndpointsPreserveExplicitPathsAndNormalizeRoot(\"https://api.example.com/custom/base\",\"https://api.example.com/custom/base\")",
+        "result": "Passed"
+      },
+      {
+        "name": "OpenAIRequestModesMapActualHttpBodyAndNeverSendImageCapabilities",
+        "result": "Passed"
+      },
+      {
+        "name": "SessionCredentialAndModelSelectionSurviveActualDomainReload",
+        "result": "Passed"
+      }
+    ]
+  },
+  "actualDomainReload": {
+    "reloadsAfterTestExecutionStarted": 1,
+    "caseResult": "Passed",
+    "caseDurationSeconds": 3.835191,
+    "mechanism": "RequestScriptReload + WaitForDomainReload + changed static domain nonce, then reopen controller/config/history"
+  },
+  "sourceSha256": {
+    "Editor/Assistant/ChatModelConnections.cs": {
+      "testedSha256": "6293422f9eb1f8524de02955ccb1a212175b889f1d8744cd2ef2cd2ad6a79b03",
+      "currentSha256": "6293422f9eb1f8524de02955ccb1a212175b889f1d8744cd2ef2cd2ad6a79b03",
+      "match": true
+    },
+    "Editor/Assistant/ChatModelConnectionWindow.cs": {
+      "testedSha256": "5541f98a098560473a4dc4abee23bc4ccc54bab3b657a58c88e855b69fa2fa59",
+      "currentSha256": "50a68372637c967f59d65ff17886b4942a2bae6c000679f58827a03615c90fdd",
+      "match": false
+    },
+    "Editor/Assistant/ChatController.cs": {
+      "testedSha256": "ab5dd357819ba084d1b9e37a1f6665caa10b97f02b9e163e049280bcfebc5a4f",
+      "currentSha256": "ab5dd357819ba084d1b9e37a1f6665caa10b97f02b9e163e049280bcfebc5a4f",
+      "match": true
+    },
+    "Editor/Assistant/ChatHistoryStore.cs": {
+      "testedSha256": "d7352e3c076fad106661f539170ec4393902b93d047dad1e42ccfe530a17b586",
+      "currentSha256": "d7352e3c076fad106661f539170ec4393902b93d047dad1e42ccfe530a17b586",
+      "match": true
+    },
+    "Editor/Assistant/AssistantContracts.cs": {
+      "testedSha256": "e37a4bd700f3bc779ec7fdcc1c83979bd47ce419265fac08b9857a8f17b1d80f",
+      "currentSha256": "e37a4bd700f3bc779ec7fdcc1c83979bd47ce419265fac08b9857a8f17b1d80f",
+      "match": true
+    },
+    "Runtime/Providers/ModelProfile.cs": {
+      "testedSha256": "bcdfd91e6d6f0e07333de8e3cb5bb212901264503bb4dbf909a2298abe8249f0",
+      "currentSha256": "bcdfd91e6d6f0e07333de8e3cb5bb212901264503bb4dbf909a2298abe8249f0",
+      "match": true
+    },
+    "Runtime/Providers/OpenAICompatibleProvider.cs": {
+      "testedSha256": "a3bfe1129c941993ada72681b59cbb91cafdb03497e0efa6c8c5b15b98ffd8d7",
+      "currentSha256": "a3bfe1129c941993ada72681b59cbb91cafdb03497e0efa6c8c5b15b98ffd8d7",
+      "match": true
+    },
+    "Tests/EditMode/ChatModelConnectionTests.cs": {
+      "testedSha256": "59833c9febd461f3b2f4f0870fbcdc57d13c0f591e4eaa67ecc9549058719944",
+      "currentSha256": "59833c9febd461f3b2f4f0870fbcdc57d13c0f591e4eaa67ecc9549058719944",
+      "match": true
+    }
+  },
+  "llmInferencePerformed": false,
+  "externalProviderConnectivityTested": false,
+  "scope": [
+    "Actual loopback mock HTTP request paths for root /v1, custom API prefix and full chat/completions URL",
+    "GET-only OpenAI models health; explicit response is the only probe issuing chat POST",
+    "JsonSchema, JsonObject and Text map actual request body; text omits response_format",
+    "Local Ollama capabilities come from /api/show; embedding-only model rejected; cloud images rejected before HTTP",
+    "Session credential remains process-only across real domain reload, config and model-dropdown selection reload correctly",
+    "Exact and JSON-escaped secret values absent from config/history, including remove(clear env) and subsequent Save",
+    "Remove clears only auto-created session env; external credential env variables are not removed"
+  ],
+  "storage": {
+    "nonSecretMetadata": "UserSettings/WorldWeaverModels/connections.json",
+    "sessionKey": "process Environment plus memory-only redaction set; no EditorPrefs/keychain/files",
+    "persistentAccess": "user-managed environment variable; only its name is saved"
+  },
+  "limitations": [
+    "Mock server validates adapter/protocol behavior, not every external provider/model",
+    "Supports Ollama and OpenAI-compatible Chat Completions, not native Anthropic Messages or Gemini",
+    "Custom cloud adapter is text-only; local loopback Ollama vision is enabled only after capabilities probe",
+    "Cloud token limit field is max_tokens; providers requiring a different request protocol may need another adapter",
+    "API form rendering/native screenshots are verified separately by root; caption-only live edits may differ from tested backend snapshot"
+  ]
+}

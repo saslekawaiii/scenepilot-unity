@@ -5,7 +5,7 @@ using Newtonsoft.Json.Linq;
 namespace WorldWeaver.Editor.Assistant
 {
     /// <summary>
-    /// Typed generation contract for the 16 scene tools and two reviewed code tools.
+    /// Typed generation contract for scene, gameplay, project and reviewed source operations.
     /// This guides structured decoding; SceneToolExecutor and ScriptDrafts remain authoritative.
     /// Unions are standalone anyOf nodes, without properties/type siblings or remote references.
     /// </summary>
@@ -55,8 +55,22 @@ namespace WorldWeaver.Editor.Assistant
                 }, "code"), ClassName(), EmptyTarget()),
                 Command("attach_script", Object(new JObject()), ClassName(), ExplicitTarget())
             };
+            foreach (var schema in WorldGameplayTools.CommandSchemas()) commands.Add(schema);
+            foreach (var schema in AgentProjectTools.CommandSchemas()) commands.Add(schema);
+            commands.Add(AgentSourcePatches.CommandSchema());
             return new JObject { ["anyOf"] = commands };
         }
+
+        public static JObject Restrict(IEnumerable<string> allowed, bool decoder)
+        {
+            var set = new HashSet<string>(allowed);
+            var schema = CommandSchema();
+            schema["anyOf"] = new JArray(((JArray)schema["anyOf"]).OfType<JObject>().Where(c => set.Contains(ToolName(c))));
+            if (decoder) RemoveLargeStringBounds(schema);
+            return schema;
+        }
+
+        public static string ToolName(JObject command) => (string)(command["properties"]?["tool"]?["const"] ?? command["properties"]?["tool"]?["enum"]?[0]);
 
         /// <summary>
         /// Local-decoder variant of the complete validation schema. Ollama 0.32.6/Qwen3.5:2b
@@ -125,7 +139,7 @@ namespace WorldWeaver.Editor.Assistant
                 {
                     var properties = (JObject)branch["properties"];
                     var required = (branch["required"] as JArray ?? new JArray()).Values<string>().ToArray();
-                    string tool = (string)command["properties"]["tool"]["enum"][0];
+                    string tool = ToolName(command);
                     if (properties["behavior"]?["enum"] is JArray modes) tool += "(" + string.Join("/", modes.Values<string>()) + ")";
                     string line = tool + ": " + string.Join(",", required.Concat(properties.Properties().Select(p => p.Name).Where(key => !required.Contains(key))));
                     if (!lines.Contains(line)) lines.Add(line);

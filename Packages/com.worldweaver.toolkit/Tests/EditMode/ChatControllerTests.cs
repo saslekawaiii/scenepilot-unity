@@ -79,14 +79,14 @@ namespace WorldWeaver.Tests
             {
                 if(round==0)return Task.FromResult(Reply(false,Create("FirstCube")));
                 var created=Find("FirstCube");Assert.That(created,Is.Not.Null,"Later inference began before actual creation.");
-                string observation=request.Messages.Last().Content;StringAssert.Contains("FirstCube",observation);StringAssert.Contains("id:"+created.GetInstanceID(),observation);
+                string observation=request.Messages.Last().Content;StringAssert.Contains("FirstCube",observation);StringAssert.Contains(ProjectContextIndex.StableTarget(created),observation);
                 if(round==1)return Task.FromResult(Reply(true,new EditorCommand{tool="set_transform",target="id:"+created.GetInstanceID(),args=new JObject{["position"]=new JArray(4,2,8)}}));
                 Assert.That(round,Is.EqualTo(2));Assert.That(created.transform.position,Is.EqualTo(new Vector3(4,2,8)));
                 return Task.FromResult(Reply(true));
             };
             var controller=Controller(provider);controller.Settings.Power=AssistantPower.Balanced;
             yield return Finish(controller.SendAsync("Создай куб и затем переставь его."));
-            var answer=controller.Current.Messages.Last();Assert.That(answer.IsError,Is.False,answer.Text);Assert.That(answer.Status,Is.EqualTo("Готово"));Assert.That(provider.Requests.Count,Is.EqualTo(3));Assert.That(answer.Steps.Count(s=>s.Success),Is.EqualTo(2));
+            var answer=controller.Current.Messages.Last();Assert.That(answer.IsError,Is.False,answer.Text);Assert.That(answer.Status,Is.EqualTo("Изменения применены"));Assert.That(provider.Requests.Count,Is.EqualTo(3));Assert.That(answer.Steps.Count(s=>s.Success),Is.EqualTo(2));
             Assert.That(Find("FirstCube").transform.position,Is.EqualTo(new Vector3(4,2,8)));Assert.That(answer.InputTokens,Is.EqualTo(39));Assert.That(answer.OutputTokens,Is.EqualTo(21));
         }
         [UnityTest] public IEnumerator RejectedPlanHasNoMutationAndProviderCanRepairIt()
@@ -101,11 +101,11 @@ namespace WorldWeaver.Tests
                     return Task.FromResult(Reply(true,Create("RepairedCube")));
                 }
                 Assert.That(round,Is.EqualTo(2));var created=Find("RepairedCube");Assert.That(created,Is.Not.Null);
-                StringAssert.Contains("id:"+created.GetInstanceID(),request.Messages.Last().Content);
+                StringAssert.Contains(ProjectContextIndex.StableTarget(created),request.Messages.Last().Content);
                 return Task.FromResult(Reply(true));
             };
             var controller=Controller(provider);controller.Settings.Power=AssistantPower.Balanced;yield return Finish(controller.SendAsync("Создай объект."));
-            var answer=controller.Current.Messages.Last();Assert.That(answer.IsError,Is.False,answer.Text);Assert.That(answer.Status,Is.EqualTo("Готово"));Assert.That(provider.Requests.Count,Is.EqualTo(3));Assert.That(Find("MustNotExist"),Is.Null);Assert.That(Find("RepairedCube"),Is.Not.Null);Assert.That(answer.Steps.Count(s=>s.Success),Is.EqualTo(1));
+            var answer=controller.Current.Messages.Last();Assert.That(answer.IsError,Is.False,answer.Text);Assert.That(answer.Status,Is.EqualTo("Изменения применены"));Assert.That(provider.Requests.Count,Is.EqualTo(3));Assert.That(Find("MustNotExist"),Is.Null);Assert.That(Find("RepairedCube"),Is.Not.Null);Assert.That(answer.Steps.Count(s=>s.Success),Is.EqualTo(1));
         }
         [UnityTest] public IEnumerator CompleteFlagStillRequiresFreshReadbackAndGoalRepair()
         {
@@ -117,7 +117,7 @@ namespace WorldWeaver.Tests
                 if(round==0)return Task.FromResult(Reply(true,Create("VerifiedCube")));
                 var cube=Find("VerifiedCube");Assert.That(cube,Is.Not.Null,"Verification must run after the real executor commits creation.");
                 string observation=request.Messages.Last().Content;
-                StringAssert.Contains("VerifiedCube",observation);StringAssert.Contains("id:"+cube.GetInstanceID(),observation);
+                StringAssert.Contains("VerifiedCube",observation);StringAssert.Contains(ProjectContextIndex.StableTarget(cube),observation);
                 Assert.That(request.Messages.Any(message=>message.Content.Contains(goal)),Is.True,"Verification lost the original user goal.");
                 if(round==1)
                 {
@@ -129,7 +129,7 @@ namespace WorldWeaver.Tests
             };
             var controller=Controller(provider);controller.Settings.Power=AssistantPower.Balanced;
             yield return Finish(controller.SendAsync(goal));
-            var answer=controller.Current.Messages.Last();Assert.That(answer.IsError,Is.False,answer.Text);Assert.That(answer.Status,Is.EqualTo("Готово"));
+            var answer=controller.Current.Messages.Last();Assert.That(answer.IsError,Is.False,answer.Text);Assert.That(answer.Status,Is.EqualTo("Изменения применены"));
             Assert.That(provider.Requests.Count,Is.EqualTo(3));Assert.That(answer.Attempts.Count,Is.EqualTo(3));Assert.That(answer.Attempts.All(attempt=>attempt.Accepted),Is.True);
             Assert.That(answer.Steps.Count,Is.EqualTo(2));Assert.That(answer.Steps.All(step=>step.Success),Is.True);
             Assert.That(answer.Steps.Select(step=>step.Tool),Is.EqualTo(new[]{"create_object","set_transform"}));
@@ -162,7 +162,7 @@ namespace WorldWeaver.Tests
             Assert.That(answer.Steps.Any(step => !step.Success && step.Tool == "batch"), Is.True,
                 "The regression must reach a real execution failure, not a validation rejection.");
             Assert.That(testScene.rootCount, Is.Zero, "The failed batch must remain rolled back.");
-            Assert.That(answer.IsError, Is.True); Assert.That(answer.Status, Is.EqualTo("Не выполнено"));
+            Assert.That(answer.IsError, Is.True); Assert.That(answer.Status, Is.EqualTo("Проверки не пройдены"));
         }
         [UnityTest] public IEnumerator CancellationBeforeCompletionCreatesNothing()
         {
@@ -208,7 +208,7 @@ namespace WorldWeaver.Tests
             var answer = controller.Current.Messages.Last();
             Assert.That(answer.Attempts[0].Response, Is.EqualTo(broken), "Retain the raw failure for auditing.");
             Assert.That(answer.Attempts[0].Error, Is.Not.Empty);
-            Assert.That(answer.IsError, Is.False, answer.Text); Assert.That(answer.Status, Is.EqualTo("Готово"));
+            Assert.That(answer.IsError, Is.False, answer.Text); Assert.That(answer.Status, Is.EqualTo("Изменения применены"));
             Assert.That(Find("RepairPrefixCube"), Is.Not.Null);
         }
         [UnityTest] public IEnumerator HistoryAndProviderRequestsRedactCredentialsAndRestoreSessionSettings()
@@ -327,7 +327,9 @@ namespace WorldWeaver.Tests
             var provider=new RecordingProvider{Respond=(round,request,token)=>
             {
                 if(round==0)return Task.FromResult(Reply(true,Draft("PreservedReviewRotor")));
-                Assert.That(request.Messages.Any(m=>m.Role=="system"&&m.Content.Contains("CURRENT REQUEST IS EXPLICITLY READ ONLY")),Is.True);
+                Assert.That(request.Messages.Any(m=>m.Role=="system"&&m.Content.Contains("User interaction mode: Ask.")),Is.True);
+                var exposed=((JArray)request.Schema["properties"]["actions"]["items"]["anyOf"]).OfType<JObject>().Select(EditorToolSchema.ToolName).ToArray();
+                Assert.That(exposed,Is.Not.Empty);Assert.That(exposed.All(SceneToolExecutor.IsReadOnlyTool),Is.True,"An explanation request must expose only read tools.");
                 return Task.FromResult(plain);
             }};
             var controller=Controller(provider);controller.Settings.ModelKey="pollinations:openai-fast";controller.Settings.Power=AssistantPower.Fast;
@@ -364,7 +366,15 @@ namespace WorldWeaver.Tests
                 string name="IntentCube"+Guid.NewGuid().ToString("N");var provider=new RecordingProvider{Respond=(round,request,token)=>Task.FromResult(round==0?Reply(true,Create(name)):Reply(true))};
                 var controller=Controller(provider);controller.Settings.Power=AssistantPower.Balanced;
                 yield return Finish(controller.SendAsync(prompt));var answer=controller.Current.Messages.Last();
-                Assert.That(answer.IsError,Is.False,answer.Text);Assert.That(answer.Steps.Single().Success,Is.True);Assert.That(Find(name),Is.Not.Null);
+                Assert.That(answer.Task.MutationAuthorized,Is.True,"Mixed edit/explain requests retain their explicit edit authorization.");
+                Assert.That(answer.Steps.Single().Success,Is.True);Assert.That(Find(name),Is.Not.Null);
+                if(prompt.EndsWith("Напиши скрипт вращения.",StringComparison.Ordinal))
+                {
+                    Assert.That(answer.Task.CompilationRequired,Is.True);
+                    Assert.That(answer.IsError,Is.True,"Creating only a cube cannot complete an additional request for a compiled script.");
+                    Assert.That(answer.Task.Checks.Single(check=>check.RequirementId=="required_compilation").Passed,Is.False);
+                }
+                else Assert.That(answer.IsError,Is.False,answer.Text);
             }
         }
         [UnityTest] public IEnumerator ReadOnlyInspectionUsesRealReadToolWithoutMutatingScene()

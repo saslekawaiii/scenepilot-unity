@@ -1,4 +1,4 @@
 {
   "name": "WorldWeaver.Editor", "rootNamespace": "WorldWeaver.Editor",
-  "references": ["WorldWeaver.Runtime", "Unity.Newtonsoft.Json"], "includePlatforms": ["Editor"]
+  "references": ["WorldWeaver.Runtime", "Unity.Newtonsoft.Json", "UnityEditor.TestRunner"], "includePlatforms": ["Editor"]
 }

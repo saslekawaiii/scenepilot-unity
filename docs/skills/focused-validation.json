@@ -1,0 +1,123 @@
+{
+  "recorded_utc": "2026-10-31T21:01:41.765564+00:00",
+  "catalog": {
+    "skills": 60,
+    "pinned_source_files_including_licenses": 62,
+    "licenses": 2,
+    "offline_sha_verification": "PASS",
+    "pinned_https_redownload_sha_verification": "PASS",
+    "focused_nunit_cases": 26,
+    "passed": 26,
+    "failed": 0,
+    "runtime_llm_quality_test": false
+  },
+  "streaming": {
+    "focused_async_loopback_tests": 10,
+    "passed": 10,
+    "failed": 0,
+    "incremental_callback_before_terminal_frame": true,
+    "cancel_and_dispose_no_later_delta": true,
+    "unicode_terminal_statistics_and_image_envelope": true,
+    "invalid_protocol_encoding_limits_timeout_rejected": true,
+    "real_ollama_inference": false
+  },
+  "execution_scope": "Actual C# implementations compiled with Unity-bundled mcs/Mono and Newtonsoft/NUnit; standalone test harness stubs Unity package-path resolver and ModelProfile/Unity carrier objects only. Full Unity Test Runner remains a separate integration check.",
+  "files": {
+    "Packages/com.worldweaver.toolkit/Editor/Assistant/AgentSkillCatalog.cs": "4fe2b663aa9af50d58cf9868e64948a605f881f20a41b1703ead0e4e358abcdc",
+    "Packages/com.worldweaver.toolkit/Tests/EditMode/AgentSkillCatalogTests.cs": "71b0dd4d4bdaa5efb5bb0ec9e152b600a6ca49168f4adc9a83a8e6e0853382b4",
+    "Packages/com.worldweaver.toolkit/Editor/Skills/catalog.json": "b5fecc5eac620fbba03af1a5549f32fa4e429d3974d2b9719da36589794e8d43",
+    "Packages/com.worldweaver.toolkit/Runtime/Providers/LocalProvider.cs": "ecf44af29d8b93108d5974de9f5442bf1577ba415a3dbfc862c573770e0af96e",
+    "Packages/com.worldweaver.toolkit/Runtime/Providers/OllamaStreamingTransport.cs": "07e8cb441ac7253369f51d56649aebd2709f427af51498165f28708ec45b20a7",
+    "Packages/com.worldweaver.toolkit/Tests/EditMode/OllamaStreamingTests.cs": "05453d5efcb1966cb9cd42702fcd969e31a8a819b3cd5c186bfc2bb0b51e9a36"
+  },
+  "actual_unity_followup": {
+    "recorded_utc": "2026-10-31T22:45:32.752994+00:00",
+    "receipt": "results/integration-1.2-sixth-summary.json",
+    "snapshot_content_tree_sha256": "ae723ac0d7e15b205ea491823ac1feadeb9d5275a9fb9b8b8387baadf9011f0c",
+    "unity_version": "6000.3.27f1",
+    "catalog_passed": 30,
+    "streaming_passed": 10,
+    "schema_and_intent_passed": 50,
+    "workflow_passed": 45,
+    "prompt_context_passed": 22,
+    "custom_api_passed": 14,
+    "editmode_passed": 300,
+    "playmode_passed": 9,
+    "failed": 0,
+    "external_inference": false,
+    "source_sha256": {
+      "Editor/Assistant/AgentSkillCatalog.cs": "abcadd98ed221fe510d3277daea4369ba2a084d5ac17f8ddc866e336a437fdf0",
+      "Tests/EditMode/AgentSkillCatalogTests.cs": "b43941f1d390f8c282b66e3069d83e4b10ec14f60842ccf5c29affa704976ef1",
+      "Editor/Skills/catalog.json": "b5fecc5eac620fbba03af1a5549f32fa4e429d3974d2b9719da36589794e8d43",
+      "Runtime/Providers/LocalProvider.cs": "ecf44af29d8b93108d5974de9f5442bf1577ba415a3dbfc862c573770e0af96e",
+      "Runtime/Providers/OllamaStreamingTransport.cs": "07e8cb441ac7253369f51d56649aebd2709f427af51498165f28708ec45b20a7",
+      "Tests/EditMode/OllamaStreamingTests.cs": "05453d5efcb1966cb9cd42702fcd969e31a8a819b3cd5c186bfc2bb0b51e9a36"
+    },
+    "scope": "Shared finite direct-world-creation routing grammar; actual7 intent matrix, negation/location/object cases, combined-world+NPC continuation, injected controller applies three lights in one batch. Includes all FIFTH source: compact context, literal terrain checks, responsive UI/custom API/checkpoints/job guards."
+  },
+  "historical_actual_unity_followups": [
+    {
+      "receipt": "results/integration-1.2-third-summary.json",
+      "snapshot_content_tree_sha256": "1728aa71cc4f144a544bb1fbe6bb6f098e1ede760682a87ca258beb738779923",
+      "unity_version": "6000.3.27f1",
+      "catalog_passed": 26,
+      "streaming_passed": 10,
+      "editmode_passed": 210,
+      "playmode_passed": 9,
+      "failed": 0,
+      "external_inference": false,
+      "scope": "Full immutable final snapshot includes lexical tool-selection/skill-budget optimization and read-only expansion regression tests. Subsequent UI centering/custom API additions are outside this snapshot."
+    },
+    {
+      "recorded_utc": "2026-10-31T22:11:09.816149+00:00",
+      "receipt": "results/integration-1.2-fourth-summary.json",
+      "snapshot_content_tree_sha256": "2ab8af32454e90fe493c8807b1fae34149fe8b8e27144b53dac46b9fdb02e685",
+      "unity_version": "6000.3.27f1",
+      "catalog_passed": 30,
+      "streaming_passed": 10,
+      "schema_binding_passed": 17,
+      "workflow_passed": 45,
+      "custom_api_passed": 14,
+      "editmode_passed": 245,
+      "playmode_passed": 9,
+      "failed": 0,
+      "external_inference": false,
+      "source_sha256": {
+        "Editor/Assistant/AgentSkillCatalog.cs": "abcadd98ed221fe510d3277daea4369ba2a084d5ac17f8ddc866e336a437fdf0",
+        "Tests/EditMode/AgentSkillCatalogTests.cs": "b43941f1d390f8c282b66e3069d83e4b10ec14f60842ccf5c29affa704976ef1",
+        "Editor/Skills/catalog.json": "b5fecc5eac620fbba03af1a5549f32fa4e429d3974d2b9719da36589794e8d43",
+        "Runtime/Providers/LocalProvider.cs": "ecf44af29d8b93108d5974de9f5442bf1577ba415a3dbfc862c573770e0af96e",
+        "Runtime/Providers/OllamaStreamingTransport.cs": "07e8cb441ac7253369f51d56649aebd2709f427af51498165f28708ec45b20a7",
+        "Tests/EditMode/OllamaStreamingTests.cs": "05453d5efcb1966cb9cd42702fcd969e31a8a819b3cd5c186bfc2bb0b51e9a36"
+      },
+      "scope": "Immutable snapshot includes shared-axis responsive UI, custom model API and redaction hardening, per-request literal schema enum/required/maxItems1 and host guard, operational-only skill context. Later root differs only by two API UI labels and package documentation; final-root Roslyn and native UI are separate receipts.",
+      "post_snapshot_root_followup": "results/integration-1.2-final-ui-label-delta.json"
+    },
+    {
+      "recorded_utc": "2026-10-31T22:33:08.359643+00:00",
+      "receipt": "results/integration-1.2-fifth-summary.json",
+      "snapshot_content_tree_sha256": "a8167089aa205071d0c7d2a8a0d43df804c909a3e07ab318f5bd5354843e04dc",
+      "unity_version": "6000.3.27f1",
+      "catalog_passed": 30,
+      "streaming_passed": 10,
+      "schema_binding_passed": 17,
+      "workflow_passed": 45,
+      "prompt_context_passed": 22,
+      "custom_api_passed": 14,
+      "editmode_passed": 267,
+      "playmode_passed": 9,
+      "failed": 0,
+      "external_inference": false,
+      "source_sha256": {
+        "Editor/Assistant/AgentSkillCatalog.cs": "abcadd98ed221fe510d3277daea4369ba2a084d5ac17f8ddc866e336a437fdf0",
+        "Tests/EditMode/AgentSkillCatalogTests.cs": "b43941f1d390f8c282b66e3069d83e4b10ec14f60842ccf5c29affa704976ef1",
+        "Editor/Skills/catalog.json": "b5fecc5eac620fbba03af1a5549f32fa4e429d3974d2b9719da36589794e8d43",
+        "Runtime/Providers/LocalProvider.cs": "ecf44af29d8b93108d5974de9f5442bf1577ba415a3dbfc862c573770e0af96e",
+        "Runtime/Providers/OllamaStreamingTransport.cs": "07e8cb441ac7253369f51d56649aebd2709f427af51498165f28708ec45b20a7",
+        "Tests/EditMode/OllamaStreamingTests.cs": "05453d5efcb1966cb9cd42702fcd969e31a8a819b3cd5c186bfc2bb0b51e9a36"
+      },
+      "scope": "Final bounded prompt projection, exact named/selected/scope identities, optional important-object budget, unchanged host baseline, bounded readback; terrain dimensions recognize valley/village and world inflections, height binds explicit terrain noun or closest world subject; NPC/object negative cases. Previous complete source including responsive UI/custom API/schema guard. Runner optional WW_CHAT_POWER included."
+    }
+  ],
+  "standalone_historical_file_hash_note": "Top-level files and catalog/streaming focused counts describe original standalone harness version, not latest source. Latest catalogue source hashes and actual Unity counts are recorded below."
+}

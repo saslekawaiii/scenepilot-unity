@@ -1,0 +1,51 @@
+{
+  "schema": 1,
+  "kind": "actual-unity-schema-export-clean-process-exit-and-source-verification",
+  "success": true,
+  "unity": "6000.3.27f1",
+  "unityProcessExitCode": 0,
+  "consumerProject": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/product-schema-12-project",
+  "packageSnapshot": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/product-consumer-package",
+  "packageVersion": "1.2.0",
+  "toolCount": 46,
+  "semanticCasesPassed": 33,
+  "semanticCasesTotal": 33,
+  "decoderSchema": {
+    "path": "results/editor-command-schema-decoder-1.2.json",
+    "sha256": "63e7b9e83eea1e8995b370c777ef09d804943a1fd8bcd2af1f7a549026e92b18"
+  },
+  "exportReceipt": {
+    "path": "results/editor-schema-export-1.2.json",
+    "sha256": "8c221fc5c6c3c0c97d56797dfca6cfc8fd4aad6e47ed1ff9f1232c2f2a3f0df5"
+  },
+  "verifierReceipt": {
+    "path": "results/editor-schema-verification-1.2.json",
+    "sha256": "b8629876b8f06490f493ed4249f1503621c55c26205f9040778768dff975e077"
+  },
+  "runner": {
+    "path": "scripts/SchemaExportRunner.cs",
+    "sha256": "080e559d880bd76e5f4e50840375801f020e6ee1ddaa6545cfd1780c31ebdb02",
+    "shutdown": "returns from executeMethod; delayCall/update after five-second startup settle before Exit(0)"
+  },
+  "generatorSources": {
+    "EditorToolSchema.cs": "8ca52de4bfe5b3e81c08dda9036991416984f998a7ae67e9c81f65c43424bc70",
+    "WorldGameplayTools.cs": "5456e7108fb0e97432d8fc620a135b5fc08bf22c43aec86ce7330fc2e0ceea4a",
+    "AgentProjectTools.cs": "89be0bc7557672847e88a2cec8a64f7c3a5402b9f221e615c49664db0b42b374",
+    "AgentSourcePatches.cs": "5314b2a7178f057302e91b3bdc6e68c60b2912c39dbe2e29b83d114a754480bc"
+  },
+  "llmInferencePerformed": false,
+  "scope": [
+    "Actual C# schema generator export from compiled1.2 consumer package",
+    "Clean Unity native process exit0 after export",
+    "All46 tool branches, helper generator fingerprints and runtime dispatch coverage checked against current source",
+    "33 positive/negative semantic schema cases and decoder compatibility verification"
+  ],
+  "limitations": [
+    "Earlier cold-start export wrote output then native shutdown exited132; this receipt binds the successful final retry with startup settle",
+    "Schema verification is a protocol/source-binding check, not an inference reliability result"
+  ],
+  "fullSchema": {
+    "path": "results/editor-command-schema-1.2.json",
+    "sha256": "55e345132082fa9e6e1dd22410774abb3f5f0341ffb19ee154cb6363253aa1e3"
+  }
+}

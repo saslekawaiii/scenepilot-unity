@@ -1,0 +1,54 @@
+@startuml
+skinparam defaultFontName Arial
+skinparam defaultFontSize 17
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam nodesep 26
+skinparam ranksep 34
+skinparam ArrowColor #087F86
+skinparam componentBorderColor #142F46
+skinparam componentBackgroundColor #FFFFFF
+skinparam packageBorderColor #52677A
+skinparam packageBackgroundColor #F5F8F8
+top to bottom direction
+
+package "Unity Editor · создание и изменение сцены" as Editor {
+  [Чат\nWorldWeaverChatWindow] as Chat
+  [ChatController\nEditorPlan / EditorToolSchema] as Controller
+  [История\nChatHistoryStore] as History
+  [SceneToolExecutor\nWorldComposer] as Executor
+  [ScriptDrafts\nимпорт / compiler / revert] as Scripts
+  Chat -down-> Controller
+  Controller -down-> History
+  Controller -down-> Executor
+  Controller -down-> Scripts
+  History -[hidden]right-> Executor
+  Executor -[hidden]right-> Scripts
+}
+
+[Модельные провайдеры\nOllama / OpenAI-compatible] as Providers
+
+package "Runtime · мир и диалог NPC" as Runtime {
+  [IntelligentNPC\nNpcPipeline] as Dialogue
+  [RagIndex\nembeddings / VectorStore] as RAG
+  [ActionDispatcher\nInventory / NavMeshAgent] as Actions
+  [TerrainGenerator] as Terrain
+  Dialogue -down-> RAG
+  Dialogue -down-> Actions
+  Terrain -[hidden]right-> Dialogue
+  RAG -[hidden]right-> Actions
+}
+
+Controller --> Providers : EditorPlan
+Executor -down-> Dialogue : создание и настройка
+Executor --> Terrain : TerrainSpec
+Dialogue --> Providers : NpcDecision
+Editor -[hidden]down-> Runtime
+Actions -[hidden]down-> Providers
+
+legend bottom
+  Editor и runtime используют общий интерфейс ILLMProvider.
+  История чата: UserSettings. Знания и память NPC: отдельный RAG.
+  C# импортируется после просмотра. Compiler feedback возвращается в чат.
+endlegend
+@enduml

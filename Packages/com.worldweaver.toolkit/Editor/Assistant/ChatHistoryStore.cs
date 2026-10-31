@@ -28,6 +28,10 @@ namespace WorldWeaver.Editor.Assistant
                     {
                         if (session.Settings == null) session.Settings = new ChatSettings();
                         if (!Enum.IsDefined(typeof(AssistantPower), session.Settings.Power)) session.Settings.Power = AssistantPower.Balanced;
+                        if (!Enum.IsDefined(typeof(AssistantMode), session.Settings.Mode)) session.Settings.Mode = AssistantMode.Execute;
+                        session.Settings.SkillContextBudget=Math.Max(1000,Math.Min(12000,session.Settings.SkillContextBudget));
+                        if(session.Settings.SkillFolders==null)session.Settings.SkillFolders=new List<string>();
+                        if(session.DesignMemory==null)session.DesignMemory=new List<DesignNote>();
                         if (string.IsNullOrWhiteSpace(session.Settings.ModelKey)) session.Settings.ModelKey = new ChatSettings().ModelKey;
                         session.Title = Redact(session.Title ?? "Новый чат");
                         session.Messages.RemoveAll(m => m == null);
@@ -38,6 +42,16 @@ namespace WorldWeaver.Editor.Assistant
                             if (message.Role != "user") message.Role = "assistant";
                             if (message.Attempts == null) message.Attempts = new List<EditorPlanAttempt>();
                             if (message.Steps == null) message.Steps = new List<EditorCommandResult>();
+                            if(message.Attachments==null)message.Attachments=new List<ChatAttachment>();message.Attachments.RemoveAll(a=>a==null);
+                            if(message.Skills==null)message.Skills=new List<string>();
+                            if(message.Task!=null)
+                            {
+                                if(message.Task.Requirements==null)message.Task.Requirements=new List<AgentRequirement>();message.Task.Requirements.RemoveAll(r=>r==null);
+                                if(message.Task.Checks==null)message.Task.Checks=new List<AgentCheckResult>();message.Task.Checks.RemoveAll(c=>c==null);
+                                if(message.Task.Evidence==null)message.Task.Evidence=new List<string>();
+                                if(message.Task.OpenQuestions==null)message.Task.OpenQuestions=new List<string>();
+                                if(message.Task.ReviewedCodeScope==null)message.Task.ReviewedCodeScope=new List<string>();
+                            }
                             message.Steps.RemoveAll(step => step == null);
                             foreach (var step in message.Steps)
                             {
@@ -71,7 +85,7 @@ namespace WorldWeaver.Editor.Assistant
         public static bool ValidId(string id) => id != null && Regex.IsMatch(id, "^[a-f0-9]{32}$");
         public static string Redact(string text)
         {
-            text = text ?? "";
+            text = ChatModelConnections.RedactSecrets(text ?? "");
             return Regex.Replace(text, @"\b(?:gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{20,}|gsk_[A-Za-z0-9]{20,})", "[секрет скрыт]");
         }
     }

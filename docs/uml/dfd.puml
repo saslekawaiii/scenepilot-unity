@@ -1,60 +1,35 @@
 @startuml
 skinparam defaultFontName Arial
-skinparam defaultFontSize 17
+skinparam defaultFontSize 20
+skinparam ArrowFontSize 18
 skinparam shadowing false
-skinparam nodesep 22
-skinparam ranksep 28
 skinparam ArrowColor #087F86
+skinparam nodesep 20
+skinparam ranksep 28
 skinparam usecaseBorderColor #142F46
-skinparam usecaseBackgroundColor #FFFFFF
+skinparam usecaseBackgroundColor white
 skinparam databaseBorderColor #52677A
 skinparam databaseBackgroundColor #F0F6F5
-skinparam packageBackgroundColor #FAFCFC
 top to bottom direction
-
-package "Редакторский контур" as Editor {
-  rectangle "Разработчик" as Developer
-  usecase "1. Чат\nWorldWeaverChatWindow" as Chat
-  usecase "2. Контекст и цикл\nChatController" as Controller
-  database "D1 Чат\nUserSettings" as History
-  rectangle "LLM\nOllama / Classic" as LLMEditor
-  usecase "3. SceneToolExecutor\nпроверка и исполнение" as Executor
-  usecase "4. ScriptDrafts\nпросмотр и импорт C#" as Scripts
-  database "D2 Сцена и ассеты" as SceneEditor
-
-  Developer -down-> Chat : запрос / применение
-  Chat -down-> Controller : сообщение
-  Controller <-left-> History : история
-  Controller <-right-> LLMEditor : запрос /\nплан
-  Controller -down-> Executor : план сцены
-  Controller <-down-> Scripts : просмотр C# /\nкомпиляция
-  Executor -down-> SceneEditor : изменения
-  Scripts -down-> SceneEditor : исходник
-  SceneEditor --> Controller : read-back
-  Executor -[hidden]right-> Scripts
-}
-
-package "Runtime-контур" as Runtime {
-  rectangle "Игрок" as Player
-  usecase "5. Диалог NPC\nNpcPipeline" as Dialogue
-  database "D3 Знания и память\nRagIndex" as RAG
-  rectangle "LLM\nOllama / Classic" as LLMRuntime
-  usecase "6. Проверка действия\nActionDispatcher" as Actions
-  database "D2 Сцена и ассеты" as SceneRuntime
-
-  Player <-down-> Dialogue : реплика / речь
-  Dialogue <-left-> RAG : query + scope /\ntop k
-  Dialogue <-right-> LLMRuntime : контекст /\nNpcDecision
-  Dialogue -down-> Actions : кандидат действия
-  Actions -down-> SceneRuntime : допустимое изменение
-  SceneRuntime --> Dialogue : состояние мира
-  Actions --> RAG : исполненное событие
-}
-
-SceneEditor -[hidden]down-> Player
-legend bottom
-  D1 и D3 хранят разные виды истории.
-  D2 и модельные провайдеры повторены для читаемости: это общие ресурсы.
-  Ответ модели проверяется в C#. Результат читается из Unity.
-endlegend
+rectangle "Разработчик" as User
+usecase "1. Запрос и режим\nChatController" as Chat
+database "D1 Чат и задача\nтребования / проверки" as History
+usecase "2. Отбор данных\nиндекс / память / MD" as Context
+rectangle "LLM" as Model
+usecase "3. Проверка плана\nи исполнение" as Execute
+database "D2 Unity-проект\nсцены / ассеты / C#" as Project
+database "D3 Checkpoint\nBefore / After / WriteSet" as Backup
+usecase "4. Проверка результата\nscene / compiler / jobs" as Verify
+User -down-> Chat : запрос / просмотр
+Chat <-left-> History : задача
+Chat -down-> Context : просьба
+Context <-right-> Model : контекст / план
+Context -down-> Execute : полный план
+Execute <-left-> Backup : снимок / Restore
+Execute <-right-> Project : данные / read-back
+Execute -down-> Verify : результат
+Verify -up-> History : проверки
+Verify -up-> Chat : итог
+History -[hidden]down-> Backup
+Model -[hidden]down-> Project
 @enduml

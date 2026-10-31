@@ -1,0 +1,72 @@
+{
+  "kind": "native-unity-gui-verification",
+  "unity": "6000.3.27f1",
+  "utc": "2026-10-31T22:08:37.643820+00:00",
+  "capture": "cua_repl native window screenshot; original pixels",
+  "checks": {
+    "wide1470x859": "welcome/card/composer common horizontal center",
+    "wideWithHistory": "common center within main panel",
+    "900x700": "header and composer fit; welcome region scrolls",
+    "780x650": "header/composer fit; greeting remains centered; scroll available",
+    "420x700": "one-column cards, header wraps, lower cards reachable by actual scrollbar drag",
+    "420x700History": "drawer with scrim and close control visible",
+    "addApi": "actual native form filled and added OpenAI-compatible Ollama endpoint http://127.0.0.1:11434/v1, model qwen3.5:9b, no API key; GET-only connection verified; test duplicate removed",
+    "apiLabels": "clipped access field labels shortened and actually rechecked",
+    "skills": "60 skills; selected Architecture entry content visible",
+    "nativePlayQuest": "Actual keyboard WASD then E: letter acquired from villager, carried to guard, quest completed and5coins visible; repeatedE gave no duplicate reward. No LLM involved. Exited Play Mode."
+  },
+  "limitations": [
+    "Viewport dimensions are approximate logical sizes inferred from native Retina screenshot/resize; no claim of full UI accessibility.",
+    "No generated game or LLM quality claim follows from layout verification."
+  ],
+  "files": [
+    {
+      "path": "docs/screenshots/1.2/add-api.jpg",
+      "sha256": "060821cf13315e693cf46df4506cd8e47cbf28af816a269d9c4c71bab9a5a141"
+    },
+    {
+      "path": "docs/screenshots/1.2/agent-skills.jpg",
+      "sha256": "a729ea25ecbf6919e5f20f35b672353be33e62fbdfbda2022107c0ef56d49f97"
+    },
+    {
+      "path": "docs/screenshots/1.2/api-connection-verified.jpg",
+      "sha256": "588a7cbd3701ebfdf09f4e2bb86232ff330975c5125c6cf6efbda69bf69e2109"
+    },
+    {
+      "path": "docs/screenshots/1.2/chat-420-history.jpg",
+      "sha256": "5af76d5cfaab3d8bd718731a200803b99ce8e16eec2bf615b492abdc7f12e3a7"
+    },
+    {
+      "path": "docs/screenshots/1.2/chat-420-scrolled.jpg",
+      "sha256": "c396783879466df172fde97522bda418b57e61dd6af22b730f350d6caeda2c07"
+    },
+    {
+      "path": "docs/screenshots/1.2/chat-420.jpg",
+      "sha256": "8971e78d4eef4cd99bb9519d5f614527ca499413d9274ebffed88102e192318a"
+    },
+    {
+      "path": "docs/screenshots/1.2/chat-780.jpg",
+      "sha256": "77d7096944ffa1685d21268249a190c955af81c3973e43aade5ab40cf7470cb9"
+    },
+    {
+      "path": "docs/screenshots/1.2/chat-900.jpg",
+      "sha256": "daf9da275f2128bdab318a0696229d6c1c01c3dd373364472baf40ef9a296d45"
+    },
+    {
+      "path": "docs/screenshots/1.2/chat-wide-history.jpg",
+      "sha256": "575e4ec279db610a87fffad2f4222801d3a1b07b1a461dcd12776d94730907a5"
+    },
+    {
+      "path": "docs/screenshots/1.2/chat-wide.jpg",
+      "sha256": "93e5c2b9c9d87322063244ed004ba358d81617b93424cfb905a71b0ca5081b54"
+    },
+    {
+      "path": "docs/screenshots/1.2/village-letter-received.jpg",
+      "sha256": "a5b1bfd0cc0a043fae765c95491376205f5240e02a4d4e8750c1373e2bbe1938"
+    },
+    {
+      "path": "docs/screenshots/1.2/village-quest-completed.jpg",
+      "sha256": "8087927c9c25555cf0d0d3ceeea008c6d754d428de6a3f4304f2fad80dbd99e7"
+    }
+  ]
+}

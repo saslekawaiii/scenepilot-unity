@@ -1,0 +1,23 @@
+name: Предложение
+description: Задача пользователя и наблюдаемый критерий результата
+title: "[Feature] "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Какую задачу нужно решить
+      description: Опишите исходную сцену и затруднение пользователя.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Ожидаемый результат
+      description: Что должно появиться или измениться; как это проверить в Unity.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Контекст и ограничения
+      description: Подходящие примеры, Unity/package version, локальный или облачный маршрут. Секреты не прикладывайте.

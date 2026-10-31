@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="14" result="Passed" total="14" passed="14" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-10-31 21:37:07Z" end-time="2026-10-31 21:37:10Z" duration="2.4290657">
+  <test-suite type="TestSuite" id="1000" name="UnityProject" fullname="UnityProject" runstate="Runnable" testcasecount="126" result="Passed" start-time="2026-10-31 21:37:07Z" end-time="2026-10-31 21:37:10Z" duration="2.429066" total="14" passed="14" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1141" name="WorldWeaver.EditMode.dll" fullname="/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/gameplay-test-project/Library/ScriptAssemblies/WorldWeaver.EditMode.dll" runstate="Runnable" testcasecount="126" result="Passed" start-time="2026-10-31 21:37:07Z" end-time="2026-10-31 21:37:10Z" duration="2.379533" total="14" passed="14" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="46952" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1142" name="WorldWeaver" fullname="WorldWeaver" runstate="Runnable" testcasecount="126" result="Passed" start-time="2026-10-31 21:37:07Z" end-time="2026-10-31 21:37:10Z" duration="2.378861" total="14" passed="14" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1143" name="Tests" fullname="WorldWeaver.Tests" runstate="Runnable" testcasecount="126" result="Passed" start-time="2026-10-31 21:37:07Z" end-time="2026-10-31 21:37:10Z" duration="2.378286" total="14" passed="14" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestFixture" id="1003" name="AgentCheckpointTests" fullname="WorldWeaver.Tests.AgentCheckpointTests" classname="WorldWeaver.Tests.AgentCheckpointTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-10-31 21:37:07Z" end-time="2026-10-31 21:37:07Z" duration="0.022088" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1008" name="CodeSealIncludesMetaAndSurvivesRealCompileDomainReload" fullname="WorldWeaver.Tests.AgentCheckpointTests.CodeSealIncludesMetaAndSurvivesRealCompileDomainReload" methodname="CodeSealIncludesMetaAndSurvivesRealCompileDomainReload" classname="WorldWeaver.Tests.AgentCheckpointTests" runstate="Runnable" seed="299758334" result="Passed" start-time="2026-10-31 21:36:51Z" end-time="2026-10-31 21:37:04Z" duration="13.017576" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1010" name="CorruptBackupFailsBeforeChangingSceneOrFiles" fullname="WorldWeaver.Tests.AgentCheckpointTests.CorruptBackupFailsBeforeChangingSceneOrFiles" methodname="CorruptBackupFailsBeforeChangingSceneOrFiles" classname="WorldWeaver.Tests.AgentCheckpointTests" runstate="Runnable" seed="502404132" result="Passed" start-time="2026-10-31 21:37:04Z" end-time="2026-10-31 21:37:04Z" duration="0.363085" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1006" name="ManualFileConflictPreservesEveryCurrentChange" fullname="WorldWeaver.Tests.AgentCheckpointTests.ManualFileConflictPreservesEveryCurrentChange" methodname="ManualFileConflictPreservesEveryCurrentChange" classname="WorldWeaver.Tests.AgentCheckpointTests" runstate="Runnable" seed="251601301" result="Passed" start-time="2026-10-31 21:37:04Z" end-time="2026-10-31 21:37:04Z" duration="0.293071" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1007" name="ManualInMemorySceneEditIsAConflictAndUnrelatedFileIsPreserved" fullname="WorldWeaver.Tests.AgentCheckpointTests.ManualInMemorySceneEditIsAConflictAndUnrelatedFileIsPreserved" methodname="ManualInMemorySceneEditIsAConflictAndUnrelatedFileIsPreserved" classname="WorldWeaver.Tests.AgentCheckpointTests" runstate="Runnable" seed="90270426" result="Passed" start-time="2026-10-31 21:37:04Z" end-time="2026-10-31 21:37:04Z" duration="0.198017" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1009" name="MultipleBatchesRestoreOnlyTheirWriteSetAndPreserveLaterUnrelatedFile" fullname="WorldWeaver.Tests.AgentCheckpointTests.MultipleBatchesRestoreOnlyTheirWriteSetAndPreserveLaterUnrelatedFile" methodname="MultipleBatchesRestoreOnlyTheirWriteSetAndPreserveLaterUnrelatedFile" classname="WorldWeaver.Tests.AgentCheckpointTests" runstate="Runnable" seed="1395571730" result="Passed" start-time="2026-10-31 21:37:04Z" end-time="2026-10-31 21:37:05Z" duration="0.351064" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1005" name="SavedSceneDirtyWorkingStateRestoresWithoutChangingItsDiskBytes" fullname="WorldWeaver.Tests.AgentCheckpointTests.SavedSceneDirtyWorkingStateRestoresWithoutChangingItsDiskBytes" methodname="SavedSceneDirtyWorkingStateRestoresWithoutChangingItsDiskBytes" classname="WorldWeaver.Tests.AgentCheckpointTests" runstate="Runnable" seed="1316030465" result="Passed" start-time="2026-10-31 21:37:05Z" end-time="2026-10-31 21:37:05Z" duration="0.175886" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1004" name="UnsavedDirtySceneAssetsAndSourceRestoreAfterReloadingJournal" fullname="WorldWeaver.Tests.AgentCheckpointTests.UnsavedDirtySceneAssetsAndSourceRestoreAfterReloadingJournal" methodname="UnsavedDirtySceneAssetsAndSourceRestoreAfterReloadingJournal" classname="WorldWeaver.Tests.AgentCheckpointTests" runstate="Runnable" seed="2001945502" result="Passed" start-time="2026-10-31 21:37:05Z" end-time="2026-10-31 21:37:07Z" duration="2.211246" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <reason>
+                <message><![CDATA[]]></message>
+              </reason>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1016" name="AgentTestSceneScopeTests" fullname="WorldWeaver.Tests.AgentTestSceneScopeTests" classname="WorldWeaver.Tests.AgentTestSceneScopeTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-31 21:37:07Z" end-time="2026-10-31 21:37:08Z" duration="0.663238" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1017" name="DirtySavedWorkingCopyAndDiskBytesSurviveStagingAndReload" fullname="WorldWeaver.Tests.AgentTestSceneScopeTests.DirtySavedWorkingCopyAndDiskBytesSurviveStagingAndReload" methodname="DirtySavedWorkingCopyAndDiskBytesSurviveStagingAndReload" classname="WorldWeaver.Tests.AgentTestSceneScopeTests" runstate="Runnable" seed="1700193661" result="Passed" start-time="2026-10-31 21:37:07Z" end-time="2026-10-31 21:37:08Z" duration="0.431884" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1018" name="LaterManualSceneEditIsPreservedAndOriginalSnapshotRetained" fullname="WorldWeaver.Tests.AgentTestSceneScopeTests.LaterManualSceneEditIsPreservedAndOriginalSnapshotRetained" methodname="LaterManualSceneEditIsPreservedAndOriginalSnapshotRetained" classname="WorldWeaver.Tests.AgentTestSceneScopeTests" runstate="Runnable" seed="837542752" result="Passed" start-time="2026-10-31 21:37:08Z" end-time="2026-10-31 21:37:08Z" duration="0.122709" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1019" name="LaterOriginalSceneAssetEditIsNeverOverwritten" fullname="WorldWeaver.Tests.AgentTestSceneScopeTests.LaterOriginalSceneAssetEditIsNeverOverwritten" methodname="LaterOriginalSceneAssetEditIsNeverOverwritten" classname="WorldWeaver.Tests.AgentTestSceneScopeTests" runstate="Runnable" seed="655043423" result="Passed" start-time="2026-10-31 21:37:08Z" end-time="2026-10-31 21:37:08Z" duration="0.106926" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1136" name="WorldGameplayEditorTests" fullname="WorldWeaver.Tests.WorldGameplayEditorTests" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-10-31 21:37:08Z" end-time="2026-10-31 21:37:10Z" duration="1.689208" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1139" name="AnchoredLightRetainsClearanceAfterWaterAndHeightChange" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.AnchoredLightRetainsClearanceAfterWaterAndHeightChange" methodname="AnchoredLightRetainsClearanceAfterWaterAndHeightChange" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" seed="2131459173" result="Passed" start-time="2026-10-31 21:37:08Z" end-time="2026-10-31 21:37:08Z" duration="0.120429" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1140" name="PrefabScriptsRequireExplicitReviewAndOriginalAssetIsUntouched" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.PrefabScriptsRequireExplicitReviewAndOriginalAssetIsUntouched" methodname="PrefabScriptsRequireExplicitReviewAndOriginalAssetIsUntouched" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" seed="652836886" result="Passed" start-time="2026-10-31 21:37:08Z" end-time="2026-10-31 21:37:08Z" duration="0.074059" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1137" name="VillageHasConnectedEntrancesAndSurvivesSceneReload" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.VillageHasConnectedEntrancesAndSurvivesSceneReload" methodname="VillageHasConnectedEntrancesAndSurvivesSceneReload" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" seed="685813909" result="Passed" start-time="2026-10-31 21:37:08Z" end-time="2026-10-31 21:37:09Z" duration="0.800110" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1138" name="WorldClockToolUpdatesPhysicalGateAndRollsBackAsOneUndoGroup" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.WorldClockToolUpdatesPhysicalGateAndRollsBackAsOneUndoGroup" methodname="WorldClockToolUpdatesPhysicalGateAndRollsBackAsOneUndoGroup" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" seed="446859472" result="Passed" start-time="2026-10-31 21:37:09Z" end-time="2026-10-31 21:37:10Z" duration="0.692179" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Saving results to: /Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/schedule-editor-focused.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

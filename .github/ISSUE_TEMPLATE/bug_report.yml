@@ -1,0 +1,33 @@
+name: Ошибка
+description: Воспроизводимый сбой в редакторе, игре или документации
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: "Укажите минимальное воспроизведение. Не прикладывайте .env, ключи или личную историю."
+  - type: input
+    id: environment
+    attributes:
+      label: Среда
+      description: Версии Unity и пакета, ОС; для модельного сбоя — модель, провайдер и режим.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Как воспроизвести
+      description: Исходная сцена, действия или точный неконфиденциальный запрос.
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Фактический и ожидаемый результат
+      description: Что произошло в Unity и какой результат требовался.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Обезличенные доказательства
+      description: Ошибка Console, путь к протоколу, скриншот или минимальный проект; для checkpoint — наличие последующих ручных правок.

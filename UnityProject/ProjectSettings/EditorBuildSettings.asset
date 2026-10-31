@@ -8,5 +8,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/WorldWeaverDemo/WorldWeaverDemo.unity
     guid: 74cf71e687ed747068e5a63541cc6614
+  - enabled: 1
+    path: Assets/WorldWeaverGenerated/Scenes/WorldWeaverVillage.unity
+    guid: 9f0c45dde3ae74cf29ab9d08df07d13c
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

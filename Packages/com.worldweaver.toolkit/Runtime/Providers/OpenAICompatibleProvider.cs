@@ -40,6 +40,8 @@ namespace WorldWeaver
         }
         private async Task<CompletionResult> CompleteCoreAsync(CompletionRequest request, CancellationToken cancellationToken)
         {
+            if(request==null)throw new ArgumentNullException(nameof(request));
+            if(request.Messages.Any(message=>message.Images!=null&&message.Images.Count>0))throw new ProviderException("This OpenAI-compatible adapter currently accepts text only. Use a supported local Ollama vision model for images.");
             var messages = new JArray();
             bool classicText = profile.Provider == ProviderKind.Pollinations && !profile.StrictSchema;
             if (classicText)
@@ -66,7 +68,7 @@ namespace WorldWeaver
             }
             var body = new JObject { ["model"] = profile.Model, ["messages"] = messages, ["temperature"] = profile.Temperature,
                 [profile.Provider == ProviderKind.Groq ? "max_completion_tokens" : "max_tokens"] = profile.Provider == ProviderKind.Pollinations ? Math.Min(profile.MaxTokens, 1500) : profile.MaxTokens };
-            if (!classicText)
+            if (!classicText && profile.ResponseMode != OpenAIResponseMode.Text)
                 body["response_format"] = profile.StrictSchema && request.Schema != null
                     ? new JObject { ["type"] = "json_schema", ["json_schema"] = new JObject { ["name"] = "worldweaver", ["strict"] = true, ["schema"] = request.Schema } }
                     : new JObject { ["type"] = "json_object" };

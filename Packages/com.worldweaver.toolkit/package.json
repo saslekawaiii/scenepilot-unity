@@ -1,6 +1,6 @@
 {
   "name": "com.worldweaver.toolkit",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "displayName": "WorldWeaver Intelligent World Toolkit",
   "description": "Chat-first Unity Editor agent with model selection, transactional scene tools, reviewed C# drafts, deterministic terrain and scoped RAG NPCs.",
   "unity": "6000.3",
@@ -16,7 +16,8 @@
     "llm"
   ],
   "dependencies": {
-    "com.unity.nuget.newtonsoft-json": "3.2.1"
+    "com.unity.nuget.newtonsoft-json": "3.2.1",
+    "com.unity.test-framework": "1.6.0"
   },
   "samples": [
     {

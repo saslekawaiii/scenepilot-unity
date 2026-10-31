@@ -1,0 +1,40 @@
+{
+  "recorded_utc": "2026-10-31T22:11:09.816149+00:00",
+  "baseline_snapshot_receipt": "results/integration-1.2-snapshot-fourth.json",
+  "baseline_snapshot_content_tree_sha256": "2ab8af32454e90fe493c8807b1fae34149fe8b8e27144b53dac46b9fdb02e685",
+  "baseline_files": 394,
+  "current_package_content_tree_sha256": "23b333bdc5746379b985c55c0889e74d0a3c7f7a5b30aee9b7089e59a5d4225a",
+  "current_files": 394,
+  "all_different_files": [
+    "Documentation~/index.md",
+    "Editor/Assistant/ChatModelConnectionWindow.cs"
+  ],
+  "production_difference_note": "Exactly two user-facing labels changed after immutable snapshot; verified full file equals baseline with only those two literal substitutions. No production logic change. Documentation update separately recorded.",
+  "production_changes": [
+    {
+      "path": "Editor/Assistant/ChatModelConnectionWindow.cs",
+      "before_sha256": "5541f98a098560473a4dc4abee23bc4ccc54bab3b657a58c88e855b69fa2fa59",
+      "after_sha256": "50a68372637c967f59d65ff17886b4942a2bae6c000679f58827a03615c90fdd",
+      "full_file_equals_two_label_substitutions": true,
+      "unified_diff": "--- snapshot/Editor/Assistant/ChatModelConnectionWindow.cs\n+++ current/Editor/Assistant/ChatModelConnectionWindow.cs\n@@ -38,8 +38,8 @@\n                     responseMode=(OpenAIResponseMode)EditorGUILayout.EnumPopup(\"Формат ответа\",responseMode);\n                     EditorGUILayout.LabelField(\"JsonSchema — строгая схема, если сервер её поддерживает. JsonObject — JSON mode. Text — без response_format, ответ всё равно проверяется парсером WorldWeaver.\",EditorStyles.wordWrappedMiniLabel);\n                     EditorGUILayout.Space(8);EditorGUILayout.LabelField(\"Доступ\",EditorStyles.boldLabel);\n-                    sessionKey=EditorGUILayout.PasswordField(\"Ключ на этот запуск Unity\",sessionKey??\"\");\n-                    environmentVariable=EditorGUILayout.TextField(\"Или переменная окружения\",environmentVariable);\n+                    sessionKey=EditorGUILayout.PasswordField(\"Ключ API\",sessionKey??\"\");\n+                    environmentVariable=EditorGUILayout.TextField(\"Имя переменной\",environmentVariable);\n                     EditorGUILayout.HelpBox(\"Сам ключ хранится только в окружении процесса Unity: переживает перекомпиляцию, исчезает после закрытия Unity. На диск и в историю он не записывается. Для постоянного доступа заранее задайте переменную окружения и укажите только её имя. Для API без авторизации оставьте оба поля пустыми.\",MessageType.None);\n                 }\n                 else EditorGUILayout.HelpBox(\"Этот адаптер Ollama работает без API-ключа. Vision включается только для локального сервера после проверки /api/show.\",MessageType.None);\n"
+    }
+  ],
+  "documentation_changes": [
+    {
+      "path": "Documentation~/index.md",
+      "before_sha256": "7947458520899ee39d27cd40fb3f38379175a0395a0ca4bb4cc587866fb7e554",
+      "after_sha256": "90bce04c0c02fb4866279ce2b3750e5decd14f3ff02447bcc6e6390e50cbd6bb"
+    }
+  ],
+  "final_root_roslyn": {
+    "command": "python3 .private/temp/check-unity-roslyn.py",
+    "process_exit_code": 0,
+    "runtime_exit_code": 0,
+    "editor_exit_code": 0,
+    "errors": 0,
+    "warnings": 2,
+    "warning_note": "Existing PreventDefault calls are behind !UNITY_6000_0_OR_NEWER; standalone helper does not define that Unity symbol."
+  },
+  "native_gui_followup_receipt": "results/ui-centering-1.2-native-verification.json",
+  "full_suite_not_repeated_for_labels": true
+}

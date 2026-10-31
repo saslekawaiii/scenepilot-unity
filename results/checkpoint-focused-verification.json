@@ -1,0 +1,83 @@
+{
+  "schema": 1,
+  "kind": "actual-Unity-checkpoint-and-gameplay-focused-verification",
+  "unity": "6000.3.27f1",
+  "package_snapshot": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/gameplay-test-project/Packages/com.worldweaver.toolkit",
+  "total": 10,
+  "passed": 10,
+  "failed": 0,
+  "started_utc": "2026-10-31 20:57:19Z",
+  "ended_utc": "2026-10-31 20:57:22Z",
+  "xml_sha256": "09a2c80eeccd60fd28f84ab310538b00e71a91912d8cf728f75169407b5a28b6",
+  "source_sha256": {
+    "Editor/Assistant/AgentCheckpoints.cs": "13b3873c6e55656037738e1b568e454e33211d1ff5035f6b7246152048dd6819",
+    "Runtime/Assistant/GeneratedSceneObject.cs": "8b571244c6cd93975d0dcf2302421e15a6ecc1c177912bc440c9eb0c13650551",
+    "Editor/Assistant/WorldGameplayTools.cs": "918cb16d5c7c12ddbc8497af489389478bd5171abb7765bd29bf0cb95b9ba697",
+    "Tests/EditMode/AgentCheckpointTests.cs": "f436c0b517bf41a0e0588540a1f2262eca2a45d0879247d544ea3628934804db",
+    "Tests/EditMode/WorldGameplayEditorTests.cs": "ccb97211f9b24e9cfb78342f05d89673f20a3a4b8050eb83ce20571bec5e954f"
+  },
+  "tests": [
+    {
+      "name": "CodeSealIncludesMetaAndSurvivesRealCompileDomainReload",
+      "result": "Passed"
+    },
+    {
+      "name": "CorruptBackupFailsBeforeChangingSceneOrFiles",
+      "result": "Passed"
+    },
+    {
+      "name": "ManualFileConflictPreservesEveryCurrentChange",
+      "result": "Passed"
+    },
+    {
+      "name": "ManualInMemorySceneEditIsAConflictAndUnrelatedFileIsPreserved",
+      "result": "Passed"
+    },
+    {
+      "name": "MultipleBatchesRestoreOnlyTheirWriteSetAndPreserveLaterUnrelatedFile",
+      "result": "Passed"
+    },
+    {
+      "name": "SavedSceneDirtyWorkingStateRestoresWithoutChangingItsDiskBytes",
+      "result": "Passed"
+    },
+    {
+      "name": "UnsavedDirtySceneAssetsAndSourceRestoreAfterReloadingJournal",
+      "result": "Passed"
+    },
+    {
+      "name": "AnchoredLightRetainsClearanceAfterWaterAndHeightChange",
+      "result": "Passed"
+    },
+    {
+      "name": "PrefabScriptsRequireExplicitReviewAndOriginalAssetIsUntouched",
+      "result": "Passed"
+    },
+    {
+      "name": "VillageHasConnectedEntrancesAndSurvivesSceneReload",
+      "result": "Passed"
+    }
+  ],
+  "compiler_evidence": {
+    "compiled_type": "WWCheckpointCompiledProbe, Assembly-CSharp",
+    "actual_reflection_value": 9001,
+    "actual_Csc_log": "results/checkpoint-editor-focused.log",
+    "two_real_domain_reloads": true,
+    "restored_source_and_meta_absent": true
+  },
+  "scope": [
+    "Assets and metadata",
+    "ProjectSettings",
+    "Packages manifest and lock",
+    "loaded scene working state incl one unsaved scene",
+    "per-request cumulative write set with conflicts",
+    "preserve later unrelated files; CanExtend rejects absorbing them"
+  ],
+  "limits": [
+    "300 MiB backup per checkpoint, 20000 files",
+    "one untitled scene or up to eight saved loaded scenes",
+    "no prefab stage, symlinks or baked lighting",
+    "crash or disk failure during restore itself is not fault-injected",
+    "frozen Editor baseline; final integration checked separately by root"
+  ]
+}

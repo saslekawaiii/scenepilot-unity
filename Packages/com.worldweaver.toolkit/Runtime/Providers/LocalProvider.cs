@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
@@ -11,22 +12,81 @@ namespace WorldWeaver
     {
         private readonly ModelProfile profile;
         private readonly JsonTransport transport = new JsonTransport();
+        private readonly OllamaStreamingTransport streaming = new OllamaStreamingTransport();
         public LocalProvider(ModelProfile profile) { profile.Validate(); this.profile = profile; }
         public async Task<CompletionResult> CompleteAsync(CompletionRequest request, CancellationToken token)
         {
+            if (request == null) throw new ArgumentNullException(nameof(request));
+            token.ThrowIfCancellationRequested();
             var messages = new JArray();
-            foreach (var message in request.Messages) messages.Add(new JObject { ["role"] = message.Role, ["content"] = message.Content });
-            var body = new JObject { ["model"] = profile.Model, ["messages"] = messages, ["stream"] = false, ["think"] = false,
+            int imageCount = 0, imageBytes = 0;
+            foreach (var message in request.Messages)
+            {
+                var item = new JObject { ["role"] = message.Role, ["content"] = message.Content };
+                if (message.Images != null && message.Images.Count > 0)
+                {
+                    var images = new JArray();
+                    foreach (string encoded in message.Images)
+                    {
+                        if (++imageCount > 4 || string.IsNullOrWhiteSpace(encoded) || encoded.Length > 2796204) throw new ProviderException("Ollama accepts at most four bounded base64 images per request.");
+                        byte[] decoded;
+                        try { decoded = Convert.FromBase64String(encoded); }
+                        catch (FormatException) { throw new ProviderException("Ollama image is not valid base64."); }
+                        imageBytes += decoded.Length;
+                        if (decoded.Length == 0 || decoded.Length > 2 * 1024 * 1024 || imageBytes > 6 * 1024 * 1024) throw new ProviderException("Ollama image payload is too large.");
+                        images.Add(encoded);
+                    }
+                    item["images"] = images;
+                }
+                messages.Add(item);
+            }
+            var body = new JObject { ["model"] = profile.Model, ["messages"] = messages, ["stream"] = request.Stream, ["think"] = false,
                 ["format"] = request.Schema != null ? (JToken)request.Schema : new JValue("json"), ["keep_alive"] = "10m",
                 ["options"] = new JObject { ["temperature"] = profile.Temperature, ["num_predict"] = profile.MaxTokens, ["num_ctx"] = profile.ContextWindow } };
             var watch = Stopwatch.StartNew();
-            var result = await transport.SendAsync(profile.Endpoint.TrimEnd('/') + "/api/chat", body, "", profile.TimeoutSeconds, profile.Retries, token);
-            var content = (string)result["message"]?["content"];
+            JObject result; string content; long firstToken = 0;
+            if (request.Stream)
+            {
+                var text = new StringBuilder();
+                request.OnActivity?.Invoke("Ожидаю ответ локальной модели…");
+                result = await streaming.SendAsync(profile.Endpoint.TrimEnd('/') + "/api/chat", body, profile.TimeoutSeconds, frame =>
+                {
+                    token.ThrowIfCancellationRequested();
+                    string delta = (string)frame["message"]?["content"] ?? "";
+                    if (delta.Length > 0)
+                    {
+                        if (text.Length == 0) firstToken = Math.Max(1, watch.ElapsedMilliseconds);
+                        text.Append(delta); request.OnContentDelta?.Invoke(delta);
+                    }
+                    else if (frame["message"]?["thinking"]?.Type == JTokenType.String)
+                        request.OnActivity?.Invoke("Локальная модель обрабатывает запрос…");
+                }, token);
+                content = text.ToString();
+            }
+            else
+            {
+                result = await transport.SendAsync(profile.Endpoint.TrimEnd('/') + "/api/chat", body, "", profile.TimeoutSeconds, profile.Retries, token);
+                content = (string)result["message"]?["content"];
+            }
+            token.ThrowIfCancellationRequested();
             if (string.IsNullOrWhiteSpace(content)) throw new ProviderException("Ollama returned no text.");
-            var duration = (double?)result["eval_duration"] ?? 0;
+            int input = Counter(result, "prompt_eval_count"), output = Counter(result, "eval_count");
+            double duration = Duration(result);
             return new CompletionResult { Text = content, Model = profile.Model, Provider = "Ollama", ElapsedMs = watch.ElapsedMilliseconds,
-                InputTokens = (int?)result["prompt_eval_count"] ?? 0, OutputTokens = (int?)result["eval_count"] ?? 0,
-                TokensPerSecond = duration > 0 ? ((int?)result["eval_count"] ?? 0) * 1e9 / duration : 0 };
+                FirstTokenMs = firstToken, InputTokens = input, OutputTokens = output,
+                TokensPerSecond = duration > 0 ? output * 1e9 / duration : 0 };
+        }
+        private static int Counter(JObject result, string name)
+        {
+            if (result[name] == null) return 0;
+            if (result[name].Type != JTokenType.Integer || !int.TryParse(result[name].ToString(), out int value) || value < 0) throw new ProviderException("Malformed Ollama token statistics.");
+            return value;
+        }
+        private static double Duration(JObject result)
+        {
+            if (result["eval_duration"] == null) return 0;
+            if (result["eval_duration"].Type != JTokenType.Integer || !long.TryParse(result["eval_duration"].ToString(), out long value) || value < 0) throw new ProviderException("Malformed Ollama duration statistics.");
+            return value;
         }
         public async Task<bool> HealthAsync(CancellationToken token)
         {
@@ -34,7 +94,7 @@ namespace WorldWeaver
             foreach (var model in response["models"] ?? new JArray()) if ((string)model["name"] == profile.Model || (string)model["name"] == profile.Model + ":latest") return true;
             return false;
         }
-        public void Dispose() { transport.Dispose(); }
+        public void Dispose() { streaming.Dispose(); transport.Dispose(); }
     }
 
     public sealed class OllamaEmbeddingProvider : IEmbeddingProvider

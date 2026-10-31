@@ -9,8 +9,15 @@ Paths supplied on the command line are relative to the current working directory
 Defaults are relative to this script's repository. Source coverage is checked when
 the local package sources exist; use --require-source-coverage to require them.
 The verifier does not regenerate the export, compile C#, or call a model/provider.
+Both singleton tool enums and string const branches are supported. With 1.2 sources,
+shared helper schemas must be included by EditorToolSchema and reached by runtime
+Validate dispatch; missing wiring or an unrecognized source representation fails.
 An optional --generated-source-sha256 records the source hash captured at export;
 when the local source is available, a mismatch fails the verification.
+That single hash covers EditorToolSchema.cs, not all dependencies; helper source
+fingerprints are reported separately and require an exporter/release binding.
+Use --export-receipt for the C# export's generatorSources SHA-256 map; when local
+sources exist, every required generator must be included and match its bytes.
 Use --decoder-schema to also check the separately exported decoder variant. Only
 removing maxLength >= 2000 from string nodes is allowed in this compatibility diff.
 """
@@ -103,11 +110,20 @@ def argument_coverage(schema):
                 or set(branch.get('required', [])) != set(properties),
                 'Every command branch must require exactly tool/name/target/args.')
         tool_schema = properties['tool']
-        fail_if(tool_schema.get('type') != 'string' or len(tool_schema.get('enum', [])) != 1,
-                'Each tool branch must have a single-valued string enum.')
+        fail_if(tool_schema.get('type') != 'string', 'Tool must be a string.')
+        choices = tool_schema.get('enum')
+        constant = tool_schema.get('const')
+        if choices is not None:
+            fail_if(not isinstance(choices, list) or len(choices) != 1
+                    or not isinstance(choices[0], str),
+                    'Tool enum must contain exactly one string.')
+        fail_if('const' in tool_schema and not isinstance(constant, str), 'Tool const must be a string.')
+        fail_if(choices is None and constant is None, 'Tool needs a singleton enum or const.')
+        fail_if(choices is not None and constant is not None and choices[0] != constant,
+                'Tool enum and const disagree.')
         for key in ('name', 'target'):
             fail_if(properties[key].get('type') != 'string', key + ' must be a string.')
-        tool = tool_schema['enum'][0]
+        tool = constant if constant is not None else choices[0]
         fields = set()
         for args in object_leaves(properties['args']):
             fail_if(args.get('additionalProperties') is not False,
@@ -157,8 +173,108 @@ def verify_semantics(schema, validator_type):
     return results
 
 
+CS_NON_CODE = re.compile(r'//[^\n]*|/\*.*?\*/|@"(?:""|[^"])*"|"(?:\\.|[^"\\])*"|\'(?:\\.|[^\'\\])*\'', re.S)
+
+
+def masked_csharp(source):
+    """Preserve offsets/braces in code, while excluding strings and comments."""
+    return CS_NON_CODE.sub(lambda m: ''.join('\n' if c == '\n' else ' ' for c in m[0]), source)
+
+
+def uncomment_csharp(source):
+    """Commented-out validation calls are not evidence of runtime wiring."""
+    return CS_NON_CODE.sub(lambda m: (''.join('\n' if c == '\n' else ' ' for c in m[0])
+                                     if m[0].startswith(('//', '/*')) else m[0]), source)
+
+
+def balanced_csharp(source, opening, left='{', right='}'):
+    masked = masked_csharp(source)
+    fail_if(opening >= len(source) or masked[opening] != left, 'Expected C# ' + left + ' boundary.')
+    depth = 0
+    for pos in range(opening, len(source)):
+        if masked[pos] == left:
+            depth += 1
+        elif masked[pos] == right:
+            depth -= 1
+            if depth == 0:
+                return source[opening:pos + 1]
+    raise ValueError('Unterminated C# source boundary.')
+
+
+def initializer_entries(block):
+    """Read only direct ["key"] = value entries, never nested schema properties."""
+    fail_if(not block.startswith('{') or not block.endswith('}'), 'Expected initializer block.')
+    masked = masked_csharp(block)
+    depth, depths = 0, []
+    for char in masked:
+        depths.append(depth)
+        if char == '{':
+            depth += 1
+        elif char == '}':
+            depth -= 1
+    matches = [m for m in re.finditer(r'\[\s*"([A-Za-z_][A-Za-z_0-9]*)"\s*\]\s*=', block)
+               if masked[m.start()] == '[' and depths[m.start()] == 1]
+    result = {}
+    for index, match in enumerate(matches):
+        name = match[1]
+        fail_if(name in result, 'Duplicate C# initializer key: ' + name)
+        end = matches[index + 1].start() if index + 1 < len(matches) else len(block) - 1
+        result[name] = block[match.end():end].strip().rstrip(',').strip()
+    return result
+
+
+def jobject_entries(expression):
+    match = re.search(r'new\s+JObject\s*(?:\(\s*\))?\s*', expression)
+    fail_if(match is None, 'Unrecognized JObject schema source.')
+    if match.end() == len(expression) or expression[match.end()] != '{':
+        fail_if(not expression[match.start():match.end()].strip().endswith('()'),
+                'Unrecognized empty JObject source.')
+        return {}
+    return initializer_entries(balanced_csharp(expression, match.end()))
+
+
+def method_block(source, signature):
+    fail_if(signature not in source, 'Cannot locate C# method: ' + signature)
+    start = source.index(signature) + len(signature)
+    opening = masked_csharp(source).find('{', start)
+    fail_if(opening < 0, 'Cannot locate method body: ' + signature)
+    return balanced_csharp(source, opening)
+
+
+def helper_coverage(source, helper, scene_validation, schema_source):
+    """Helper allowlists are shared with Validate; assert both wiring directions.
+
+    This is deliberately representation-specific, fail-closed source inspection,
+    not a C# compiler or proof of all geometry/serialized-property validation.
+    """
+    body = method_block(source, 'IEnumerable<JObject> CommandSchemas()')
+    dictionary = re.search(r'new\s+Dictionary\s*<\s*string\s*,\s*JObject\s*>\s*\{', body)
+    fail_if(dictionary is None, 'Cannot locate shared schema dictionary for ' + helper)
+    rows = initializer_entries(balanced_csharp(body, dictionary.end() - 1))
+    fields = {tool: set(jobject_entries(value)) for tool, value in rows.items()}
+    names = re.search(r'string\[\]\s+Names\s*=\s*\{([^}]+)\}', source)
+    fail_if(names is None or set(re.findall(r'"([a-z_]+)"', names[1])) != set(fields),
+            helper + '.Handles names disagree with its shared schema dictionary.')
+    validate = method_block(source, 'void Validate(EditorCommand c,Func<string,GameObject> resolve)')
+    fail_if(not re.search(r'CommandSchemas\(\)\s*\.First\(', validate)
+            or not re.search(r'\["properties"\]\s*\["args"\]', validate)
+            or 'c.args.Properties()' not in validate or '.Property(p.Name)==null' not in validate,
+            helper + '.Validate no longer reads/rejects fields from its shared schema.')
+    dispatch = re.search(r'if\s*\(\s*' + re.escape(helper) + r'\.Handles\(command\.tool\)\s*\)', scene_validation)
+    fail_if(dispatch is None, helper + ' is not dispatched by SceneToolExecutor.Validate.')
+    opening = masked_csharp(scene_validation).find('{', dispatch.end())
+    dispatch_body = balanced_csharp(scene_validation, opening)
+    fail_if(not re.search(re.escape(helper) + r'\.Validate\(\s*command\s*,', dispatch_body)
+            or 'continue;' not in dispatch_body,
+            helper + ' dispatch bypasses its runtime validator.')
+    fail_if(not re.search(r'foreach\s*\([^)]*\bin\s+' + re.escape(helper)
+                         + r'\.CommandSchemas\(\)\s*\)\s*commands\.Add\(', schema_source),
+            'EditorToolSchema no longer includes ' + helper + '.CommandSchemas().')
+    return fields
+
+
 def runtime_coverage(package):
-    """Read literal Keys(a, ...) allowlists; do not execute C# or invoke Unity.
+    """Read literal allowlists and shared helper schemas, without executing C#.
 
     If the validator source changes to a different representation, this parser
     deliberately fails so a skipped comparison cannot silently become a PASS.
@@ -168,12 +284,21 @@ def runtime_coverage(package):
         'terrain': package / 'Runtime/Terrain/TerrainSpec.cs',
         'scripts': package / 'Editor/Assistant/ScriptDrafts.cs',
     }
+    helper_paths = {
+        'project': package / 'Editor/Assistant/AgentProjectTools.cs',
+        'gameplay': package / 'Editor/Assistant/WorldGameplayTools.cs',
+        'patches': package / 'Editor/Assistant/AgentSourcePatches.cs',
+    }
+    if any(path.exists() for path in helper_paths.values()):
+        paths.update(helper_paths)
+        paths['schema'] = package / SOURCE_RELATIVE
+        paths['controller'] = package / 'Editor/Assistant/ChatController.cs'
     present = {name: path.exists() for name, path in paths.items()}
     if not any(present.values()):
         return None, {'status': 'SKIPPED', 'reason': 'Local runtime validator sources are unavailable.'}
     fail_if(not all(present.values()), 'Partial local sources; missing: ' + ', '.join(
         str(paths[name]) for name, exists in present.items() if not exists))
-    source = {name: path.read_text(encoding='utf-8') for name, path in paths.items()}
+    source = {name: uncomment_csharp(path.read_text(encoding='utf-8')) for name, path in paths.items()}
     start = 'public static void Validate(EditorPlan plan)'
     fail_if(start not in source['scene'] or 'private static void NpcArgs' not in source['scene'],
             'Cannot locate SceneToolExecutor.Validate source boundaries.')
@@ -206,9 +331,36 @@ def runtime_coverage(package):
             'Cannot verify attach_script empty-argument guard.')
     expected['draft_script'] = code_fields
     expected['attach_script'] = set()
+    helper_wiring = []
+    if 'project' in source:
+        for key, helper in (('project', 'AgentProjectTools'), ('gameplay', 'WorldGameplayTools')):
+            additions = helper_coverage(source[key], helper, validation, source['schema'])
+            fail_if(bool(expected.keys() & additions.keys()), helper + ' shadows a previous tool.')
+            expected.update(additions)
+            helper_wiring.append({'helper': helper, 'passed': True,
+                                  'proof': 'CommandSchema inclusion, Handles names, Validate shared schema lookup and SceneToolExecutor.Validate dispatch are present.'})
+        patch_source = source['patches']
+        patch_schema = jobject_entries(patch_source.split('JObject CommandSchema()=>', 1)[-1])
+        fail_if('properties' not in patch_schema, 'Cannot locate patch_script CommandSchema properties.')
+        patch_command = jobject_entries(patch_schema['properties'])
+        patch_args = jobject_entries(patch_command.get('args', ''))
+        patch_fields = set(jobject_entries(patch_args.get('properties', '')))
+        patch_validation = method_block(patch_source, 'void Validate(EditorCommand command)')
+        allowlist = re.search(r'command\.args\.Properties\(\)\.Any\(p\s*=>\s*!new\[\]\s*\{([^}]+)\}\.Contains\(p\.Name\)\)', patch_validation)
+        fail_if(allowlist is None, 'Cannot extract patch_script runtime allowlist.')
+        patch_runtime_fields = set(re.findall(r'"([A-Za-z_][A-Za-z_0-9]*)"', allowlist[1]))
+        fail_if(patch_fields != patch_runtime_fields,
+                'patch_script shared schema/runtime argument allowlists differ.')
+        fail_if('commands.Add(AgentSourcePatches.CommandSchema())' not in source['schema']
+                or not re.search(r'if\s*\(action\.tool\s*==\s*"patch_script"\)\s*AgentSourcePatches\.Validate\(action\)', source['controller']),
+                'patch_script schema/ChatController runtime validation wiring is missing.')
+        expected['patch_script'] = patch_runtime_fields
+        helper_wiring.append({'helper': 'AgentSourcePatches', 'passed': True,
+                              'proof': 'CommandSchema fields equal independent Validate allowlist; EditorToolSchema inclusion and ChatController validator call are present.'})
     return expected, {
-        'status': 'CHECKED', 'method': 'Read-only extraction of current validator argument allowlists.',
+        'status': 'CHECKED', 'method': 'Fail-closed read-only extraction of literal allowlists and helper shared schemas; helper inclusion/validator dispatch are asserted.',
         'source_files': {str(path.relative_to(package)): sha256(path) for path in paths.values()},
+        'helper_runtime_validation_wiring': helper_wiring,
     }
 
 
@@ -242,6 +394,8 @@ def main():
     parser.add_argument('--require-source-coverage', action='store_true')
     parser.add_argument('--generated-source-sha256', type=parse_hash,
                         help='Source SHA-256 recorded when this schema was generated; checked against local source if available.')
+    parser.add_argument('--export-receipt', type=Path,
+                        help='C# export JSON containing generatorSources hashes, optionally toolCount; bind all current helper generators to local bytes.')
     args = parser.parse_args()
     schema_path = args.schema.resolve()
     report_path = args.report.resolve()
@@ -249,6 +403,8 @@ def main():
         parser.error('--schema and --report must be different files.')
     if args.decoder_schema and args.decoder_schema.resolve() == report_path:
         parser.error('--decoder-schema and --report must be different files.')
+    if args.export_receipt and args.export_receipt.resolve() == report_path:
+        parser.error('--export-receipt and --report must be different files.')
     package = args.source_root.resolve() / PACKAGE_RELATIVE
     report = {
         'created_utc': datetime.now(timezone.utc).isoformat(), 'passed': False,
@@ -259,6 +415,7 @@ def main():
             'Does not prove that any inference backend enforces all schema keywords.',
             'Does not execute runtime scene, geometry, ownership, file or plan-order checks.',
             'A supplied generation-source hash is provenance supplied by the exporter, not regeneration by this script.',
+            'The generation-source hash covers EditorToolSchema.cs only; helper source hashes are observations and must also be bound to the export by the release process.',
         ],
     }
     checks = report['checks']
@@ -334,6 +491,38 @@ def main():
             report['generation_source_verification'] = 'Compared supplied generation hash with local source bytes.'
         else:
             report['generation_source_verification'] = 'Unverified: generation hash or local schema source unavailable.'
+        if args.export_receipt:
+            receipt_path = args.export_receipt.resolve()
+            receipt = json.loads(receipt_path.read_text(encoding='utf-8'), parse_constant=reject_constant,
+                                 object_pairs_hook=reject_duplicate_keys)
+            generators = receipt.get('generatorSources')
+            fail_if(not isinstance(generators, dict) or not generators, 'Export receipt needs a nonempty generatorSources map.')
+            required = {SOURCE_RELATIVE.name}
+            required.update(path.name for path in (package / 'Editor/Assistant').glob('*.cs')
+                            if path.name in {'WorldGameplayTools.cs', 'AgentProjectTools.cs', 'AgentSourcePatches.cs'})
+            fail_if(not required.issubset(generators), 'Export receipt omits current generators: ' + ','.join(sorted(required - set(generators))))
+            bindings = {}
+            for name, exported_hash in generators.items():
+                fail_if(not re.fullmatch(r'[A-Za-z_][A-Za-z_0-9]*\.cs', name)
+                        or not isinstance(exported_hash, str) or not re.fullmatch('[a-f0-9]{64}', exported_hash),
+                        'Invalid generator filename/hash in export receipt.')
+                generator = package / 'Editor/Assistant' / name
+                observed = sha256(generator) if generator.is_file() else None
+                bindings[name] = {'exported_sha256': exported_hash, 'local_sha256': observed,
+                                  'matches': observed == exported_hash if observed is not None else None}
+            source_available = local_source_hash is not None
+            binding_passed = (all(row['matches'] is True for row in bindings.values()) if source_available
+                              else not args.require_source_coverage)
+            declared_count = receipt.get('toolCount')
+            fail_if(declared_count is not None and (type(declared_count) is not int or declared_count != len(actual)),
+                    'Export receipt toolCount differs from the actual schema.')
+            report['export_receipt'] = {'path': str(receipt_path), 'sha256': sha256(receipt_path),
+                                        'generator_sources': bindings, 'source_binding_passed': binding_passed,
+                                        'tool_count': declared_count, 'unity': receipt.get('unity'),
+                                        'package_version': receipt.get('packageVersion'),
+                                        'note': 'Hashes bind supplied receipt metadata to observed source bytes; this verifier does not regenerate or authenticate the C# export.'}
+            checks.append({'name': 'export_generator_source_binding', 'passed': binding_passed,
+                           'skipped': not source_available})
         report['passed'] = all(check['passed'] for check in checks)
     except Exception as error:
         report['error'] = type(error).__name__ + ': ' + str(error)

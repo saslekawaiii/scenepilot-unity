@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="3" result="Passed" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-10-31 21:29:40Z" end-time="2026-10-31 21:29:42Z" duration="2.4106522">
+  <test-suite type="TestSuite" id="1000" name="UnityProject" fullname="UnityProject" runstate="Runnable" testcasecount="126" result="Passed" start-time="2026-10-31 21:29:40Z" end-time="2026-10-31 21:29:42Z" duration="2.410652" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1141" name="WorldWeaver.EditMode.dll" fullname="/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/gameplay-test-project/Library/ScriptAssemblies/WorldWeaver.EditMode.dll" runstate="Runnable" testcasecount="126" result="Passed" start-time="2026-10-31 21:29:40Z" end-time="2026-10-31 21:29:42Z" duration="2.388318" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="45496" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1142" name="WorldWeaver" fullname="WorldWeaver" runstate="Runnable" testcasecount="126" result="Passed" start-time="2026-10-31 21:29:40Z" end-time="2026-10-31 21:29:42Z" duration="2.385226" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1143" name="Tests" fullname="WorldWeaver.Tests" runstate="Runnable" testcasecount="126" result="Passed" start-time="2026-10-31 21:29:40Z" end-time="2026-10-31 21:29:42Z" duration="2.382475" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestFixture" id="1016" name="AgentTestSceneScopeTests" fullname="WorldWeaver.Tests.AgentTestSceneScopeTests" classname="WorldWeaver.Tests.AgentTestSceneScopeTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-31 21:29:40Z" end-time="2026-10-31 21:29:42Z" duration="2.373384" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1017" name="DirtySavedWorkingCopyAndDiskBytesSurviveStagingAndReload" fullname="WorldWeaver.Tests.AgentTestSceneScopeTests.DirtySavedWorkingCopyAndDiskBytesSurviveStagingAndReload" methodname="DirtySavedWorkingCopyAndDiskBytesSurviveStagingAndReload" classname="WorldWeaver.Tests.AgentTestSceneScopeTests" runstate="Runnable" seed="1000810285" result="Passed" start-time="2026-10-31 21:29:40Z" end-time="2026-10-31 21:29:41Z" duration="1.428077" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1018" name="LaterManualSceneEditIsPreservedAndOriginalSnapshotRetained" fullname="WorldWeaver.Tests.AgentTestSceneScopeTests.LaterManualSceneEditIsPreservedAndOriginalSnapshotRetained" methodname="LaterManualSceneEditIsPreservedAndOriginalSnapshotRetained" classname="WorldWeaver.Tests.AgentTestSceneScopeTests" runstate="Runnable" seed="518550606" result="Passed" start-time="2026-10-31 21:29:41Z" end-time="2026-10-31 21:29:42Z" duration="0.460213" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1019" name="LaterOriginalSceneAssetEditIsNeverOverwritten" fullname="WorldWeaver.Tests.AgentTestSceneScopeTests.LaterOriginalSceneAssetEditIsNeverOverwritten" methodname="LaterOriginalSceneAssetEditIsNeverOverwritten" classname="WorldWeaver.Tests.AgentTestSceneScopeTests" runstate="Runnable" seed="905365231" result="Passed" start-time="2026-10-31 21:29:42Z" end-time="2026-10-31 21:29:42Z" duration="0.449318" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Saving results to: /Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/test-scene-scope-editor-focused.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

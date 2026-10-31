@@ -1,0 +1,18 @@
+# Лицензии и происхождение материалов
+
+## Авторский код WorldWeaver
+
+В текущем репозитории общая лицензия авторского кода не назначена: отдельного корневого LICENSE нет, а `package.json` не объявляет SPDX-лицензию. Эта страница описывает файлы поставки. Решение о лицензии принимает автор проекта отдельно.
+
+## Справочная MD-библиотека
+
+Для адаптированных Markdown-навыков сохранены MIT notices исходных проектов:
+
+- [Besty0728/Unity-Skills](https://github.com/Besty0728/Unity-Skills/tree/fb7a8d4208671bca1d1013b2776eb2e4917f4964), commit `fb7a8d4208671bca1d1013b2776eb2e4917f4964`; [копия лицензии](../Packages/com.worldweaver.toolkit/Editor/Skills/LICENSES/Besty0728-MIT.txt).
+- [Nice-Wolf-Studio/unity-claude-skills](https://github.com/Nice-Wolf-Studio/unity-claude-skills/tree/a149d3e995420432f52b0899092daa4b069f441f), commit `a149d3e995420432f52b0899092daa4b069f441f`; [копия лицензии](../Packages/com.worldweaver.toolkit/Editor/Skills/LICENSES/Nice-Wolf-Studio-MIT.txt).
+
+Точные source paths и SHA, русские адаптации и условия загрузки описаны в [реестре навыков](skills/README.md) и [THIRD-PARTY-NOTICES](../Packages/com.worldweaver.toolkit/Editor/Skills/THIRD-PARTY-NOTICES.md). Бейдж «MD skills · MIT» в README относится к этим материалам.
+
+## Ассеты пользователя и зависимости
+
+Для размещаемых prefabs и материалов сохраняются условия их исходной поставки; каталог WorldWeaver не подтверждает их лицензию автоматически. Unity и подключаемые пакеты распространяются по своим условиям. Веса моделей не входят в репозиторий. Ссылки на научные и официальные источники не означают передачи прав на их содержимое.
