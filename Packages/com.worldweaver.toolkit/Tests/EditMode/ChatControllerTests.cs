@@ -65,6 +65,7 @@ namespace WorldWeaver.Tests
         private GameObject Find(string name)=>testScene.GetRootGameObjects().SelectMany(r=>r.GetComponentsInChildren<Transform>(true)).Select(t=>t.gameObject).FirstOrDefault(o=>o.name==name);
         private static string Reply(bool complete,params EditorCommand[] commands)=>JsonConvert.SerializeObject(new EditorPlan{reply="Проверяемый план",complete=complete,actions=commands.ToList()});
         private static EditorCommand Create(string name)=>new EditorCommand{tool="create_object",name=name,args=new JObject{["kind"]="cube",["on_terrain"]=false}};
+        private static EditorCommand Draft(string name,string code=null)=>new EditorCommand{tool="draft_script",name=name,args=new JObject{["code"]=code??("using UnityEngine; public class "+name+" : MonoBehaviour { void Update() { transform.Rotate(Vector3.up,30f*Time.deltaTime,Space.Self); } }"),["description"]="Код для просмотра"}};
         private static IEnumerator Finish(Task task)
         {
             float until=Time.realtimeSinceStartup+10;
@@ -195,6 +196,7 @@ namespace WorldWeaver.Tests
                 if (round == 1)
                 {
                     StringAssert.Contains("План отклонён", request.Messages.Last().Content);
+                    Assert.That(request.Messages.Last().Content,Does.EndWith("CURRENT USER TASK: Создай RepairPrefixCube"),"A repair must end with this user task, not an older code-writing task.");
                     Assert.That(Find("RepairPrefixCube"), Is.Null);
                     return Task.FromResult(Reply(true, Create("RepairPrefixCube")));
                 }
@@ -225,6 +227,154 @@ namespace WorldWeaver.Tests
             var provider=new RecordingProvider{Respond=(round,request,token)=>Task.FromResult(Reply(true))};var controller=Controller(provider);
             yield return Finish(controller.SendAsync("Первый разговор"));string id=controller.Current.Id;controller.NewChat();Assert.That(controller.Current.Id,Is.Not.EqualTo(id));Assert.That(controller.Current.Messages,Is.Empty);controller.OpenChat(id);Assert.That(controller.Current.Messages.First().Text,Is.EqualTo("Первый разговор"));
             var restored=Controller(new RecordingProvider());Assert.That(restored.Sessions.Count,Is.EqualTo(2));Assert.That(restored.Sessions.Any(s=>s.Id==id&&s.Messages.Count==2),Is.True);
+        }
+        [UnityTest] public IEnumerator ClassicFinalRootClosurePreservesEscapedCodeAndRawAudit()
+        {
+            const string code="using UnityEngine; public class EscapeRotor : MonoBehaviour { string text = \"quoted \\\" ] } { \\\"\"; void Update() { transform.Rotate(Vector3.up,30f*Time.deltaTime,Space.Self); } }";
+            string valid=Reply(true,Draft("EscapeRotor",code));string raw=valid.Substring(0,valid.Length-1)+" \n";
+            var provider=new RecordingProvider{Respond=(round,request,token)=>Task.FromResult(raw)};
+            var controller=Controller(provider);controller.Settings.ModelKey="pollinations:openai-fast";controller.Settings.Power=AssistantPower.Fast;
+            yield return Finish(controller.SendAsync("Напиши вращение для моего ревью, пока не импортируй."));
+            var answer=controller.Current.Messages.Last();var attempt=answer.Attempts.Single();
+            Assert.That(answer.IsError,Is.False,answer.Text);Assert.That(answer.PendingPlan,Is.Not.Null);Assert.That(answer.Steps,Is.Empty);
+            Assert.That((string)answer.PendingPlan.actions.Single().args["code"],Is.EqualTo(code));
+            Assert.That(attempt.Response,Is.EqualTo(raw));Assert.That(attempt.RawResponse,Is.EqualTo(raw));Assert.That(attempt.RepairKind,Is.EqualTo("classic-final-root-close"));
+            Assert.That(attempt.NormalizedResponse,Is.EqualTo(raw+"}"));Assert.That(attempt.Accepted,Is.True);Assert.That(testScene.rootCount,Is.Zero);
+            Assert.That(File.Exists("Assets/WorldWeaverGenerated/Scripts/EscapeRotor.cs"),Is.False,"A reviewed draft must not be imported by normalization.");
+            string persisted=File.ReadAllText(Path.Combine(folder,controller.Current.Id+".json"));var stored=JsonConvert.DeserializeObject<ChatSession>(persisted).Messages.Last().Attempts.Single();
+            Assert.That(stored.RawResponse,Is.EqualTo(raw));Assert.That(stored.NormalizedResponse,Is.EqualTo(raw+"}"));Assert.That(stored.RepairKind,Is.EqualTo(attempt.RepairKind));
+        }
+        [UnityTest] public IEnumerator ClassicNormalizedPlanUsesValidatedTextInLaterInference()
+        {
+            string sentinel="sk-"+new string('y',39);
+            string valid=JsonConvert.SerializeObject(new EditorPlan{reply="Готово "+sentinel,complete=true,actions=new List<EditorCommand>{Create("NormalizedCube")}});string raw=valid.Substring(0,valid.Length-1);
+            string normalized=ChatHistoryStore.Redact(valid);
+            var provider=new RecordingProvider{Respond=(round,request,token)=>
+            {
+                if(round==0)return Task.FromResult(raw);
+                Assert.That(Find("NormalizedCube"),Is.Not.Null,"The real scene executor must have committed before verification.");
+                Assert.That(request.Messages.Any(m=>m.Role=="assistant"&&m.Content==normalized),Is.True);
+                Assert.That(request.Messages.Any(m=>m.Role=="assistant"&&m.Content==raw),Is.False,"Do not reinforce malformed raw JSON after a successful adapter repair.");
+                Assert.That(string.Join("\n",request.Messages.Select(m=>m.Content)),Does.Not.Contain(sentinel),"Normalized assistant text must retain credential redaction before the next request.");
+                return Task.FromResult(Reply(true));
+            }};
+            var controller=Controller(provider);controller.Settings.ModelKey="pollinations:openai-fast";controller.Settings.Power=AssistantPower.Balanced;
+            yield return Finish(controller.SendAsync("Создай NormalizedCube."));var answer=controller.Current.Messages.Last();
+            Assert.That(answer.IsError,Is.False,answer.Text);Assert.That(answer.Steps.Single().Success,Is.True);Assert.That(answer.Attempts[0].RawResponse,Is.EqualTo(ChatHistoryStore.Redact(raw)));
+            Assert.That(answer.Attempts[0].NormalizedResponse,Is.EqualTo(normalized));
+            Assert.That(provider.Requests.Count,Is.EqualTo(2));Assert.That(Find("NormalizedCube"),Is.Not.Null);
+        }
+        [UnityTest] public IEnumerator ClassicRepairRejectsIncompleteInnerStringsAndMismatchedBrackets()
+        {
+            string[] invalid={
+                "{\"reply\":\"x\",\"complete\":true,\"actions\":[{\"tool\":\"create_object\",\"name\":\"UnsafeCube\",\"target\":\"\",\"args\":{\"kind\":\"cube\"}]",
+                "{\"reply\":\"unterminated escaped \\\" string ]",
+                "{\"reply\":\"x\",\"complete\":true,\"actions\":[}",
+                "{\"reply\":\"x\",\"complete\":true,\"actions\":\"[]\"",
+                Reply(true)+"]",
+                "```json\n{\"reply\":\"x\",\"complete\":true,\"actions\":[]\n```"
+            };
+            foreach(string raw in invalid)
+            {
+                var provider=new RecordingProvider{Respond=(round,request,token)=>Task.FromResult(raw)};var controller=Controller(provider);
+                controller.Settings.ModelKey="pollinations:openai-fast";controller.Settings.Power=AssistantPower.Fast;
+                yield return Finish(controller.SendAsync("Создай объект."));var answer=controller.Current.Messages.Last();var attempt=answer.Attempts.Single();
+                Assert.That(answer.IsError,Is.True,raw);Assert.That(attempt.RepairKind,Is.Null,raw);Assert.That(attempt.NormalizedResponse,Is.Null);Assert.That(attempt.RawResponse,Is.EqualTo(raw));
+                Assert.That(answer.PendingPlan,Is.Null);Assert.That(answer.Steps,Is.Empty);Assert.That(testScene.rootCount,Is.Zero);
+            }
+        }
+        [UnityTest] public IEnumerator LocalProviderDoesNotUseClassicRootOrPlainTextRepair()
+        {
+            string valid=Reply(true,Create("LocalMustNotExist"));string[] responses={valid.Substring(0,valid.Length-1),"Сейчас выбрана локальная модель, сцена пуста."};
+            foreach(string raw in responses)
+            {
+                var provider=new RecordingProvider{Respond=(round,request,token)=>Task.FromResult(raw)};var controller=Controller(provider);controller.Settings.Power=AssistantPower.Fast;
+                controller.Settings.ModelKey="ollama:qwen3.5:9b";
+                yield return Finish(controller.SendAsync("Только объясни сцену."));var answer=controller.Current.Messages.Last();var attempt=answer.Attempts.Single();
+                Assert.That(answer.IsError,Is.True);Assert.That(attempt.RawResponse,Is.EqualTo(raw));Assert.That(attempt.RepairKind,Is.Null);Assert.That(attempt.NormalizedResponse,Is.Null);
+                Assert.That(answer.PendingPlan,Is.Null);Assert.That(testScene.rootCount,Is.Zero);
+            }
+        }
+        [UnityTest] public IEnumerator RepairedClassicJsonStillRejectsForbiddenTool()
+        {
+            string valid=Reply(true,new EditorCommand{tool="run_shell",name="Forbidden",args=new JObject{["command"]="fictional-command"}});string raw=valid.Substring(0,valid.Length-1);
+            var provider=new RecordingProvider{Respond=(round,request,token)=>Task.FromResult(raw)};var controller=Controller(provider);
+            controller.Settings.ModelKey="pollinations:openai-fast";controller.Settings.Power=AssistantPower.Fast;
+            yield return Finish(controller.SendAsync("Создай объект."));var answer=controller.Current.Messages.Last();var attempt=answer.Attempts.Single();
+            Assert.That(attempt.RepairKind,Is.EqualTo("classic-final-root-close"));Assert.That(attempt.NormalizedResponse,Is.EqualTo(valid));
+            Assert.That(attempt.Accepted,Is.False);Assert.That(answer.IsError,Is.True);Assert.That(answer.PendingPlan,Is.Null);Assert.That(answer.Steps,Is.Empty);Assert.That(testScene.rootCount,Is.Zero);
+        }
+        [UnityTest] public IEnumerator ExplicitReadOnlyBlocksCreateDraftAndAttachWithoutReplacingOlderDraft()
+        {
+            var mutations=new[]{Create("ReadOnlyMustNotExist"),Draft("ReadOnlyMustNotDraft"),new EditorCommand{tool="attach_script",name="ReadOnlyMustNotAttach",target="MissingTarget"}};
+            var provider=new RecordingProvider{Respond=(round,request,token)=>Task.FromResult(round==0?Reply(true,Draft("ExistingReviewRotor")):Reply(true,mutations[(round-1)%mutations.Length]))};
+            var controller=Controller(provider);controller.Settings.Power=AssistantPower.Fast;
+            yield return Finish(controller.SendAsync("Напиши вращение, не импортируй: сначала ревью."));var oldAnswer=controller.Current.Messages.Last();
+            Assert.That(oldAnswer.PendingPlan,Is.Not.Null);string previousPlan=JsonConvert.SerializeObject(oldAnswer.PendingPlan);
+            foreach(string prompt in new[]{"Какая модель сейчас выбрана и что находится в этой сцене? Только объясни в чате. Ничего не создавай и не изменяй; предыдущий черновик C# оставь ожидающим моего ревью.","Only explain the current scene. Do not create or import anything.","Только расскажи о сцене.","Только объясни сцену. Напиши кратко.","Only explain the scene. Write in Russian.","Только объясни сцену. Сделай ответ коротким."})
+            {
+                yield return Finish(controller.SendAsync(prompt));var answer=controller.Current.Messages.Last();
+                Assert.That(answer.IsError,Is.True);Assert.That(answer.Attempts.Single().Error,Does.Contain("только объяснение"));Assert.That(answer.PendingPlan,Is.Null);Assert.That(answer.Steps,Is.Empty);
+                Assert.That(JsonConvert.SerializeObject(oldAnswer.PendingPlan),Is.EqualTo(previousPlan));Assert.That(testScene.rootCount,Is.Zero);
+            }
+            var restored=JsonConvert.DeserializeObject<ChatSession>(File.ReadAllText(Path.Combine(folder,controller.Current.Id+".json")));
+            Assert.That(JsonConvert.SerializeObject(restored.Messages.Single(m=>m.Id==oldAnswer.Id).PendingPlan),Is.EqualTo(previousPlan));
+        }
+        [UnityTest] public IEnumerator ClassicReadOnlyPlainTextIsAuditedAndHasNoSceneOrPendingEffects()
+        {
+            const string plain="Выбрана GPT-OSS. В сцене куб ExistingSceneCube; прежний код ожидает ревью.";
+            var cube=new GameObject("ExistingSceneCube");cube.transform.position=new Vector3(3,2,1);
+            var provider=new RecordingProvider{Respond=(round,request,token)=>
+            {
+                if(round==0)return Task.FromResult(Reply(true,Draft("PreservedReviewRotor")));
+                Assert.That(request.Messages.Any(m=>m.Role=="system"&&m.Content.Contains("CURRENT REQUEST IS EXPLICITLY READ ONLY")),Is.True);
+                return Task.FromResult(plain);
+            }};
+            var controller=Controller(provider);controller.Settings.ModelKey="pollinations:openai-fast";controller.Settings.Power=AssistantPower.Fast;
+            yield return Finish(controller.SendAsync("Напиши код для ревью, не импортируй."));var older=controller.Current.Messages.Last();string retained=JsonConvert.SerializeObject(older.PendingPlan);
+            yield return Finish(controller.SendAsync("Какая модель и что находится в сцене? Только объясни в чате. Ничего не создавай и не изменяй."));
+            var answer=controller.Current.Messages.Last();var attempt=answer.Attempts.Single();Assert.That(answer.IsError,Is.False,answer.Text);Assert.That(answer.Status,Is.EqualTo("Готово"));Assert.That(answer.Text,Is.EqualTo(plain));
+            Assert.That(attempt.RawResponse,Is.EqualTo(plain));Assert.That(attempt.Response,Is.EqualTo(plain));Assert.That(attempt.RepairKind,Is.EqualTo("classic-readonly-text"));Assert.That(attempt.Accepted,Is.True);
+            var normalized=EditorPlan.Parse(attempt.NormalizedResponse);Assert.That(normalized.reply,Is.EqualTo(plain));Assert.That(normalized.actions,Is.Empty);Assert.That(normalized.complete,Is.True);
+            Assert.That(answer.PendingPlan,Is.Null);Assert.That(answer.Steps,Is.Empty);Assert.That(JsonConvert.SerializeObject(older.PendingPlan),Is.EqualTo(retained));
+            Assert.That(testScene.rootCount,Is.EqualTo(1));Assert.That(cube.transform.position,Is.EqualTo(new Vector3(3,2,1)));Assert.That(Find("ExistingSceneCube"),Is.SameAs(cube));
+        }
+        [UnityTest] public IEnumerator ClassicCodeReviewPlainTextIsNotAnAcceptedDraft()
+        {
+            const string plain="Вот MonoBehaviour для вращения; импортируйте его после ревью.";
+            var provider=new RecordingProvider{Respond=(round,request,token)=>Task.FromResult(plain)};var controller=Controller(provider);
+            controller.Settings.ModelKey="pollinations:openai-fast";controller.Settings.Power=AssistantPower.Fast;
+            yield return Finish(controller.SendAsync("Напиши отдельный C# MonoBehaviour для плавного вращения. Подготовь код для моего ревью, пока не импортируй, не подключай и не исполняй его."));
+            var answer=controller.Current.Messages.Last();Assert.That(answer.IsError,Is.True);Assert.That(answer.Attempts.Single().RepairKind,Is.Null);Assert.That(answer.PendingPlan,Is.Null);Assert.That(answer.Steps,Is.Empty);Assert.That(testScene.rootCount,Is.Zero);
+        }
+        [UnityTest] public IEnumerator ClassicReadOnlyDoesNotWrapJsonArraysFencesOrMalformedObjects()
+        {
+            foreach(string raw in new[]{"{broken}","[\"explanation\"]","```json\n{\"reply\":\"explanation\"}\n```"})
+            {
+                var provider=new RecordingProvider{Respond=(round,request,token)=>Task.FromResult(raw)};var controller=Controller(provider);
+                controller.Settings.ModelKey="pollinations:openai-fast";controller.Settings.Power=AssistantPower.Fast;
+                yield return Finish(controller.SendAsync("Только опиши сцену."));var answer=controller.Current.Messages.Last();
+                Assert.That(answer.IsError,Is.True);Assert.That(answer.Attempts.Single().RepairKind,Is.Null);Assert.That(answer.PendingPlan,Is.Null);Assert.That(answer.Steps,Is.Empty);Assert.That(testScene.rootCount,Is.Zero);
+            }
+        }
+        [UnityTest] public IEnumerator QuotedReadOnlyWordsAndMixedEditRequestsKeepTheirActualEditIntent()
+        {
+            foreach(string prompt in new[]{"Создай куб с именем «Только объясни».","Создай куб. Затем только объясни результат.","Create a cube named `Only explain`.","Нужен куб с именем «Пример. Только объясни».","Please produce a cube named `Example. Only explain`.","Сначала создай куб. Только расскажи, что сделал.","Сгенерируй куб. Только объясни результат.","Build a cube. Only explain the result.","Только объясни сцену, затем создай куб.","Only explain the scene, then create a cube.","Только объясни сцену. Напиши скрипт вращения."})
+            {
+                string name="IntentCube"+Guid.NewGuid().ToString("N");var provider=new RecordingProvider{Respond=(round,request,token)=>Task.FromResult(round==0?Reply(true,Create(name)):Reply(true))};
+                var controller=Controller(provider);controller.Settings.Power=AssistantPower.Balanced;
+                yield return Finish(controller.SendAsync(prompt));var answer=controller.Current.Messages.Last();
+                Assert.That(answer.IsError,Is.False,answer.Text);Assert.That(answer.Steps.Single().Success,Is.True);Assert.That(Find(name),Is.Not.Null);
+            }
+        }
+        [UnityTest] public IEnumerator ReadOnlyInspectionUsesRealReadToolWithoutMutatingScene()
+        {
+            var cube=new GameObject("InspectableCube");cube.transform.position=new Vector3(8,5,2);
+            var provider=new RecordingProvider{Respond=(round,request,token)=>Task.FromResult(round==0?Reply(false,new EditorCommand{tool="inspect_object",target="id:"+cube.GetInstanceID()}):Reply(true))};
+            var controller=Controller(provider);controller.Settings.Power=AssistantPower.Balanced;
+            yield return Finish(controller.SendAsync("Only explain the existing cube after inspecting it."));var answer=controller.Current.Messages.Last();
+            Assert.That(answer.IsError,Is.False,answer.Text);Assert.That(answer.Steps.Single().Tool,Is.EqualTo("inspect_object"));Assert.That(answer.Steps.Single().Success,Is.True);
+            Assert.That(answer.PendingPlan,Is.Null);Assert.That(testScene.rootCount,Is.EqualTo(1));Assert.That(cube.transform.position,Is.EqualTo(new Vector3(8,5,2)));
         }
     }
 }

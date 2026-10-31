@@ -747,11 +747,13 @@ namespace WorldWeaver.Editor.Assistant
                     RenderSteps(value.Steps);
                     changed = true;
                 }
-                string pending = value.PendingPlan == null ? "" : value.PendingPlan.reply + "\n" + string.Join("\n", value.PendingPlan.actions.Select(a => a.tool + ":" + a.name + ":" + a.target + ":" + a.args));
+                var displayedPlan = value.PendingPlan ?? HistoricalCodePlan(value);
+                bool awaitingReview = value.PendingPlan != null;
+                string pending = displayedPlan == null ? "" : (awaitingReview ? "pending:" : "history:") + displayedPlan.reply + "\n" + string.Join("\n", displayedPlan.actions.Select(a => a.tool + ":" + a.name + ":" + a.target + ":" + a.args));
                 if (pending != planSignature)
                 {
                     planSignature = pending;
-                    RenderPlan(value.PendingPlan);
+                    RenderPlan(displayedPlan, awaitingReview);
                     changed = true;
                 }
                 return changed;
@@ -801,19 +803,39 @@ namespace WorldWeaver.Editor.Assistant
                 steps.Add(foldout);
             }
 
-            void RenderPlan(EditorPlan plan)
+            static EditorPlan HistoricalCodePlan(AssistantMessage value)
+            {
+                if (value.Attempts == null || value.Steps == null ||
+                    !value.Steps.Any(step => step.Tool == "draft_script" && step.Success)) return null;
+                foreach (var attempt in value.Attempts.Where(attempt => attempt != null && attempt.Accepted).Reverse())
+                {
+                    string source = string.IsNullOrEmpty(attempt.NormalizedResponse) ? attempt.Response : attempt.NormalizedResponse;
+                    if (string.IsNullOrEmpty(source) || source.Length > 40000 || !source.Contains("\"draft_script\"")) continue;
+                    try
+                    {
+                        var parsed = EditorPlan.Parse(source);
+                        var drafts = parsed.actions.Where(action => action.tool == "draft_script").ToList();
+                        if (drafts.Count > 0) return new EditorPlan { reply = parsed.reply, complete = parsed.complete, actions = drafts };
+                    }
+                    catch (ArgumentException) { }
+                    catch (Newtonsoft.Json.JsonException) { }
+                }
+                return null;
+            }
+
+            void RenderPlan(EditorPlan plan, bool awaitingReview)
             {
                 review.Clear();
                 review.style.display = plan == null ? DisplayStyle.None : DisplayStyle.Flex;
                 if (plan == null) return;
-                review.Add(Text("План ждёт подтверждения", "review-title"));
+                review.Add(Text(awaitingReview ? "План ждёт подтверждения" : "Код из истории сообщения", "review-title"));
                 foreach (var action in plan.actions)
                 {
                     if (action.tool == "draft_script")
                     {
                         string name = string.IsNullOrWhiteSpace(action.name) ? "НовыйСкрипт" : action.name;
                         if (!name.EndsWith(".cs", StringComparison.OrdinalIgnoreCase)) name += ".cs";
-                        var foldout = new Foldout { text = "Код · " + name, value = true };
+                        var foldout = new Foldout { text = "Код · " + name, value = awaitingReview };
                         string description = action.args?["description"]?.ToString();
                         if (!string.IsNullOrEmpty(description)) foldout.Add(Text(description, "review-description"));
                         string code = action.args?["code"]?.ToString() ?? "";
@@ -822,7 +844,8 @@ namespace WorldWeaver.Editor.Assistant
                         foldout.Add(field);
                         foldout.Add(Button("Копировать код", () => EditorGUIUtility.systemCopyBuffer = code, "message-action"));
                         review.Add(foldout);
-                        review.Add(Text("Скрипт попадёт в проект после «Применить план». Результат импорта и компиляции появится в чате.", "review-caption"));
+                        review.Add(Text(awaitingReview ? "Скрипт попадёт в проект после «Применить план». Результат импорта и компиляции появится в чате." :
+                            "Сохранённый снимок кода из этого ответа. Текущее состояние файла может отличаться.", "review-caption"));
                     }
                     else
                     {
@@ -874,6 +897,7 @@ namespace WorldWeaver.Editor.Assistant
                     case "read_script": return "Прочитать скрипт";
                     case "draft_script": return "Подготовить скрипт";
                     case "attach_script": return "Добавить скрипт к объекту";
+                    case "compile_scripts": return "Проверить компиляцию C#";
                     default: return "Действие с объектом";
                 }
             }

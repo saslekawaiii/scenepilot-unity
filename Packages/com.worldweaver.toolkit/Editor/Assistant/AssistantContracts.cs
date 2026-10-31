@@ -103,7 +103,9 @@ namespace WorldWeaver.Editor.Assistant
     public sealed class EditorPlanAttempt
     {
         public int Round;
-        public string Response, Error, SchemaHash, Model;
+        // Response remains the raw provider text for compatibility with older traces.
+        // NormalizedResponse is recorded only for an explicit, narrowly scoped adapter repair.
+        public string Response, RawResponse, NormalizedResponse, RepairKind, Error, SchemaHash, Model;
         public long ProviderElapsedMs;
         public List<ChatMessage> Messages = new List<ChatMessage>();
         public bool Accepted;
