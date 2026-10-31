@@ -27,7 +27,9 @@ namespace WorldWeaver.Editor
 
         [MenuItem("Tools/Intelligent World Toolkit")]
         [MenuItem("Tools/WorldWeaver/Open Toolkit")]
-        public static void ShowWindow() { GetWindow<WorldWeaverWindow>("WorldWeaver").minSize = new Vector2(490, 580); }
+        public static void ShowWindow() { Assistant.WorldWeaverChatWindow.ShowWindow(); }
+        [MenuItem("Tools/WorldWeaver/Advanced Inspector")]
+        public static void ShowAdvanced() { GetWindow<WorldWeaverWindow>("WorldWeaver · Inspector").minSize = new Vector2(490, 580); }
         // Menu alternatives make IMGUI views reachable through native keyboard menus.
         [MenuItem("Tools/WorldWeaver/Views/World")] private static void WorldView() => OpenView(0);
         [MenuItem("Tools/WorldWeaver/Views/Character")] private static void CharacterView() => OpenView(1);
@@ -36,7 +38,7 @@ namespace WorldWeaver.Editor
         [MenuItem("Tools/WorldWeaver/Views/Debug")] private static void TraceView() => OpenView(4);
         private static void OpenView(int index)
         {
-            ShowWindow(); var window = GetWindow<WorldWeaverWindow>();
+            ShowAdvanced(); var window = GetWindow<WorldWeaverWindow>();
             var selected = Selection.activeGameObject ? Selection.activeGameObject.GetComponent<IntelligentNPC>() : null;
             if (!selected && GameObject.Find("Merchant")) selected = GameObject.Find("Merchant").GetComponent<IntelligentNPC>();
             if (selected) { window.npc = selected; Selection.activeGameObject = selected.gameObject; }

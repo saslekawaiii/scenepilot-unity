@@ -15,6 +15,7 @@ namespace WorldWeaver
         [Range(0, 3)] public int Retries = 1;
         [Range(0, 2)] public float Temperature = 0;
         [Range(64, 8192)] public int MaxTokens = 768;
+        [Range(1024, 32768)] public int ContextWindow = 4096;
         public bool StrictSchema = true;
 
         public void Validate()
@@ -25,7 +26,7 @@ namespace WorldWeaver
                 throw new ArgumentException("Use HTTPS or loopback HTTP, without credentials, query or fragment.");
             if (string.IsNullOrWhiteSpace(Model) || Model.Length > 200) throw new ArgumentException("Model ID is required.");
             if (TimeoutSeconds < 1 || TimeoutSeconds > 300 || Retries < 0 || Retries > 3 ||
-                MaxTokens < 64 || MaxTokens > 8192 || float.IsNaN(Temperature) || Temperature < 0 || Temperature > 2)
+                MaxTokens < 64 || MaxTokens > 8192 || ContextWindow < 1024 || ContextWindow > 32768 || float.IsNaN(Temperature) || Temperature < 0 || Temperature > 2)
                 throw new ArgumentException("Invalid model limits.");
             if (ApiKeyEnvironmentVariable.Length > 128 || ApiKeyEnvironmentVariable.Contains(" "))
                 throw new ArgumentException("Specify an environment variable name, never an API key.");

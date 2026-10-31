@@ -1,11 +1,28 @@
 {
   "name": "com.worldweaver.toolkit",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "displayName": "WorldWeaver Intelligent World Toolkit",
-  "description": "Deterministic terrain, scoped RAG and validated LLM-driven NPC actions with explicit model routing.",
-  "unity": "2022.3",
-  "author": {"name": "Kirill Kovalenko"},
-  "keywords": ["terrain", "npc", "rag", "llm"],
-  "dependencies": {"com.unity.nuget.newtonsoft-json": "3.2.1"},
-  "samples": [{"displayName": "Village knowledge", "description": "Small authored knowledge base for the demo merchant. Create the complete scene via Tools > WorldWeaver > Create Demo.", "path": "Samples~/Village"}]
+  "description": "Chat-first Unity Editor agent with model selection, transactional scene tools, reviewed C# drafts, deterministic terrain and scoped RAG NPCs.",
+  "unity": "6000.3",
+  "author": {
+    "name": "Kirill Kovalenko"
+  },
+  "keywords": [
+    "chat",
+    "agent",
+    "terrain",
+    "npc",
+    "rag",
+    "llm"
+  ],
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "3.2.1"
+  },
+  "samples": [
+    {
+      "displayName": "Village knowledge",
+      "description": "Small authored knowledge base for the demo merchant. Create the complete scene via Tools > WorldWeaver > Create Demo.",
+      "path": "Samples~/Village"
+    }
+  ]
 }

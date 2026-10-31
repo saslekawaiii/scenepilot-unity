@@ -18,7 +18,7 @@ namespace WorldWeaver
             foreach (var message in request.Messages) messages.Add(new JObject { ["role"] = message.Role, ["content"] = message.Content });
             var body = new JObject { ["model"] = profile.Model, ["messages"] = messages, ["stream"] = false, ["think"] = false,
                 ["format"] = request.Schema != null ? (JToken)request.Schema : new JValue("json"), ["keep_alive"] = "10m",
-                ["options"] = new JObject { ["temperature"] = profile.Temperature, ["num_predict"] = profile.MaxTokens, ["num_ctx"] = 4096 } };
+                ["options"] = new JObject { ["temperature"] = profile.Temperature, ["num_predict"] = profile.MaxTokens, ["num_ctx"] = profile.ContextWindow } };
             var watch = Stopwatch.StartNew();
             var result = await transport.SendAsync(profile.Endpoint.TrimEnd('/') + "/api/chat", body, "", profile.TimeoutSeconds, profile.Retries, token);
             var content = (string)result["message"]?["content"];

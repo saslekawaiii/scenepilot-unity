@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
@@ -32,7 +33,7 @@ namespace WorldWeaver
             {
                 var delay = freeNext - DateTime.UtcNow;
                 if (delay > TimeSpan.Zero) await Task.Delay(delay, cancellationToken);
-                freeNext = DateTime.UtcNow.AddSeconds(31);
+                freeNext = DateTime.UtcNow.AddSeconds(46);
                 return await CompleteCoreAsync(request, cancellationToken);
             }
             finally { freeGate.Release(); }
@@ -40,14 +41,35 @@ namespace WorldWeaver
         private async Task<CompletionResult> CompleteCoreAsync(CompletionRequest request, CancellationToken cancellationToken)
         {
             var messages = new JArray();
-            if (!profile.StrictSchema && request.Schema != null)
-                messages.Add(new JObject { ["role"] = "system", ["content"] = "Return one JSON object matching exactly this schema, including every required field: " + request.Schema.ToString(Newtonsoft.Json.Formatting.None) });
-            foreach (var message in request.Messages) messages.Add(new JObject { ["role"] = message.Role, ["content"] = message.Content });
+            bool classicText = profile.Provider == ProviderKind.Pollinations && !profile.StrictSchema;
+            if (classicText)
+            {
+                // Classic's JSON-object formatter can corrupt the first property of a
+                // valid model answer. Its native grammar also rejects propertyNames.
+                // Use ordinary text with an explicit instance contract, then apply
+                // the unchanged strict parser and tool validator in the caller.
+                string contract = "Return ONLY one valid JSON INSTANCE, never a JSON Schema or Markdown. Follow the JSON contract requested below, with every required field. ";
+                if (request.Schema?["properties"]?["reply"] != null && request.Schema?["properties"]?["actions"] != null)
+                    contract += "EditorPlan INSTANCE: {\"reply\":\"Russian response\",\"complete\":true,\"actions\":[{\"tool\":\"tool_name\",\"name\":\"object name or empty\",\"target\":\"existing target or empty\",\"args\":{}}]}. Use actions:[] for a finished non-editing answer. Each action requires tool,name,target,args. Use the tools and typed arguments described in these instructions. ";
+                else if (request.Schema != null)
+                    contract += "Required output fields: " + string.Join(", ", request.Schema["required"] ?? new JArray()) +
+                        ". Fill an instance of this contract: " + request.Schema.ToString(Newtonsoft.Json.Formatting.None) + ". ";
+                messages.Add(new JObject { ["role"] = "system", ["content"] = contract + "\n" + string.Join("\n\n", request.Messages.Where(message => message.Role == "system").Select(message => message.Content)) });
+                foreach (var message in request.Messages.Where(message => message.Role != "system"))
+                    messages.Add(new JObject { ["role"] = message.Role, ["content"] = message.Content });
+            }
+            else
+            {
+                if (!profile.StrictSchema && request.Schema != null)
+                    messages.Add(new JObject { ["role"] = "system", ["content"] = "Return one JSON object matching exactly this schema, including every required field: " + request.Schema.ToString(Newtonsoft.Json.Formatting.None) });
+                foreach (var message in request.Messages) messages.Add(new JObject { ["role"] = message.Role, ["content"] = message.Content });
+            }
             var body = new JObject { ["model"] = profile.Model, ["messages"] = messages, ["temperature"] = profile.Temperature,
-                [profile.Provider == ProviderKind.Groq ? "max_completion_tokens" : "max_tokens"] = profile.MaxTokens };
-            body["response_format"] = profile.StrictSchema && request.Schema != null
-                ? new JObject { ["type"] = "json_schema", ["json_schema"] = new JObject { ["name"] = "worldweaver", ["strict"] = true, ["schema"] = request.Schema } }
-                : new JObject { ["type"] = "json_object" };
+                [profile.Provider == ProviderKind.Groq ? "max_completion_tokens" : "max_tokens"] = profile.Provider == ProviderKind.Pollinations ? Math.Min(profile.MaxTokens, 1500) : profile.MaxTokens };
+            if (!classicText)
+                body["response_format"] = profile.StrictSchema && request.Schema != null
+                    ? new JObject { ["type"] = "json_schema", ["json_schema"] = new JObject { ["name"] = "worldweaver", ["strict"] = true, ["schema"] = request.Schema } }
+                    : new JObject { ["type"] = "json_object" };
             if (profile.Provider == ProviderKind.Groq && profile.Model.StartsWith("openai/gpt-oss", StringComparison.Ordinal)) body["reasoning_effort"] = "low";
             var watch = Stopwatch.StartNew();
             var suffix = profile.Provider == ProviderKind.Pollinations ? "/openai" : "/chat/completions";
