@@ -1,0 +1,68 @@
+{
+  "kind": "independent-semantic-review-of-completed-conversation",
+  "reviewedUtc": "2026-10-31T23:09:38.585028+00:00",
+  "sourceCommit": "a64874b124c0c1562d84bcfd8f81232ab03bf744",
+  "snapshot": "SIXTH",
+  "packageTreeSha256": "ae723ac0d7e15b205ea491823ac1feadeb9d5275a9fb9b8b8387baadf9011f0c",
+  "report": "results/iterations/chat-agent-acceptance-local-1.2-sixth-complete.json",
+  "reportSha256": "b3a76299df342a9e0f153dada529fdc76d4fc10ccc7a054c95089c0227a392e9",
+  "completed": 7,
+  "automatedPassed": 5,
+  "automatedTotal": 7,
+  "automatedSuccess": false,
+  "model": "ollama:qwen3.5:9b",
+  "power": "Deep",
+  "caseReviews": [
+    {
+      "case": 1,
+      "automatedPassed": true,
+      "review": "Terrain160x160; actual12trees/3houses/4rocks; sun/camera. No general artistic-quality claim."
+    },
+    {
+      "case": 2,
+      "automatedPassed": true,
+      "review": "ExistingTerrain height24, stable decoration counts; no secondworld."
+    },
+    {
+      "case": 3,
+      "automatedPassed": true,
+      "review": "Ignat role/personality/scoped gate fact created. Additional unrequested bob behavior was also applied; narrow completion criterion does not imply exact minimal change."
+    },
+    {
+      "case": 4,
+      "automatedPassed": false,
+      "review": "240444ms per-request timeout; goal not changed. Server log recorded1105 generated tokens before cancellation; raw partial plan not retained, so precise generation content unknown."
+    },
+    {
+      "case": 5,
+      "automatedPassed": false,
+      "review": "3neworangePoint lights, but model explicitly sent on_terrain:false and all3 fail3m clearance. Existing UI task checker only counted lights and incorrectly showed checks passed for this broader placement criterion."
+    },
+    {
+      "case": 6,
+      "automatedPassed": true,
+      "review": "Review-only draft persisted with no automatic import; code has static unit defect: Mathf.Deg2Rad*30 passed to Transform.Rotate, which accepts degrees. Expected from code0.5235988deg/s instead of30; actual compile/runtime not yet checked here. Draft-availability success is not algorithm correctness.",
+      "actualRuntimeFollowup": {
+        "receipt": "results/iterations/rotation-runtime-1.2-sixth-fresh-draft.json",
+        "sha256": "7b5d76385483443e121bf3f24c30dcdf8ca9a1481ab16dd4869da614a504f03a",
+        "success": false,
+        "actualDegrees": 1.0508985496152454,
+        "expectedDegrees": 60.213068452380945,
+        "actualSeconds": 2.0071022817460316,
+        "samples": 99,
+        "stationaryDegrees": 0.0,
+        "sourceUnchanged": true,
+        "UnityExitCode": 1,
+        "source": "47eec449075c0ccfe8a114adff16714b838ccfbe098d416ce93089de0ec02d36",
+        "method": "Exact original generated UTF8 code imported unchanged in isolated SIXTH-package consumer; actual PlayMode sampling via public AgentEditorJobs. No model call or code repair in this measurement."
+      },
+      "unitReference": "https://docs.unity.com/en-us/engine/6000.3/script-reference/unityengine/transform/rotate"
+    },
+    {
+      "case": 7,
+      "automatedPassed": true,
+      "review": "Read-only answer preserved scene and pending draft. Extra claims are unsupported/incorrect: water24percent (specwaterLevel0.1), assignedNPCroutes (case4failed; bob is not navigation). Read-only preservation criterion is not factual-answer quality."
+    }
+  ],
+  "limitation": "Known seven debugging/acceptance scenarios, single deterministic local conversation. Not a held-out benchmark or reliability estimate. Complete failure outcome preserved before production fixes; no failed case removed."
+}

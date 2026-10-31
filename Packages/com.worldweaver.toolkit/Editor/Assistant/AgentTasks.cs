@@ -62,7 +62,7 @@ namespace WorldWeaver.Editor.Assistant
             input=input??"";
             var ambiguousKinds=new HashSet<string>();
             var number = @"(?:\d{1,6}|один|одна|одно|два|две|три|четыре|пять|шесть|семь|восемь|девять|десять|one|two|three|four|five|six|seven|eight|nine|ten)";
-            foreach (Match match in Regex.Matches(input, @"(?i)(?<![\w\d])(?<n>"+number+@")(?![\w\d])\s+(?:(?:новых|новые|новый|новое|new|orange|оранжевых|оранжевые|точечных|точечные)\s+){0,4}(?<kind>дерев(?:о|а|ья|ьев|ьям|ьями|ьях)\b|дом(?:ов|а|ом|ами|ах)?\b|камен\w*|камн\w*|персонаж\w*|NPC\b|lights?\b|Point\s*Light\b|источник\w*\s+света|trees?\b|houses?\b|rocks?\b)",RegexOptions.CultureInvariant))
+            foreach (Match match in Regex.Matches(input, @"(?i)(?<![\w\d])(?<n>"+number+@")(?![\w\d])\s+(?:(?:новых|новые|новый|новое|new|orange|оранжевых|оранжевые|точечных|точечные)\s+){0,4}(?<kind>дерев(?:о|а|ья|ьев|ьям|ьями|ьях)\b|дом(?:ов|а|ом|ами|ах)?\b|камен\w*|камн\w*|персонаж\w*|NPC\b|lights?\b|Point\s*Lights?\b|источник\w*\s+света|trees?\b|houses?\b|rocks?\b)",RegexOptions.CultureInvariant))
             {
                 string token=match.Groups["n"].Value; int count=Words.TryGetValue(token,out int named)?named:int.Parse(token);
                 string word=match.Groups["kind"].Value.ToLowerInvariant();
@@ -100,6 +100,11 @@ namespace WorldWeaver.Editor.Assistant
             if(Regex.IsMatch(input,@"(?i)(играбельн|управляем\w*\s+(?:игрок|персонаж)|WASD|playable|player\s+controller)"))task.Requirements.Add(new AgentRequirement{Kind="player",Number=1,Description="В сцене есть управляемый игрок"});
             if(Regex.IsMatch(input,@"(?i)(квест|достав\w*\s+письм|delivery\s+quest)"))task.Requirements.Add(new AgentRequirement{Kind="quest",Number=1,Description="Квест доставки имеет двух участников и награду"});
             if(Regex.IsMatch(input,@"(?i)(проходим|достижим|NavMesh|connected\s+village|pathfinding)"))task.Requirements.Add(new AgentRequirement{Kind="navigation",Number=1,Description="Связи именованных мест имеют полные пути NavMesh"});
+            if(AgentTaskSchema.GroundedPointLights(task))
+            {
+                var count=task.Requirements.First(r=>r.Kind=="count"&&r.Expected=="point_light"&&r.Relative);
+                task.Requirements.Add(new AgentRequirement{Kind="point_light_placement",Expected="point_light",Number=1,Relative=true,BaselineTargets=new List<string>(count.BaselineTargets),Description="Новые Point-источники находятся в пределах Terrain, не ниже 3 м над поверхностью и освещают её своим range"});
+            }
             return task;
         }
         static bool MatchesKind(GameObject go,string expected)=>expected=="light"?go.GetComponent<Light>()!=null:Kind(go)==expected;
@@ -120,6 +125,10 @@ namespace WorldWeaver.Editor.Assistant
                 {
                     var matching=objects.Where(go=>MatchesKind(go,requirement.Expected));
                     actual=requirement.Relative&&requirement.BaselineTargets!=null?matching.Count(go=>!requirement.BaselineTargets.Contains(ProjectContextIndex.StableTarget(go))):matching.Count()-(requirement.Relative?requirement.Baseline:0);
+                }
+                else if(requirement.Kind=="point_light_placement")
+                {
+                    actual=PointLightPlacement(objects,requirement,out evidence)?1:0;
                 }
                 else if(requirement.Kind=="preserve")
                 {
@@ -144,6 +153,30 @@ namespace WorldWeaver.Editor.Assistant
             foreach(string question in task.OpenQuestions)task.Checks.Add(new AgentCheckResult{RequirementId="ambiguous",Description=question,Actual="Нужна отдельная оценка",Evidence="Неоднозначное буквальное условие не объявляется подтверждённым",Passed=false});
             task.Status=task.Checks.Count==0?"actions_need_review":task.Checks.All(c=>c.Passed)?"literal_checks_passed":"checks_failed";
             return task.Checks;
+        }
+        static bool PointLightPlacement(GameObject[] objects,AgentRequirement requirement,out string evidence)
+        {
+            var lights=objects.Where(go=>Kind(go)=="point_light"&&!requirement.BaselineTargets.Contains(ProjectContextIndex.StableTarget(go))).Select(go=>go.GetComponent<Light>()).ToArray();
+            var terrains=objects.Where(go=>go.scene==UnityEngine.SceneManagement.SceneManager.GetActiveScene()).Select(go=>go.GetComponent<Terrain>()).Where(t=>t&&t.enabled&&t.gameObject.activeInHierarchy&&t.terrainData).ToArray();
+            var observations=new List<object>();bool valid=lights.Length>0;
+            foreach(var light in lights)
+            {
+                var p=light.transform.position;float surface=float.NegativeInfinity;
+                foreach(var terrain in terrains)
+                {
+                    var origin=terrain.transform.position;var size=terrain.terrainData.size;
+                    if(p.x<origin.x||p.x>origin.x+size.x||p.z<origin.z||p.z>origin.z+size.z)continue;
+                    float h=terrain.terrainData.GetInterpolatedHeight((p.x-origin.x)/size.x,(p.z-origin.z)/size.z)+origin.y;
+                    var generated=terrain.GetComponent<GeneratedTerrain>();
+                    if(generated&&generated.Specification!=null)h=Mathf.Max(h,origin.y+generated.Specification.waterLevel*generated.Specification.height);
+                    surface=Mathf.Max(surface,h);
+                }
+                bool inBounds=!float.IsNegativeInfinity(surface);float clearance=inBounds?p.y-surface:0;
+                bool passed=inBounds&&clearance>=2.98f&&light.range+.02f>=clearance;
+                valid&=passed;observations.Add(new{light=light.name,x=p.x,y=p.y,z=p.z,inBounds,surface=inBounds?(float?)surface:null,clearance=inBounds?(float?)clearance:null,range=light.range,passed});
+            }
+            evidence="Independent TerrainData height/water/Light.range read-back: "+JsonConvert.SerializeObject(observations);
+            return valid;
         }
         public static string Context(AgentTaskState task)
         {

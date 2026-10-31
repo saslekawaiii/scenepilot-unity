@@ -297,8 +297,9 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
                             Undo.RecordObject(light,"Assistant light");Undo.RecordObject(go.transform,"Assistant light rotation");if(a["type"]!=null)light.type=(string)a["type"]=="point"?LightType.Point:(string)a["type"]=="spot"?LightType.Spot:LightType.Directional;if(a["position"]!=null)go.transform.position=Vector(a["position"],"position");if(a["range"]!=null)light.range=(float)a["range"];if(a["spot_angle"]!=null)light.spotAngle=(float)a["spot_angle"];if(a["intensity"]!=null)light.intensity=(float)a["intensity"];if(a["color"]!=null)light.color=ColorValue(a["color"]);if(a["rotation"]!=null)go.transform.eulerAngles=Vector(a["rotation"],"rotation");if(a["shadows"]!=null)light.shadows=(bool)a["shadows"]?LightShadows.Soft:LightShadows.None;
                             // New point/spot placement is terrain-aware; edits remain exact unless explicitly opted in.
                             bool alignLight=(bool?)a["on_terrain"]==true||(string.IsNullOrEmpty(command.target)&&(bool?)a["on_terrain"]!=false);
-                            bool liftedLight=alignLight&&LiftLightAboveTerrain(light);
-                            if(alignLight)WorldGameplayTools.MarkLightAnchor(light,FindTerrain(go.transform));
+                            Terrain lightTerrain=null;
+                            bool liftedLight=alignLight&&LiftLightAboveTerrain(light,out lightTerrain);
+                            if(alignLight)WorldGameplayTools.MarkLightAnchor(light,lightTerrain);
                             if(a["intensity"]!=null&&!Mathf.Approximately(light.intensity,(float)a["intensity"]))throw new InvalidOperationException("Light read-back failed.");summary=liftedLight?"Параметры света применены; источник поднят над рельефом и водой с сохранением XZ.":"Параметры источника света применены.";break;
                         case "create_camera":
                             go=tx.Empty(command.name,parent,"camera");var cam=Undo.AddComponent<Camera>(go);ApplyTransform(go,a,null);if(a["look_at"]!=null)go.transform.LookAt(Vector(a["look_at"],"look_at"));cam.fieldOfView=(float?)a["field_of_view"]??50;cam.orthographic=(bool?)a["orthographic"]??false;cam.orthographicSize=(float?)a["size"]??10;cam.farClipPlane=4000;cam.enabled=(bool?)a["enabled"]??!SceneObjects().Select(o=>o.GetComponent<Camera>()).Any(c=>c&&c!=cam&&c.enabled);if(a["background"]!=null){cam.clearFlags=CameraClearFlags.SolidColor;cam.backgroundColor=ColorValue(a["background"]);}summary="Камера создана. Существующие камеры сохранены.";break;
@@ -362,8 +363,9 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
             if(parent){var local=parent.GetComponentInChildren<Terrain>(true);if(local)return local;for(var t=parent.parent;t;t=t.parent){local=t.GetComponentInChildren<Terrain>(true);if(local)return local;}}
             return SceneObjects().Select(o=>o.GetComponent<Terrain>()).FirstOrDefault(t=>t&&t.GetComponent<GeneratedTerrain>());
         }
-        private static bool LiftLightAboveTerrain(Light light)
+        private static bool LiftLightAboveTerrain(Light light,out Terrain lightTerrain)
         {
+            lightTerrain=null;
             if(light.type!=LightType.Point&&light.type!=LightType.Spot)return false;
             var position=light.transform.position;
             float minimum=float.NegativeInfinity;
@@ -375,7 +377,7 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
                 float surface=terrain.SampleHeight(position)+origin.y;
                 var generated=terrain.GetComponent<GeneratedTerrain>();
                 if(generated&&generated.Specification!=null)surface=Mathf.Max(surface,origin.y+generated.Specification.waterLevel*generated.Specification.height);
-                minimum=Mathf.Max(minimum,surface+3f);
+                if(surface+3f>minimum){minimum=surface+3f;lightTerrain=terrain;}
             }
             if(float.IsNegativeInfinity(minimum)||position.y>=minimum)return false;
             // Undo.RecordObject(transform) is captured by the caller before this one-time adjustment.

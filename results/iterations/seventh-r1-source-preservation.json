@@ -1,0 +1,11 @@
+{
+  "kind": "preserved-failed-test-candidate-source",
+  "utc": "2026-10-31T23:21:33.243149+00:00",
+  "candidate": "SEVENTH-r1; superseded, not the release package",
+  "sourceTreeSha256": "e628e5c6875e5ad876bdd04e776af90fc58a06a6dc5c987142f0d7c06411f4b3",
+  "files": 396,
+  "archive": "results/iterations/experimental-package-seventh-r1.tgz",
+  "archiveSha256": "9a1d92b7b27f4180244f0b8465ce31205f93ff107adcbc2df0054ffa165cd32c",
+  "sourceReceipt": "results/integration-1.2-snapshot-seventh.json",
+  "focusedOutcome": "202/224 passed;22 failed from a test helper assuming one set_lighting branch, whereas schema has separate creation/edit branches. Failure retained. R2 production/schema/refactoring and tests have a different source pin."
+}
