@@ -217,7 +217,7 @@ namespace WorldWeaver.Editor.Assistant
                 ["intensity"] = Number(0, 8), ["color"] = Color(),
                 ["position"] = Vector(), ["rotation"] = Vector(),
                 ["range"] = Number(.1, 500), ["spot_angle"] = Number(1, 179),
-                ["shadows"] = Boolean()
+                ["shadows"] = Boolean(), ["on_terrain"] = Boolean()
             });
         }
 

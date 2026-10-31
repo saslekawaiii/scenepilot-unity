@@ -11,7 +11,7 @@ namespace WorldWeaver.Editor.Assistant
     [Serializable]
     public sealed class ChatSettings
     {
-        public string ModelKey = "ollama:qwen2.5-coder:latest";
+        public string ModelKey = "ollama:qwen3.5:9b";
         public AssistantPower Power = AssistantPower.Balanced;
         public bool AutoApply = true;
     }

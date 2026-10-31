@@ -167,7 +167,68 @@ namespace WorldWeaver.Tests
         [Test] public void PointLightsAndRealRuntimePresetsCanBeCreated()
         {
             var result=Run(Plan(Cmd("set_lighting","Lantern",args:new JObject{["type"]="point",["range"]=12,["intensity"]=3,["position"]=new JArray(1,2,3)}),Cmd("attach_behavior",target:"@Lantern",args:new JObject{["behavior"]="bob",["amplitude"]=.2,["frequency"]=.5})));
-            Assert.That(result.Success,Is.True,result.Error);var go=Find("Lantern");Assert.That(go.GetComponent<Light>().type,Is.EqualTo(LightType.Point));Assert.That(go.GetComponent<Light>().range,Is.EqualTo(12));Assert.That(go.GetComponent<SceneBehavior>().Mode,Is.EqualTo(SceneBehaviorKind.Bob));
+            Assert.That(result.Success,Is.True,result.Error);var go=Find("Lantern");Assert.That(go.GetComponent<Light>().type,Is.EqualTo(LightType.Point));Assert.That(go.GetComponent<Light>().range,Is.EqualTo(12));Assert.That(go.GetComponent<SceneBehavior>().Mode,Is.EqualTo(SceneBehaviorKind.Bob));Assert.That(go.transform.position,Is.EqualTo(new Vector3(1,2,3)),"Without terrain initial Point placement stays exact.");
+        }
+        private Terrain LightPlacementTerrain(Vector3 origin,float normalizedHeight,float waterLevel)
+        {
+            var data=new TerrainData{heightmapResolution=33,size=new Vector3(32,20,32)};
+            var heights=new float[33,33];for(int z=0;z<33;z++)for(int x=0;x<33;x++)heights[z,x]=normalizedHeight;
+            data.SetHeights(0,0,heights);
+            string path=AssetDatabase.GenerateUniqueAssetPath("Assets/AssistantLightPlacementTerrain.asset");AssetDatabase.CreateAsset(data,path);assets.Add(path);
+            var go=Terrain.CreateTerrainGameObject(data);go.name="LightPlacementTerrain";go.transform.position=origin;
+            go.AddComponent<GeneratedTerrain>().Specification=new TerrainSpec{width=32,length=32,height=20,resolution=33,waterLevel=waterLevel};
+            return go.GetComponent<Terrain>();
+        }
+        [Test] public void NewPointAndSpotLightsClampAboveActualTerrainAndWaterWithoutLoweringHighY()
+        {
+            var water=LightPlacementTerrain(new Vector3(100,10,200),.25f,.7f);
+            var hill=LightPlacementTerrain(new Vector3(200,15,300),.75f,.1f);
+            var result=Run(Plan(
+                Cmd("set_lighting","WaterPoint",args:new JObject{["type"]="point",["position"]=new JArray(110,-6,210)}),
+                Cmd("set_lighting","HillSpot",args:new JObject{["type"]="spot",["position"]=new JArray(210,-5,310)}),
+                Cmd("set_lighting","HighPoint",args:new JObject{["type"]="point",["position"]=new JArray(112,80,212)})));
+            Assert.That(result.Success,Is.True,result.Error);
+            Assert.That(water.SampleHeight(new Vector3(110,0,210))+water.transform.position.y,Is.EqualTo(15).Within(.001));
+            Assert.That(Find("WaterPoint").transform.position,Is.EqualTo(new Vector3(110,27,210))); // water24 + clearance3
+            Assert.That(hill.SampleHeight(new Vector3(210,0,310))+hill.transform.position.y,Is.EqualTo(30).Within(.001));
+            Assert.That(Find("HillSpot").transform.position.y,Is.EqualTo(33).Within(.001));Assert.That(Find("HillSpot").transform.position.x,Is.EqualTo(210));Assert.That(Find("HillSpot").transform.position.z,Is.EqualTo(310)); // actual ground30 + clearance3
+            Assert.That(Find("HighPoint").transform.position,Is.EqualTo(new Vector3(112,80,212)));
+            Assert.That(Find("WaterPoint").GetComponent<GeneratedSceneObject>().SurfaceAnchored,Is.False,"One-time light clearance must not enable zero-offset UpdateWorld anchoring.");
+            Undo.RevertAllDownToGroup(result.UndoGroup);groups.Remove(result.UndoGroup);
+            Assert.That(testScene.GetRootGameObjects().SelectMany(r=>r.GetComponentsInChildren<Light>(true)),Is.Empty);
+            Assert.That(water.terrainData,Is.Not.Null);Assert.That(hill.terrainData,Is.Not.Null);
+        }
+        [Test] public void LightingOptOutDirectionalAndOutsideTerrainKeepExactCoordinates()
+        {
+            LightPlacementTerrain(new Vector3(100,10,200),.25f,.7f);
+            var result=Run(Plan(
+                Cmd("set_lighting","ExactPoint",args:new JObject{["type"]="point",["position"]=new JArray(110,-6,210),["on_terrain"]=false}),
+                Cmd("set_lighting","ExactSun",args:new JObject{["type"]="directional",["position"]=new JArray(111,-7,211),["on_terrain"]=true}),
+                Cmd("set_lighting","OutsidePoint",args:new JObject{["type"]="point",["position"]=new JArray(0,-8,0)})));
+            Assert.That(result.Success,Is.True,result.Error);
+            Assert.That(Find("ExactPoint").transform.position,Is.EqualTo(new Vector3(110,-6,210)));
+            Assert.That(Find("ExactSun").transform.position,Is.EqualTo(new Vector3(111,-7,211)));
+            Assert.That(Find("OutsidePoint").transform.position,Is.EqualTo(new Vector3(0,-8,0)),"An unrelated terrain footprint must not change this light.");
+        }
+        [Test] public void ExistingPointLightOnlyMovesForExplicitTerrainOptInAndUndoRestoresIt()
+        {
+            LightPlacementTerrain(new Vector3(100,10,200),.25f,.7f);
+            var go=new GameObject("ExistingUserPoint");var light=go.AddComponent<Light>();light.type=LightType.Point;go.transform.position=new Vector3(110,-6,210);
+            string target="id:"+go.GetInstanceID();
+            var color=Run(Plan(Cmd("set_lighting",target:target,args:new JObject{["color"]="#FF8000"})));
+            Assert.That(color.Success,Is.True,color.Error);Assert.That(go.transform.position,Is.EqualTo(new Vector3(110,-6,210)));
+            var exact=Run(Plan(Cmd("set_lighting",target:target,args:new JObject{["position"]=new JArray(111,-8,211)})));
+            Assert.That(exact.Success,Is.True,exact.Error);Assert.That(go.transform.position,Is.EqualTo(new Vector3(111,-8,211)),"Existing explicit XYZ stays exact without the new opt-in.");
+            var raised=Run(Plan(Cmd("set_lighting",target:target,args:new JObject{["on_terrain"]=true})));
+            Assert.That(raised.Success,Is.True,raised.Error);Assert.That(go.transform.position,Is.EqualTo(new Vector3(111,27,211)));
+            Undo.RevertAllDownToGroup(raised.UndoGroup);groups.Remove(raised.UndoGroup);
+            Assert.That(go.transform.position,Is.EqualTo(new Vector3(111,-8,211)));Assert.That(light.type,Is.EqualTo(LightType.Point));
+            Assert.That(light.color.r,Is.EqualTo(1));Assert.That(light.color.g,Is.EqualTo(128f/255).Within(.001));
+        }
+        [Test] public void NonBooleanLightTerrainOptionRejectsWholePlanBeforeMutation()
+        {
+            var plan=Plan(Cmd("set_lighting","First",args:new JObject{["type"]="point"}),Cmd("set_lighting","Invalid",args:new JObject{["type"]="point",["on_terrain"]="false"}));
+            Assert.Throws<ArgumentException>(()=>SceneToolExecutor.Validate(plan));Assert.That(testScene.rootCount,Is.Zero);
         }
         [Test] public void UpdateWorldClonesDataAndReanchorsExistingDecoration()
         {

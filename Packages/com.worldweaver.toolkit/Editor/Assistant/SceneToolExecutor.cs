@@ -25,9 +25,9 @@ create_object: name; target optional owned parent. args {kind:cube|sphere|capsul
 scatter_objects: name; target owned world containing terrain (or terrain itself). args {kind:tree|rock|house|cube|sphere|capsule|cylinder|plane,count:1..300,seed?:integer,center?:[x,y,z],size?:[width,length],spacing?:.1..100}. Samples dry terrain, rejects unsuitable slopes, deterministic seed; fails if requested count cannot fit. Produces an owned named group.
 set_transform: target; args {position?:[x,y,z],rotation?:[x,y,z],scale?:[x,y,z]}; at least one. World position/rotation,local scale(.01..100); coordinates bounded ±100000.
 set_material: target; args {color:hex or RGB(A) array,smoothness?:0..1,children?:bool}. Creates a new material and assigns it; never mutates existing shared materials. children defaults false; target must have matching renderer(s).
-set_lighting: target existing Light OR empty to create owned light using name. args {type?:directional|point|spot,intensity?:0..8,color?:color,position?:[x,y,z],rotation?:[x,y,z],range?:.1..500,spot_angle?:1..179,shadows?:bool}. Does not modify global RenderSettings.
+set_lighting: target existing Light OR empty to create owned light using name. args {type?:directional|point|spot,intensity?:0..8,color?:color,position?:[x,y,z],rotation?:[x,y,z],range?:.1..500,spot_angle?:1..179,shadows?:bool,on_terrain?:bool}. NEW point/spot lights default on_terrain=true: preserve x/z and any higher y, raise only up to at least3m above terrain and generated water under that x/z. Without terrain under x/z keep position. Existing lights preserve exact position unless on_terrain=true is explicit, including edits with position; false preserves exact xyz. Directional lights are never moved by this option. This is initial placement, not permanent terrain anchoring. Set range large enough to reach the ground from the final height. Does not modify global RenderSettings.
 create_camera: name; target optional owned parent. args {position?:[x,y,z],rotation?:[x,y,z],look_at?:[x,y,z],field_of_view?:10..120,orthographic?:bool,size?:1..1000,enabled?:bool,background?:color}. Never disables existing cameras; explicitly enable only when needed.
-update_npc: target IntelligentNPC; args {role?,personality?,biography?,goals?,constraints?,knowledge?:text|strings,inventory?:object,autonomous?:bool}. Knowledge replacement creates a new scoped asset, leaving any old/shared asset intact.
+update_npc: target IntelligentNPC; args {role?,personality?,biography?,goals?,constraints?,knowledge?:text|strings,inventory?:object,autonomous?:bool}. Knowledge replacement creates a new scoped asset, leaving any old/shared asset intact. A goal-only change does not require attach_behavior; add physical movement only when the user asks for it.
 attach_behavior: target; args {behavior:rotate|bob|patrol|followplayer,speed?:.01..360,amplitude?:0..10,frequency?:.01..10,axis?:[x,y,z],points?:array of2..32 world vectors,follow_target?:target,stopping_distance?:0..20}. Patrol requires points,followplayer requires explicit follow_target. Real runtime preset components, no arbitrary type names. One SceneBehavior per object; replaces its settings.
 delete_object: target owned object; args {}. Cannot delete unrelated or foreign descendants.
 save_scene: target empty; args {path?:Assets/WorldWeaverGenerated/.../Name.unity}. Must be the LAST action. Always a unique destination, never overwrites a scene. Does not touch build settings.
@@ -184,7 +184,7 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
                         if(!target.Renderer)throw new ArgumentException("No renderers on material target.");
                         if((bool?)a["children"]!=true&&!target.OwnRenderer)throw new ArgumentException("Target has no renderer; set children=true explicitly.");break;
                     case "set_lighting":
-                        Keys(a,"type","intensity","color","position","rotation","range","spot_angle","shadows");Choice(a,"type",new[]{"directional","point","spot"},"directional");OptionalNumber(a,"intensity",0,8);OptionalNumber(a,"range",.1f,500);OptionalNumber(a,"spot_angle",1,179);OptionalVector(a,"position");OptionalVector(a,"rotation");Boolean(a,"shadows");if(a["color"]!=null)ColorValue(a["color"]);
+                        Keys(a,"type","intensity","color","position","rotation","range","spot_angle","shadows","on_terrain");Boolean(a,"on_terrain");Choice(a,"type",new[]{"directional","point","spot"},"directional");OptionalNumber(a,"intensity",0,8);OptionalNumber(a,"range",.1f,500);OptionalNumber(a,"spot_angle",1,179);OptionalVector(a,"position");OptionalVector(a,"rotation");Boolean(a,"shadows");if(a["color"]!=null)ColorValue(a["color"]);
                         if(string.IsNullOrEmpty(command.target)){creation=true;cost=1;target=new VirtualTarget{Owned=true,Light=true};}else{target=Resolve(command.target,aliases);if(!target.Light)throw new ArgumentException("Target must have Light.");}break;
                     case "create_camera":
                         Keys(a,"position","rotation","look_at","field_of_view","orthographic","size","enabled","background");OptionalVector(a,"position");OptionalVector(a,"rotation");OptionalVector(a,"look_at");OptionalNumber(a,"field_of_view",10,120);OptionalNumber(a,"size",1,1000);Boolean(a,"orthographic");Boolean(a,"enabled");if(a["background"]!=null)ColorValue(a["background"]);
@@ -262,7 +262,10 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
                         case "set_lighting":
                             go=string.IsNullOrEmpty(command.target)?tx.Empty(command.name,getGroup().transform,"light"):resolve(command.target);var light=go.GetComponent<Light>();if(!light){light=Undo.AddComponent<Light>(go);light.type=LightType.Directional;}
                             Undo.RecordObject(light,"Assistant light");Undo.RecordObject(go.transform,"Assistant light rotation");if(a["type"]!=null)light.type=(string)a["type"]=="point"?LightType.Point:(string)a["type"]=="spot"?LightType.Spot:LightType.Directional;if(a["position"]!=null)go.transform.position=Vector(a["position"],"position");if(a["range"]!=null)light.range=(float)a["range"];if(a["spot_angle"]!=null)light.spotAngle=(float)a["spot_angle"];if(a["intensity"]!=null)light.intensity=(float)a["intensity"];if(a["color"]!=null)light.color=ColorValue(a["color"]);if(a["rotation"]!=null)go.transform.eulerAngles=Vector(a["rotation"],"rotation");if(a["shadows"]!=null)light.shadows=(bool)a["shadows"]?LightShadows.Soft:LightShadows.None;
-                            if(a["intensity"]!=null&&!Mathf.Approximately(light.intensity,(float)a["intensity"]))throw new InvalidOperationException("Light read-back failed.");summary="Параметры источника света применены.";break;
+                            // New point/spot placement is terrain-aware; edits remain exact unless explicitly opted in.
+                            bool alignLight=(bool?)a["on_terrain"]==true||(string.IsNullOrEmpty(command.target)&&(bool?)a["on_terrain"]!=false);
+                            bool liftedLight=alignLight&&LiftLightAboveTerrain(light);
+                            if(a["intensity"]!=null&&!Mathf.Approximately(light.intensity,(float)a["intensity"]))throw new InvalidOperationException("Light read-back failed.");summary=liftedLight?"Параметры света применены; источник поднят над рельефом и водой с сохранением XZ.":"Параметры источника света применены.";break;
                         case "create_camera":
                             go=tx.Empty(command.name,parent,"camera");var cam=Undo.AddComponent<Camera>(go);ApplyTransform(go,a,null);if(a["look_at"]!=null)go.transform.LookAt(Vector(a["look_at"],"look_at"));cam.fieldOfView=(float?)a["field_of_view"]??50;cam.orthographic=(bool?)a["orthographic"]??false;cam.orthographicSize=(float?)a["size"]??10;cam.farClipPlane=4000;cam.enabled=(bool?)a["enabled"]??!SceneObjects().Select(o=>o.GetComponent<Camera>()).Any(c=>c&&c!=cam&&c.enabled);if(a["background"]!=null){cam.clearFlags=CameraClearFlags.SolidColor;cam.backgroundColor=ColorValue(a["background"]);}summary="Камера создана. Существующие камеры сохранены.";break;
                         case "update_npc":go=resolve(command.target);var update=go.GetComponent<IntelligentNPC>();NpcValues(tx,update,a,false);changedNpcs.Add(update);summary="Настройки персонажа «"+update.NpcName+"» обновлены.";break;
@@ -324,6 +327,28 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
         {
             if(parent){var local=parent.GetComponentInChildren<Terrain>(true);if(local)return local;for(var t=parent.parent;t;t=t.parent){local=t.GetComponentInChildren<Terrain>(true);if(local)return local;}}
             return SceneObjects().Select(o=>o.GetComponent<Terrain>()).FirstOrDefault(t=>t&&t.GetComponent<GeneratedTerrain>());
+        }
+        private static bool LiftLightAboveTerrain(Light light)
+        {
+            if(light.type!=LightType.Point&&light.type!=LightType.Spot)return false;
+            var position=light.transform.position;
+            float minimum=float.NegativeInfinity;
+            foreach(var terrain in SceneObjects().Select(o=>o.GetComponent<Terrain>()).Where(t=>t&&t.enabled&&t.gameObject.activeInHierarchy&&t.terrainData))
+            {
+                var origin=terrain.transform.position;var size=terrain.terrainData.size;
+                // Never sample an unrelated edge outside this terrain's actual world footprint.
+                if(position.x<origin.x||position.x>origin.x+size.x||position.z<origin.z||position.z>origin.z+size.z)continue;
+                float surface=terrain.SampleHeight(position)+origin.y;
+                var generated=terrain.GetComponent<GeneratedTerrain>();
+                if(generated&&generated.Specification!=null)surface=Mathf.Max(surface,origin.y+generated.Specification.waterLevel*generated.Specification.height);
+                minimum=Mathf.Max(minimum,surface+3f);
+            }
+            if(float.IsNegativeInfinity(minimum)||position.y>=minimum)return false;
+            // Undo.RecordObject(transform) is captured by the caller before this one-time adjustment.
+            position.y=minimum;light.transform.position=position;
+            if(Mathf.Abs(light.transform.position.y-minimum)>.001f)throw new InvalidOperationException("Light terrain placement read-back failed.");
+            // Deliberately leave SurfaceAnchored=false: UpdateWorld's ground anchor has no light offset.
+            return true;
         }
         private static string Style(Transform parent)
         {for(var t=parent;t;t=t.parent){var own=t.GetComponent<GeneratedSceneObject>();if(own&&!string.IsNullOrEmpty(own.Style))return own.Style;}return "forest";}

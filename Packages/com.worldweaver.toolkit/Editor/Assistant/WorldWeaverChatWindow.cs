@@ -38,6 +38,7 @@ namespace WorldWeaver.Editor.Assistant
         bool lastEditorCompiling, lastEditorPlaying;
         int lifecycleVersion;
         int needsRefresh, scrollVersion;
+        double nextElapsedRefresh;
 
         [MenuItem("Tools/WorldWeaver/Чат", priority = 0)]
         public static void ShowWindow()
@@ -91,6 +92,17 @@ namespace WorldWeaver.Editor.Assistant
                 MarkChanged();
             }
             if (Interlocked.Exchange(ref needsRefresh, 0) != 0 && composer != null) Render();
+            if (controller?.Busy == true && phaseLabel != null && EditorApplication.timeSinceStartup >= nextElapsedRefresh)
+            {
+                nextElapsedRefresh = EditorApplication.timeSinceStartup + 1;
+                var currentReply = controller.Current?.Messages.LastOrDefault(message => message.Role == "assistant");
+                if (currentReply != null && DateTime.TryParse(currentReply.CreatedUtc, null,
+                    System.Globalization.DateTimeStyles.RoundtripKind, out var started))
+                {
+                    long seconds = Math.Max(0, (long)(DateTime.UtcNow - started.ToUniversalTime()).TotalSeconds);
+                    phaseLabel.text = controller.Phase + " · " + (seconds / 60) + ":" + (seconds % 60).ToString("D2");
+                }
+            }
         }
 
         public void CreateGUI()
@@ -188,7 +200,7 @@ namespace WorldWeaver.Editor.Assistant
             controls.Add(modelGroup);
             var powerGroup = Element("power-group");
             powerGroup.Add(Text("Режим", "field-caption"));
-            powerDropdown = new DropdownField(PowerLabels, 1) { name = "assistant-power", tooltip = "Быстро: 1 шаг и короткий ответ. Баланс: до 3 шагов. Глубоко: до 6 шагов и больше кода. Модель выбирается отдельно; режим не меняет её число параметров." };
+            powerDropdown = new DropdownField(PowerLabels, 1) { name = "assistant-power", tooltip = "Быстро: 1 шаг, до 2 минут. Баланс: до 3 шагов, до 4 минут. Глубоко: до 6 шагов, до 8 минут. Это верхние пределы ожидания; время зависит от модели. Режим не меняет число её параметров." };
             powerDropdown.RegisterValueChangedCallback(evt =>
             {
                 if (updatingControls) return;

@@ -21,7 +21,7 @@ namespace WorldWeaver.Editor.Assistant
     /// </summary>
     public static class ChatAcceptanceRunner
     {
-        private static string ModelKey => Environment.GetEnvironmentVariable("WW_CHAT_MODEL") ?? "ollama:qwen2.5-coder:latest";
+        private static string ModelKey => Environment.GetEnvironmentVariable("WW_CHAT_MODEL") ?? new ChatSettings().ModelKey;
         private static bool running;
 
         [MenuItem("Tools/WorldWeaver/Testing/Chat Acceptance")]
@@ -36,6 +36,7 @@ namespace WorldWeaver.Editor.Assistant
             var capturedPending = new JObject();
             var report = new JObject {
                 ["schemaVersion"] = 1, ["runner"] = typeof(ChatAcceptanceRunner).FullName,
+                ["acceptanceCriteriaVersion"] = 2, ["lightCriterion"] = "Three actual orange Points within terrain bounds, at least3m above terrain/water, with range reaching ground; no render-quality claim.",
                 ["startedUtc"] = DateTime.UtcNow.ToString("o"), ["unityVersion"] = Application.unityVersion,
                 ["modelKey"] = ModelKey, ["power"] = AssistantPower.Balanced.ToString(),
                 ["providerMode"] = ModelKey.StartsWith("pollinations:", StringComparison.Ordinal) ? "real-free-cloud-inference" : "real-local-inference", ["tests"] = tests,
@@ -241,6 +242,13 @@ namespace WorldWeaver.Editor.Assistant
                         Color.RGBToHSV(new Color((float)c[0], (float)c[1], (float)c[2]), out float hue, out float saturation, out float value);
                         Require(hue >= .025f && hue <= .18f && saturation >= .5f && value > .05f, reasons, "A new light is not orange.");
                         Require((float)light["intensity"] > 0 && (float)light["range"] > 0 && (bool)light["enabled"], reasons, "A new Point light cannot illuminate the scene.");
+                        var placement=light["terrainPlacement"] as JObject;
+                        Require(placement!=null, reasons, "A new Point light is outside the actual terrain footprint.");
+                        if(placement!=null)
+                        {
+                            Require((float)placement["surfaceClearance"]>=3f-.001f, reasons, "A new Point light is buried or lacks3m clearance above terrain/generated water.");
+                            Require((bool)placement["rangeReachesGround"], reasons, "A new Point light's range does not reach the actual ground below it.");
+                        }
                     }
                     Require(added.Select(l => l["position"].ToString(Formatting.None)).Distinct().Count() == 3, reasons, "The three new lights are not at different positions.");
                     Require(Rows(before, "lights").All(l => Rows(after, "lights").Any(a => JToken.DeepEquals(l, a))), reasons, "Existing lighting was modified or deleted.");
@@ -271,6 +279,7 @@ namespace WorldWeaver.Editor.Assistant
                 .Where(o => o.scene == scene).OrderBy(o => o.GetInstanceID()).ToArray();
             var owned = objects.Select(o => o.GetComponent<GeneratedSceneObject>()).Where(o => o).ToArray();
             var terrainRows = new JArray();
+            var actualTerrains=objects.Select(o=>o.GetComponent<Terrain>()).Where(t=>t&&t.enabled&&t.gameObject.activeInHierarchy&&t.terrainData).ToArray();
             foreach (var terrain in objects.Select(o => o.GetComponent<Terrain>()).Where(t => t))
             {
                 var data = terrain.terrainData;
@@ -293,7 +302,8 @@ namespace WorldWeaver.Editor.Assistant
             }));
             var lights = new JArray(objects.Select(o => o.GetComponent<Light>()).Where(l => l).Select(l => new JObject {
                 ["id"] = l.gameObject.GetInstanceID(), ["type"] = l.type.ToString(), ["color"] = new JArray(l.color.r, l.color.g, l.color.b),
-                ["intensity"] = l.intensity, ["range"] = l.range, ["enabled"] = l.enabled, ["position"] = Vec(l.transform.position)
+                ["intensity"] = l.intensity, ["range"] = l.range, ["enabled"] = l.enabled, ["position"] = Vec(l.transform.position),
+                ["terrainPlacement"] = LightTerrainSnapshot(l,actualTerrains)
             }));
             var objectRows = new JArray(objects.Select(o => new JObject {
                 ["id"] = o.GetInstanceID(), ["name"] = o.name, ["active"] = o.activeSelf,
@@ -318,6 +328,30 @@ namespace WorldWeaver.Editor.Assistant
             dataRows["scripts"] = Scripts();
             dataRows["context"] = SceneToolExecutor.Context();
             return dataRows;
+        }
+
+        private static JObject LightTerrainSnapshot(Light light,IEnumerable<Terrain> terrains)
+        {
+            if(light.type!=LightType.Point&&light.type!=LightType.Spot)return null;
+            var point=light.transform.position;JObject result=null;float highestSurface=float.NegativeInfinity;
+            // Independent acceptance readback: sample real TerrainData, not the executor's placement helper.
+            foreach(var terrain in terrains)
+            {
+                var origin=terrain.transform.position;var data=terrain.terrainData;
+                if(point.x<origin.x||point.x>origin.x+data.size.x||point.z<origin.z||point.z>origin.z+data.size.z)continue;
+                float x=(point.x-origin.x)/data.size.x,z=(point.z-origin.z)/data.size.z;
+                float ground=origin.y+data.GetInterpolatedHeight(x,z);
+                var spec=terrain.GetComponent<GeneratedTerrain>()?.Specification;
+                float? water=spec==null?(float?)null:origin.y+spec.waterLevel*spec.height;
+                float surface=Mathf.Max(ground,water??ground);
+                if(result!=null&&surface<=highestSurface)continue;
+                highestSurface=surface;
+                result=new JObject{["terrainId"]=terrain.gameObject.GetInstanceID(),["insideBounds"]=true,
+                    ["groundY"]=ground,["waterY"]=water,["surfaceY"]=surface,["groundClearance"]=point.y-ground,
+                    ["surfaceClearance"]=point.y-surface,["minimumPlacementY"]=surface+3f,
+                    ["rangeReachesGround"]=light.range>Mathf.Abs(point.y-ground)+.001f};
+            }
+            return result;
         }
 
         private static JObject Scripts()
