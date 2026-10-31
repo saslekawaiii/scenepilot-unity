@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="20" result="Passed" total="20" passed="20" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-10-31 23:47:22Z" end-time="2026-10-31 23:47:31Z" duration="9.246414">
+  <test-suite type="TestSuite" id="1000" name="UnityProject" fullname="UnityProject" runstate="Runnable" testcasecount="397" result="Passed" start-time="2026-10-31 23:47:22Z" end-time="2026-10-31 23:47:31Z" duration="9.246414" total="20" passed="20" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1448" name="WorldWeaver.EditMode.dll" fullname="/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/integrated-test-snapshot/project-edit-compaction/Library/ScriptAssemblies/WorldWeaver.EditMode.dll" runstate="Runnable" testcasecount="397" result="Passed" start-time="2026-10-31 23:47:22Z" end-time="2026-10-31 23:47:31Z" duration="9.231260" total="20" passed="20" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="78731" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1449" name="WorldWeaver" fullname="WorldWeaver" runstate="Runnable" testcasecount="397" result="Passed" start-time="2026-10-31 23:47:22Z" end-time="2026-10-31 23:47:31Z" duration="9.226943" total="20" passed="20" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1450" name="Tests" fullname="WorldWeaver.Tests" runstate="Runnable" testcasecount="397" result="Passed" start-time="2026-10-31 23:47:22Z" end-time="2026-10-31 23:47:31Z" duration="9.220036" total="20" passed="20" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestFixture" id="1424" name="WorldGameplayEditorTests" fullname="WorldWeaver.Tests.WorldGameplayEditorTests" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" testcasecount="20" result="Passed" start-time="2026-10-31 23:47:22Z" end-time="2026-10-31 23:47:31Z" duration="9.212494" total="20" passed="20" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1427" name="AnchoredLightRetainsClearanceAfterWaterAndHeightChange" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.AnchoredLightRetainsClearanceAfterWaterAndHeightChange" methodname="AnchoredLightRetainsClearanceAfterWaterAndHeightChange" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" seed="1230283481" result="Passed" start-time="2026-10-31 23:47:22Z" end-time="2026-10-31 23:47:22Z" duration="0.123121" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1438" name="ExplicitLightPlacementTransitionsStayDetachedAcrossWorldUpdatesAndSceneReload" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.ExplicitLightPlacementTransitionsStayDetachedAcrossWorldUpdatesAndSceneReload" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-10-31 23:47:22Z" end-time="2026-10-31 23:47:26Z" duration="4.411638" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1430" name="ExplicitLightPlacementTransitionsStayDetachedAcrossWorldUpdatesAndSceneReload(&quot;point&quot;,&quot;opt-out&quot;)" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.ExplicitLightPlacementTransitionsStayDetachedAcrossWorldUpdatesAndSceneReload(&quot;point&quot;,&quot;opt-out&quot;)" methodname="ExplicitLightPlacementTransitionsStayDetachedAcrossWorldUpdatesAndSceneReload" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" seed="1314297407" result="Passed" start-time="2026-10-31 23:47:22Z" end-time="2026-10-31 23:47:23Z" duration="0.703944" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1431" name="ExplicitLightPlacementTransitionsStayDetachedAcrossWorldUpdatesAndSceneReload(&quot;spot&quot;,&quot;opt-out&quot;)" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.ExplicitLightPlacementTransitionsStayDetachedAcrossWorldUpdatesAndSceneReload(&quot;spot&quot;,&quot;opt-out&quot;)" methodname="ExplicitLightPlacementTransitionsStayDetachedAcrossWorldUpdatesAndSceneReload" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" seed="431772014" result="Passed" start-time="2026-10-31 23:47:23Z" end-time="2026-10-31 23:47:23Z" duration="0.592455" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1432" name="ExplicitLightPlacementTransitionsStayDetachedAcrossWorldUpdatesAndSceneReload(&quot;point&quot;,&quot;directional&quot;)" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.ExplicitLightPlacementTransitionsStayDetachedAcrossWorldUpdatesAndSceneReload(&quot;point&quot;,&quot;directional&quot;)" methodname="ExplicitLightPlacementTransitionsStayDetachedAcrossWorldUpdatesAndSceneReload" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" seed="1934298331" result="Passed" start-time="2026-10-31 23:47:23Z" end-time="2026-10-31 23:47:24Z" duration="0.551113" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1433" name="ExplicitLightPlacementTransitionsStayDetachedAcrossWorldUpdatesAndSceneReload(&quot;spot&quot;,&quot;directional&quot;)" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.ExplicitLightPlacementTransitionsStayDetachedAcrossWorldUpdatesAndSceneReload(&quot;spot&quot;,&quot;directional&quot;)" methodname="ExplicitLightPlacementTransitionsStayDetachedAcrossWorldUpdatesAndSceneReload" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" seed="1654539798" result="Passed" start-time="2026-10-31 23:47:24Z" end-time="2026-10-31 23:47:24Z" duration="0.498982" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1434" name="ExplicitLightPlacementTransitionsStayDetachedAcrossWorldUpdatesAndSceneReload(&quot;point&quot;,&quot;outside&quot;)" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.ExplicitLightPlacementTransitionsStayDetachedAcrossWorldUpdatesAndSceneReload(&quot;point&quot;,&quot;outside&quot;)" methodname="ExplicitLightPlacementTransitionsStayDetachedAcrossWorldUpdatesAndSceneReload" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" seed="2010849300" result="Passed" start-time="2026-10-31 23:47:24Z" end-time="2026-10-31 23:47:25Z" duration="0.512029" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1435" name="ExplicitLightPlacementTransitionsStayDetachedAcrossWorldUpdatesAndSceneReload(&quot;spot&quot;,&quot;outside&quot;)" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.ExplicitLightPlacementTransitionsStayDetachedAcrossWorldUpdatesAndSceneReload(&quot;spot&quot;,&quot;outside&quot;)" methodname="ExplicitLightPlacementTransitionsStayDetachedAcrossWorldUpdatesAndSceneReload" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" seed="1182213369" result="Passed" start-time="2026-10-31 23:47:25Z" end-time="2026-10-31 23:47:25Z" duration="0.503514" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1436" name="ExplicitLightPlacementTransitionsStayDetachedAcrossWorldUpdatesAndSceneReload(&quot;point&quot;,&quot;exact-position&quot;)" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.ExplicitLightPlacementTransitionsStayDetachedAcrossWorldUpdatesAndSceneReload(&quot;point&quot;,&quot;exact-position&quot;)" methodname="ExplicitLightPlacementTransitionsStayDetachedAcrossWorldUpdatesAndSceneReload" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" seed="2119402812" result="Passed" start-time="2026-10-31 23:47:25Z" end-time="2026-10-31 23:47:26Z" duration="0.515181" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1437" name="ExplicitLightPlacementTransitionsStayDetachedAcrossWorldUpdatesAndSceneReload(&quot;spot&quot;,&quot;exact-position&quot;)" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.ExplicitLightPlacementTransitionsStayDetachedAcrossWorldUpdatesAndSceneReload(&quot;spot&quot;,&quot;exact-position&quot;)" methodname="ExplicitLightPlacementTransitionsStayDetachedAcrossWorldUpdatesAndSceneReload" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" seed="1234973435" result="Passed" start-time="2026-10-31 23:47:26Z" end-time="2026-10-31 23:47:26Z" duration="0.527398" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="ParameterizedMethod" id="1441" name="LightColorAndIntensityEditsKeepTheExistingTerrainAnchor" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.LightColorAndIntensityEditsKeepTheExistingTerrainAnchor" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-10-31 23:47:26Z" end-time="2026-10-31 23:47:27Z" duration="0.702708" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1439" name="LightColorAndIntensityEditsKeepTheExistingTerrainAnchor(&quot;point&quot;)" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.LightColorAndIntensityEditsKeepTheExistingTerrainAnchor(&quot;point&quot;)" methodname="LightColorAndIntensityEditsKeepTheExistingTerrainAnchor" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" seed="45083990" result="Passed" start-time="2026-10-31 23:47:26Z" end-time="2026-10-31 23:47:27Z" duration="0.353501" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1440" name="LightColorAndIntensityEditsKeepTheExistingTerrainAnchor(&quot;spot&quot;)" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.LightColorAndIntensityEditsKeepTheExistingTerrainAnchor(&quot;spot&quot;)" methodname="LightColorAndIntensityEditsKeepTheExistingTerrainAnchor" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" seed="1063187065" result="Passed" start-time="2026-10-31 23:47:27Z" end-time="2026-10-31 23:47:27Z" duration="0.332592" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-case id="1428" name="NewLightAnchorsToCoveringWorldAcrossIndependentUpdatesAndReload" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.NewLightAnchorsToCoveringWorldAcrossIndependentUpdatesAndReload" methodname="NewLightAnchorsToCoveringWorldAcrossIndependentUpdatesAndReload" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" seed="2089807872" result="Passed" start-time="2026-10-31 23:47:27Z" end-time="2026-10-31 23:47:28Z" duration="0.731711" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1429" name="OverlappingTerrainsAnchorLightToTheHighestGroundOrWaterSurface" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.OverlappingTerrainsAnchorLightToTheHighestGroundOrWaterSurface" methodname="OverlappingTerrainsAnchorLightToTheHighestGroundOrWaterSurface" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" seed="1715386318" result="Passed" start-time="2026-10-31 23:47:28Z" end-time="2026-10-31 23:47:28Z" duration="0.341293" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1447" name="PrefabScriptsRequireExplicitReviewAndOriginalAssetIsUntouched" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.PrefabScriptsRequireExplicitReviewAndOriginalAssetIsUntouched" methodname="PrefabScriptsRequireExplicitReviewAndOriginalAssetIsUntouched" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" seed="935630291" result="Passed" start-time="2026-10-31 23:47:28Z" end-time="2026-10-31 23:47:28Z" duration="0.066151" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1446" name="UndoRestoresTheRemovedLightAnchorAndItsTerrainFollowing" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.UndoRestoresTheRemovedLightAnchorAndItsTerrainFollowing" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-10-31 23:47:28Z" end-time="2026-10-31 23:47:30Z" duration="1.376008" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1442" name="UndoRestoresTheRemovedLightAnchorAndItsTerrainFollowing(&quot;opt-out&quot;)" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.UndoRestoresTheRemovedLightAnchorAndItsTerrainFollowing(&quot;opt-out&quot;)" methodname="UndoRestoresTheRemovedLightAnchorAndItsTerrainFollowing" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" seed="1605244862" result="Passed" start-time="2026-10-31 23:47:28Z" end-time="2026-10-31 23:47:29Z" duration="0.342353" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1443" name="UndoRestoresTheRemovedLightAnchorAndItsTerrainFollowing(&quot;directional&quot;)" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.UndoRestoresTheRemovedLightAnchorAndItsTerrainFollowing(&quot;directional&quot;)" methodname="UndoRestoresTheRemovedLightAnchorAndItsTerrainFollowing" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" seed="789118552" result="Passed" start-time="2026-10-31 23:47:29Z" end-time="2026-10-31 23:47:29Z" duration="0.336287" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1444" name="UndoRestoresTheRemovedLightAnchorAndItsTerrainFollowing(&quot;outside&quot;)" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.UndoRestoresTheRemovedLightAnchorAndItsTerrainFollowing(&quot;outside&quot;)" methodname="UndoRestoresTheRemovedLightAnchorAndItsTerrainFollowing" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" seed="1631090497" result="Passed" start-time="2026-10-31 23:47:29Z" end-time="2026-10-31 23:47:29Z" duration="0.350603" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1445" name="UndoRestoresTheRemovedLightAnchorAndItsTerrainFollowing(&quot;exact-position&quot;)" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.UndoRestoresTheRemovedLightAnchorAndItsTerrainFollowing(&quot;exact-position&quot;)" methodname="UndoRestoresTheRemovedLightAnchorAndItsTerrainFollowing" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" seed="771326710" result="Passed" start-time="2026-10-31 23:47:29Z" end-time="2026-10-31 23:47:30Z" duration="0.343355" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-case id="1425" name="VillageHasConnectedEntrancesAndSurvivesSceneReload" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.VillageHasConnectedEntrancesAndSurvivesSceneReload" methodname="VillageHasConnectedEntrancesAndSurvivesSceneReload" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" seed="1452125326" result="Passed" start-time="2026-10-31 23:47:30Z" end-time="2026-10-31 23:47:30Z" duration="0.802982" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1426" name="WorldClockToolUpdatesPhysicalGateAndRollsBackAsOneUndoGroup" fullname="WorldWeaver.Tests.WorldGameplayEditorTests.WorldClockToolUpdatesPhysicalGateAndRollsBackAsOneUndoGroup" methodname="WorldClockToolUpdatesPhysicalGateAndRollsBackAsOneUndoGroup" classname="WorldWeaver.Tests.WorldGameplayEditorTests" runstate="Runnable" seed="216491831" result="Passed" start-time="2026-10-31 23:47:30Z" end-time="2026-10-31 23:47:31Z" duration="0.645144" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Saving results to: /Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/integration-1.2-focused-seventh-r3.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

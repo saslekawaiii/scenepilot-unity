@@ -299,7 +299,13 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
                             bool alignLight=(bool?)a["on_terrain"]==true||(string.IsNullOrEmpty(command.target)&&(bool?)a["on_terrain"]!=false);
                             Terrain lightTerrain=null;
                             bool liftedLight=alignLight&&LiftLightAboveTerrain(light,out lightTerrain);
-                            if(alignLight)WorldGameplayTools.MarkLightAnchor(light,lightTerrain);
+                            // Explicit positioning/opt-out and Directional lights must not retain an old
+                            // serialized terrain dependency. Parameter-only edits preserve that dependency.
+                            bool clearLightAnchor=(bool?)a["on_terrain"]==false||light.type==LightType.Directional||
+                                (!string.IsNullOrEmpty(command.target)&&a["position"]!=null&&!alignLight)||(alignLight&&!lightTerrain);
+                            var previousLightAnchor=go.GetComponent<WorldSurfaceAnchor>();
+                            if(clearLightAnchor&&previousLightAnchor)Undo.DestroyObjectImmediate(previousLightAnchor);
+                            else if(alignLight)WorldGameplayTools.MarkLightAnchor(light,lightTerrain);
                             if(a["intensity"]!=null&&!Mathf.Approximately(light.intensity,(float)a["intensity"]))throw new InvalidOperationException("Light read-back failed.");summary=liftedLight?"Параметры света применены; источник поднят над рельефом и водой с сохранением XZ.":"Параметры источника света применены.";break;
                         case "create_camera":
                             go=tx.Empty(command.name,parent,"camera");var cam=Undo.AddComponent<Camera>(go);ApplyTransform(go,a,null);if(a["look_at"]!=null)go.transform.LookAt(Vector(a["look_at"],"look_at"));cam.fieldOfView=(float?)a["field_of_view"]??50;cam.orthographic=(bool?)a["orthographic"]??false;cam.orthographicSize=(float?)a["size"]??10;cam.farClipPlane=4000;cam.enabled=(bool?)a["enabled"]??!SceneObjects().Select(o=>o.GetComponent<Camera>()).Any(c=>c&&c!=cam&&c.enabled);if(a["background"]!=null){cam.clearFlags=CameraClearFlags.SolidColor;cam.backgroundColor=ColorValue(a["background"]);}summary="Камера создана. Существующие камеры сохранены.";break;

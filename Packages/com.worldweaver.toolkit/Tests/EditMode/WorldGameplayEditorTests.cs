@@ -68,11 +68,12 @@ namespace WorldWeaver.Tests
             generated.Specification.waterLevel=.5f;anchor.Reanchor();Assert.That(lamp.transform.position.y,Is.EqualTo(16).Within(.001));Assert.That(lamp.transform.position.x,Is.EqualTo(16));Object.DestroyImmediate(lamp);Object.DestroyImmediate(terrainObject);Object.DestroyImmediate(data);
         }
         private static EditorCommand SceneCommand(string tool,string name="",string target="",JObject args=null)=>new EditorCommand{tool=tool,name=name,target=target,args=args??new JObject()};
-        private void RunScene(params EditorCommand[] commands)
+        private EditorBatchResult RunScene(params EditorCommand[] commands)
         {
             var result=SceneToolExecutor.Execute(new EditorPlan{actions=commands.ToList()});
             sceneToolAssets.AddRange(result.Results.SelectMany(r=>r.CreatedAssets));
             Assert.That(result.Success,Is.True,result.Error);
+            return result;
         }
         private static GameObject SceneObject(string name)=>SceneManager.GetActiveScene().GetRootGameObjects().SelectMany(r=>r.GetComponentsInChildren<Transform>(true)).Single(t=>t.name==name).gameObject;
         private static JObject SmallWorld(float height=20,float water=.8f)=>new JObject{["width"]=32,["length"]=32,["height"]=height,["waterLevel"]=water,["resolution"]=33,["trees"]=0,["buildings"]=0,["rocks"]=0};
@@ -113,6 +114,59 @@ namespace WorldWeaver.Tests
             var lower=SceneObject("Lower Light World").GetComponentInChildren<Terrain>();var upper=SceneObject("Upper Light World").GetComponentInChildren<Terrain>();var lamp=SceneObject("Overlapping Point");
             Assert.That(SurfaceAt(upper,lamp.transform.position),Is.GreaterThan(SurfaceAt(lower,lamp.transform.position)));Assert.That(lamp.GetComponent<WorldSurfaceAnchor>().Terrain,Is.SameAs(upper));
             Assert.That(lamp.transform.position.y,Is.EqualTo(SurfaceAt(upper,lamp.transform.position)+3).Within(.001));
+        }
+        private static JObject LightTransition(string transition)
+        {
+            switch(transition)
+            {
+                case "opt-out":return new JObject{["on_terrain"]=false,["position"]=new JArray(0,-6,0)};
+                case "directional":return new JObject{["type"]="directional"};
+                case "outside":return new JObject{["on_terrain"]=true,["position"]=new JArray(1000,-9,1000)};
+                case "exact-position":return new JObject{["position"]=new JArray(0,-6,0)};
+                default:throw new ArgumentException("Unknown light transition "+transition);
+            }
+        }
+        [TestCase("point","opt-out")] [TestCase("spot","opt-out")]
+        [TestCase("point","directional")] [TestCase("spot","directional")]
+        [TestCase("point","outside")] [TestCase("spot","outside")]
+        [TestCase("point","exact-position")] [TestCase("spot","exact-position")]
+        public void ExplicitLightPlacementTransitionsStayDetachedAcrossWorldUpdatesAndSceneReload(string type,string transition)
+        {
+            RunScene(SceneCommand("create_world","Transition World",args:SmallWorld()),SceneCommand("set_lighting","Transition Light",args:new JObject{["type"]=type,["position"]=new JArray(0,-9,0)}));
+            var lamp=SceneObject("Transition Light");Assert.That(lamp.GetComponent<WorldSurfaceAnchor>(),Is.Not.Null);
+            var args=LightTransition(transition);var expected=args["position"] is JArray p?new Vector3((float)p[0],(float)p[1],(float)p[2]):lamp.transform.position;
+            RunScene(SceneCommand("set_lighting",target:"Transition Light",args:args));
+            Assert.That(lamp.GetComponent<WorldSurfaceAnchor>(),Is.Null);Assert.That(lamp.transform.position,Is.EqualTo(expected));
+            var expectedType=transition=="directional"?LightType.Directional:type=="point"?LightType.Point:LightType.Spot;Assert.That(lamp.GetComponent<Light>().type,Is.EqualTo(expectedType));
+            RunScene(SceneCommand("update_world",target:"Transition World",args:new JObject{["height"]=40,["waterLevel"]=.8f}));
+            Assert.That(lamp.transform.position,Is.EqualTo(expected),"A detached light must retain its exact position after terrain regeneration.");
+            string folder=(string)transactionType.GetProperty("Folder",BindingFlags.Instance|BindingFlags.NonPublic).GetValue(transaction);string path=folder+"/DetachedLightReload.unity";
+            AssetDatabase.SaveAssets();Assert.That(EditorSceneManager.SaveScene(SceneManager.GetActiveScene(),path),Is.True);EditorSceneManager.OpenScene(path);
+            lamp=SceneObject("Transition Light");Assert.That(lamp.GetComponent<WorldSurfaceAnchor>(),Is.Null);Assert.That(lamp.GetComponent<Light>().type,Is.EqualTo(expectedType));Assert.That(lamp.transform.position,Is.EqualTo(expected));
+            RunScene(SceneCommand("update_world",target:"Transition World",args:new JObject{["height"]=60,["waterLevel"]=.8f}));
+            Assert.That(lamp.transform.position,Is.EqualTo(expected),"Reload must not revive the removed terrain dependency.");
+        }
+        [TestCase("point")] [TestCase("spot")]
+        public void LightColorAndIntensityEditsKeepTheExistingTerrainAnchor(string type)
+        {
+            RunScene(SceneCommand("create_world","Parameter World",args:SmallWorld()),SceneCommand("set_lighting","Parameter Light",args:new JObject{["type"]=type,["position"]=new JArray(0,-9,0)}));
+            var lamp=SceneObject("Parameter Light");var anchor=lamp.GetComponent<WorldSurfaceAnchor>();var before=lamp.transform.position;float offset=anchor.Offset;
+            RunScene(SceneCommand("set_lighting",target:"Parameter Light",args:new JObject{["color"]="#00FF00",["intensity"]=3.2f}));
+            Assert.That(lamp.GetComponent<WorldSurfaceAnchor>(),Is.SameAs(anchor));Assert.That(anchor.Offset,Is.EqualTo(offset));Assert.That(lamp.transform.position,Is.EqualTo(before));Assert.That(lamp.GetComponent<Light>().intensity,Is.EqualTo(3.2f));Assert.That(lamp.GetComponent<Light>().color,Is.EqualTo(Color.green));
+            RunScene(SceneCommand("update_world",target:"Parameter World",args:new JObject{["height"]=40,["waterLevel"]=.8f}));
+            Assert.That(lamp.transform.position.y,Is.EqualTo(SurfaceAt(anchor.Terrain,lamp.transform.position)+offset).Within(.001));Assert.That(lamp.transform.position.y,Is.GreaterThan(before.y));
+        }
+        [TestCase("opt-out")] [TestCase("directional")] [TestCase("outside")] [TestCase("exact-position")]
+        public void UndoRestoresTheRemovedLightAnchorAndItsTerrainFollowing(string transition)
+        {
+            RunScene(SceneCommand("create_world","Undo Anchor World",args:SmallWorld()),SceneCommand("set_lighting","Undo Anchor Light",args:new JObject{["type"]="point",["position"]=new JArray(0,-9,0)}));
+            var lamp=SceneObject("Undo Anchor Light");var original=lamp.GetComponent<WorldSurfaceAnchor>();var terrain=original.Terrain;float offset=original.Offset;bool aboveWater=original.AboveWater;var before=lamp.transform.position;
+            var args=LightTransition(transition);if(transition=="opt-out")args.Remove("position"); // An explicit false must detach even without a Transform edit.
+            Undo.FlushUndoRecordObjects();var result=RunScene(SceneCommand("set_lighting",target:"Undo Anchor Light",args:args));Assert.That(lamp.GetComponent<WorldSurfaceAnchor>(),Is.Null);
+            Undo.FlushUndoRecordObjects();Undo.RevertAllDownToGroup(result.UndoGroup);
+            var restored=lamp.GetComponent<WorldSurfaceAnchor>();Assert.That(restored,Is.Not.Null);Assert.That(restored.Terrain,Is.SameAs(terrain));Assert.That(restored.Offset,Is.EqualTo(offset));Assert.That(restored.AboveWater,Is.EqualTo(aboveWater));Assert.That(lamp.transform.position,Is.EqualTo(before));Assert.That(lamp.GetComponent<Light>().type,Is.EqualTo(LightType.Point));
+            RunScene(SceneCommand("update_world",target:"Undo Anchor World",args:new JObject{["height"]=40,["waterLevel"]=.8f}));
+            Assert.That(lamp.transform.position.y,Is.EqualTo(SurfaceAt(terrain,lamp.transform.position)+offset).Within(.001));Assert.That(lamp.transform.position.y,Is.GreaterThan(before.y));
         }
         [Test] public void PrefabScriptsRequireExplicitReviewAndOriginalAssetIsUntouched()
         {
