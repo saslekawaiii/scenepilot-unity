@@ -30,7 +30,7 @@ execute_editor_code: optional existing owned target, otherwise an owned workspac
         }
         internal static EditorCommandResult Execute(EditorCommand command,Func<string,GameObject> resolve,AgentExecutionContext context)
         {
-            if(context?.Session?.Settings?.AllowEditorCode!=true||context.Session.Settings.Mode!=AssistantMode.Execute)
+            if(context?.Session?.Settings?.AllowEditorCode!=true||context.Session.Settings.Mode!=AssistantMode.Execute&&context.Reviewed!=true)
                 throw new InvalidOperationException("Autonomous Editor C# is disabled in this project. Enable it in chat settings or use reviewed script tools.");
             string code=(string)command.args["code"];
             if(string.IsNullOrWhiteSpace(code)||code.Length>20000)throw new ArgumentException("A complete C# method body up to 20000 characters is required.");
@@ -64,10 +64,34 @@ execute_editor_code: optional existing owned target, otherwise an owned workspac
                 Undo.RegisterCreatedObjectUndo(go,"Agent C# creation");
                 if(!go.GetComponent<GeneratedSceneObject>())Undo.AddComponent<GeneratedSceneObject>(go).Kind="code_generated";
             }
-            string data=JsonConvert.SerializeObject(result,new JsonSerializerSettings{ReferenceLoopHandling=ReferenceLoopHandling.Ignore,MaxDepth=8});
+            string data=JsonConvert.SerializeObject(result,new JsonSerializerSettings{ReferenceLoopHandling=ReferenceLoopHandling.Ignore,MaxDepth=8,Converters=new List<JsonConverter>{new UnityReadbackConverter()}});
             if(data.Length>16000)data=data.Substring(0,16000)+" [output truncated]";
             var report=new JObject{["compiled"]=true,["executed"]=true,["sourceHash"]=hash,["result"]=data,["createdObjects"]=new JArray(created.Take(80).Select(g=>ProjectContextIndex.StableTarget(g))),["verification"]="Compilation and execution only; runtime gameplay was not tested by this command."};
             return new EditorCommandResult{Tool=command.tool,Success=true,Target=ProjectContextIndex.StableTarget(target),Summary=report.ToString(Formatting.None)};
+        }
+        sealed class UnityReadbackConverter:JsonConverter
+        {
+            public override bool CanRead=>false;
+            public override bool CanConvert(Type type)=>typeof(UnityEngine.Object).IsAssignableFrom(type)||type==typeof(Vector2)||type==typeof(Vector3)||type==typeof(Vector4)||type==typeof(Quaternion)||type==typeof(Color)||type==typeof(Bounds);
+            public override object ReadJson(JsonReader reader,Type type,object existing,JsonSerializer serializer)=>throw new NotSupportedException();
+            public override void WriteJson(JsonWriter writer,object value,JsonSerializer serializer)
+            {
+                JToken data;
+                if(value is Vector2 v2)data=new JArray(v2.x,v2.y);
+                else if(value is Vector3 v3)data=new JArray(v3.x,v3.y,v3.z);
+                else if(value is Vector4 v4)data=new JArray(v4.x,v4.y,v4.z,v4.w);
+                else if(value is Quaternion q)data=new JArray(q.x,q.y,q.z,q.w);
+                else if(value is Color color)data=new JArray(color.r,color.g,color.b,color.a);
+                else if(value is Bounds bounds)data=new JObject{["center"]=new JArray(bounds.center.x,bounds.center.y,bounds.center.z),["size"]=new JArray(bounds.size.x,bounds.size.y,bounds.size.z)};
+                else
+                {
+                    var obj=value as UnityEngine.Object;
+                    if(!obj){writer.WriteNull();return;}
+                    var go=obj as GameObject??(obj as Component)?.gameObject;
+                    data=new JObject{["name"]=obj.name,["type"]=obj.GetType().FullName,["asset"]=AssetDatabase.GetAssetPath(obj),["target"]=go?ProjectContextIndex.StableTarget(go):null};
+                }
+                data.WriteTo(writer);
+            }
         }
     }
 }

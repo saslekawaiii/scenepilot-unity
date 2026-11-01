@@ -77,9 +77,10 @@ namespace WorldWeaver.Tests
     var context=new AgentExecutionContext{Session=session,Message=new AssistantMessage()};
     var bad=new EditorPlan{actions={new EditorCommand{tool="execute_editor_code",args=new JObject{["code"]="return missingSymbol;"}}}};
     var failed=await SceneToolExecutor.ExecuteAsync(bad,null,context,default);Assert.IsFalse(failed.Success);Assert.That(failed.Results.Last().Error,Does.Contain("missingSymbol"));
-    var good=new EditorPlan{actions={new EditorCommand{tool="execute_editor_code",args=new JObject{["code"]="var light=Undo.AddComponent<Light>(target); light.type=LightType.Point; light.range=17f; return new { range=light.range };"}}}};
+    var good=new EditorPlan{actions={new EditorCommand{tool="execute_editor_code",args=new JObject{["code"]="var light=Undo.AddComponent<Light>(target); light.type=LightType.Point; light.range=17f; return new { range=light.range, position=target.transform.position, owner=target };"}}}};
     var result=await SceneToolExecutor.ExecuteAsync(good,null,context,default);Assert.IsTrue(result.Success,result.Error);
     Assert.AreEqual(17,UnityEngine.Object.FindFirstObjectByType<Light>().range);
+    var readback=JObject.Parse((string)JObject.Parse(result.Results.Single(s=>s.Tool=="execute_editor_code").Summary)["result"]);Assert.AreEqual(JTokenType.Array,readback["position"].Type);Assert.AreEqual(result.Results.Single(s=>s.Tool=="execute_editor_code").Target,(string)readback["owner"]["target"]);
     session.Settings.AllowEditorCode=false;var denied=await SceneToolExecutor.ExecuteAsync(good,null,context,default);Assert.IsFalse(denied.Success);
    }
    EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
