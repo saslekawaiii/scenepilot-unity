@@ -80,6 +80,14 @@ namespace WorldWeaver.Editor.Assistant.Tests
             Assert.That(Run("set_parent",target:"Child",args:new JObject{["parent"]="Parent"}).Success,Is.True);Assert.That(Named("Child").transform.position,Is.EqualTo(new Vector3(2,3,4)));
             Assert.That(Run("set_parent",target:"Parent",args:new JObject{["parent"]="Child"}).Success,Is.False);
         }
+        [Test] public void UnnamedCreationsReceiveUniqueDefaultsWithoutRewritingAuditedCommands()
+        {
+            var command=new EditorCommand{tool="create_node",name="",target="",args=new JObject()};
+            var first=SceneToolExecutor.Execute(new EditorPlan{actions=new List<EditorCommand>{command}});if(first.UndoGroup>=0)groups.Add(first.UndoGroup);
+            Assert.That(first.Success,Is.True,first.Error);Assert.That(command.name,Is.Empty);
+            var second=Run("create_node");Assert.That(second.Success,Is.True,second.Error);Assert.That(first.Results.Single().Target,Is.Not.EqualTo(second.Results.Single().Target));
+            Assert.That(Named("Узел"),Is.Not.Null);Assert.That(Named("Узел 2"),Is.Not.Null);
+        }
         [Test] public void TerrainBrushChangesActualHeightsAndPreservesOriginalSharedAsset()
         {
             var terrain=World().GetComponentInChildren<Terrain>();var original=terrain.terrainData;float before=terrain.SampleHeight(Vector3.zero);

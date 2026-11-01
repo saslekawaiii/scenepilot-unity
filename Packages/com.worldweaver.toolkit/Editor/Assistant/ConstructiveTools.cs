@@ -13,15 +13,15 @@ namespace WorldWeaver.Editor.Assistant
     /// <summary>Composable operations, not per-prompt game generators. Every write uses the normal transaction.</summary>
     internal static class ConstructiveTools
     {
-        internal const string Reference=@"create_node: name, optional owned parent target; args {position?:[x,y,z]}. Empty owned GameObject for arbitrary component composition, not a visual placeholder.
+        internal const string Reference=@"create_node: name optional (empty resolves to a unique name), optional owned parent target; args {position?:[x,y,z]}. Empty owned GameObject for arbitrary component composition, not a visual placeholder.
 set_parent: target existing owned object; args {parent:string,keep_world?:bool}. Reparent under another owned object, preserving world transform by default. Rejects cycles.
-create_mesh: name, optional owned parent; args {vertices:[[x,y,z]...],triangles:[integer...],uv?:[[u,v]...],color?:[r,g,b,a],collider?:bool}. 3..2048 vertices, 3..12000 indices divisible by three; explicit editable saved mesh, arbitrary geometry within bounds, not only primitives. Use correct winding and UVs. Complex imported art requires catalog_assets/instantiate_prefab, not pretending this is a pretrained 3D generator.
+create_mesh: name optional (empty resolves to a unique name), optional owned parent; args {vertices:[[x,y,z]...],triangles:[integer...],uv?:[[u,v]...],color?:[r,g,b,a],collider?:bool}. 3..2048 vertices, 3..12000 indices divisible by three; explicit editable saved mesh, arbitrary geometry within bounds, not only primitives. Use correct winding and UVs. Complex imported art requires catalog_assets/instantiate_prefab, not pretending this is a pretrained 3D generator.
 shape_terrain: target owned world/terrain; args {operation:crater|hill|flatten|lunar,center?:[world_x,world_z],radius?:2..80,amount?:.1..30,craters?:0..24,seed?:integer}. Clones TerrainData before modifying, measurements in metres. lunar builds a seeded lunar-style heightmap and crater records, not measured NASA geography; other operations edit a local circular brush. Shape terrain BEFORE adding caves.
 create_cave: name, target existing owned world/terrain; args {position:[world_x,world_z],length?:12..32,width?:4..10}. Creates a real walkable rock tube with a descending ramp, collision mesh and Terrain holes. Returns world entrance/interior for navigation. Do not sculpt under an existing cave.
 configure_physics: target existing owned object; args {mass?:.01..10000,gravity?:bool,kinematic?:bool,collider?:box|sphere|capsule,friction?:0..1,bounce?:0..1}. Configures Rigidbody and collider; does not add a duplicate collider or mutate shared physics materials. A nonconvex mesh cannot be a dynamic body.
 configure_audio: target existing owned object; args {clip:string,volume?:0..1,loop?:bool,spatial?:bool}. Existing imported AudioClip asset path only, not an invented URL; adds AudioSource and playOnAwake.
 configure_animator: target existing owned object; args {controller:string}. Binds an actual AnimatorController asset path found through search_project; no claim that missing clips or a rig were generated.
-create_ui_element: name, optional owned Canvas/UI parent target; args {kind:canvas|panel|text|button|slider,text?:string,position?:[x,y],size?:[w,h],color?:[r,g,b,a],toggle_target?:string}. Creates real UGUI hierarchy and scaled overlay Canvas with EventSystem. Coordinates are relative to the center of the parent. A button can toggle an explicitly addressed owned GameObject; custom actions need a compiled script.
+create_ui_element: name optional (empty resolves to a unique name), optional owned Canvas/UI parent target; args {kind:canvas|panel|text|button|slider,text?:string,position?:[x,y],size?:[w,h],color?:[r,g,b,a],toggle_target?:string}. Creates real UGUI hierarchy and scaled overlay Canvas with EventSystem. Coordinates are relative to the center of the parent. A button can toggle an explicitly addressed owned GameObject; custom actions need a compiled script.
 verify_scene: standalone read-only, empty target, args {checks:[{target:string,kind:component|active|mesh|terrain_height|path,type?:string,expected?:number,to?:string}]}. Independent live read-back: component uses full type/name, mesh checks saved vertices and collision, terrain_height compares sample at target center against expected metres, path checks actual NavMesh PathComplete. A failed assertion returns a failed tool result, not a successful narrative.
 configure_survival: target existing owned WorldPlayer; args {world:string,oxygen_seconds?:30..1800,gravity?:.1..30}. Adds reusable oxygen/health/exposure loop, visible HUD and pressurized recovery habitat at the player's grounded position. Bare caves protect from exposure but do not generate oxygen. No global Physics.gravity changes.
 create_resource: name, target owned world; args {kind:oxygen|sample,position:[x,y,z]}. Finite E-interactable oxygen reserve or collectible mission sample; snaps to ground. Survival mission is collect three samples and return to habitat.";
@@ -47,7 +47,7 @@ create_resource: name, target owned world; args {kind:oxygen|sample,position:[x,
         {
             ToolArgumentValidation.Validate(c.args,Definitions()[c.tool]);
             bool creation=new[]{"create_node","create_mesh","create_ui_element","create_cave","create_resource"}.Contains(c.tool);
-            if(creation&&(string.IsNullOrWhiteSpace(c.name)||c.name.Any(ch=>char.IsControl(ch)||ch=='/'||ch=='\\')))throw new ArgumentException("Creation needs a valid nonempty name.");
+            if(creation&&c.name.Length>0&&(string.IsNullOrWhiteSpace(c.name)||c.name.Any(ch=>char.IsControl(ch)||ch=='/'||ch=='\\')))throw new ArgumentException("Creation name must contain visible text and no path separators; leave it empty for an automatic unique name.");
             bool optionalParent=c.tool=="create_node"||c.tool=="create_mesh"||c.tool=="create_ui_element";
             GameObject target=null;
             if(c.tool=="verify_scene")
@@ -85,7 +85,15 @@ create_resource: name, target owned world; args {kind:oxygen|sample,position:[x,
         internal static Color C(JToken v)=>v==null?Color.white:new Color((float)v[0],(float)v[1],(float)v[2],(float)v[3]);
         internal static WorldGameplayToolResult Execute(EditorCommand c,SceneBuildTransaction tx,Transform parent,Func<string,GameObject> resolve)
         {
-            Validate(c,resolve);var a=c.args;GameObject go=string.IsNullOrEmpty(c.target)?null:resolve(c.target);JObject report=null;
+            Validate(c,resolve);
+            if(c.name.Length==0&&new[]{"create_node","create_mesh","create_ui_element","create_cave","create_resource"}.Contains(c.tool))
+            {
+                string label=c.tool=="create_node"?"Узел":c.tool=="create_mesh"?"Меш":c.tool=="create_cave"?"Пещера":c.tool=="create_resource"?"Ресурс":"Интерфейс";
+                var names=UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects().SelectMany(g=>g.GetComponentsInChildren<Transform>(true)).Select(t=>t.name).ToHashSet();
+                string name=label;for(int i=2;names.Contains(name);i++)name=label+" "+i;
+                c=new EditorCommand{tool=c.tool,name=name,target=c.target,args=c.args}; // Resolve a default; the original audited model plan stays unchanged.
+            }
+            var a=c.args;GameObject go=string.IsNullOrEmpty(c.target)?null:resolve(c.target);JObject report=null;
             switch(c.tool)
             {
                 case "create_node":go=tx.Empty(c.name,go?go.transform:parent,"node");if(a["position"]!=null)go.transform.position=V(a["position"]);break;

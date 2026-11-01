@@ -166,6 +166,7 @@ namespace WorldWeaver.Editor.Assistant
                     int maximumRounds = Settings.Power == AssistantPower.Fast ? 6 : Settings.Power == AssistantPower.Deep ? 16 : 8;
                     if(AgentCapabilities.NeedsExtendedWorkflow(text)&&!SimpleAnimatedPlayerRequest(text))rounds=maximumRounds;
                     int totalActions = 0;
+                    var repeatedValidationFailures=new Dictionary<string,int>(StringComparer.Ordinal);
                     int emptyPlanRepairs = 0;
                     int planningRepairs = 0; // One fresh format repair is available even in Fast; it never grants another execution round.
                     bool unresolvedFailure = false;
@@ -219,7 +220,10 @@ namespace WorldWeaver.Editor.Assistant
                         catch (Exception error) when (error is ArgumentException || error is JsonException)
                         {
                             unresolvedFailure = true;
-                            attempt.Error = ChatHistoryStore.Redact(error.Message); answer.Status = "Исправляю план"; Save();
+                            string failureKey=error.Message;
+                            repeatedValidationFailures.TryGetValue(failureKey,out int repeats);repeatedValidationFailures[failureKey]=repeats+1;
+                            attempt.Error = ChatHistoryStore.Redact(error.Message);
+                            if(repeats>=2)throw new ArgumentException("Модель трижды повторила недопустимый шаг: "+attempt.Error+" Ничего из отклонённых планов не применялось."); answer.Status = "Исправляю план"; Save();
                             request = BuildRequest(session, text);
                             // A malformed assistant message can anchor the next generation to
                             // the same broken prefix. Keep the raw answer in the audit trail;
@@ -289,6 +293,7 @@ namespace WorldWeaver.Editor.Assistant
                         Phase = "Выполняю инструменты · " + plan.actions.Count; answer.Status = "Изменяю сцену"; Notify();
                         operation.Token.ThrowIfCancellationRequested();
                         var batch = await ExecutePlanAsync(plan, session.Id, answer.Id, profile,reviewedRepair,operation.Token);
+                        if(batch.Success)repeatedValidationFailures.Clear();
                         if (!batch.Success) unresolvedFailure = true;
                         else if (batch.Results.Any(result => result.Success && (!SceneToolExecutor.IsReadOnlyTool(result.Tool) || readOnlyRequest && !answer.Steps.Any(step => !step.Success)))) unresolvedFailure = false;
                         SanitizeResults(batch); answer.Steps.AddRange(batch.Results); answer.Text = ChatHistoryStore.Redact(plan.reply);
