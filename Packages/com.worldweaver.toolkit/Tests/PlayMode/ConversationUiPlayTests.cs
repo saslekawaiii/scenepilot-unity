@@ -84,6 +84,17 @@ namespace WorldWeaver.Tests
             Assert.AreEqual(0,first.ConversationHistory.Count(line=>line.IsAi));Assert.AreEqual(2,second.ConversationHistory.Count);
             var labels=ui.View.Query<Label>(className:"speech-text").ToList();Assert.AreEqual(2,labels.Count);StringAssert.Contains("торговец",labels[0].text);Assert.IsFalse(labels.Any(label=>label.text.Contains("очень подробно")));
         }
+        [UnityTest] public IEnumerator RepeatedBlankModelRepliesRestoreInputAndDisplaySystemNoticeInsteadOfNpcAnswer()
+        {
+            var player=Player(out var world);var router=new BlankReplyRouter();var npc=Actor(world,"guard",new Vector3(1,3,0),router);
+            var ui=player.Conversation;ui.Open(npc);const string submitted="Почему ты молчишь?";
+            var pending=ui.SendAsync(submitted);while(!pending.IsCompleted)yield return null;var trace=pending.GetAwaiter().GetResult();yield return null;
+            Assert.AreEqual(2,router.Calls,"The one repair is consumed before reporting a rejected reply.");Assert.IsFalse(trace.Validation.Accepted);
+            Assert.AreEqual(submitted,ui.View.Q<TextField>("conversation-input").value);Assert.IsNotEmpty(ui.LastError);Assert.IsFalse(npc.Busy);
+            Assert.AreEqual(0,npc.ConversationHistory.Count(line=>line.IsAi));Assert.AreEqual("Действие отклонено проверкой",npc.AiStatus);
+            var speakers=ui.View.Query<Label>(className:"speaker-name").ToList();Assert.IsTrue(speakers.Any(label=>label.text=="СИСТЕМА"));Assert.IsFalse(speakers.Any(label=>label.text=="GUARD"));
+            Assert.IsTrue(ui.View.Q<Button>("conversation-send").enabledInHierarchy);
+        }
         [UnityTest] public IEnumerator DisablingOrDestroyingActiveNpcClosesDialogueAndReleasesPlayer()
         {
             var player=Player(out var world);var first=Actor(world,"guard",new Vector3(1,3,0));var social=first.gameObject.AddComponent<NpcSocialAutonomy>();var ui=player.Conversation;ui.Open(first);first.enabled=false;
@@ -140,6 +151,12 @@ namespace WorldWeaver.Tests
         sealed class ReplyRouter:IModelRouter
         {
             public Task<CompletionResult> CompleteAsync(ModelTask task,CompletionRequest request,CancellationToken token) {token.ThrowIfCancellationRequested();return Task.FromResult(new CompletionResult {Text=new JObject {["speech"]="Поговорим об этом своими словами.",["actions"]=new JArray()}.ToString(),Provider="explicit-ui-test-fixture"});}
+            public void Dispose(){}
+        }
+        sealed class BlankReplyRouter:IModelRouter
+        {
+            public int Calls;
+            public Task<CompletionResult> CompleteAsync(ModelTask task,CompletionRequest request,CancellationToken token) {token.ThrowIfCancellationRequested();Calls++;return Task.FromResult(new CompletionResult {Text="{\"speech\":\"  \",\"actions\":[]}",Provider="explicit-blank-ui-test-fixture"});}
             public void Dispose(){}
         }
         sealed class BlockingRouter:IModelRouter

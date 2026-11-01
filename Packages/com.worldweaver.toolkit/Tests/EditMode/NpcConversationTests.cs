@@ -202,6 +202,57 @@ namespace WorldWeaver.Tests
             Assert.AreEqual(1,npc.ConversationHistory.Count(line=>line.IsAi));Assert.IsFalse(npc.ExportMemory().Any(doc=>doc.Text.Contains("Unexecuted proposal")));
             Assert.IsTrue(JToken.DeepEquals(router.Requests[0].Schema,router.Requests[1].Schema));Assert.AreEqual(router.Requests[0].Messages[1].Content,router.Requests[1].Messages[1].Content);
         }
+        [UnityTest] public IEnumerator BlankPlayerDialogueRepairsBeforeTransferAndCommitsCorrectedDecisionOnce()=>Await(RepairBlankPlayerDialogue());
+        async Task RepairBlankPlayerDialogue()
+        {
+            var npc=TransferActor(out var player);int aiEvents=0;npc.SpeechReceived+=line=>{if(line.IsAi)aiEvents++;};
+            string blank=Batch("","",true),corrected=Batch("Вот одна монета.","",true);
+            var router=new ScriptedRouter((call,request,token)=>
+            {
+                if(call==2)
+                {
+                    Assert.AreEqual(0,player.Count("Coin"));Assert.AreEqual(5,npc.GetComponent<Inventory>().Count("Coin"));
+                    Assert.AreEqual(0,aiEvents);Assert.IsEmpty(npc.ExportMemory());
+                    StringAssert.Contains("Dialogue speech",request.Messages.Last().Content);
+                }
+                return Task.FromResult(Completion(call,call==1?blank:corrected));
+            });npc.ConfigureInference(router,new RejectEmbedding());
+            var trace=await npc.SpeakToPlayerAsync("Передай одну монету и объясни ответ.");
+            Assert.AreEqual(2,router.Calls);Assert.AreEqual(2,trace.ModelRequestStarts);Assert.AreEqual(blank,trace.Attempts[0].Raw);
+            Assert.AreEqual("validation_rejected",trace.Attempts[0].Status);Assert.IsFalse(trace.Attempts[0].Validation.Accepted);Assert.IsEmpty(trace.Attempts[0].Validation.Executed);
+            Assert.IsTrue(trace.Validation.Accepted);Assert.AreEqual(2,trace.Validation.Executed.Count);Assert.AreEqual(1,player.Count("Coin"));Assert.AreEqual(4,npc.GetComponent<Inventory>().Count("Coin"));
+            Assert.AreEqual(1,aiEvents);Assert.AreEqual("Вот одна монета.",trace.Speech);Assert.AreEqual(1,npc.ConversationHistory.Count(line=>line.IsAi));
+            Assert.IsTrue(JToken.DeepEquals(router.Requests[0].Schema,router.Requests[1].Schema));Assert.AreEqual(router.Requests[0].Messages[1].Content,router.Requests[1].Messages[1].Content);
+        }
+        [UnityTest] public IEnumerator TwoBlankDialogueDecisionsReturnDiagnosticWithoutEffectsOrFakeAiSpeech()=>Await(RejectTwoBlankDialogueDecisions());
+        async Task RejectTwoBlankDialogueDecisions()
+        {
+            var npc=TransferActor(out var player);int aiEvents=0;npc.SpeechReceived+=line=>{if(line.IsAi)aiEvents++;};
+            var router=new ScriptedRouter((call,request,token)=>Task.FromResult(Completion(call,Batch(call==1?"":" \t\r\n","",true))));npc.ConfigureInference(router,new RejectEmbedding());
+            var trace=await npc.SpeakToPlayerAsync("Не теряй мою неожиданную реплику.");
+            Assert.AreEqual(2,router.Calls);Assert.IsFalse(trace.Validation.Accepted);Assert.IsEmpty(trace.Validation.Executed);Assert.IsTrue(trace.Attempts.All(attempt=>attempt.Status=="validation_rejected"));
+            Assert.AreEqual(0,player.Count("Coin"));Assert.AreEqual(5,npc.GetComponent<Inventory>().Count("Coin"));Assert.IsEmpty(npc.ExportMemory());Assert.AreEqual(0,aiEvents);Assert.AreEqual(0,npc.ConversationHistory.Count(line=>line.IsAi));
+            StringAssert.Contains("2 attempt(s)",trace.Error);StringAssert.Contains("Dialogue speech",trace.Error);Assert.IsNotEmpty(trace.Speech);
+            Assert.AreEqual("Действие отклонено проверкой",npc.AiStatus);Assert.AreEqual("Не теряй мою неожиданную реплику.",npc.ConversationHistory.First(line=>line.IsPlayer).Text);Assert.IsFalse(npc.Busy);
+        }
+        [UnityTest] public IEnumerator BlankPeerDialogueUsesOneRepairAndPublishesOnlyCorrectedReply()=>Await(RepairBlankPeerDialogue());
+        async Task RepairBlankPeerDialogue()
+        {
+            var npc=Actor("guard");var peer=Actor("merchant");
+            var router=new ScriptedRouter((call,request,token)=>Task.FromResult(Completion(call,new JObject { ["speech"]=call==1?" \t":"Давай проверять путников, сохраняя проход для торговли.",["actions"]=new JArray() }.ToString())));npc.ConfigureInference(router,new RejectEmbedding());
+            var trace=await npc.SpeakToNpcAsync(peer,"Как сохранить торговлю без риска?");
+            Assert.AreEqual(2,router.Calls);Assert.IsTrue(trace.Attempts[1].IsRepair);Assert.IsFalse(trace.Attempts[0].Validation.Accepted);Assert.IsTrue(trace.Validation.Accepted);
+            Assert.AreEqual(1,npc.ConversationHistory.Count);Assert.IsTrue(npc.ConversationHistory[0].IsAi);Assert.AreEqual("merchant",npc.ConversationHistory[0].TargetId);Assert.AreEqual(trace.Speech,npc.ConversationHistory[0].Text);
+            StringAssert.Contains("speech обязательно содержит непустой ответ",router.Requests[0].Messages[0].Content);
+        }
+        [UnityTest] public IEnumerator AutonomousPlanningMayStillWaitWithoutSpeechOrDialogueRepair()=>Await(BlankPlanningWait());
+        async Task BlankPlanningWait()
+        {
+            var npc=Actor("guard");var router=new ScriptedRouter((call,request,token)=>Task.FromResult(Completion(call,new JObject { ["speech"]="",["actions"]=new JArray(new JObject { ["type"]="Wait",["target"]="",["item"]="",["amount"]=0 }) }.ToString())));npc.ConfigureInference(router,new RejectEmbedding());
+            var trace=await npc.PlanAsync();
+            Assert.AreEqual(1,router.Calls);Assert.AreEqual(1,trace.ModelRequestStarts);Assert.IsTrue(trace.Validation.Accepted);Assert.AreEqual(1,trace.Validation.Executed.Count);StringAssert.StartsWith("Wait(",trace.Validation.Executed[0]);
+            Assert.AreEqual("",trace.Speech);Assert.IsEmpty(npc.ConversationHistory);StringAssert.DoesNotContain("speech обязательно содержит непустой ответ",router.Requests[0].Messages[0].Content);
+        }
         [UnityTest] public IEnumerator ParseFailureRepairsWithStrictSchemaAndKeepsOriginalRawAudit()=>Await(RepairParse());
         async Task RepairParse()
         {

@@ -207,7 +207,7 @@ namespace WorldWeaver
             {
                 var row = Box(timeline, "utterance");
                 row.AddToClassList(entry.IsPlayer ? "player-utterance" : "npc-utterance");
-                Label(row, entry.IsPlayer ? "ВЫ" : (entry.SpeakerName ?? ActiveNpc.NpcName).ToUpperInvariant(), "speaker-name");
+                Label(row, entry.IsPlayer ? "ВЫ" : entry.IsAi ? (entry.SpeakerName ?? ActiveNpc.NpcName).ToUpperInvariant() : "СИСТЕМА", "speaker-name");
                 Label(row, entry.Text ?? "", "speech-text");
             }
             history.schedule.Execute(() => { if (history.panel != null) history.scrollOffset = new Vector2(0, history.verticalScroller.highValue); });
@@ -243,6 +243,11 @@ namespace WorldWeaver
                 if (this && version == conversationVersion)
                 {
                     if (trace.ReplySuppressed) notice.text = "Ответ отменён. Уже выполненные действия сохранены.";
+                    else if (trace.Validation == null || !trace.Validation.Accepted)
+                    {
+                        LastError = "Модель не подготовила допустимый ответ. Ваша реплика сохранена — её можно уточнить или отправить снова.";
+                        notice.text = LastError; input.SetValueWithoutNotify(text);
+                    }
                     RefreshHistory(); RefreshQuestAction();
                 }
                 return trace;
