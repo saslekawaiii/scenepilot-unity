@@ -105,6 +105,8 @@ namespace WorldWeaver.Editor.Assistant
                 var count=task.Requirements.First(r=>r.Kind=="count"&&r.Expected=="point_light"&&r.Relative);
                 task.Requirements.Add(new AgentRequirement{Kind="point_light_placement",Expected="point_light",Number=1,Relative=true,BaselineTargets=new List<string>(count.BaselineTargets),Description="Новые Point-источники находятся в пределах Terrain, не ниже 3 м над поверхностью и освещают её своим range"});
             }
+            var materialApplication=AgentMaterialApplicationGoal.Capture(input,mutationAuthorized);
+            if(materialApplication!=null)task.Requirements.Add(materialApplication);
             return task;
         }
         static bool MatchesKind(GameObject go,string expected)=>expected=="light"?go.GetComponent<Light>()!=null:Kind(go)==expected;
@@ -118,7 +120,7 @@ namespace WorldWeaver.Editor.Assistant
             task.Checks.Clear();
             foreach(var requirement in task.Requirements)
             {
-                if(requirement.Kind=="rotation_speed")continue; // Actual Play sampling is combined with job evidence by the controller.
+                if(requirement.Kind=="rotation_speed"||requirement.Kind==AgentMaterialApplicationGoal.Kind)continue; // Controller combines tool evidence with actual read-back.
                 double actual=double.NaN;string evidence="live Unity scene";
                 if(missingScope){task.Checks.Add(new AgentCheckResult{RequirementId=requirement.Id,Description=requirement.Description,Actual="Мир задания отсутствует",Evidence="Не разрешён ScopeTarget; чужие объекты не учитываются",Passed=false});continue;}
                 if(requirement.Kind=="count")

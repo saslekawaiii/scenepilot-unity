@@ -35,6 +35,8 @@ namespace WorldWeaver.Editor.Assistant
                 bool passed=jobs.Any(s=>{try{var job=JObject.Parse(s.Summary);return s.Success&&(string.IsNullOrEmpty(requirement.Target)||(string)job["StableTarget"]==requirement.Target)&&Math.Abs(((double?)job["DegreesPerSecond"]??double.NaN)-requirement.Number)<.001&&(int?)job["Samples"]>=3;}catch(JsonException){return false;}});
                 answer.Task.Checks.Add(new AgentCheckResult{RequirementId=requirement.Id,Description=requirement.Description,Passed=passed,Actual=passed?"Измеренная скорость соответствует исходному запросу":"Нет успешного измерения с запрошенной скоростью "+requirement.Number,Evidence="run_play_check: фактические угол, elapsed game time, off-axis drift"});
             }
+            foreach(var requirement in answer.Task.Requirements.Where(r=>r.Kind==AgentMaterialApplicationGoal.Kind))
+                answer.Task.Checks.Add(AgentMaterialApplicationGoal.Verify(requirement,answer.Steps));
             answer.Task.Status=answer.Task.Checks.Count==0?"actions_need_review":answer.Task.Checks.All(c=>c.Passed)?"checks_passed":"checks_failed";
             return answer.Task.Checks;
         }

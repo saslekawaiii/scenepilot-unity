@@ -202,4 +202,121 @@ namespace WorldWeaver.Tests
             finally {foreach(string path in result.Results.SelectMany(r=>r.CreatedAssets).Reverse())AssetDatabase.DeleteAsset(path);}
         }
     }
+    /// <summary>Pure query/metadata fixtures: no Unity scene, files, network or model inference.</summary>
+    public sealed class MaterialSearchQueryTests
+    {
+        private sealed class SearchCapture : IMaterialHttpTransport
+        {
+            public readonly List<Uri> Requests = new List<Uri>();
+            public Action<CancellationToken> BeforeReply;
+            public Task<byte[]> GetAsync(Uri uri, int maxBytes, CancellationToken token)
+            {
+                token.ThrowIfCancellationRequested(); PolyHavenMaterialClient.ValidateEndpoint(uri);
+                Requests.Add(uri); BeforeReply?.Invoke(token);
+                return Task.FromResult(Encoding.UTF8.GetBytes("{\"results\":[]}"));
+            }
+        }
+        private static T Completed<T>(Task<T> task)
+        {
+            // This fake transport completes synchronously. Never block Unity's context.
+            Assert.That(task.IsCompleted, Is.True); return task.GetAwaiter().GetResult();
+        }
+        private static string CapturedQuery(SearchCapture http)
+        {
+            var uri=http.Requests.Single(); Assert.That(uri.Host, Is.EqualTo("api.polyhaven.com"));
+            Assert.That(uri.AbsolutePath, Is.EqualTo("/search")); Assert.That(uri.Fragment, Is.Empty);
+            return Uri.UnescapeDataString(uri.Query.Substring("?q=".Length).Split('&')[0]);
+        }
+        [TestCase("выветренный дерево", "weathered wood")]
+        [TestCase("выветренные деревянные доски", "weathered wood planks")]
+        [TestCase("обветренного дерева", "weathered wood")]
+        [TestCase("состаренные доски", "aged planks")]
+        [TestCase("потёртое тёмное дерево", "worn dark wood")]
+        [TestCase("изношенной кожи", "worn leather")]
+        [TestCase("луговая трава", "meadow grass")]
+        [TestCase("камнями", "stone")]
+        [TestCase("грубый камень", "rough stone")]
+        [TestCase("известковая штукатурка", "lime plaster")]
+        [TestCase("гладкая штукатурка", "smooth plaster")]
+        [TestCase("деревянных досок", "wood planks")]
+        [TestCase("черепица кровли", "roof tiles roof")]
+        [TestCase("кирпичная стена", "brick стена")]
+        [TestCase("матовый металл", "matte metal")]
+        [TestCase("ржавое железо", "rusty iron")]
+        [TestCase("ржавчина стали", "rust steel")]
+        [TestCase("песчаная дорога", "sand road")]
+        [TestCase("снежный лёд", "snow ice")]
+        [TestCase("кора дерева", "bark wood")]
+        [TestCase("шерстяная ткань", "wool fabric")]
+        [TestCase("хлопковая ткань", "cotton fabric")]
+        [TestCase("кожаный", "leather")]
+        [TestCase("рябь воды", "ripples water")]
+        [TestCase("брусчатка", "cobblestone")]
+        [TestCase("мощёная мостовая", "paving pavement")]
+        [TestCase("светлый известняк", "light limestone")]
+        [TestCase("Weathered oak Boards 4K", "weathered oak boards 4k")]
+        [TestCase("незнакомый гранит oak_wood 2k", "незнакомый гранит oak_wood 2k")]
+        [TestCase("деревня деревенский деревушка", "деревня деревенский деревушка")]
+        [TestCase("поддерево передерево деревянность", "поддерево передерево деревянность")]
+        [TestCase("дерево42 Xдерево дерево_X _дерево", "дерево42 xдерево дерево_x _дерево")]
+        [TestCase("дорогой металл", "дорогой metal")]
+        [TestCase(" WOOD\t  planks\n", "wood planks")]
+        [TestCase("wood &host=https://example.test/a", "wood &host=https://example.test/a")]
+        public void LiteralMaterialTermsReachTheOfficialSearchWithoutChangingUnknownTerms(string query, string effective)
+        {
+            var http=new SearchCapture(); Completed(new PolyHavenMaterialClient(http).SearchAsync(query, 1));
+            Assert.That(CapturedQuery(http), Is.EqualTo(effective));
+            Assert.That(http.Requests.Single().Query, Does.EndWith("&type=textures&limit=1"));
+        }
+        [TestCase(null)] [TestCase("")] [TestCase(" \t\n ")] [TestCase("wood\0stone")]
+        public void MissingOrControlCodeQueriesFailBeforeTransport(string query)
+        {
+            var http=new SearchCapture(); Assert.Throws<ArgumentException>(()=>Completed(new PolyHavenMaterialClient(http).SearchAsync(query,1)));
+            Assert.That(http.Requests, Is.Empty);
+        }
+        [Test] public void RawAndExpandedQueryBoundsRejectOversizeWithoutTruncationOrTransport()
+        {
+            var http=new SearchCapture(); var client=new PolyHavenMaterialClient(http);
+            Assert.Throws<ArgumentException>(()=>Completed(client.SearchAsync(new string('x',101),1)));
+            Assert.Throws<ArgumentException>(()=>Completed(client.SearchAsync(new string(' ',100)+"x",1)));
+            // A short Russian input may expand beyond the same bounded API query budget.
+            Assert.Throws<ArgumentException>(()=>Completed(client.SearchAsync(string.Join(" ",Enumerable.Repeat("рябь",12))+" woods",1)));
+            Assert.That(http.Requests, Is.Empty);
+            Completed(client.SearchAsync(new string('x',100),1));Assert.That(CapturedQuery(http), Has.Length.EqualTo(100));
+            http.Requests.Clear(); Completed(client.SearchAsync(string.Join(" ",Enumerable.Repeat("рябь",12))+" wood",1));
+            Assert.That(CapturedQuery(http), Is.EqualTo(string.Join(" ",Enumerable.Repeat("ripples",12))+" wood"));
+            Assert.That(CapturedQuery(http), Has.Length.EqualTo(100));
+        }
+        [Test] public void EquivalentRussianAndEnglishQueriesShareCacheWhileLimitsRemainDistinct()
+        {
+            var http=new SearchCapture(); var client=new PolyHavenMaterialClient(http);
+            var a=Completed(client.SearchAsync("выветренный дерево",2));var b=Completed(client.SearchAsync("WEATHERED  wood",2));
+            Assert.That(b, Is.SameAs(a));Assert.That(http.Requests.Count, Is.EqualTo(1));
+            Completed(client.SearchAsync("weathered wood",1));Assert.That(http.Requests.Count, Is.EqualTo(2));
+        }
+        [Test] public void CancellationIsObservedBeforeBothUncachedAndCachedSearches()
+        {
+            var http=new SearchCapture();var client=new PolyHavenMaterialClient(http);
+            using(var stop=new CancellationTokenSource())
+            {
+                stop.Cancel();Assert.Catch<OperationCanceledException>(()=>Completed(client.SearchAsync("дерево",1,stop.Token)));Assert.That(http.Requests, Is.Empty);
+                Completed(client.SearchAsync("дерево",1));Assert.Catch<OperationCanceledException>(()=>Completed(client.SearchAsync("wood",1,stop.Token)));
+                Assert.That(http.Requests.Count, Is.EqualTo(1));
+            }
+        }
+        [Test] public void CancellationAfterEmptySearchReplyCannotPopulateCache()
+        {
+            var http=new SearchCapture();var client=new PolyHavenMaterialClient(http);
+            using(var stop=new CancellationTokenSource())
+            {
+                http.BeforeReply=_=>stop.Cancel();Assert.Catch<OperationCanceledException>(()=>Completed(client.SearchAsync("дерево",1,stop.Token)));
+                http.BeforeReply=null;Completed(client.SearchAsync("wood",1));Assert.That(http.Requests.Count, Is.EqualTo(2));
+            }
+        }
+        [TestCase(0)] [TestCase(9)] public void InvalidResultLimitsNeverReachTransport(int limit)
+        {
+            var http=new SearchCapture();Assert.Throws<ArgumentOutOfRangeException>(()=>Completed(new PolyHavenMaterialClient(http).SearchAsync("дерево",limit)));
+            Assert.That(http.Requests, Is.Empty);
+        }
+    }
 }

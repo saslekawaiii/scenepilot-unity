@@ -253,7 +253,7 @@ namespace WorldWeaver.Editor.Assistant
             controls.Add(modelGroup);
             var powerGroup = Element("power-group");
             powerGroup.Add(Text("Глубина", "field-caption"));
-            powerDropdown = new DropdownField(PowerLabels, 1) { name = "assistant-power", tooltip = "Быстро: 1 шаг, до 2 минут. Баланс: до 3 шагов, до 4 минут. Глубоко: до 6 шагов, до 8 минут. Это верхние пределы ожидания; время зависит от модели. Режим не меняет число её параметров." };
+            powerDropdown = new DropdownField(PowerLabels, 1) { name = "assistant-power", tooltip = "Быстро: 1 шаг, до 2 минут. Баланс: до 3 шагов, до 4 минут. Глубоко: до 6 шагов, до 15 минут. Это верхние пределы ожидания; время зависит от модели. Режим не меняет число её параметров." };
             powerDropdown.RegisterValueChangedCallback(evt =>
             {
                 if (updatingControls) return;

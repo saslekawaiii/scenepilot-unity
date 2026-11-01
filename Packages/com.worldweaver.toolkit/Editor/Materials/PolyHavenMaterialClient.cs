@@ -187,9 +187,91 @@ namespace WorldWeaver.Editor.Assistant
     public sealed class PolyHavenMaterialClient
     {
         public const int MaxImageBytes = 8 * 1024 * 1024, MaxTotalBytes = 24 * 1024 * 1024;
+        public const int MaxSearchQueryCharacters = 100, MaxEffectiveSearchQueryCharacters = 100;
         private readonly IMaterialHttpTransport http;
         private readonly Dictionary<string, MaterialDescriptor[]> searches = new Dictionary<string, MaterialDescriptor[]>();
         public PolyHavenMaterialClient(IMaterialHttpTransport transport = null) { http = transport ?? new MaterialHttpTransport(); }
+        private sealed class QueryTerm
+        {
+            public readonly Regex Pattern; public readonly string English;
+            public QueryTerm(string pattern, string english)
+            { Pattern = new Regex("^(?:" + pattern + ")$", RegexOptions.CultureInvariant); English = english; }
+        }
+        // Literal material vocabulary only. Full-word inflections avoid broad stems such as
+        // дерев*: деревня/деревенский must never silently become a request for wood.
+        private const string Adjective = "(?:ый|ий|ой|ая|яя|ое|ее|ые|ие|ого|его|ей|ому|ему|ым|им|ую|юю|ых|их|ыми|ими)";
+        private static readonly QueryTerm[] QueryTerms = {
+            new QueryTerm(@"дерев(?:о|а|у|ом|е|ья|ьев|ьям|ьями|ьях)|деревянн"+Adjective+@"|древесин(?:а|ы|у|е|ой|ою)", "wood"),
+            new QueryTerm(@"доск(?:а|и|у|е|ой|ою|ам|ами|ах)|досок", "planks"),
+            new QueryTerm(@"бревн(?:о|а|у|ом|е|ами|ах)", "logs"),
+            new QueryTerm(@"(?:выветренн|обветренн)"+Adjective, "weathered"),
+            new QueryTerm(@"состаренн"+Adjective, "aged"),
+            new QueryTerm(@"(?:изношенн|потерт)"+Adjective, "worn"),
+            new QueryTerm(@"стар"+Adjective, "old"),
+            new QueryTerm(@"кам(?:ень|ня|ню|нем|не|ни|ней|ням|нями|нях)|каменн"+Adjective, "stone"),
+            new QueryTerm(@"скал(?:а|ы|у|е|ой|ою|ам|ами|ах)", "rock"),
+            new QueryTerm(@"кирпич(?:и|а|у|ом|е|ей|ам|ами|ах)?|кирпичн"+Adjective, "brick"),
+            new QueryTerm(@"трав(?:а|ы|у|е|ой|ою|ам|ами|ах)|травян"+Adjective+@"|травянн"+Adjective, "grass"),
+            new QueryTerm(@"луг(?:а|у|ом|е|ам|ами|ах)?|лугов"+Adjective, "meadow"),
+            new QueryTerm(@"штукатурк(?:а|и|у|е|ой|ою|ам|ами|ах)|штукатурн"+Adjective, "plaster"),
+            new QueryTerm(@"известняк(?:а|у|ом|е|и|ов|ам|ами|ах)?", "limestone"),
+            new QueryTerm(@"известков"+Adjective, "lime"),
+            new QueryTerm(@"крыш(?:а|и|у|е|ей|ам|ами|ах)|кровл(?:я|и|ю|е|ей|ям|ями|ях)", "roof"),
+            new QueryTerm(@"черепиц(?:а|ы|у|е|ей)|черепичн"+Adjective, "roof tiles"),
+            new QueryTerm(@"плитк(?:а|и|у|е|ой|ою|ам|ами|ах)", "tiles"),
+            new QueryTerm(@"металл(?:ы|а|у|ом|е|ов|ам|ами|ах)?|металлическ"+Adjective, "metal"),
+            new QueryTerm(@"стал(?:ь|и|ью|ей|ям|ями|ях)|стальн"+Adjective, "steel"),
+            new QueryTerm(@"желез(?:о|а|у|ом|е)|железн"+Adjective, "iron"),
+            new QueryTerm(@"ржавчин(?:а|ы|у|е|ой|ою)", "rust"),
+            new QueryTerm(@"ржав"+Adjective, "rusty"),
+            new QueryTerm(@"пес(?:ок|ка|ку|ком|ке|ки|ков|кам|ками|ках)|песчан"+Adjective, "sand"),
+            new QueryTerm(@"грунт(?:ы|а|у|ом|е|ов|ам|ами|ах)?|почв(?:а|ы|у|е|ой|ою)", "soil"),
+            new QueryTerm(@"земл(?:я|и|ю|е|ей|ям|ями|ях)", "ground"),
+            new QueryTerm(@"гряз(?:ь|и|ью|ей)", "dirt"),
+            new QueryTerm(@"дорог(?:а|и|у|е|ам|ами|ах)", "road"),
+            new QueryTerm(@"снег(?:а|у|ом|е|и|ов|ам|ами|ах)?|снежн"+Adjective, "snow"),
+            new QueryTerm(@"лед|льд(?:а|у|ом|е|ы|ов|ам|ами|ах)|ледян"+Adjective, "ice"),
+            new QueryTerm(@"кор(?:а|ы|у|е|ой|ою)", "bark"),
+            new QueryTerm(@"ствол(?:ы|а|у|ом|е|ов|ам|ами|ах)?", "trunk"),
+            new QueryTerm(@"ткан(?:ь|и|ью|ей|ям|ями|ях)|тканев"+Adjective, "fabric"),
+            new QueryTerm(@"сукн(?:о|а|у|ом|е)", "cloth"),
+            new QueryTerm(@"хлоп(?:ок|ка|ку|ком|ке)|хлопков"+Adjective, "cotton"),
+            new QueryTerm(@"шерст(?:ь|и|ью|ей)|шерстян"+Adjective, "wool"),
+            new QueryTerm(@"кож(?:а|и|у|е|ей)|кожан"+Adjective, "leather"),
+            new QueryTerm(@"вод(?:а|ы|у|е|ой|ою|ам|ами|ах)|водн"+Adjective, "water"),
+            new QueryTerm(@"озер(?:о|а|у|ом|е|ами|ах)", "lake"),
+            new QueryTerm(@"ряб(?:ь|и|ью)", "ripples"),
+            new QueryTerm(@"брусчатк(?:а|и|у|е|ой|ою)", "cobblestone"),
+            new QueryTerm(@"мостов(?:ая|ой|ую|ые|ых|ыми)", "pavement"),
+            new QueryTerm(@"мощен"+Adjective, "paving"),
+            new QueryTerm(@"шероховат"+Adjective+@"|груб"+Adjective, "rough"),
+            new QueryTerm(@"гладк"+Adjective, "smooth"),
+            new QueryTerm(@"полированн"+Adjective, "polished"),
+            new QueryTerm(@"матов"+Adjective, "matte"),
+            new QueryTerm(@"темн"+Adjective, "dark"),
+            new QueryTerm(@"светл"+Adjective, "light"),
+            new QueryTerm(@"красн"+Adjective, "red"),
+            new QueryTerm(@"сер"+Adjective, "grey"),
+            new QueryTerm(@"бел"+Adjective, "white"),
+            new QueryTerm(@"черн"+Adjective, "black"),
+            new QueryTerm(@"зелен"+Adjective, "green"),
+            new QueryTerm(@"коричнев"+Adjective, "brown")
+        };
+        private static readonly Regex RussianQueryWord = new Regex(@"(?<![\p{L}\p{N}_])[а-яё]+(?![\p{L}\p{N}_])", RegexOptions.CultureInvariant);
+        internal static string NormaliseSearchQuery(string query)
+        {
+            if (query == null || query.Length == 0 || query.Length > MaxSearchQueryCharacters || query.Any(c => char.IsControl(c) && !char.IsWhiteSpace(c)))
+                throw new ArgumentException("Texture search needs 1–100 input characters without control codes.", nameof(query));
+            string input = Regex.Replace(query.Trim().ToLowerInvariant(), @"\s+", " ");
+            if (input.Length == 0) throw new ArgumentException("Texture search needs a nonempty material query.", nameof(query));
+            string effective = RussianQueryWord.Replace(input, match => {
+                string word = match.Value.Replace('ё', 'е');
+                return QueryTerms.FirstOrDefault(term => term.Pattern.IsMatch(word))?.English ?? match.Value;
+            });
+            if (effective.Length > MaxEffectiveSearchQueryCharacters)
+                throw new ArgumentException("The English material query exceeds 100 characters; use fewer material terms.", nameof(query));
+            return effective;
+        }
         public static string ValidateSlug(string slug)
         {
             if (string.IsNullOrEmpty(slug) || !Regex.IsMatch(slug, "^[a-z0-9][a-z0-9_]{0,79}$", RegexOptions.CultureInvariant))
@@ -222,15 +304,17 @@ namespace WorldWeaver.Editor.Assistant
         private static string SafeText(string value, int max) => new string((value ?? "").Where(c => !char.IsControl(c)).Take(max).ToArray());
         public async Task<MaterialDescriptor[]> SearchAsync(string query, int limit, CancellationToken token = default)
         {
+            token.ThrowIfCancellationRequested();
+            query = NormaliseSearchQuery(query);
+            if (limit < 1 || limit > 8) throw new ArgumentOutOfRangeException(nameof(limit));
             using(var requestBudget=CancellationTokenSource.CreateLinkedTokenSource(token))
             {
             requestBudget.CancelAfter(TimeSpan.FromSeconds(90));token=requestBudget.Token;
-            query = (query ?? "").Trim().ToLowerInvariant();
-            if (query.Length == 0 || query.Length > 100) throw new ArgumentException("Texture search needs 1–100 characters.");
-            if (limit < 1 || limit > 8) throw new ArgumentOutOfRangeException(nameof(limit));
             string key = query + "|" + limit;
+            token.ThrowIfCancellationRequested();
             if (searches.TryGetValue(key, out var cached)) return cached;
             var result = await Json("/search?q=" + Uri.EscapeDataString(query) + "&type=textures&limit=" + limit, token);
+            token.ThrowIfCancellationRequested();
             var list = new List<MaterialDescriptor>();
             foreach (var item in (result["results"] as JArray ?? new JArray()).Take(limit))
             {
@@ -238,6 +322,7 @@ namespace WorldWeaver.Editor.Assistant
                 string slug = ValidateSlug((string)item["slug"]);
                 list.Add(Descriptor(slug, await Json("/info/" + slug, token)));
             }
+            token.ThrowIfCancellationRequested();
             if (searches.Count >= 32) searches.Clear();
             return searches[key] = list.ToArray();
             }

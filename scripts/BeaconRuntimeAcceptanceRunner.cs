@@ -17,7 +17,7 @@ using Object=UnityEngine.Object;
 
 /// <summary>
 /// Disposable-project runtime measurement of an exact reviewed MonoBehaviour.
-/// Public Game View input injection is checked against the actual legacy Input state;
+/// Public batch Game View injection or externally supplied native keys are checked against actual legacy Input state;
 /// generated source and its methods/input API are never replaced or invoked by this harness.
 /// Install into disposable Assets/Editor after other Unity processes have finished.
 /// </summary>
@@ -26,12 +26,13 @@ public static class BeaconRuntimeAcceptanceRunner
 {
     const string StateName="WorldWeaverBeaconRuntimeAcceptance.json";
     const int HoldFrames=30,ReleasedFrames=15,InputDeadlineFrames=180,MaximumSamples=700;
-    const double RuntimeDeadlineSeconds=45,PhaseDeadlineSeconds=120;
+    const double RuntimeDeadlineSeconds=45,NativeRuntimeDeadlineSeconds=180,PhaseDeadlineSeconds=120;
     const float ColorTolerance=.025f;
     [Serializable] sealed class State
     {
-        public string Phase,Project,Output,Source,SourceSha256,ClassName,FixtureFolder,FixtureScene,Positive,Negative,DeadlineUtc;
-        public float[] Blue,Amber;
+        public string Phase,Project,Output,CueFile,Source,SourceSha256,ClassName,FixtureFolder,FixtureScene,Positive,Negative,DeadlineUtc;
+        public float[] Blue,Amber,Sentinel;
+        public bool ManualInput;
         public Dictionary<string,string> PackageFiles;
         public string PackageRoot;
         public JObject Report;
@@ -54,17 +55,24 @@ public static class BeaconRuntimeAcceptanceRunner
         EditorApplication.playModeStateChanged+=PlayState;
     }
 
-    public static void Run()
+    public static void Run()=>Begin(false);
+    [MenuItem("WorldWeaver/Acceptance/Run Reviewed Beacon Native")]
+    public static void RunNative()=>Begin(true);
+
+    static void Begin(bool manualInput)
     {
-        if(Environment.GetEnvironmentVariable("WW_BEACON_ACCEPTANCE")!="1"||!Application.isBatchMode)
-            throw new InvalidOperationException("Explicit WW_BEACON_ACCEPTANCE=1 and disposable batch mode are required.");
+        if(Environment.GetEnvironmentVariable("WW_BEACON_ACCEPTANCE")!="1"||manualInput==Application.isBatchMode)
+            throw new InvalidOperationException("WW_BEACON_ACCEPTANCE=1 is required; Run uses batch mode and RunNative uses a normal disposable Editor.");
+        if(manualInput&&Environment.GetEnvironmentVariable("WW_BEACON_NATIVE_INPUT")!="1")
+            throw new InvalidOperationException("RunNative additionally requires WW_BEACON_NATIVE_INPUT=1; native key events are supplied externally.");
         string project=Directory.GetParent(Application.dataPath).FullName;
-        if(Path.GetFullPath(Environment.GetEnvironmentVariable("WW_BEACON_DISPOSABLE_PROJECT")??"")!=Path.GetFullPath(project))
+        if(Path.GetFullPath(Required("WW_BEACON_DISPOSABLE_PROJECT"))!=Path.GetFullPath(project))
             throw new InvalidOperationException("WW_BEACON_DISPOSABLE_PROJECT must exactly identify this disposable project.");
         if(File.Exists(StatePath))throw new InvalidOperationException("An existing beacon run must be inspected before starting another.");
         if(EditorApplication.isPlayingOrWillChangePlaymode||EditorApplication.isCompiling||EditorApplication.isUpdating)
             throw new InvalidOperationException("The disposable editor must be idle in Edit Mode.");
         string output=Path.GetFullPath(Required("WW_BEACON_OUTPUT"));
+        if(File.Exists(output)||File.Exists(output+".phase.json"))throw new IOException("Use new receipt and native phase-cue paths; previous evidence is never overwritten.");
         string source=SourcePath(Required("WW_BEACON_SOURCE"));
         string hash=Required("WW_BEACON_SOURCE_SHA256").ToLowerInvariant();
         if(!Regex.IsMatch(hash,"^[a-f0-9]{64}$")||Sha(File.ReadAllBytes(source))!=hash)
@@ -81,23 +89,28 @@ public static class BeaconRuntimeAcceptanceRunner
         if(Within(output,Application.dataPath)||Within(output,Path.Combine(project,"Packages"))||Within(output,package))
             throw new InvalidOperationException("Output must remain outside Assets, Packages and the resolved immutable package.");
         string folder="Assets/BeaconRuntimeAcceptance-"+Guid.NewGuid().ToString("N");
-        active=new State {Phase="creating",Project=project,Output=output,Source=source,SourceSha256=hash,ClassName=className,
-            FixtureFolder=folder,FixtureScene=folder+"/Fixture.unity",Positive="Exact reviewed beacon",Negative="Stationary blue negative control",
+        active=new State {Phase="creating",Project=project,Output=output,CueFile=output+".phase.json",ManualInput=manualInput,Source=source,SourceSha256=hash,ClassName=className,
+            FixtureFolder=folder,FixtureScene=folder+"/Fixture.unity",Positive="Exact reviewed beacon",Negative="Stationary sentinel negative control",
             Blue=ParseColor(Environment.GetEnvironmentVariable("WW_BEACON_BLUE_RGBA")??"0,0,1,1"),
-            Amber=ParseColor(Required("WW_BEACON_AMBER_RGBA")),PackageRoot=package,PackageFiles=Files(package),
-            DeadlineUtc=DateTime.UtcNow.AddSeconds(PhaseDeadlineSeconds).ToString("O"),
+            Amber=ParseColor(Required("WW_BEACON_AMBER_RGBA")),Sentinel=ParseColor(Environment.GetEnvironmentVariable("WW_BEACON_SENTINEL_RGBA")??"0.85,0.10,0.65,1"),PackageRoot=package,PackageFiles=Files(package),
+            DeadlineUtc=DateTime.UtcNow.AddSeconds(manualInput?240:PhaseDeadlineSeconds).ToString("O"),
             Report=new JObject { ["schemaVersion"]=1,["kind"]="exact-reviewed-beacon-real-input-and-color-runtime",["startedUtc"]=DateTime.UtcNow.ToString("O"),
                 ["unity"]=Application.unityVersion,["success"]=false,["llmInferencePerformed"]=false,["reviewedClassName"]=className,["reviewedSourcePath"]=source,["reviewedSourceSha256"]=hash,
                 ["sourceUnmodifiedByHarness"]=true,["harnessSourceSha256"]=File.Exists("Assets/Editor/BeaconRuntimeAcceptanceRunner.cs")?Sha(File.ReadAllBytes("Assets/Editor/BeaconRuntimeAcceptanceRunner.cs")):"not found at standard installation path",
-                ["inputInjectionApi"]="UnityEditor.EditorGUIUtility.QueueGameViewInputEvent",
+                ["inputMode"]=manualInput?"native-manual-GameView":"batch-queued-GameView",["nativeInputRequested"]=manualInput,
+                ["inputInjectionApi"]=manualInput?"None: external native keyboard events; actual legacy Input state is observed":"UnityEditor.EditorGUIUtility.QueueGameViewInputEvent",
+                ["nativePhaseCueFile"]=manualInput?output+".phase.json":null,
                 ["samplingPoint"]="An additional PostLateUpdate callback, after the normal generated Update; no generated method is invoked by the harness.",
                 ["holdFramesRequired"]=HoldFrames,["releasedFramesRequired"]=ReleasedFrames,["colorTolerancePerChannel"]=ColorTolerance,
-                ["samples"]=new JArray(),["queuedInputEvents"]=new JArray(),["runtimeErrors"]=new JArray(),["checks"]=new JObject(),
+                ["samples"]=new JArray(),["queuedInputEvents"]=new JArray(),["nativeInputRequests"]=new JArray(),["runtimeErrors"]=new JArray(),["checks"]=new JObject(),
                 ["limitations"]=new JArray("One reviewed script and one authored keyboard/color mechanic, not general model reliability.",
-                    "Input delivery must be independently observed. If Game View injection is unavailable in batch mode, behavior is not evaluated and native input is still required.",
+                    "Input delivery must be independently observed. If batch Game View injection is unavailable, behavior is not evaluated; RunNative uses externally supplied real Game View key events and a separate receipt.",
+                    "Both renderers begin with an independent sentinel. The candidate must initialize blue while the untouched control remains sentinel.",
                     "Renderer material/property-block colors are measured; this is not a rendered image or a GPU/shader/art-quality test.") }
         };
-        active.Report["expectedBlue"]=JArray.FromObject(active.Blue);active.Report["expectedAmber"]=JArray.FromObject(active.Amber);
+        if(Distance(ColorOf(active.Sentinel),ColorOf(active.Blue))<.1f||Distance(ColorOf(active.Sentinel),ColorOf(active.Amber))<.1f||Distance(ColorOf(active.Blue),ColorOf(active.Amber))<.1f)
+            throw new ArgumentException("Sentinel, blue and amber must be independently distinguishable colors.");
+        active.Report["expectedBlue"]=JArray.FromObject(active.Blue);active.Report["expectedAmber"]=JArray.FromObject(active.Amber);active.Report["independentInitialSentinel"]=JArray.FromObject(active.Sentinel);
         Save(active);
         try
         {
@@ -105,13 +118,25 @@ public static class BeaconRuntimeAcceptanceRunner
             if(string.IsNullOrEmpty(AssetDatabase.CreateFolder("Assets",Path.GetFileName(folder))))throw new IOException("Cannot create disposable fixture folder.");
             var shader=GraphicsSettings.currentRenderPipeline?Shader.Find("Universal Render Pipeline/Lit"):Shader.Find("Standard");
             if(!shader)throw new InvalidOperationException("No supported Standard/URP Lit shader for the renderer fixture.");
-            var material=new Material(shader){name="Initial independently authored blue"};material.color=ColorOf(active.Blue);
-            AssetDatabase.CreateAsset(material,folder+"/InitialBlue.mat");
+            var material=new Material(shader){name="Independent non-blue initialization sentinel"};material.color=ColorOf(active.Sentinel);
+            AssetDatabase.CreateAsset(material,folder+"/InitialSentinel.mat");
             var go=GameObject.CreatePrimitive(PrimitiveType.Cube);go.name=active.Positive;go.GetComponent<Renderer>().sharedMaterial=material;go.AddComponent(type);
             var control=GameObject.CreatePrimitive(PrimitiveType.Cube);control.name=active.Negative;control.transform.position=Vector3.right*3;
             control.GetComponent<Renderer>().sharedMaterial=material;
+            Color initialPositive=EffectiveColor(go.GetComponent<Renderer>()),initialNegative=EffectiveColor(control.GetComponent<Renderer>());
+            active.Report["fixtureBeforePlay"]=new JObject {["candidateColor"]=ColorArray(initialPositive),["negativeColor"]=ColorArray(initialNegative)};
+            ((JObject)active.Report["checks"])["bothRenderersActuallyBeginWithIndependentSentinel"]=Distance(initialPositive,ColorOf(active.Sentinel))<=ColorTolerance&&Distance(initialNegative,ColorOf(active.Sentinel))<=ColorTolerance;
             // Separate runtime material instances are deliberately left to the reviewed source.
             // A script mutating the shared asset will also change the negative control and fail.
+            if(manualInput)
+            {
+                var cameraObject=new GameObject("Independent acceptance camera");var camera=cameraObject.AddComponent<Camera>();
+                camera.transform.position=new Vector3(1.5f,2f,-7f);camera.transform.LookAt(new Vector3(1.5f,0,0));camera.fieldOfView=45;
+                camera.clearFlags=CameraClearFlags.SolidColor;camera.backgroundColor=new Color(.08f,.09f,.12f,1);
+                var light=new GameObject("Independent acceptance lighting").AddComponent<Light>();light.type=LightType.Directional;light.intensity=1.3f;light.transform.rotation=Quaternion.Euler(45,-30,0);
+                RenderSettings.ambientLight=new Color(.6f,.6f,.6f,1);
+                EditorApplication.ExecuteMenuItem("Window/General/Game");
+            }
             EditorSceneManager.SaveScene(go.scene,active.FixtureScene);
             active.Phase="entering";Save(active);Write(active.Output,active.Report);
             EditorApplication.isPlaying=true;
@@ -141,6 +166,7 @@ public static class BeaconRuntimeAcceptanceRunner
         observedFrames=downEdges=upEdges=heldOne=heldTwo=colorChanges=0;
         startedTime=stageTime=Time.realtimeSinceStartup;stageFrame=0;stage="baseline";previous=EffectiveColor(positive);
         active.Phase="playing";Save(active);
+        Cue("baseline");
     }
     static void Observe()
     {
@@ -152,10 +178,10 @@ public static class BeaconRuntimeAcceptanceRunner
             bool down=Input.GetKeyDown(KeyCode.F),held=Input.GetKey(KeyCode.F),up=Input.GetKeyUp(KeyCode.F);
             if(down)downEdges++;if(up)upEdges++;
             var color=EffectiveColor(positive);var control=EffectiveColor(negative);
-            if(Distance(color,previous)>ColorTolerance)colorChanges++;previous=color;
+            if(observedFrames>1&&Distance(color,previous)>ColorTolerance)colorChanges++;previous=color;
             ((JArray)active.Report["samples"]).Add(new JObject { ["frame"]=Time.frameCount,["observedFrame"]=observedFrames,["time"]=Time.realtimeSinceStartup-startedTime,
                 ["phase"]=stage,["fDown"]=down,["fHeld"]=held,["fUp"]=up,["color"]=ColorArray(color),["negativeColor"]=ColorArray(control) });
-            if(observedFrames>MaximumSamples||Time.realtimeSinceStartup-startedTime>RuntimeDeadlineSeconds)
+            if(observedFrames>(active.ManualInput?12000:MaximumSamples)||Time.realtimeSinceStartup-startedTime>(active.ManualInput?NativeRuntimeDeadlineSeconds:RuntimeDeadlineSeconds))
                 throw new TimeoutException("Runtime/input-delivery deadline reached; missing input is not a generated-code failure.");
             switch(stage)
             {
@@ -174,10 +200,14 @@ public static class BeaconRuntimeAcceptanceRunner
         catch(Exception error){Fail(active,error);}
     }
     static void InputTimeout()
-    {if(observedFrames-stageFrame>=InputDeadlineFrames)throw new TimeoutException("Queued F input was not observed by the legacy Input API; runtime behavior was not evaluated.");}
-    static void Phase(string next){stage=next;stageFrame=observedFrames;stageTime=Time.realtimeSinceStartup;}
+    {if(active.ManualInput?Time.realtimeSinceStartup-stageTime>=30:observedFrames-stageFrame>=InputDeadlineFrames)throw new TimeoutException("Requested F input was not observed by the legacy Input API; runtime behavior was not evaluated.");}
+    static void Phase(string next){stage=next;stageFrame=observedFrames;stageTime=Time.realtimeSinceStartup;Cue(next);}
     static void Queue(EventType type)
     {
+        if(active.ManualInput)
+        {
+            ((JArray)active.Report["nativeInputRequests"]).Add(new JObject {["requestedType"]=type.ToString(),["key"]="F",["afterObservedFrame"]=observedFrames,["utc"]=DateTime.UtcNow.ToString("O")});return;
+        }
         var evt=new Event {type=type,keyCode=KeyCode.F,character='f',modifiers=EventModifiers.None};
         EditorGUIUtility.QueueGameViewInputEvent(evt);
         ((JArray)active.Report["queuedInputEvents"]).Add(new JObject {["type"]=type.ToString(),["key"]="F",["afterObservedFrame"]=observedFrames,["utc"]=DateTime.UtcNow.ToString("O")});
@@ -192,16 +222,19 @@ public static class BeaconRuntimeAcceptanceRunner
         checks["secondHoldObservedWithoutAdditionalEdges"]=heldTwo>=HoldFrames&&InputPhase("held_blue",true);
         checks["releasedIntervalsActuallyObserved"]=InputPhase("released_amber",false)&&InputPhase("released_blue",false);
         checks["initialBlue"]=ColorPhase("baseline",active.Blue);
+        checks["generatedInitializationReplacedIndependentSentinelWithBlue"]=(bool)checks["initialBlue"]&&Distance(ColorOf(active.Sentinel),ColorOf(active.Blue))>.1f;
         checks["firstPressAmber"]=ColorPhase("held_amber",active.Amber)&&rows.Where(r=>(string)r["phase"]=="first_down"&&(bool)r["fDown"]).All(r=>Distance(ReadColor(r["color"]),ColorOf(active.Amber))<=ColorTolerance);
         checks["releaseDoesNotToggleColor"]=ColorPhase("first_up",active.Amber)&&ColorPhase("released_amber",active.Amber);
         checks["secondPressReturnsExactBlue"]=ColorPhase("held_blue",active.Blue)&&ColorPhase("released_blue",active.Blue)&&rows.Where(r=>(string)r["phase"]=="second_down"&&(bool)r["fDown"]).All(r=>Distance(ReadColor(r["color"]),ColorOf(active.Blue))<=ColorTolerance);
         checks["exactlyTwoObservedColorTransitions"]=colorChanges==2;
-        checks["stationaryNegativeControlAlwaysBlue"]=rows.All(r=>Distance(ReadColor(r["negativeColor"]),ColorOf(active.Blue))<=ColorTolerance);
+        checks["stationaryNegativeControlAlwaysSentinel"]=rows.All(r=>Distance(ReadColor(r["negativeColor"]),ColorOf(active.Sentinel))<=ColorTolerance);
         checks["noRuntimeErrors"]=((JArray)active.Report["runtimeErrors"]).Count==0;
+        checks["nativeModeDidNotInjectSyntheticInput"]=!active.ManualInput||((JArray)active.Report["queuedInputEvents"]).Count==0;
         active.Report["inputDeliveryConfirmed"]=(bool)checks["twoActualPressEdgesAndReleaseEdgesObserved"]&&(bool)checks["firstHoldObservedWithoutAdditionalEdges"]&&(bool)checks["secondHoldObservedWithoutAdditionalEdges"];
         active.Report["runtimeBehaviorEvaluated"]=active.Report["inputDeliveryConfirmed"].Value<bool>();
         active.Report["actualDownEdges"]=downEdges;active.Report["actualUpEdges"]=upEdges;active.Report["colorTransitions"]=colorChanges;
         active.Report["observedFrames"]=observedFrames;active.Phase="exit_requested";Save(active);
+        Cue("complete");
     }
     static void Log(string message,string stack,LogType type)
     {
@@ -213,14 +246,14 @@ public static class BeaconRuntimeAcceptanceRunner
         if(stepping||!File.Exists(StatePath))return;stepping=true;
         try
         {
-            var state=active??Load();
+            var state=active??Load();active=state;
             if(DateTime.UtcNow>DateTime.Parse(state.DeadlineUtc).ToUniversalTime()&&state.Phase!="exiting"&&state.Phase!="finished")Fail(state,new TimeoutException("Beacon acceptance exceeded its phase deadline."));
             state=active??Load();
             if(state.Phase=="entering"&&Application.isPlaying)InstallObservation();
             if(state.Phase=="exit_requested")
             {
                 if(observing){PlayerLoop.SetPlayerLoop(originalLoop);Application.logMessageReceived-=Log;observing=false;}
-                if(Application.isPlaying)EditorGUIUtility.QueueGameViewInputEvent(new Event {type=EventType.KeyUp,keyCode=KeyCode.F,character='f'});
+                if(Application.isPlaying&&!state.ManualInput)EditorGUIUtility.QueueGameViewInputEvent(new Event {type=EventType.KeyUp,keyCode=KeyCode.F,character='f'});
                 state.Phase="exiting";state.DeadlineUtc=DateTime.UtcNow.AddSeconds(PhaseDeadlineSeconds).ToString("O");Save(state);EditorApplication.isPlaying=false;
             }
             else if(state.Phase=="exiting"&&!EditorApplication.isPlayingOrWillChangePlaymode&&!EditorApplication.isCompiling&&!EditorApplication.isUpdating)Finish(state);
@@ -242,6 +275,7 @@ public static class BeaconRuntimeAcceptanceRunner
         if(state.Report["inputDeliveryConfirmed"]==null)state.Report["inputDeliveryConfirmed"]=false;
         if(state.Report["runtimeBehaviorEvaluated"]==null)state.Report["runtimeBehaviorEvaluated"]=false;
         state.Phase="exit_requested";Save(state);
+        Cue("failed_release_any_held_key");
     }
     static void Finish(State state)
     {
@@ -256,6 +290,7 @@ public static class BeaconRuntimeAcceptanceRunner
         state.Report["packageTreeSha256"]=Sha(Encoding.UTF8.GetBytes(string.Concat(state.PackageFiles.OrderBy(p=>p.Key,StringComparer.Ordinal).Select(p=>p.Key+"\0"+p.Value+"\n"))));
         bool success=state.Report["error"]==null&&state.Report["runtimeBehaviorEvaluated"]?.Value<bool>()==true&&checks.Properties().All(p=>p.Value.Type==JTokenType.Boolean&&(bool)p.Value);
         state.Report["success"]=success;state.Report["finishedUtc"]=DateTime.UtcNow.ToString("O");Write(state.Output,state.Report);
+        Cue("finished");
         File.Delete(StatePath);active=null;EditorApplication.Exit(success?0:1);
     }
     static Color EffectiveColor(Renderer renderer)
@@ -265,6 +300,15 @@ public static class BeaconRuntimeAcceptanceRunner
         if(property==null)throw new InvalidOperationException("The runtime material has no supported visible color property.");
         var block=new MaterialPropertyBlock();renderer.GetPropertyBlock(block);
         return block.HasColor(property)?block.GetColor(property):material.GetColor(property);
+    }
+    static void Cue(string phase)
+    {
+        if(active==null||!active.ManualInput)return;
+        string instruction=phase=="first_down"||phase=="second_down"?"Focus Game View, press and hold F until a release cue.":
+            phase=="first_up"||phase=="second_up"?"Release F now; do not press again until a new down cue.":
+            phase=="held_amber"||phase=="held_blue"?"Keep F held until a release cue.":
+            phase=="failed_release_any_held_key"?"Release any held key. Measurement failed; inspect the receipt.":"Keep F released and wait.";
+        Write(active.CueFile,new JObject {["phase"]=phase,["instruction"]=instruction,["utc"]=DateTime.UtcNow.ToString("O"),["reviewedSourceSha256"]=active.SourceSha256,["output"]=active.Output,["actualDownEdges"]=downEdges,["actualUpEdges"]=upEdges,["observedFrames"]=observedFrames});
     }
     static float Distance(Color a,Color b)=>Mathf.Max(Mathf.Abs(a.r-b.r),Mathf.Abs(a.g-b.g),Mathf.Abs(a.b-b.b),Mathf.Abs(a.a-b.a));
     static JArray ColorArray(Color c)=>new JArray(c.r,c.g,c.b,c.a);

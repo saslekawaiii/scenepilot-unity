@@ -6,8 +6,10 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine.TestTools;
@@ -61,6 +63,49 @@ namespace WorldWeaver.Tests
             var range=request.Headers.Range.Ranges.Single();long start=range.From.Value,end=Math.Min(range.To.Value,data.Length-1);
             var response=new HttpResponseMessage(HttpStatusCode.PartialContent){Content=new ByteArrayContent(data.Skip((int)start).Take((int)(end-start+1)).ToArray())};
             response.Content.Headers.ContentRange=new ContentRangeHeaderValue(start,end,data.Length);response.Headers.ETag=new EntityTagHeaderValue("\"fixture-v1\"");return response;
+        }
+        [UnityTest] public IEnumerator RussianWeatheredWoodSearchSendsEnglishQueryThroughActualHttpTransport()=>AwaitCase(RussianMaterialQueryCase);
+        static async Task RussianMaterialQueryCase()
+        {
+            var requests=new ConcurrentQueue<Uri>();
+            var transport=new MaterialHttpTransport(()=>new Handler(async(request,token)=>
+            {
+                requests.Enqueue(request.RequestUri);await Task.Delay(1,token);
+                string body;
+                if(request.RequestUri.AbsolutePath=="/search")
+                {
+                    string effective=Uri.UnescapeDataString(request.RequestUri.Query.Substring("?q=".Length).Split('&')[0]);
+                    // The old untranslated request takes the intentionally wrong leaves branch.
+                    string slug=effective=="weathered wood"?"weathered_planks_fixture":"forest_leaves_fixture";
+                    body=new JObject{["results"]=new JArray(new JObject{["slug"]=slug})}.ToString();
+                }
+                else body=new JObject{["type"]=1,["name"]="Fixture Material",["tags"]=new JArray("wood")}.ToString();
+                return Whole(Encoding.UTF8.GetBytes(body));
+            }));
+            var client=new PolyHavenMaterialClient(transport);var found=await client.SearchAsync("выветренный дерево",2);
+            Assert.That(found.Single().Id,Is.EqualTo("polyhaven:weathered_planks_fixture"));
+            Assert.That(requests.First().AbsoluteUri,Is.EqualTo("https://api.polyhaven.com/search?q=weathered%20wood&type=textures&limit=2"));
+            Assert.That(requests.All(uri=>uri.Scheme=="https"&&uri.Host=="api.polyhaven.com"),Is.True);
+            Assert.That(await client.SearchAsync("Weathered  WOOD",2),Is.SameAs(found));Assert.That(requests.Count,Is.EqualTo(2));
+            using(var stop=new CancellationTokenSource())
+            {
+                stop.Cancel();await ExpectFailure<OperationCanceledException>(async()=>await client.SearchAsync("weathered wood",2,stop.Token));
+                Assert.That(requests.Count,Is.EqualTo(2));
+            }
+        }
+        [UnityTest] public IEnumerator SearchBoundsAreValidatedBeforeActualHttpHandlerRuns()=>AwaitCase(MaterialQueryBoundsCase);
+        static async Task MaterialQueryBoundsCase()
+        {
+            int requests=0;var transport=new MaterialHttpTransport(()=>new Handler((request,token)=>
+            {Interlocked.Increment(ref requests);return Task.FromResult(Whole(Encoding.UTF8.GetBytes("{\"results\":[]}")));}));
+            var client=new PolyHavenMaterialClient(transport);
+            await ExpectFailure<ArgumentException>(async()=>await client.SearchAsync(new string('x',101),1));
+            await ExpectFailure<ArgumentException>(async()=>await client.SearchAsync(string.Join(" ",Enumerable.Repeat("рябь",16)),1));
+            using(var stop=new CancellationTokenSource())
+            {
+                stop.Cancel();await ExpectFailure<OperationCanceledException>(async()=>await client.SearchAsync("дерево",1,stop.Token));
+            }
+            Assert.That(requests,Is.Zero);
         }
         [UnityTest] public IEnumerator HealthyTextureUsesOneNormalRequestWithoutFragmenting()=>AwaitCase(HealthyCase);
         static async Task HealthyCase()
