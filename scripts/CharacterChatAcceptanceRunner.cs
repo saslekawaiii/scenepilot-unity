@@ -8,6 +8,11 @@ using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.Rendering;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
+#endif
 using WorldWeaver;
 using WorldWeaver.Editor.Assistant;
 
@@ -102,7 +107,22 @@ public sealed class CharacterAcceptanceMotionProbe:MonoBehaviour
         yield return null;yield return new WaitForFixedUpdate();yield return null;yield return new WaitForSeconds(1);
         var player=UnityEngine.Object.FindFirstObjectByType<WorldPlayer>();var binder=player?player.GetComponent<WorldCharacterAnimation>():null;
         if(!player||!binder){report["error"]="No actual player/binder after entering Play Mode.";CharacterChatAcceptanceRunner.Write(output,report);CharacterChatAcceptanceRunner.Finish();EditorApplication.Exit(1);yield break;}
-        player.enabled=false;player.View.enabled=true;Application.runInBackground=true;
+        bool virtualInput=Environment.GetEnvironmentVariable("WW_CHARACTER_USE_VIRTUAL_INPUT")=="1";
+#if ENABLE_INPUT_SYSTEM
+        Keyboard keyboard=null;var previousBackground=InputSystem.settings.backgroundBehavior;var previousRouting=InputSystem.settings.editorInputBehaviorInPlayMode;
+        if(virtualInput)
+        {
+            InputSystem.settings.backgroundBehavior=InputSettings.BackgroundBehavior.IgnoreFocus;
+            InputSystem.settings.editorInputBehaviorInPlayMode=InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
+            keyboard=InputSystem.AddDevice<Keyboard>();keyboard.MakeCurrent();InputSystem.QueueStateEvent(keyboard,new KeyboardState());yield return null;
+        }
+#else
+        if(virtualInput)throw new InvalidOperationException("Virtual input acceptance requires the active new Input System.");
+#endif
+        player.enabled=virtualInput;player.View.enabled=true;Application.runInBackground=true;
+        report["simulatedUnityKeyboardUsed"]=virtualInput;report["nativeDesktopKeysSent"]=false;report["playerUpdateActive"]=player.enabled;
+        report["renderPipeline"]=GraphicsSettings.currentRenderPipeline?GraphicsSettings.currentRenderPipeline.GetType().FullName:"Built-in";
+        report["materialShaders"]=new JArray(player.GetComponentsInChildren<SkinnedMeshRenderer>().SelectMany(r=>r.sharedMaterials).Where(m=>m).Select(m=>m.shader.name).Distinct());
         var samples=new JArray();report["motion"]=samples;
         var bones=player.GetComponentsInChildren<SkinnedMeshRenderer>().SelectMany(r=>r.bones).Where(b=>b).Distinct().ToArray();
         foreach(string phase in new[]{"settle","idle","walk","sprint","jump","land"})
@@ -115,7 +135,10 @@ public sealed class CharacterAcceptanceMotionProbe:MonoBehaviour
             {
                 bool jump=phase=="jump"&&!jumped;jumped|=jump;
                 frameCount++;maxDt=Mathf.Max(maxDt,Time.deltaTime);integratedDt+=Mathf.Min(Time.deltaTime,.1f);
-                player.MoveFrame(phase=="walk"||phase=="sprint"?Vector2.up:Vector2.zero,phase=="sprint",jump,Time.deltaTime);
+                if(!virtualInput)player.MoveFrame(phase=="walk"||phase=="sprint"?Vector2.up:Vector2.zero,phase=="sprint",jump,Time.deltaTime);
+#if ENABLE_INPUT_SYSTEM
+                else InputSystem.QueueStateEvent(keyboard,phase=="walk"?new KeyboardState(Key.W):phase=="sprint"?new KeyboardState(Key.W,Key.LeftShift):jump?new KeyboardState(Key.Space):new KeyboardState());
+#endif
                 maxY=Mathf.Max(maxY,player.transform.position.y);
                 for(int i=0;i<bones.Length;i++)maxPose=Mathf.Max(maxPose,Quaternion.Angle(pose[i],bones[i].localRotation));
                 yield return null;
@@ -130,14 +153,24 @@ public sealed class CharacterAcceptanceMotionProbe:MonoBehaviour
             if(phase=="land")checks["landsOnPhysicalGround"]=player.IsGrounded;
             if(phase=="idle"||phase=="walk"||phase=="sprint")
             {
-                var camera=player.View;var texture=new RenderTexture(960,600,24);camera.targetTexture=texture;camera.Render();
+                var camera=player.View;var texture=new RenderTexture(960,600,24);
+                if(GraphicsSettings.currentRenderPipeline)
+                {
+                    var render=new RenderPipeline.StandardRequest{destination=texture};
+                    if(!RenderPipeline.SupportsRenderRequest(camera,render))throw new InvalidOperationException("Active SRP does not support the requested real camera render.");
+                    RenderPipeline.SubmitRenderRequest(camera,render);
+                }
+                else{camera.targetTexture=texture;camera.Render();}
                 var previous=RenderTexture.active;RenderTexture.active=texture;var image=new Texture2D(960,600,TextureFormat.RGB24,false);image.ReadPixels(new Rect(0,0,960,600),0,0);image.Apply();
                 string screenshot=Path.ChangeExtension(output,null)+"-"+phase+".png";File.WriteAllBytes(screenshot,image.EncodeToPNG());sample["cameraRender"]=screenshot;
                 camera.targetTexture=null;RenderTexture.active=previous;Destroy(image);texture.Release();Destroy(texture);
             }
             CharacterChatAcceptanceRunner.Write(output,report);
         }
-        report["motionInputScope"]="Deterministic calls to the same WorldPlayer.MoveFrame used by keyboard Update. Player input Update disabled during measurements; real CharacterController physics, LateUpdate animation binding, Animator clips, bones and camera rendering remained active. This is not a native keyboard acceptance.";
+        report["motionInputScope"]=virtualInput?"Queued states on an isolated Unity Input System Keyboard; the normal WorldPlayer.Update reads those keys and performs all motion. The probe never calls MoveFrame, changes transforms or writes animation parameters in this mode. This is software device integration, not native desktop keyboard/IME acceptance.":"Deterministic calls to the same WorldPlayer.MoveFrame used by keyboard Update. Player input Update disabled during measurements; real CharacterController physics, LateUpdate animation binding, Animator clips, bones and camera rendering remained active. This is not a native keyboard acceptance.";
+#if ENABLE_INPUT_SYSTEM
+        if(keyboard!=null)InputSystem.RemoveDevice(keyboard);InputSystem.settings.backgroundBehavior=previousBackground;InputSystem.settings.editorInputBehaviorInPlayMode=previousRouting;
+#endif
         report["passed"]=checks.Properties().All(p=>(bool)p.Value);report["finishedUtc"]=DateTime.UtcNow.ToString("O");
         CharacterChatAcceptanceRunner.Write(output,report);CharacterChatAcceptanceRunner.Finish();EditorApplication.Exit((bool)report["passed"]?0:1);
     }

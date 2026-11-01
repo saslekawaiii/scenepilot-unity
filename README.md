@@ -9,8 +9,8 @@
 просмотр C# и восстановление изменений.
 
 [![Unity](https://img.shields.io/badge/Unity-6000.3-222C37?logo=unity&logoColor=white)](Packages/com.worldweaver.toolkit/package.json)
-[![UPM](https://img.shields.io/badge/UPM-1.3.0-47876A)](docs/1.3-status.md)
-[![Unity checks R11](https://img.shields.io/badge/R11_checks-601_Edit_%2B_21_Play-47876A)](results/integration-1.3-edit-r11.xml)
+[![UPM](https://img.shields.io/badge/UPM-1.3.1-47876A)](docs/character-workflow-fix.md)
+[![Character fix checks](https://img.shields.io/badge/1.3.1_checks-645_Edit_%2B_23_Play-47876A)](docs/character-workflow-fix.md)
 [![Base schema checks 1.2](https://img.shields.io/badge/1.2_base_schema-33%2F33-586373)](results/editor-schema-verification-1.2.json)
 [![MD skills license](https://img.shields.io/badge/MD_skills-MIT-536DFE)](Packages/com.worldweaver.toolkit/Editor/Skills/THIRD-PARTY-NOTICES.md)
 
@@ -18,7 +18,7 @@
 
 </div>
 
-> **WorldWeaver 1.3.0** — локальные модели, текстуры и свободный разговор NPC в Unity. R11: 601 EditMode и 21 PlayMode, полный модельный запрос материала за 8 мин 54 с и ограниченный независимый PASS. [Выпуск и комплект](https://github.com/saslekawaiii/worldweaver-thesis/releases/tag/v1.3.0) · [Подробные результаты и ограничения](docs/1.3-status.md). Репозиторий приватный.
+> **Исправление 1.3.1** — настоящий анимированный герой из встроенного ассета, короткий план вместо большого JSON с C#, правдивые состояния ошибок и поддержка обоих Unity Input backend. Точный запрос проверен на Qwen 9B и бесплатном GPT-OSS; отдельно проверен URP-проект с программной клавиатурой Input System. [Исправление и протоколы](docs/character-workflow-fix.md) · [Выпуск](https://github.com/saslekawaiii/worldweaver-thesis/releases/tag/v1.3.1). Репозиторий приватный.
 
 ![WorldWeaver 1.3 R11 — нативный чат Unity с историей, выбором локальной модели и глубины](results/screenshots-1.3/chat-wide-r11.png)
 
@@ -32,6 +32,7 @@
 | **Текстурные поверхности.** 13 встроенных CC0-материалов и поиск PBR-наборов Poly Haven. | **Модели без ручного списка.** Запущенная Ollama и новые установленные модели обнаруживаются автоматически. |
 | **Свободные разговоры NPC.** Собственная реплика игрока, история, включение ИИ у каждого персонажа. | **C# для новых механик.** Агент получает инструменты подготовки компонентов без обязательного слова «скрипт» в запросе. |
 | **Общение между NPC.** Поочерёдные ответы модели, личности, цели и ограниченная память. | **Просмотр перед импортом.** После просмотра Unity компилирует применённый компонент; игровое поведение проверяется отдельно. |
+| **Анимированный главный герой.** Две встроенные модели Kenney CC0, кости, Idle/Walk/Sprint, Jump/Fall, камера и управление; оба Unity Input backend. | **Достоверный статус.** Усечённый план не исполняется, ошибка и неприменённый план не выглядят успешными. |
 | **Игровой пример.** Игрок, ворота, доставка письма и сохранения; каталог существующих prefabs проекта. | **Проверки и восстановление.** Unity jobs, контрольная точка запроса, изображения и 60 справочных MD-навыков. |
 
 Срез **R11** прошёл 601 проверку редактора и 21 проверку Play Mode. Настоящий запрос материала через чат R11 прошёл [26 условий](results/material-chat-acceptance-1.3-r11.json) и [независимый смысловой разбор](results/material-chat-semantic-review-1.3-r11.json); один просмотренный компонент прошёл [нативную проверку F](results/beacon-native-acceptance-1.3-r11.json). Эти отдельные сценарии не устанавливают успешность любого запроса. Это инструментарий прототипирования. [Подробные результаты и ограничения](docs/1.3-status.md) · [Устройство агента](docs/agent-architecture-and-limits.md).
@@ -40,13 +41,13 @@
 
 **1. Установите пакет.** Целевая среда — Unity 6000.3; разработка ведётся в 6000.3.27f1. В Package Manager выберите **Install package from disk** и `Packages/com.worldweaver.toolkit/package.json`, либо откройте `UnityProject`.
 
-Установка 1.3.0 из Git:
+Установка 1.3.1 из Git:
 
 ```text
-https://github.com/saslekawaiii/worldweaver-thesis.git?path=/Packages/com.worldweaver.toolkit#v1.3.0
+https://github.com/saslekawaiii/worldweaver-thesis.git?path=/Packages/com.worldweaver.toolkit#v1.3.1
 ```
 
-Для приватного репозитория нужен авторизованный Git; токен не вставляется в URL. Готовый TGZ находится в [выпуске](https://github.com/saslekawaiii/worldweaver-thesis/releases/tag/v1.3.0).
+Для приватного репозитория нужен авторизованный Git; токен не вставляется в URL. Готовый TGZ находится в [выпуске](https://github.com/saslekawaiii/worldweaver-thesis/releases/tag/v1.3.1).
 
 **2. Запустите приложение Ollama и установите разговорную модель.** Локальный endpoint — `http://127.0.0.1:11434`. Если приложение Ollama не запущено, выполните `ollama serve` в отдельном терминале.
 
