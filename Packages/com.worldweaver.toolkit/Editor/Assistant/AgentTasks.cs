@@ -110,6 +110,7 @@ namespace WorldWeaver.Editor.Assistant
                 {
                     if(Regex.IsMatch(input,@"(?i)гравитац|gravity"))physics["gravity"]=!Regex.IsMatch(input,@"(?i)без\s+гравитац|no\s+gravity");
                     if(Regex.IsMatch(input,@"(?i)красн\p{L}*\s+(?:мяч|шар)|red\s+(?:ball|sphere)"))physics["red"]=true;
+                    if(Regex.IsMatch(input,@"(?i)площадк|платформ|\bground\b|\bfloor\b"))physics["ground"]=true;
                     var at=Regex.Match(input,@"(?i)(?:на\s+высоте|at\s+(?:a\s+)?height(?:\s+of)?)\s*(?<n>\d+(?:[.,]\d+)?)");if(at.Success&&double.TryParse(at.Groups["n"].Value.Replace(',','.'),System.Globalization.NumberStyles.Float,System.Globalization.CultureInfo.InvariantCulture,out double y))physics["y"]=y;
                     task.Requirements.Add(new AgentRequirement{Kind="body_physics",Number=1,Expected=physics.ToString(Formatting.None),Description="Одно физическое тело соответствует указанным массе, гравитации, отскоку, цвету и высоте: "+physics.ToString(Formatting.None)});
                 }
@@ -162,12 +163,14 @@ namespace WorldWeaver.Editor.Assistant
                 else if(requirement.Kind=="body_physics")
                 {
                     var expected=JObject.Parse(requirement.Expected);
+                    Physics.SyncTransforms();
                     actual=objects.Select(g=>g.GetComponent<Rigidbody>()).Where(b=>b).Any(b=>
                     {
                         var collider=b.GetComponent<Collider>();var renderer=b.GetComponentInChildren<Renderer>();var color=renderer&&renderer.sharedMaterial?renderer.sharedMaterial.color:Color.clear;
                         return (expected["mass"]==null||Math.Abs(b.mass-(double)expected["mass"])<.02)&&
                             (expected["gravity"]==null||b.useGravity==(bool)expected["gravity"])&&
                             (expected["bounce"]==null||collider&&collider.sharedMaterial&&Math.Abs(collider.sharedMaterial.bounciness-(double)expected["bounce"])<.02)&&
+                            (expected["ground"]==null||Physics.RaycastAll(b.transform.position,Vector3.down,100,~0,QueryTriggerInteraction.Ignore).Any(h=>h.collider.attachedRigidbody!=b&&h.point.y<b.transform.position.y-.1f))&&
                             (expected["y"]==null||Math.Abs(b.transform.position.y-(double)expected["y"])<.05)&&
                             (expected["red"]==null||color.r>.8f&&color.g<.25f&&color.b<.25f);
                     })?1:0;
