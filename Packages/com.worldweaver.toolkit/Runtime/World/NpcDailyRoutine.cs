@@ -29,7 +29,7 @@ namespace WorldWeaver
         void Update()
         {
             if(!Clock||!agent||!agent.enabled||!agent.isOnNavMesh||Time.time<nextCheck)return;nextCheck=Time.time+.4f;
-            var npc=GetComponent<IntelligentNPC>();if(npc&&npc.Busy)return;
+            var npc=GetComponent<IntelligentNPC>();if(npc&&(npc.Busy||npc.PlayerConversationActive||(npc.GetComponent<NpcSocialAutonomy>()?.HoldsMovement??false)))return;
             if(!string.IsNullOrEmpty(pendingMemory)&&npc){npc.RememberEvent(pendingMemory);pendingMemory=null;}
             string period=WorldClock.InPeriod(Clock.Hour,StartHour,EndHour)?"day":"night";var goal=period=="day"?DayPlace:NightPlace;
             if(!goal){Status="Missing named destination";GoalReached=false;return;}

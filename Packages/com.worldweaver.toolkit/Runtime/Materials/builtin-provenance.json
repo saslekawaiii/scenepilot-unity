@@ -1,0 +1,207 @@
+{
+  "generator": "scripts/generate_builtin_materials.py",
+  "origin": "Original deterministic mathematical patterns; no source images",
+  "license": "CC0-1.0",
+  "size": [
+    256,
+    256
+  ],
+  "materials": 13,
+  "files": [
+    {
+      "path": "grass_albedo.png",
+      "sha256": "ae5f2005a18e1e88b4c2acfab818c3c8c4f14fce1aa53d246b7b9e36209e1c90",
+      "bytes": 34950
+    },
+    {
+      "path": "grass_normal.png",
+      "sha256": "fb1588710c1a315d254d10dfeef61dac10d398c85ac1c839385d0ff5c2c7980d",
+      "bytes": 51080
+    },
+    {
+      "path": "grass_metallic_smoothness.png",
+      "sha256": "82e3bc4370af301265be2ffd24a6d212491e49c0abb93a2e810ad461d7abe604",
+      "bytes": 7258
+    },
+    {
+      "path": "stone_albedo.png",
+      "sha256": "9040eb9899081b4abdb10747106241204e4071b60eca2d8de94829f4a89ded31",
+      "bytes": 44125
+    },
+    {
+      "path": "stone_normal.png",
+      "sha256": "cde49992555e4a0d1c4557abf0c4e04e6aa6c6e882e7fb56f22e65f030005c99",
+      "bytes": 45804
+    },
+    {
+      "path": "stone_metallic_smoothness.png",
+      "sha256": "ac91a2740d256394a24d7cc7ef655caa5c75605efc8dea3357e347b599e28c5f",
+      "bytes": 7480
+    },
+    {
+      "path": "plaster_albedo.png",
+      "sha256": "775c05548ce6ddedac37944b471d509c3f2a7c70e417e1bba54640c4b2c29a0d",
+      "bytes": 22246
+    },
+    {
+      "path": "plaster_normal.png",
+      "sha256": "7d50d022014fe29e8429cb50d1a2726bbf09d49433ece581665d40ec67a28e09",
+      "bytes": 20921
+    },
+    {
+      "path": "plaster_metallic_smoothness.png",
+      "sha256": "82aba7221870629e34b2dac87a95ba43edb5b576f62c0c3affed825d660eec7c",
+      "bytes": 7860
+    },
+    {
+      "path": "wood_albedo.png",
+      "sha256": "0cda54366a7e427f5fcf65215505f97b95cf037b34e4d9c73c7ee1e0bf632592",
+      "bytes": 36028
+    },
+    {
+      "path": "wood_normal.png",
+      "sha256": "187b3bd358e62c9eec646424b53020e4bceead9c9262aa074ade6bfd3397da5b",
+      "bytes": 41662
+    },
+    {
+      "path": "wood_metallic_smoothness.png",
+      "sha256": "fceb36aa96701c3d017de15644b936510b6dcce90327e964bc259dd12c51c18d",
+      "bytes": 7827
+    },
+    {
+      "path": "roof_albedo.png",
+      "sha256": "ab9110ae076cf245b74dfa25959deb33a95097dcb439ce926b211cb65196ddbb",
+      "bytes": 28527
+    },
+    {
+      "path": "roof_normal.png",
+      "sha256": "aac7b22c19e6489555675194020bbd1075a94e4c404756eb710a12bffa181980",
+      "bytes": 23082
+    },
+    {
+      "path": "roof_metallic_smoothness.png",
+      "sha256": "d9ff416147571c28ae3089074709def59dcee10a3de3cb1655b8e7855def701d",
+      "bytes": 7641
+    },
+    {
+      "path": "metal_albedo.png",
+      "sha256": "325156da24a4a6df3757bf9c1f1c37e3d6a17ebf968c2cb93f532ada8d85072a",
+      "bytes": 18461
+    },
+    {
+      "path": "metal_normal.png",
+      "sha256": "1058d02f2029c0cca1be38dfcd1f7dbabc120460081b2eef07c51779c63dc94f",
+      "bytes": 565
+    },
+    {
+      "path": "metal_metallic_smoothness.png",
+      "sha256": "14977ff62ba108175f59a997361b20cdc821565450956f36f05d41d43308fa5a",
+      "bytes": 7704
+    },
+    {
+      "path": "sand_albedo.png",
+      "sha256": "886265609a74cdb92e1e3bff8797b649c465b658c3ebf46f9beac24651eba3e1",
+      "bytes": 43462
+    },
+    {
+      "path": "sand_normal.png",
+      "sha256": "dce1403f9ab34449fc036bd351697c4d7c6dfadf5a89f4fb9108c78aa22de325",
+      "bytes": 35918
+    },
+    {
+      "path": "sand_metallic_smoothness.png",
+      "sha256": "2f4c073e268e41b6e58f4b534d8870d478ac9679dca096ab738414d9593100df",
+      "bytes": 7929
+    },
+    {
+      "path": "snow_albedo.png",
+      "sha256": "9120289a58765ee6e3954d1b1914b098480164887a2b809a08fbb8422516ccd4",
+      "bytes": 13175
+    },
+    {
+      "path": "snow_normal.png",
+      "sha256": "27b5aabaea78079f970707ebf5681857ffdee54ca1d372eba3a4dc38d00615dc",
+      "bytes": 8744
+    },
+    {
+      "path": "snow_metallic_smoothness.png",
+      "sha256": "e0c5c9682ad991487955a7030564710fbbc589c39fea65c151194d28737599ea",
+      "bytes": 7388
+    },
+    {
+      "path": "bark_albedo.png",
+      "sha256": "efd632fabf06265a81dd0ebb7307654aaeef2bc108a0d3965ebd091e64e7457b",
+      "bytes": 33072
+    },
+    {
+      "path": "bark_normal.png",
+      "sha256": "8342be95a7568a3d2626b4edfbc7660aeb0b68016837b5298f3b8ad4dd14e1b4",
+      "bytes": 39435
+    },
+    {
+      "path": "bark_metallic_smoothness.png",
+      "sha256": "c36b1da3bec880f341c294ce2c537bb3cff6ed2b20b1b5c4698ddbfc6abd32b6",
+      "bytes": 8317
+    },
+    {
+      "path": "cloth_albedo.png",
+      "sha256": "e774fdcc34ab49075c5462baa878844f74661ff910a38d0152a04791a8ae61eb",
+      "bytes": 23301
+    },
+    {
+      "path": "cloth_normal.png",
+      "sha256": "b6e722d4f0efc369376b45abd80c67c4cbd73dfd53d523555d5d612c72254ec2",
+      "bytes": 65846
+    },
+    {
+      "path": "cloth_metallic_smoothness.png",
+      "sha256": "77d607339149663326f9ab1c391f35bafc0513a9a472d4884098810f65776a64",
+      "bytes": 8253
+    },
+    {
+      "path": "leather_albedo.png",
+      "sha256": "154d1502b835c15abc554acdd3de9a5b0ffc4e9cf9132edcc797556fe1c8db3b",
+      "bytes": 27401
+    },
+    {
+      "path": "leather_normal.png",
+      "sha256": "351eb6fcb2d8845dd5fe31f9cc2b93fa5ceb783129cf68d16b63471c6aaa78cd",
+      "bytes": 31746
+    },
+    {
+      "path": "leather_metallic_smoothness.png",
+      "sha256": "c4a3f2710deb130d35921de8696b8a42b0ff534481f5b6a489bfdd4828972f75",
+      "bytes": 7439
+    },
+    {
+      "path": "water_albedo.png",
+      "sha256": "d080ff0c7ea064c5df4bb8ce785418124c1db4082ffb803bc0d106e9cf2825b9",
+      "bytes": 20628
+    },
+    {
+      "path": "water_normal.png",
+      "sha256": "a76c637a6672a9f955c97f2dc516c0967603e1ff249fcfa9a59a83d668472265",
+      "bytes": 11874
+    },
+    {
+      "path": "water_metallic_smoothness.png",
+      "sha256": "11c9b401b85c373a709eeb803a39ad83e07e30c1da6c8ea094da000d5039a45f",
+      "bytes": 8145
+    },
+    {
+      "path": "cobblestone_albedo.png",
+      "sha256": "0e94ae22c2798dbacfda2a3e8a3bdb9161f755e942668aee1a5a60d3afc3d464",
+      "bytes": 32353
+    },
+    {
+      "path": "cobblestone_normal.png",
+      "sha256": "7430180fdd988f9d5235cab25f30314decc4dd91897bb8f04760cf7bf6c8c0fb",
+      "bytes": 26867
+    },
+    {
+      "path": "cobblestone_metallic_smoothness.png",
+      "sha256": "2004afb1d8aaa74f704759c00bb7a6e141510f324e7ccc1eaa44438ab6751f02",
+      "bytes": 8628
+    }
+  ]
+}

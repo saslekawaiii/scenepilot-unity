@@ -17,6 +17,13 @@ namespace WorldWeaver
             public Dictionary<string,int> Inventory;
             public List<KnowledgeDocument> Memory;
             public List<NpcRelationship> Relationships;
+            public List<NpcUtterance> Conversation;
+            public NpcAiState Ai;
+        }
+        [Serializable] public sealed class NpcAiState
+        {
+            public bool Enabled,Autonomous,Social;
+            public string NpcName,Role,Personality,Biography,Goals,Constraints,SocialTopic;
         }
         [Serializable] public sealed class QuestState { public string Id; public DeliveryQuestStage Stage; }
         [Serializable] public sealed class ClockState { public int Day;public float Hour,DaySeconds;public bool Running; }
@@ -32,7 +39,7 @@ namespace WorldWeaver
             foreach (var place in Actors())
             {
                 var npc = place.GetComponent<IntelligentNPC>(); if (npc && npc.Busy) throw new InvalidOperationException("Дождитесь ответа персонажей перед сохранением.");
-                var p=place.transform.position; result.Actors.Add(new ActorState { Id=place.PersistentId,X=p.x,Y=p.y,Z=p.z,Inventory=place.GetComponent<Inventory>().Snapshot(),Memory=npc?npc.ExportMemory():new List<KnowledgeDocument>(),Relationships=place.GetComponent<NpcRelationships>()?.Relations.Select(r=>new NpcRelationship{ActorId=r.ActorId,Trust=r.Trust}).ToList() });
+                var p=place.transform.position; result.Actors.Add(new ActorState { Id=place.PersistentId,X=p.x,Y=p.y,Z=p.z,Inventory=place.GetComponent<Inventory>().Snapshot(),Memory=npc?npc.ExportMemory():new List<KnowledgeDocument>(),Conversation=npc?npc.ExportConversation():null,Ai=npc?CaptureAi(npc):null,Relationships=place.GetComponent<NpcRelationships>()?.Relations.Select(r=>new NpcRelationship{ActorId=r.ActorId,Trust=r.Trust}).ToList() });
             }
             result.Quests = GetComponentsInChildren<DeliveryQuest>(true).Select(q => new QuestState { Id=q.QuestId,Stage=q.Stage }).ToList();
             var clock=GetComponent<WorldClock>();if(clock)result.Clock=new ClockState {Day=clock.Day,Hour=clock.Hour,DaySeconds=clock.DaySeconds,Running=clock.Running};
@@ -52,6 +59,8 @@ namespace WorldWeaver
                 if(actor==null || actor.Id==null || !actors.TryGetValue(actor.Id,out var place) || !Finite(actor.X)||!Finite(actor.Y)||!Finite(actor.Z) || actor.Inventory==null || actor.Inventory.Count>1000 || actor.Inventory.Any(p=>string.IsNullOrWhiteSpace(p.Key)||p.Key.Length>120||p.Value<0) || actor.Inventory.Sum(p=>(long)p.Value)>place.GetComponent<Inventory>().Capacity) throw new ArgumentException("Invalid actor state.");
                 if(actor.Relationships!=null&&(actor.Relationships.Count>32||actor.Relationships.Any(r=>r==null||string.IsNullOrWhiteSpace(r.ActorId)||r.ActorId.Length>160||r.Trust< -100||r.Trust>100)||actor.Relationships.Select(r=>r.ActorId).Distinct().Count()!=actor.Relationships.Count))throw new ArgumentException("Invalid NPC relationships.");
                 var npc=place.GetComponent<IntelligentNPC>();
+                if(actor.Conversation!=null&&(!npc||!IntelligentNPC.ValidConversation(actor.Conversation)||actor.Conversation.Any(line=>line.SpeakerId!=npc.CharacterId&&line.TargetId!=npc.CharacterId)))throw new ArgumentException("Invalid scoped NPC transcript.");
+                if(actor.Ai!=null&&(!npc||!ValidAi(actor.Ai)))throw new ArgumentException("Invalid saved NPC personality.");
                 if(npc && (npc.Busy || actor.Memory==null || actor.Memory.Count>32 || actor.Memory.Any(d=>d==null||d.Scope!=npc.CharacterId||d.Kind==MemoryKind.StaticKnowledge||!Enum.IsDefined(typeof(MemoryKind),d.Kind)||d.Text==null||d.Text.Length>900||string.IsNullOrWhiteSpace(d.Id)))) throw new ArgumentException("Invalid scoped NPC memory.");
             }
             foreach(var quest in saved.Quests) if(quest==null||quest.Id==null||!quests.ContainsKey(quest.Id)||!Enum.IsDefined(typeof(DeliveryQuestStage),quest.Stage)) throw new ArgumentException("Invalid quest state.");
@@ -64,7 +73,7 @@ namespace WorldWeaver
                 var destination=new Vector3(actor.X,actor.Y,actor.Z); var agent=place.GetComponent<NavMeshAgent>();
                 if(agent&&agent.enabled&&agent.isOnNavMesh){agent.ResetPath();agent.Warp(destination);}else place.transform.position=destination;
                 if(enabled)motor.enabled=true;
-                var npc=place.GetComponent<IntelligentNPC>(); if(npc)npc.RestoreMemory(actor.Memory);
+                var npc=place.GetComponent<IntelligentNPC>(); if(npc) { npc.RestoreMemory(actor.Memory); if(actor.Conversation!=null)npc.RestoreConversation(actor.Conversation); if(actor.Ai!=null)RestoreAi(npc,actor.Ai); }
                 var relations=place.GetComponent<NpcRelationships>();if(relations&&actor.Relationships!=null)relations.Relations=actor.Relationships.Select(r=>new NpcRelationship{ActorId=r.ActorId,Trust=r.Trust}).ToList();
             }
             foreach(var quest in saved.Quests)quests[quest.Id].Stage=quest.Stage;
@@ -76,6 +85,21 @@ namespace WorldWeaver
                 finally{if(events)events.SuppressRecording=false;}
             }
             foreach(var routine in GetComponentsInChildren<NpcDailyRoutine>())routine.ResetAfterLoad();
+        }
+        static NpcAiState CaptureAi(IntelligentNPC npc)
+        {
+            var social=npc.GetComponent<NpcSocialAutonomy>();
+            var state=new NpcAiState { Enabled=npc.AiEnabled,Autonomous=npc.Autonomous,Social=social&&social.enabled&&social.Enabled,NpcName=npc.NpcName,Role=npc.Role,Personality=npc.Personality,Biography=npc.Biography,Goals=npc.Goals,Constraints=npc.Constraints,SocialTopic=social?social.Topic:"" };
+            if(!ValidAi(state))throw new InvalidOperationException("Поля личности NPC допускают до 4000 символов; проверьте имя и тему разговора перед сохранением.");
+            return state;
+        }
+        static bool ValidAi(NpcAiState state)=>Short(state.NpcName,160)&&Short(state.Role,4000)&&Short(state.Personality,4000)&&Short(state.Biography,4000)&&Short(state.Goals,4000)&&Short(state.Constraints,4000)&&Short(state.SocialTopic,800);
+        static bool Short(string value,int limit)=>value!=null&&value.Length<=limit;
+        static void RestoreAi(IntelligentNPC npc,NpcAiState state)
+        {
+            npc.NpcName=state.NpcName; npc.Role=state.Role; npc.Personality=state.Personality; npc.Biography=state.Biography; npc.Goals=state.Goals; npc.Constraints=state.Constraints;
+            npc.AiEnabled=state.Enabled; npc.Autonomous=state.Autonomous;
+            var social=npc.GetComponent<NpcSocialAutonomy>(); if(social) { social.Enabled=social.enabled=state.Social; social.Topic=state.SocialTopic; }
         }
         private static bool Finite(float value)=>!float.IsNaN(value)&&!float.IsInfinity(value)&&Mathf.Abs(value)<=100000;
         public void Save()

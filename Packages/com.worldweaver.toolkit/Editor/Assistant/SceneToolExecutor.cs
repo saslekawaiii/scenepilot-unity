@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -17,7 +19,7 @@ namespace WorldWeaver.Editor.Assistant
         private const int BatchLimit = 600, SceneLimit = 2000;
         private static readonly string[] TerrainKeys = typeof(TerrainSpec).GetFields().Select(f => f.Name).ToArray();
         private static readonly string[] Kinds = { "cube", "sphere", "capsule", "cylinder", "plane", "tree", "rock", "house" };
-        public static string ToolInstructions => @"You edit only the active scene. Never say work was done before tool results. Each action is {tool,name,target,args}. All args are STRICT: unknown keys are rejected. Numbers must be finite. Use target id:<instanceId> from context; @Name refers to an earlier creation in this plan; exact unique scene names and selected also work. Use unique nonempty name on creations. New objects live under the owned WorldWeaverGenerated group. Existing objects are editable only by explicit target. Delete accepts only owned objects with no foreign children. No reflection, arbitrary code, shell commands, downloads, or new/cleared scenes. At most24 actions,300 scatter placements,600 actual GameObjects per batch and2000 owned objects in the scene. Trees cost4 objects,houses9,NPCs8. Batch failure rolls back scene and new assets. No scene save without explicit save_scene. Tools:
+        public static string ToolInstructions => @"You edit only the active scene. Never say work was done before tool results. Each action is {tool,name,target,args}. All args are STRICT: unknown keys are rejected. Numbers must be finite. Use target id:<instanceId> from context; @Name refers to an earlier creation in this plan; exact unique scene names and selected also work. Use unique nonempty name on creations. New objects live under the owned WorldWeaverGenerated group. Existing objects are editable only by explicit target. Delete accepts only owned objects with no foreign children. No reflection, arbitrary code, shell commands, arbitrary URLs/downloads, or new/cleared scenes. The only network asset import is the bounded CC0 material_import tool. At most24 actions,300 scatter placements,600 actual GameObjects per batch and2000 owned objects in the scene. Trees cost4 objects,houses9,NPCs8. Batch failure rolls back scene and new assets. No scene save without explicit save_scene. Tools:
 create_world: name; target empty. args {style?:alpine|forest|desert,width?:32..2048,length?:32..2048,height?:4..512,trees?:0..300,buildings?:0..100,rocks?:0..300,seed?:integer,resolution?:33|65|129|257|513,scale?:0.1..32,octaves?:1..8,persistence?:0.1..0.9,lacunarity?:1..4,mountainStrength?:0.0..1.0,valleyDepth?:0.0..0.8,waterLevel?:0.0..0.8,southSlope?:0.0..1.0,smoothingPasses?:0..8}. Width,length,height are METRES. valleyDepth,waterLevel,mountainStrength,southSlope are NORMALIZED FRACTIONS, not metres; valleyDepth and waterLevel must not exceed 0.8. Partial TerrainSpec has consistent defaults: keep optional terrain noise/water factors at defaults unless the user asks to change them. Creates textured terrain,lake,spaced trees/rocks/houses,sun and camera. Preserves all existing scene objects. Presets alter geometry and colors; these are original low-poly primitives, not imported art.
 update_world: target owned world or terrain. args same partial TerrainSpec fields and optional style. Rebuilds heights/ground layers/water, keeps existing contents anchored to new ground. To lower mountains use mountainStrength or height. Does not add/remove decoration.
 create_npc: name; target optional owned parent world/group. args {role?:text,personality?:text,biography?:text,goals?:text,constraints?:text,knowledge?:text|array of strings,position?:[x,y,z],rotation?:[x,y,z],scale?:[x,y,z],on_terrain?:bool,inventory?:{item:integer},autonomous?:bool}. Creates visible character plus real IntelligentNPC,Inventory,WorldEntity,scoped KnowledgeBase and valid model routes; defaults are local Ollama. With on_terrain=true(default), deterministically snaps to nearby dry, moderately sloped ground (up to20 radial search steps); x/z may shift away from water. on_terrain=false preserves explicit xyz for special placements.
@@ -89,6 +91,11 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
             var value=new JObject{["target"]=Id(go),["name"]=go.name,["kind"]=go.GetComponent<GeneratedSceneObject>()?.Kind,["parent"]=go.transform.parent?Id(go.transform.parent.gameObject):null,["owned"]=(bool)go.GetComponent<GeneratedSceneObject>(),["active"]=go.activeSelf,["position"]=Vec(go.transform.position),["rotation"]=Vec(go.transform.eulerAngles),["scale"]=Vec(go.transform.localScale),["components"]=new JArray(go.GetComponents<Component>().Where(c=>c).Take(12).Select(c=>c.GetType().Name))};
             var terrain=go.GetComponent<GeneratedTerrain>();if(terrain)value["terrainSpecification"]=JObject.FromObject(terrain.Specification);
             var npc=go.GetComponent<IntelligentNPC>();if(npc)value["npc"]=new JObject{["id"]=npc.CharacterId,["name"]=npc.NpcName,["role"]=npc.Role,["personality"]=Short(npc.Personality,300),["goals"]=Short(npc.Goals,300),["biography"]=Short(npc.Biography,300),["constraints"]=Short(npc.Constraints,300),["autonomous"]=npc.Autonomous,["knowledgeDocuments"]=npc.Knowledge?npc.Knowledge.Documents.Count:0,["knowledgeExcerpt"]=npc.Knowledge?new JArray(npc.Knowledge.Documents.Take(3).Select(d=>new JObject{["title"]=Short(d.Title,100),["scope"]=Short(d.Scope,100),["text"]=Short(d.Text,300)})):new JArray(),["routesAssigned"]=npc.Models&&npc.Models.Dialogue&&npc.Models.Planning};
+            if(npc)
+            {
+                var state=(JObject)value["npc"];var social=npc.GetComponent<NpcSocialAutonomy>();state["aiEnabled"]=npc.AiEnabled;state["conversationEntries"]=npc.ConversationHistory.Count;
+                state["social"]=social?new JObject{["enabled"]=social.Enabled,["cooldownSeconds"]=social.CooldownSeconds,["topic"]=Short(social.Topic,1000),["active"]=social.ConversationActive}:null;
+            }
             var inventory=go.GetComponent<Inventory>();if(inventory)value["inventory"]=JObject.FromObject(inventory.Snapshot());
             var light=go.GetComponent<Light>();if(light)value["light"]=new JObject{["type"]=light.type.ToString().ToLowerInvariant(),["range"]=light.range,["spot_angle"]=light.spotAngle,["intensity"]=light.intensity,["color"]=new JArray(light.color.r,light.color.g,light.color.b)};
             var renderer=go.GetComponent<Renderer>();if(renderer&&renderer.sharedMaterial)value["material"]=renderer.sharedMaterial.name;
@@ -156,6 +163,12 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
                 if(command.name.Length>160||command.target.Length>200||command.args.ToString().Length>40000)throw new ArgumentException("Command too large.");
                 if(saved)throw new ArgumentException("save_scene must be the final command.");
                 var a=command.args;VirtualTarget target=null;bool creation=false;int cost=0;
+                if(WorldMaterialTools.Handles(command.tool))
+                {
+                    WorldMaterialTools.Validate(command,s=>Resolve(s,aliases).Object??throw new ArgumentException("Material target must already exist; apply in a subsequent step after creation."));
+                    if(WorldMaterialTools.IsAsync(command.tool)&&plan.actions.Count!=1)throw new ArgumentException("Material search/import require a standalone plan. Apply the returned material in a subsequent step.");
+                    continue;
+                }
                 if(AgentProjectTools.Handles(command.tool))
                 {
                     AgentProjectTools.Validate(command,s=>Resolve(s,aliases).Object??throw new ArgumentException("This project operation requires an already existing target; split creations and inspection into separate steps."));
@@ -241,7 +254,25 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
         private static void Parent(EditorCommand command,Dictionary<string,VirtualTarget> aliases)
         {if(!string.IsNullOrEmpty(command.target)&&!Resolve(command.target,aliases).Owned)throw new ArgumentException("Creation parent must be owned WorldWeaver group/world.");}
 
-        public static bool IsReadOnlyTool(string tool)=>tool=="inspect_object"||tool=="search_project"||tool=="read_script"||WorldGameplayTools.IsReadOnly(tool)||AgentProjectTools.IsReadOnly(tool);
+        public static bool IsReadOnlyTool(string tool)=>tool=="inspect_object"||tool=="search_project"||tool=="read_script"||WorldGameplayTools.IsReadOnly(tool)||AgentProjectTools.IsReadOnly(tool)||WorldMaterialTools.IsReadOnly(tool);
+
+        public static async Task<EditorBatchResult> ExecuteAsync(EditorPlan plan,OrchestratorProfile routes=null,AgentExecutionContext executionContext=null,CancellationToken token=default,Action beforeMutation=null)
+        {
+            token.ThrowIfCancellationRequested();
+            if(plan?.actions?.Any(a=>a!=null&&WorldMaterialTools.IsAsync(a.tool))!=true)return Execute(plan,routes,executionContext);
+            try
+            {
+                Validate(plan);
+                var command=plan.actions.Single();
+                var result=await WorldMaterialTools.ExecuteAsync(command,token,()=>{token.ThrowIfCancellationRequested();Validate(plan);beforeMutation?.Invoke();});
+                return new EditorBatchResult{Success=true,Summary="Выполнен инструмент "+command.tool,Results=new List<EditorCommandResult>{result}};
+            }
+            catch(OperationCanceledException){throw;}
+            catch(Exception error)
+            {
+                return new EditorBatchResult{Success=false,Error=error.Message,Summary="Материал не изменён.",Results=new List<EditorCommandResult>{new EditorCommandResult{Success=false,Tool=plan?.actions?.FirstOrDefault()?.tool??"batch",Error=error.Message}}};
+            }
+        }
 
         public static EditorBatchResult Execute(EditorPlan plan,OrchestratorProfile routes=null,AgentExecutionContext executionContext=null)
         {
@@ -249,8 +280,9 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
             try
             {
                 Validate(plan);
+                if(plan.actions.Any(a=>WorldMaterialTools.IsAsync(a.tool)))throw new ArgumentException("Use await SceneToolExecutor.ExecuteAsync for material search/import; synchronous scene transactions never wait for network I/O.");
                 if(plan.actions.Count==0){result.Success=true;result.Summary="Нет редакторских действий.";return result;}
-                if(routes&&plan.actions.Any(a=>a.tool=="create_npc")){routes.Resolve(ModelTask.Dialogue).Validate();routes.Resolve(ModelTask.Planning).Validate();}
+                if(routes&&plan.actions.Any(a=>a.tool=="create_npc"||a.tool=="create_village"||a.tool=="configure_npc_ai"&&(bool?)a.args["assign_selected_model"]==true)){routes.Resolve(ModelTask.Dialogue).Validate();routes.Resolve(ModelTask.Planning).Validate();}
                 if(plan.actions.Any(a=>!IsReadOnlyTool(a.tool))){Undo.IncrementCurrentGroup();undo=Undo.GetCurrentGroup();Undo.SetCurrentGroupName("WorldWeaver assistant batch");result.UndoGroup=undo;}
                 var aliases=new Dictionary<string,GameObject>(StringComparer.Ordinal);var createdNpcs=new List<IntelligentNPC>();var changedNpcs=new List<IntelligentNPC>();OrchestratorProfile actualRoutes=routes;
                 GameObject group=null;
@@ -259,6 +291,8 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
                 foreach(var command in plan.actions)
                 {
                     int assetStart=tx.Assets.Count;var a=command.args;GameObject go=null;string summary="";
+                    if(command.tool=="material_apply")
+                    {result.Results.Add(WorldMaterialTools.Apply(command,resolve,tx));continue;}
                     if(AgentProjectTools.Handles(command.tool))
                     {
                         result.Results.Add(AgentProjectTools.Execute(command,resolve,executionContext));continue;

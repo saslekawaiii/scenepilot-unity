@@ -1,0 +1,15 @@
+WorldWeaver original procedural starter textures
+CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
+
+These 39 texture maps were generated from original deterministic mathematical
+patterns by scripts/generate_builtin_materials.py. No source photographs,
+third-party art, trained image-generation models, or copied texture maps were
+used. To the extent possible under law, the authors waive all copyright and
+related rights to these maps under CC0-1.0.
+
+https://creativecommons.org/publicdomain/zero/1.0/
+
+This dedication applies to Textures/*.png and the generated texture data.
+The surrounding toolkit source code retains its repository license.
+Poly Haven downloads are separate assets governed by Poly Haven's CC0 asset
+license and the service's API terms; each import records its own provenance.

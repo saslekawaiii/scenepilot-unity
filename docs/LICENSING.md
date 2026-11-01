@@ -15,4 +15,8 @@
 
 ## Ассеты пользователя и зависимости
 
+Встроенные 13 процедурных поверхностей и их 39 карт описаны в [реестре происхождения](../Packages/com.worldweaver.toolkit/Runtime/Materials/builtin-provenance.json); [условия CC0](../Packages/com.worldweaver.toolkit/Runtime/Materials/LICENSE.txt) относятся к этим изображениям. Для скачанных поверхностей Poly Haven импортёр сохраняет источник, лицензию и контрольные суммы в каталоге самого материала. [Устройство библиотеки](material-library.md).
+
+Интерфейс диалогов использует **Cormorant Garamond** и **Noto Sans** из Google Fonts под SIL Open Font License 1.1. Сохранены исходные байты шрифтов, точные commits, SHA-256 и тексты лицензий: [реестр шрифтов](../Packages/com.worldweaver.toolkit/Resources/WorldWeaver/UI/Fonts/SOURCES.json), [Cormorant OFL](../Packages/com.worldweaver.toolkit/Resources/WorldWeaver/UI/Fonts/cormorantgaramond-OFL.txt), [Noto OFL](../Packages/com.worldweaver.toolkit/Resources/WorldWeaver/UI/Fonts/notosans-OFL.txt).
+
 Для размещаемых prefabs и материалов сохраняются условия их исходной поставки; каталог WorldWeaver не подтверждает их лицензию автоматически. Unity и подключаемые пакеты распространяются по своим условиям. Веса моделей не входят в репозиторий. Ссылки на научные и официальные источники не означают передачи прав на их содержимое.

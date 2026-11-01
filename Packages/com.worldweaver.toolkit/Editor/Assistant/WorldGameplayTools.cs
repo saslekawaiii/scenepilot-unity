@@ -24,9 +24,10 @@ catalog_assets: target empty; args {query?:text,limit?:1..40}. Read-only prefab 
 instantiate_prefab: name; target optional owned parent; args {path:Assets/...prefab,position?:[x,y,z],scale?:[x,y,z],allow_scripts?:bool}. Copies a real existing project prefab; scripts denied unless explicitly allowed by user review. Never downloads assets.
 configure_world_time: target owned world; args {hour:0..<24,day?:1..1000000,running?:bool,day_seconds?:30..3600}. Updates actual clock, gates and schedules.
 configure_npc_routine: target owned NPC in a clocked world; args {day_place:semantic key,night_place:semantic key,fallback_place?:key,start_hour?:0..23.99,end_hour?:0..23.99,enabled?:bool}. Actual NavMesh schedule, unreachable primary goal remains blocked even at fallback.
+configure_npc_ai: target existing NPC; args {enabled?:bool,social?:bool,autonomous?:bool,topic?:text,cooldown_seconds?:15..300,assign_selected_model?:bool}. Enables/disables freeform AI per character and optional nearby NPC-to-NPC conversations, bounded to three turns with player priority. assign_selected_model explicitly copies the chat's chosen model route; other settings preserve existing routes. Existing NavMesh supports walking up to nearby characters; never invent a path. Generated speech never changes quest/reward state by itself.
 configure_gate: target owned gate; args {open_hour:0..23.99,close_hour:0..23.99}. Physical panel collider/carved navigation gate; closed connection is intentionally blocked.
 validate_world: target owned world; args {}. Read-only semantic graph/NavMesh/quest/player/asset validation; reports failures, not an unverified success.";
-        private static readonly string[] Names={"configure_world_time","configure_npc_routine","configure_gate","create_village","bake_navigation","set_navigation","create_player","create_delivery_quest","catalog_assets","instantiate_prefab","validate_world"};
+        private static readonly string[] Names={"configure_world_time","configure_npc_routine","configure_npc_ai","configure_gate","create_village","bake_navigation","set_navigation","create_player","create_delivery_quest","catalog_assets","instantiate_prefab","validate_world"};
         internal static bool Handles(string tool)=>Names.Contains(tool);
         internal static bool IsReadOnly(string tool)=>tool=="catalog_assets"||tool=="validate_world";
         private static JObject S(string type)=>new JObject { ["type"]=type };
@@ -37,6 +38,7 @@ validate_world: target owned world; args {}. Read-only semantic graph/NavMesh/qu
             var definitions=new Dictionary<string,JObject> {
                 ["configure_world_time"]=new JObject { ["hour"]=N("number",0,23.999),["day"]=N("integer",1,1000000),["running"]=S("boolean"),["day_seconds"]=N("number",30,3600) },
                 ["configure_npc_routine"]=new JObject { ["day_place"]=S("string"),["night_place"]=S("string"),["fallback_place"]=S("string"),["start_hour"]=N("number",0,23.999),["end_hour"]=N("number",0,23.999),["enabled"]=S("boolean") },
+                ["configure_npc_ai"]=new JObject { ["enabled"]=S("boolean"),["social"]=S("boolean"),["autonomous"]=S("boolean"),["topic"]=new JObject { ["type"]="string",["maxLength"]=800 },["cooldown_seconds"]=N("number",15,300),["assign_selected_model"]=S("boolean") },
                 ["configure_gate"]=new JObject { ["open_hour"]=N("number",0,23.999),["close_hour"]=N("number",0,23.999) },
                 ["create_village"]=new JObject { ["houses"]=N("integer",1,12),["width"]=N("number",96,512),["seed"]=N("integer",int.MinValue,int.MaxValue),["trees"]=N("integer",0,60),["player"]=S("boolean"),["quest"]=S("boolean") },
                 ["bake_navigation"]=new JObject(),["validate_world"]=new JObject(),
@@ -61,7 +63,16 @@ validate_world: target owned world; args {}. Read-only semantic graph/NavMesh/qu
             foreach(string key in (JArray)definition["properties"]["args"]["required"])if(c.args[key]==null)throw new ArgumentException("Missing "+key);
             foreach(var pair in c.args.Properties())ValidateValue(pair.Value,(JObject)allowed[pair.Name],pair.Name);
             if(c.tool=="create_village"||c.tool=="catalog_assets") { if(!string.IsNullOrEmpty(c.target))throw new ArgumentException(c.tool+" requires empty target."); }
-            else if(c.tool!="instantiate_prefab"||!string.IsNullOrEmpty(c.target)) { var go=resolve(c.target); if(!go||!go.GetComponent<GeneratedSceneObject>())throw new ArgumentException("Gameplay target must be owned."); }
+            else if(c.tool!="instantiate_prefab"||!string.IsNullOrEmpty(c.target)) { var go=resolve(c.target); if(!go||c.tool!="configure_npc_ai"&&!go.GetComponent<GeneratedSceneObject>())throw new ArgumentException("Gameplay target must be owned."); }
+            if(c.tool=="configure_npc_ai")
+            {
+                var npc=resolve(c.target).GetComponent<IntelligentNPC>();
+                if(!npc||c.args.Count==0)throw new ArgumentException("AI configuration needs an existing NPC and at least one setting.");
+                if(string.IsNullOrWhiteSpace(npc.CharacterId)||npc.gameObject.scene.GetRootGameObjects().SelectMany(g=>g.GetComponentsInChildren<IntelligentNPC>(true)).Count(n=>n.CharacterId==npc.CharacterId)>1)throw new ArgumentException("NPC CharacterId must be unique before enabling conversation memory.");
+                bool needsRoute=(bool?)c.args["enabled"]==true||(bool?)c.args["social"]==true||(bool?)c.args["autonomous"]==true;
+                if(needsRoute&&!npc.Models&&(bool?)c.args["assign_selected_model"]!=true)throw new ArgumentException("Assign a model route or set assign_selected_model=true.");
+                if(needsRoute&&npc.Models&&(bool?)c.args["assign_selected_model"]!=true) { npc.Models.Resolve(ModelTask.Dialogue).Validate();npc.Models.Resolve(ModelTask.Planning).Validate(); }
+            }
             if(c.tool=="instantiate_prefab")
             {
                 var prefab=Prefab(c.args); if(prefab.GetComponentsInChildren<MonoBehaviour>(true).Any()&&(bool?)c.args["allow_scripts"]!=true)throw new ArgumentException("Prefab contains scripts. Review before explicitly allowing scripts.");
@@ -100,6 +111,10 @@ validate_world: target owned world; args {}. Read-only semantic graph/NavMesh/qu
                     var clock=target.GetComponent<WorldClock>();Undo.RecordObject(clock,"World time");foreach(var controlledGate in target.GetComponentsInChildren<WorldGate>(true))if(controlledGate.Panel)Undo.RecordObject(controlledGate.Panel,"Clock gate panel");if(a["running"]!=null)clock.Running=(bool)a["running"];if(a["day_seconds"]!=null)clock.DaySeconds=(float)a["day_seconds"];clock.SetTime((float)a["hour"],(int?)a["day"]??-1);foreach(var gate in target.GetComponentsInChildren<WorldGate>(true))gate.ApplyClock();summary=clock.Snapshot().ToString(Formatting.None);break;
                 case "configure_gate":var gateComponent=target.GetComponent<WorldGate>();Undo.RecordObject(gateComponent,"Gate hours");if(gateComponent.Panel)Undo.RecordObject(gateComponent.Panel,"Gate panel state");gateComponent.OpenHour=(float)a["open_hour"];gateComponent.CloseHour=(float)a["close_hour"];gateComponent.ApplyClock();summary=gateComponent.Snapshot().ToString(Formatting.None);break;
                 case "configure_npc_routine":Routine(target,a);summary=target.GetComponent<NpcDailyRoutine>().Snapshot().ToString(Formatting.None);break;
+                case "configure_npc_ai":
+                    ConfigureNpcAi(target,a,routes);
+                    var configured=target.GetComponent<IntelligentNPC>();var social=target.GetComponent<NpcSocialAutonomy>();
+                    summary=new JObject { ["aiEnabled"]=configured.AiEnabled,["autonomous"]=configured.Autonomous,["social"]=social&&social.enabled&&social.Enabled,["model"]=configured.Models&&configured.Models.Dialogue?configured.Models.Dialogue.Model:null,["conversationMemoryLimit"]=32,["ambientRequestsPerMinute"]=4,["playerHasPriority"]=true }.ToString(Formatting.None);break;
                 case "create_village":target=Village(tx,parent,c.name,a,routes);summary=Report(target).ToString(Formatting.None);break;
                 case "bake_navigation":Bake(tx,target);summary=Report(target).ToString(Formatting.None);break;
                 case "set_navigation":SetNavigation(target,a);summary="Настроен маршрут по именованным точкам на действительной NavMesh.";break;
@@ -113,6 +128,26 @@ validate_world: target owned world; args {}. Read-only semantic graph/NavMesh/qu
             return new WorldGameplayToolResult { Target=target,Summary=summary };
         }
         private static Vector3 Vector(JToken v)=>new Vector3((float)v[0],(float)v[1],(float)v[2]);
+        private static void ConfigureNpcAi(GameObject target,JObject args,OrchestratorProfile routes)
+        {
+            var npc=target.GetComponent<IntelligentNPC>();Undo.RecordObject(npc,"Configure NPC intelligence");
+            if((bool?)args["assign_selected_model"]==true)
+            { if(!routes)throw new ArgumentException("The selected chat model route is unavailable.");routes.Resolve(ModelTask.Dialogue).Validate();routes.Resolve(ModelTask.Planning).Validate();npc.ReleaseServices();npc.Models=routes; }
+            if(args["enabled"]!=null)npc.AiEnabled=(bool)args["enabled"];
+            if(args["autonomous"]!=null)npc.Autonomous=(bool)args["autonomous"];
+            if(args["cooldown_seconds"]!=null)npc.PlanningCooldown=(float)args["cooldown_seconds"];
+            var social=target.GetComponent<NpcSocialAutonomy>();
+            if((bool?)args["social"]==true&&!social)social=Undo.AddComponent<NpcSocialAutonomy>(target);
+            if(social)
+            {
+                Undo.RecordObject(social,"Configure NPC conversations");
+                if(args["social"]!=null)social.Enabled=social.enabled=(bool)args["social"];
+                if(args["topic"]!=null)social.Topic=(string)args["topic"];
+                if(args["cooldown_seconds"]!=null)social.CooldownSeconds=(float)args["cooldown_seconds"];
+                social.MaxTurns=3;EditorUtility.SetDirty(social);
+            }
+            EditorUtility.SetDirty(npc);
+        }
         private static WorldPlace Place(GameObject go,string key,WorldPlaceKind kind)
         {
             var place=go.GetComponent<WorldPlace>()??Undo.AddComponent<WorldPlace>(go); place.Key=key;place.Kind=kind;

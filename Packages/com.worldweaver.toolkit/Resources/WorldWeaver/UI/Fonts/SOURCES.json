@@ -1,0 +1,30 @@
+[
+  {
+    "file": "CormorantGaramond.ttf",
+    "source": "https://raw.githubusercontent.com/google/fonts/c06520efccd2c99d970b536d4f62cb4d95b4e6b2/ofl/cormorantgaramond/CormorantGaramond-Regular.ttf",
+    "commit": "c06520efccd2c99d970b536d4f62cb4d95b4e6b2",
+    "sha256": "3f20a07914c56de160a4057f8fa48ec5372d77edf35c168fe4b0547b66502106",
+    "license": "OFL-1.1",
+    "licenseSource": "https://raw.githubusercontent.com/google/fonts/c06520efccd2c99d970b536d4f62cb4d95b4e6b2/ofl/cormorantgaramond/OFL.txt",
+    "modifications": "None; original static Regular font bytes"
+  },
+  {
+    "file": "NotoSans.ttf",
+    "source": "https://raw.githubusercontent.com/google/fonts/6c1dbe27dcf7d817d4b62cec033ba77fa8e2a5ec/ofl/notosans/NotoSans%5Bwdth%2Cwght%5D.ttf",
+    "commit": "6c1dbe27dcf7d817d4b62cec033ba77fa8e2a5ec",
+    "sha256": "bfb7bb691513f12e734dc346c03a03f784912432d7e3fa8e56efcf906fe86b3d",
+    "license": "OFL-1.1",
+    "licenseSource": "https://raw.githubusercontent.com/google/fonts/6c1dbe27dcf7d817d4b62cec033ba77fa8e2a5ec/ofl/notosans/OFL.txt",
+    "modifications": "None; original font bytes",
+    "axes": [
+      {
+        "tag": "wght",
+        "default": 400.0
+      },
+      {
+        "tag": "wdth",
+        "default": 100.0
+      }
+    ]
+  }
+]

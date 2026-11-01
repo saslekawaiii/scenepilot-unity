@@ -35,7 +35,7 @@ namespace WorldWeaver.Editor.Assistant
         public string Phase { get; private set; } = "Проверка моделей…";
         public bool Connected => models.FirstOrDefault(m => m.Key == Settings.ModelKey)?.Available ?? false;
 
-        public ChatController(Func<ModelProfile, ILLMProvider> factory = null, string historyFolder = null,string modelConnectionsFolder=null)
+        public ChatController(Func<ModelProfile, ILLMProvider> factory = null, string historyFolder = null,string modelConnectionsFolder=null, OllamaModelDiscovery discovery=null)
         {
             providerFactory = factory ?? (profile => profile.CreateProvider());
             store = new ChatHistoryStore(historyFolder); sessions = store.Load();
@@ -48,6 +48,7 @@ namespace WorldWeaver.Editor.Assistant
             AgentSourcePatches.Changed += CompilationChanged;
             AgentEditorJobs.Changed += JobsChanged;
             if(historyFolder==null)AgentTaskResumeCoordinator.Register(this);
+            InitializeModelDiscovery(historyFolder==null, discovery);
         }
 
         private void SeedModels()
@@ -63,43 +64,23 @@ namespace WorldWeaver.Editor.Assistant
         public async Task RefreshModelsAsync()
         {
             if (disposed) return;
-            string failure = "";
+            await RefreshLocalModelsAsync();
+            if (disposed) return;
             var found = new List<AvailableModel>();
             using (var transport = new JsonTransport())
             {
-                try
-                {
-                    var data = await transport.SendAsync("http://127.0.0.1:11434/api/tags", null, "", 5, 0, CancellationToken.None);
-                    foreach (var item in data["models"] ?? new JArray())
-                    {
-                        string name = (string)item["name"];
-                        var capabilities = item["capabilities"]?.Values<string>().ToList();
-                        if (string.IsNullOrWhiteSpace(name) || name.IndexOf("embed", StringComparison.OrdinalIgnoreCase) >= 0 || capabilities != null && !capabilities.Contains("completion")) continue;
-                        string parameters = (string)item["details"]?["parameter_size"] ?? "";
-                        bool vision=false;
-                        try {var details=await transport.SendAsync("http://127.0.0.1:11434/api/show",new JObject{["model"]=name},"",5,0,CancellationToken.None);vision=(details["capabilities"] as JArray??new JArray()).Values<string>().Contains("vision");}catch(ProviderException){}
-                        found.Add(new AvailableModel { Key = "ollama:" + name, Name = name + (parameters.Length > 0 ? " · " + parameters : ""), Model = name, Endpoint = "http://127.0.0.1:11434", Provider = ProviderKind.Ollama, Available = true, SupportsVision=vision, Description = "На этом компьютере · " + ((long?)item["size"] / 1e9)?.ToString("F1") + " ГБ · без облачной квоты" });
-                    }
-                }
-                catch (ProviderException) { failure = "Ollama недоступна. Запустите ollama serve или выберите облачную модель."; }
-                if (found.Count > 0 && !disposed)
-                {
-                    models.Clear(); models.AddRange(found); models.Add(FreeCloud());models.AddRange(connectionStore.Connections.Select(ChatModelConnections.AsModel));
-                    if (!Busy) Phase = Connected ? "Готов к работе" : "Проверяю облачную модель…";
-                    Notify();
-                }
                 var cloud = FreeCloud();
-                try { var data = await transport.SendAsync("https://text.pollinations.ai/models", null, "", 5, 0, CancellationToken.None); cloud.Available = (data["data"] ?? new JArray()).Any(m => (string)m["name"] == "openai-fast"); }
+                try { var data = await transport.SendAsync("https://text.pollinations.ai/models", null, "", 5, 0, modelDiscoveryLifetime.Token); cloud.Available = (data["data"] ?? new JArray()).Any(m => (string)m["name"] == "openai-fast"); }
                 catch (ProviderException) { cloud.Description += " · сейчас не отвечает"; }
                 found.Add(cloud);
             }
             if (disposed) return;
-            await RefreshCustomModelsAsync(found);
+            await RefreshCustomModelsAsync(found,modelDiscoveryLifetime.Token);
             if(disposed)return;
-            // Keep the user's selected local model visible even while its server is offline.
-            foreach (var old in models.Where(m => !found.Any(f => f.Key == m.Key))) { old.Available = false; found.Add(old); }
-            models.Clear(); models.AddRange(found.OrderBy(m => m.Provider == ProviderKind.Ollama ? 0 : 1).ThenBy(m => m.Name));
-            if (!Busy) Phase = Connected ? "Готов к работе" : failure.Length > 0 ? failure : "Модель ещё не доступна. Обновите список или выберите другую.";
+            // Local discovery can complete again while a custom server is being checked. Preserve its newer catalog.
+            models.RemoveAll(m=>m.Provider!=ProviderKind.Ollama||!string.IsNullOrEmpty(m.ConnectionId));
+            models.AddRange(found.OrderBy(m => m.Provider == ProviderKind.Ollama ? 0 : 1).ThenBy(m => m.Name));
+            if (!Busy) Phase = Connected ? "Готов к работе" : "Модель недоступна. Локальная Ollama проверяется автоматически; для своего API проверьте подключение.";
             Notify();
         }
 
@@ -272,7 +253,7 @@ namespace WorldWeaver.Editor.Assistant
                         }
                         Phase = "Выполняю инструменты · " + plan.actions.Count; answer.Status = "Изменяю сцену"; Notify();
                         operation.Token.ThrowIfCancellationRequested();
-                        var batch = ExecutePlan(plan, session.Id, answer.Id, profile,reviewedRepair);
+                        var batch = await ExecutePlanAsync(plan, session.Id, answer.Id, profile,reviewedRepair,operation.Token);
                         if (!batch.Success) unresolvedFailure = true;
                         else if (batch.Results.Any(result => result.Success && !SceneToolExecutor.IsReadOnlyTool(result.Tool))) unresolvedFailure = false;
                         SanitizeResults(batch); answer.Steps.AddRange(batch.Results); answer.Text = ChatHistoryStore.Redact(plan.reply);
@@ -317,15 +298,15 @@ namespace WorldWeaver.Editor.Assistant
             }
         }
 
-        public Task ApplyPendingAsync(string messageId)
+        public async Task ApplyPendingAsync(string messageId)
         {
-            if (Busy || disposed || EditorApplication.isCompiling || ScriptDrafts.Pending || AgentSourcePatches.Pending || AgentEditorJobs.Busy || EditorApplication.isPlayingOrWillChangePlaymode || Settings.Mode==AssistantMode.Ask) return Task.CompletedTask;
+            if (Busy || disposed || EditorApplication.isCompiling || ScriptDrafts.Pending || AgentSourcePatches.Pending || AgentEditorJobs.Busy || EditorApplication.isPlayingOrWillChangePlaymode || Settings.Mode==AssistantMode.Ask) return;
             var answer = Current.Messages.FirstOrDefault(m => m.Id == messageId);
-            if (answer?.PendingPlan == null) return Task.CompletedTask;
+            if (answer?.PendingPlan == null) return;
             ModelProfile profile = null;
             try
             {
-                Busy = true; Phase = "Применяю проверенный план…"; Notify();
+                Busy = true; operation=new CancellationTokenSource(); Phase = "Применяю проверенный план…"; Notify();
                 if(answer.Task==null)answer.Task=AgentTaskVerifier.Create(Current.Messages.LastOrDefault(m=>m.Role=="user")?.Text??answer.Text,true);
                 answer.Task.MutationAuthorized=true;
                 foreach(var action in answer.PendingPlan.actions.Where(a=>a.tool=="draft_script"||a.tool=="patch_script"))
@@ -333,7 +314,7 @@ namespace WorldWeaver.Editor.Assistant
                 Save();
                 ValidatePlan(answer.PendingPlan);AgentTaskSchema.Validate(answer.Task,answer.PendingPlan); profile = BuildProfile();
                 bool requestedContinuation=!answer.PendingPlan.complete;
-                var batch = ExecutePlan(answer.PendingPlan, Current.Id, answer.Id, profile,true);
+                var batch = await ExecutePlanAsync(answer.PendingPlan, Current.Id, answer.Id, profile,true,operation.Token);
                 SanitizeResults(batch); answer.Steps.AddRange(batch.Results); answer.IsError = !batch.Success;
                 if (batch.Success)
                 {
@@ -348,9 +329,9 @@ namespace WorldWeaver.Editor.Assistant
                 else { answer.Status = "Ошибка применения"; answer.Text += "\n\n" + batch.Error; }
                 Phase = WaitingForEditor(answer) ? "Unity выполняет проверку. Задача продолжится после её завершения." : answer.Task.ContinueAfterReload?"Проверенный этап применён. Продолжаю задачу…":batch.Success ? "Изменения применены" : batch.Error;
             }
+            catch (OperationCanceledException) { answer.IsError = true; answer.Status = "Остановлено"; Phase = "Применение остановлено. Контрольная точка и ранее выполненные этапы доступны в сообщении."; }
             catch (Exception error) { answer.IsError = true; answer.Status = "Не применено"; Phase = FriendlyError(error); answer.Text += "\n\n" + Phase; }
-            finally { if (profile) Object.DestroyImmediate(profile); Busy = false; Save(); }
-            return Task.CompletedTask;
+            finally { operation?.Dispose();operation=null;if (profile) Object.DestroyImmediate(profile); Busy = false; Save(); }
         }
 
         private static bool SceneSaveRequested(string input) => System.Text.RegularExpressions.Regex.IsMatch(input ?? "", @"(?is)(сохран\w*|запиш\w*).{0,40}сцен|сцен.{0,40}(сохран\w*|запиш\w*)|\bsave\s+(the\s+)?scene\b|(?:собери|сборк\w*|\bbuild\b).{0,60}(?:проект|игр|прототип|player|project|game|prototype)");
@@ -456,24 +437,31 @@ namespace WorldWeaver.Editor.Assistant
             foreach (var action in code)if(action.tool=="patch_script")AgentSourcePatches.Validate(action);else ScriptDrafts.Validate(action);
             SceneToolExecutor.Validate(new EditorPlan { reply = plan.reply, complete = plan.complete, actions = plan.actions.Where(a => a.tool != "draft_script" && a.tool != "attach_script" && a.tool!="patch_script").ToList() });
         }
-        private EditorBatchResult ExecutePlan(EditorPlan plan, string sessionId, string messageId, ModelProfile profile,bool reviewed=false)
+        private async Task<EditorBatchResult> ExecutePlanAsync(EditorPlan plan, string sessionId, string messageId, ModelProfile profile,bool reviewed=false,CancellationToken token=default)
         {
             var message=Current.Messages.FirstOrDefault(m=>m.Id==messageId);
             var task=message?.Task;
             bool mutating=plan.actions.Any(a=>!SceneToolExecutor.IsReadOnlyTool(a.tool));
-            if(mutating)
+            if(mutating&&(task==null||!task.MutationAuthorized))throw new InvalidOperationException("This task has no permission to change the project.");
+            bool checkpointAdmitted=false;
+            void EnsureCheckpoint()
             {
+                if(!mutating)return;
+                token.ThrowIfCancellationRequested();
                 if(task==null||!task.MutationAuthorized)throw new InvalidOperationException("This task has no permission to change the project.");
                 if(string.IsNullOrEmpty(task.CheckpointId)){Phase="Сохраняю контрольную точку запроса…";Notify();task.CheckpointId=AgentCheckpoints.Begin(sessionId,messageId);Save();}
                 else if(task.CheckpointSealed&&!AgentCheckpoints.CanExtend(task.CheckpointId))throw new InvalidOperationException("Проект изменён между шагами. Автоматическое продолжение остановлено, чтобы сохранить ручные правки. Начните новый запрос или проверьте восстановление.");
+                checkpointAdmitted=true;
             }
+            bool deferredImport=plan.actions.Count==1&&plan.actions[0].tool=="material_import";
+            if(!deferredImport)EnsureCheckpoint();
             EditorBatchResult Finish(EditorBatchResult batch)
             {
                 if(task!=null)
                 {
                     var world=batch.Results.LastOrDefault(r=>r.Success&&(r.Tool=="create_world"||r.Tool=="create_village"));if(world!=null)task.ScopeTarget=world.Target;
                     foreach(var row in batch.Results.Where(r=>r.Success&&!string.IsNullOrEmpty(r.Target)&&r.Target.StartsWith("owned:",StringComparison.Ordinal)))AgentDesignMemory.Remember(Current,"Объект "+row.Target,row.Target+" "+row.Summary.Substring(0,Math.Min(600,row.Summary.Length)),messageId,"entity");
-                    if(mutating){AgentCheckpoints.Seal(task.CheckpointId,true);task.CheckpointSealed=true;checkpointAvailability.Clear();}
+                    if(checkpointAdmitted&&!string.IsNullOrEmpty(task.CheckpointId)){AgentCheckpoints.Seal(task.CheckpointId,true);task.CheckpointSealed=true;checkpointAvailability.Clear();}
                     if(ScriptDrafts.Pending||AgentSourcePatches.Pending){task.Status="waiting_compilation";task.ContinueAfterReload=true;message.Status="Компиляция и проверка";}
                     if(!string.IsNullOrEmpty(task.PendingJobId)){task.Status="waiting_editor_job";task.ContinueAfterReload=true;message.Status="Проверка в Unity";}
                     if(Settings.AutoVerify&&!WaitingForEditor(message))VerifyTask(message);
@@ -497,14 +485,15 @@ namespace WorldWeaver.Editor.Assistant
             var created = new List<string>();
             try
             {
-                OrchestratorProfile routes = plan.actions.Any(a => a.tool == "create_npc"||a.tool=="create_village") ? PersistentRoutes(profile, created) : null;
-                var batch = SceneToolExecutor.Execute(plan, routes,new AgentExecutionContext{Session=Current,Message=message,Reviewed=reviewed});
+                OrchestratorProfile routes = plan.actions.Any(a => a.tool == "create_npc"||a.tool=="create_village"||a.tool=="configure_npc_ai"&&(bool?)a.args["assign_selected_model"]==true) ? PersistentRoutes(profile, created) : null;
+                var batch = await SceneToolExecutor.ExecuteAsync(plan, routes,new AgentExecutionContext{Session=Current,Message=message,Reviewed=reviewed},token,EnsureCheckpoint);
                 if (!batch.Success) foreach (var path in created.AsEnumerable().Reverse()) AssetDatabase.DeleteAsset(path);
                 return Finish(batch);
             }
             catch
             {
                 foreach (var path in created.AsEnumerable().Reverse()) AssetDatabase.DeleteAsset(path);
+                if(checkpointAdmitted&&task!=null&&!string.IsNullOrEmpty(task.CheckpointId)){AgentCheckpoints.Seal(task.CheckpointId,true);task.CheckpointSealed=true;checkpointAvailability.Clear();}
                 throw;
             }
         }
@@ -731,6 +720,6 @@ namespace WorldWeaver.Editor.Assistant
             }
             return ChatHistoryStore.Redact(error is ArgumentException || error is InvalidOperationException ? error.Message : "Операция завершилась ошибкой " + error.GetType().Name + ". Состояние можно проверить в сцене.");
         }
-        public void Dispose() { if (disposed) return; disposed = true; operation?.Cancel(); ScriptDrafts.Changed -= CompilationChanged;AgentSourcePatches.Changed-=CompilationChanged;AgentEditorJobs.Changed-=JobsChanged;AgentTaskResumeCoordinator.Unregister(this); }
+        public void Dispose() { if (disposed) return; disposed = true; operation?.Cancel(); StopModelDiscovery(); ScriptDrafts.Changed -= CompilationChanged;AgentSourcePatches.Changed-=CompilationChanged;AgentEditorJobs.Changed-=JobsChanged;AgentTaskResumeCoordinator.Unregister(this); }
     }
 }

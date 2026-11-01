@@ -26,6 +26,9 @@ namespace WorldWeaver
             float dt = Time.deltaTime; elapsed += dt;
             if (Mode == SceneBehaviorKind.Rotate) { transform.Rotate(Axis.normalized, Speed * dt, Space.Self); return; }
             if (Mode == SceneBehaviorKind.Bob) { transform.position = origin + Axis.normalized * (Mathf.Sin(elapsed * Frequency * Mathf.PI * 2) * Amplitude); return; }
+            var npc=GetComponent<IntelligentNPC>();
+            // Conversation and social approach own navigation; yielding here must not reset their path.
+            if(npc&&(npc.Busy||npc.PlayerConversationActive||(npc.GetComponent<NpcSocialAutonomy>()?.HoldsMovement??false)))return;
             if (Mode == SceneBehaviorKind.FollowPlayer && !FollowTarget) return;
             int count = NamedWaypoints != null && NamedWaypoints.Length > 0 ? NamedWaypoints.Length : Waypoints?.Length ?? 0;
             if (Mode == SceneBehaviorKind.Patrol && count == 0) return;

@@ -73,6 +73,8 @@ namespace WorldWeaver.Editor.Assistant
             if (m.HasProperty("_BaseColor")) m.SetColor("_BaseColor", color);
             if (m.HasProperty("_Smoothness")) m.SetFloat("_Smoothness", smoothness);
             if (m.HasProperty("_Glossiness")) m.SetFloat("_Glossiness", smoothness);
+            string surface = WorldMaterialLibrary.SemanticBuiltIn(key);
+            if (surface != null) WorldMaterialLibrary.ConfigureBuiltIn(m, surface, color);
             materials[cache] = Asset(m, key, ".mat"); return m;
         }
         internal Mesh Mesh(string key, Func<Mesh> create)
@@ -147,16 +149,13 @@ namespace WorldWeaver.Editor.Assistant
         }
         internal static void Layers(SceneBuildTransaction tx, TerrainData data, TerrainSpec spec, string style)
         {
-            Color[] colors = style == "desert" ? new[] { new Color(.76f,.57f,.31f), new Color(.50f,.32f,.19f), new Color(.91f,.77f,.50f) } :
-                new[] { new Color(.23f,.38f,.20f), new Color(.40f,.43f,.40f), new Color(.88f,.91f,.91f) };
+            string[] surfaces = style == "desert" ? new[] { "sand", "stone", "sand" } : new[] { "grass", "stone", "snow" };
             var layers = new TerrainLayer[3];
             for (int i = 0; i < 3; i++)
             {
-                var texture = new Texture2D(32,32) { name = "Ground " + i, wrapMode = TextureWrapMode.Repeat }; var pixels = new Color[1024];
-                var random = new System.Random(spec.seed + i * 31);
-                for (int p = 0; p < pixels.Length; p++) pixels[p] = colors[i] * (.9f + (float)random.NextDouble() * .2f);
-                texture.SetPixels(pixels); texture.Apply(); tx.Asset(texture, "GroundTexture" + i);
-                layers[i] = tx.Asset(new TerrainLayer { diffuseTexture = texture, tileSize = new Vector2(14,14) }, "GroundLayer" + i, ".terrainlayer");
+                layers[i] = tx.Asset(new TerrainLayer { diffuseTexture = WorldMaterialLibrary.BuiltInTexture(surfaces[i], "albedo"),
+                    normalMapTexture = WorldMaterialLibrary.BuiltInTexture(surfaces[i], "normal"), normalScale = .6f,
+                    tileSize = new Vector2(4,4), metallic = 0, smoothness = .12f }, "GroundLayer" + i, ".terrainlayer");
             }
             data.terrainLayers = layers; Alpha(data,spec);
         }
@@ -228,17 +227,23 @@ namespace WorldWeaver.Editor.Assistant
         { var go=tx.Empty(name,parent,"part");go.transform.localPosition=p;go.transform.localScale=scale;Undo.AddComponent<MeshFilter>(go).sharedMesh=mesh;Undo.AddComponent<MeshRenderer>(go).sharedMaterial=material; }
         private static Mesh Cone()
         {
-            const int sides=9;var vertices=new List<Vector3>();var triangles=new List<int>();
+            const int sides=9;var vertices=new List<Vector3>();var triangles=new List<int>();var uv=new List<Vector2>();
             for(int i=0;i<sides;i++)
-            {float a=i*Mathf.PI*2/sides,b=(i+1)*Mathf.PI*2/sides;int j=vertices.Count;vertices.Add(new Vector3(Mathf.Cos(a)*.5f,0,Mathf.Sin(a)*.5f));vertices.Add(Vector3.up);vertices.Add(new Vector3(Mathf.Cos(b)*.5f,0,Mathf.Sin(b)*.5f));triangles.AddRange(new[]{j,j+1,j+2});}
-            var mesh=new Mesh{name="Low polygon pine crown"};mesh.SetVertices(vertices);mesh.SetTriangles(triangles,0);mesh.RecalculateNormals();mesh.RecalculateBounds();return mesh;
+            {float a=i*Mathf.PI*2/sides,b=(i+1)*Mathf.PI*2/sides;int j=vertices.Count;vertices.Add(new Vector3(Mathf.Cos(a)*.5f,0,Mathf.Sin(a)*.5f));vertices.Add(Vector3.up);vertices.Add(new Vector3(Mathf.Cos(b)*.5f,0,Mathf.Sin(b)*.5f));triangles.AddRange(new[]{j,j+1,j+2});uv.Add(new Vector2(i/(float)sides,0));uv.Add(new Vector2((i+.5f)/sides,1));uv.Add(new Vector2((i+1)/(float)sides,0));}
+            var mesh=new Mesh{name="Low polygon pine crown"};mesh.SetVertices(vertices);mesh.SetTriangles(triangles,0);mesh.SetUVs(0,uv);mesh.RecalculateNormals();mesh.RecalculateTangents();mesh.RecalculateBounds();return mesh;
         }
         private static Mesh Roof()
         {
             var points=new[]{new Vector3(-.5f,0,-.5f),new Vector3(.5f,0,-.5f),new Vector3(0,1,-.5f),new Vector3(-.5f,0,.5f),new Vector3(.5f,0,.5f),new Vector3(0,1,.5f)};
             int[] indices={0,2,1,3,4,5,0,3,5,0,5,2,1,2,5,1,5,4,0,1,4,0,4,3};
             var vertices=new Vector3[indices.Length];for(int i=0;i<indices.Length;i++)vertices[i]=points[indices[i]];
-            var mesh=new Mesh{name="Gabled roof"};mesh.vertices=vertices;mesh.triangles=Enumerable.Range(0,vertices.Length).ToArray();mesh.RecalculateNormals();mesh.RecalculateBounds();return mesh;
+            var uv=new Vector2[vertices.Length];
+            for(int i=0;i<vertices.Length;i+=3)
+            {
+                var n=Vector3.Cross(vertices[i+1]-vertices[i],vertices[i+2]-vertices[i]).normalized;
+                for(int j=i;j<i+3;j++)uv[j]=Mathf.Abs(n.z)>.8f?new Vector2(vertices[j].x+.5f,vertices[j].y):new Vector2(vertices[j].z+.5f,vertices[j].y);
+            }
+            var mesh=new Mesh{name="Gabled roof"};mesh.vertices=vertices;mesh.uv=uv;mesh.triangles=Enumerable.Range(0,vertices.Length).ToArray();mesh.RecalculateNormals();mesh.RecalculateTangents();mesh.RecalculateBounds();return mesh;
         }
         internal static GameObject Npc(SceneBuildTransaction tx,Transform parent,string name,string role)
         {

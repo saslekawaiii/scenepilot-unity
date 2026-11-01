@@ -454,6 +454,7 @@ namespace WorldWeaver.Editor.Assistant
             advanced.AddToClassList("advanced-settings");
             AddSettingToggle(advanced, "Использовать навыки", controller.Settings.UseSkills, value => controller.Settings.UseSkills = value);
             AddSettingToggle(advanced, "Проверять результат автоматически", controller.Settings.AutoVerify, value => controller.Settings.AutoVerify = value);
+            AddSettingToggle(advanced, "Создавать C# для новых игровых механик", controller.Settings.PreferGeneratedScripts, value => controller.Settings.PreferGeneratedScripts = value);
             autoApply = AddSettingToggle(advanced, "Применять план в режиме «Выполнить»", controller.Settings.AutoApply, value => controller.Settings.AutoApply = value);
             autoApply.name = "auto-apply";
             var budget = new IntegerField("Объём знаний в запросе") { value = controller.Settings.SkillContextBudget, tooltip = "Лимит символов контекста, включая обрамление. Это не токены модели." };
@@ -751,13 +752,13 @@ namespace WorldWeaver.Editor.Assistant
                 titleLabel.text = controller.Current != null ? controller.Current.Title : "Новый чат";
                 backgroundBlocked = ScriptDrafts.Pending || AgentSourcePatches.Pending || AgentEditorJobs.Busy;
                 var models = controller.Models ?? new List<AvailableModel>();
-                string signature = string.Join("\n", models.Select(m => m.Key + ":" + m.Name + ":" + m.Available + ":" + m.SupportsVision));
+                string signature = string.Join("\n", models.Select(m => m.Key + ":" + m.Name + ":" + m.Available + ":" + m.SupportsVision + ":" + m.Loaded));
                 if (signature != modelsSignature)
                 {
                     modelsSignature = signature;
                     modelChoices.Clear();
                     modelChoices.AddRange(models);
-                    var labels = modelChoices.Select(m => (string.IsNullOrEmpty(m.Name) ? m.Model : m.Name) + (m.SupportsVision ? " · зрение" : "") + (m.Available ? "" : " · недоступна")).ToList();
+                    var labels = modelChoices.Select(m => (string.IsNullOrEmpty(m.Name) ? m.Model : m.Name) + (m.SupportsVision ? " · зрение" : "") + (m.Loaded ? " · в памяти" : "") + (m.Available ? "" : " · недоступна")).ToList();
                     for (int i = 0; i < labels.Count; i++)
                         if (labels.Count(v => v == labels[i]) > 1) labels[i] += " · " + modelChoices[i].Key;
                     modelDropdown.choices = labels.Count > 0 ? labels : new List<string> { "Модели не найдены" };
@@ -776,11 +777,12 @@ namespace WorldWeaver.Editor.Assistant
                 EnsureSkillCatalog();
                 skillsButton.text = "Навыки · " + skillCatalog.List().Count;
                 connectionLabel.text = refreshingModels ? "Проверка подключения…" : controller.Connected ? "Подключено" : "Нет подключения";
+                connectionLabel.tooltip = controller.LocalDiscoveryStatus + "\nЛокальные модели Ollama появляются автоматически; установка модели не означает, что она уже загружена в память.";
                 connectionLabel.EnableInClassList("connected", controller.Connected);
                 refreshButton.SetEnabled(!controller.HasPendingWork && !refreshingModels);
                 newChatButton.SetEnabled(!controller.HasPendingWork);
                 undoButton.SetEnabled(!controller.HasPendingWork && !EditorApplication.isCompiling && !EditorApplication.isPlayingOrWillChangePlaymode && !backgroundBlocked);
-                phaseLabel.text = !string.IsNullOrWhiteSpace(controller.Phase) ? controller.Phase : controller.HasPendingWork ? "Запрос выполняется" : controller.Connected ? "Готов к работе" : "Выберите доступную модель или нажмите «Обновить»";
+                phaseLabel.text = !string.IsNullOrWhiteSpace(controller.Phase) ? controller.Phase : controller.HasPendingWork ? "Запрос выполняется" : controller.Connected ? "Готов к работе" : "Запустите Ollama — локальные модели появятся автоматически";
                 phaseLabel.EnableInClassList("working", controller.HasPendingWork);
             }
             finally { updatingControls = false; }

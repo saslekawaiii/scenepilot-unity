@@ -191,12 +191,13 @@ namespace WorldWeaver.Editor.Assistant
         {
             var result=await connectionStore.TestAsync(id,explicitResponse,token);var model=models.FirstOrDefault(m=>m.ConnectionId==id);if(model!=null){model.Available=result.Success;if(!result.ResponseRequested)model.SupportsVision=result.SupportsVision;model.Description=result.Message;}if(!Busy)Phase=result.Message;Notify();return result;
         }
-        async Task RefreshCustomModelsAsync(List<AvailableModel> found)
+        async Task RefreshCustomModelsAsync(List<AvailableModel> found,CancellationToken token=default)
         {
             foreach(var connection in connectionStore.Connections)
             {
+                token.ThrowIfCancellationRequested();if(disposed)return;
                 var model=ChatModelConnections.AsModel(connection);ChatConnectionTestResult tested;
-                try{tested=await connectionStore.TestAsync(connection.Id,false,CancellationToken.None);}catch(ArgumentException error){if(!connectionStore.Connections.Any(c=>c.Id==connection.Id))continue;tested=new ChatConnectionTestResult{Message=ChatHistoryStore.Redact(error.Message)};}
+                try{tested=await connectionStore.TestAsync(connection.Id,false,token);}catch(ArgumentException error){if(!connectionStore.Connections.Any(c=>c.Id==connection.Id))continue;tested=new ChatConnectionTestResult{Message=ChatHistoryStore.Redact(error.Message)};}
                 model.Available=tested.Success;model.SupportsVision=tested.SupportsVision;model.Description=tested.Message;found.Add(model);
             }
             var current=connectionStore.Connections.Select(c=>c.Id).ToArray();found.RemoveAll(m=>!string.IsNullOrEmpty(m.ConnectionId)&&!current.Contains(m.ConnectionId));

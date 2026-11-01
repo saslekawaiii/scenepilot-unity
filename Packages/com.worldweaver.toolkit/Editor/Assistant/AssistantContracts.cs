@@ -18,6 +18,7 @@ namespace WorldWeaver.Editor.Assistant
         public AssistantMode Mode = AssistantMode.Execute;
         public bool UseSkills = true;
         public bool AutoVerify = true;
+        public bool PreferGeneratedScripts = true;
         public int SkillContextBudget = 4000;
         public List<string> SkillFolders = new List<string>();
     }
@@ -30,6 +31,7 @@ namespace WorldWeaver.Editor.Assistant
         public string Endpoint;
         public bool Available;
         public bool SupportsVision;
+        public bool Loaded, AutoDiscovered;
         public string ConnectionId, ApiKeyEnvironmentVariable;
         public OpenAIResponseMode ResponseMode;
         public override string ToString() => Name;

@@ -28,7 +28,12 @@ namespace WorldWeaver.Editor.Assistant
             EditorGUILayout.HelpBox("Поддерживаются Ollama и OpenAI-compatible Chat Completions. Форматы Anthropic Messages и Gemini здесь не подключаются напрямую. Облачные подключения сейчас работают только с текстом.",MessageType.Info);
             using(new EditorGUI.DisabledScope(testing!=null||controller.HasPendingWork))
             {
-                EditorGUILayout.Space(6);protocol=(ChatConnectionProtocol)EditorGUILayout.EnumPopup("Тип API",protocol);
+                EditorGUILayout.Space(6);var previousProtocol=protocol;protocol=(ChatConnectionProtocol)EditorGUILayout.EnumPopup("Тип API",protocol);
+                if(previousProtocol!=protocol)
+                {
+                    if(protocol==ChatConnectionProtocol.Ollama&&endpoint=="https://api.example.com/v1")endpoint=OllamaModelDiscovery.DefaultEndpoint;
+                    else if(protocol==ChatConnectionProtocol.OpenAICompatible&&endpoint==OllamaModelDiscovery.DefaultEndpoint)endpoint="https://api.example.com/v1";
+                }
                 displayName=EditorGUILayout.TextField("Название в списке",displayName);
                 endpoint=EditorGUILayout.TextField(protocol==ChatConnectionProtocol.Ollama?"URL сервера Ollama":"URL API",endpoint);
                 EditorGUILayout.LabelField(protocol==ChatConnectionProtocol.Ollama?"Например http://127.0.0.1:11434 или HTTPS proxy path":"Например https://api.example.com/v1; root URL добавит /v1",EditorStyles.wordWrappedMiniLabel);
@@ -42,7 +47,7 @@ namespace WorldWeaver.Editor.Assistant
                     environmentVariable=EditorGUILayout.TextField("Имя переменной",environmentVariable);
                     EditorGUILayout.HelpBox("Сам ключ хранится только в окружении процесса Unity: переживает перекомпиляцию, исчезает после закрытия Unity. На диск и в историю он не записывается. Для постоянного доступа заранее задайте переменную окружения и укажите только её имя. Для API без авторизации оставьте оба поля пустыми.",MessageType.None);
                 }
-                else EditorGUILayout.HelpBox("Этот адаптер Ollama работает без API-ключа. Vision включается только для локального сервера после проверки /api/show.",MessageType.None);
+                else EditorGUILayout.HelpBox("Обычная Ollama на 127.0.0.1:11434 появляется в чате автоматически: запустите Ollama и скачайте модель. Вручную подключайте другой порт или proxy. Этот адаптер работает без API-ключа; vision включается только для локального сервера после проверки /api/show.",MessageType.None);
                 if(GUILayout.Button("Добавить и выбрать модель",GUILayout.Height(30)))
                 {
                     try

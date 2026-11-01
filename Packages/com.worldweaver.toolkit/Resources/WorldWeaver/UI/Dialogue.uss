@@ -1,0 +1,77 @@
+.world-ui { position: absolute; left: 0; right: 0; top: 0; bottom: 0; color: rgb(235, 231, 220); font-size: 17px; }
+.hud { position: absolute; left: 40px; right: 40px; top: 28px; flex-direction: row; justify-content: space-between; align-items: flex-start; }
+.world-brand { border-left-width: 2px; border-left-color: rgb(182, 150, 99); padding-left: 16px; padding-top: 4px; padding-bottom: 4px; }
+.eyebrow { color: rgb(178, 153, 115); font-size: 11px; letter-spacing: 2px; -unity-font-style: bold; }
+.location { margin-top: 5px; font-size: 22px; letter-spacing: 2px; }
+.world-time { padding: 12px 18px; color: rgb(222, 214, 197); font-size: 14px; background-color: rgba(11, 18, 23, .82); border-top-left-radius: 3px; border-bottom-left-radius: 3px; }
+.quest-card { position: absolute; top: 125px; right: 40px; width: 280px; padding: 21px; background-color: rgba(14, 23, 28, .9); border-top-width: 1px; border-top-color: rgba(191, 163, 109, .6); border-bottom-width: 1px; border-bottom-color: rgba(191, 163, 109, .18); }
+.quest-text { margin-top: 16px; color: rgb(221, 217, 206); white-space: normal; font-size: 15px; }
+.inventory-text { margin-top: 18px; color: rgb(154, 176, 171); white-space: normal; font-size: 13px; }
+.world-notice { position: absolute; left: 15%; right: 15%; bottom: 76px; -unity-text-align: middle-center; white-space: normal; font-size: 14px; color: rgb(240, 219, 178); padding: 9px 16px; background-color: rgba(12, 20, 25, .8); }
+.hud-actions { flex-direction: row; margin-top: 14px; }
+.hud-button { margin: 0 12px 0 0; padding: 3px 0; background-color: rgba(0, 0, 0, 0); color: rgb(177, 183, 181); border-width: 0; font-size: 12px; }
+.hud-button:hover { color: rgb(239, 217, 177); }
+.exploration-hint { position: absolute; left: 0; right: 0; bottom: 24px; -unity-text-align: middle-center; font-size: 13px; letter-spacing: 1px; color: rgb(229, 225, 213); background-color: rgba(12, 20, 25, .72); padding: 10px; align-self: center; }
+.dialogue-backdrop { position: absolute; left: 0; top: 0; right: 0; bottom: 0; background-color: rgba(5, 11, 16, .46); align-items: center; justify-content: flex-end; padding: 80px 48px 42px; }
+.dialogue-stage { width: 100%; max-width: 1260px; height: 100%; max-height: 720px; flex-direction: row; align-items: stretch; }
+.character-card { width: 25%; min-width: 210px; max-width: 300px; margin-right: 18px; background-color: rgb(17, 27, 33); border-top-width: 2px; border-top-color: rgb(180, 146, 94); border-bottom-width: 1px; border-bottom-color: rgb(58, 66, 67); padding: 24px; }
+.portrait { flex-grow: 1; flex-shrink: 1; min-height: 120px; margin-top: 18px; margin-bottom: 24px; background-color: rgb(23, 34, 40); border-bottom-width: 1px; border-bottom-color: rgb(74, 78, 74); }
+.character-name { font-size: 34px; color: rgb(242, 229, 205); white-space: normal; }
+.character-role { margin-top: 6px; font-size: 15px; color: rgb(184, 170, 146); white-space: normal; }
+.character-caption { margin-top: 30px; color: rgb(129, 147, 151); font-size: 13px; white-space: normal; -unity-font-style: italic; }
+.conversation-panel { flex-grow: 1; flex-shrink: 1; min-width: 0; background-color: rgb(19, 29, 35); border-top-width: 2px; border-top-color: rgb(180, 146, 94); border-bottom-width: 1px; border-bottom-color: rgb(60, 68, 67); padding: 28px 32px 16px; }
+.conversation-header { flex-direction: row; align-items: center; padding-bottom: 22px; border-bottom-width: 1px; border-bottom-color: rgb(55, 66, 69); flex-shrink: 0; }
+.conversation-heading { flex-grow: 1; flex-shrink: 1; }
+.conversation-title { margin-top: 5px; font-size: 27px; white-space: normal; color: rgb(244, 235, 218); }
+.ai-toggle { background-color: rgba(65, 91, 76, .35); color: rgb(177, 204, 183); border-width: 1px; border-color: rgb(68, 98, 80); font-size: 11px; padding: 6px 9px; border-radius: 3px; margin-right: 16px; }
+.ai-disabled { color: rgb(213, 179, 124); border-color: rgb(128, 102, 67); background-color: rgba(110, 84, 48, .2); }
+.close-button { font-size: 13px; color: rgb(168, 179, 179); background-color: rgba(0, 0, 0, 0); border-width: 0; padding: 8px 0 8px 8px; }
+.close-button:hover { color: rgb(246, 227, 190); }
+.conversation-history { flex-grow: 1; flex-shrink: 1; min-height: 75px; margin-top: 22px; margin-bottom: 12px; }
+.conversation-history .unity-scroll-view__content-container { padding-right: 18px; }
+.conversation-history .unity-scroller--vertical { width: 5px; margin-left: 5px; }
+.conversation-history .unity-scroller__low-button, .conversation-history .unity-scroller__high-button { display: none; }
+.conversation-history .unity-base-slider__tracker { background-color: rgba(0, 0, 0, 0); }
+.conversation-history .unity-base-slider__dragger { background-color: rgb(77, 89, 88); border-radius: 3px; border-width: 0; }
+.utterance { margin-top: 2px; margin-bottom: 25px; padding-left: 15px; padding-right: 8px; border-left-width: 2px; border-left-color: rgb(149, 124, 88); flex-shrink: 0; }
+.player-utterance { margin-left: 28px; padding: 15px 18px; background-color: rgb(30, 44, 49); border-left-color: rgb(97, 142, 146); border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
+.speaker-name { font-size: 11px; color: rgb(192, 164, 119); letter-spacing: 1px; -unity-font-style: bold; margin-bottom: 8px; }
+.player-utterance .speaker-name { color: rgb(136, 185, 188); }
+.speech-text { font-size: 19px; color: rgb(233, 229, 216); white-space: normal; }
+.conversation-intro { color: rgb(160, 175, 177); white-space: normal; font-size: 18px; margin: 10px 6px 24px; }
+.context-actions { flex-shrink: 0; }
+.quest-action { margin: 0 0 12px; background-color: rgba(143, 110, 57, .16); border-color: rgba(176, 145, 92, .5); border-width: 1px; border-radius: 3px; padding: 10px 14px; color: rgb(227, 205, 165); font-size: 14px; -unity-text-align: middle-left; }
+.quest-action:hover { background-color: rgba(143, 110, 57, .3); }
+.quest-action:disabled { opacity: .48; }
+.conversation-notice { white-space: normal; color: rgb(218, 176, 124); font-size: 13px; margin-bottom: 8px; flex-shrink: 0; }
+.reply-composer { padding: 15px 17px 10px; border-width: 1px; border-color: rgb(70, 86, 89); background-color: rgb(13, 23, 29); border-radius: 4px; flex-shrink: 0; }
+.reply-input { margin: 10px 0 8px; min-height: 57px; max-height: 100px; color: rgb(240, 233, 219); font-size: 18px; }
+.reply-input .unity-text-field__input { padding: 0; margin: 0; background-color: rgba(0, 0, 0, 0); border-width: 0; white-space: normal; color: rgb(240, 233, 219); }
+.reply-input:focus .unity-text-field__input { border-width: 0; }
+.reply-footer { flex-direction: row; align-items: center; }
+.reply-status { flex-grow: 1; flex-shrink: 1; min-width: 0; font-size: 12px; color: rgb(144, 162, 165); white-space: normal; }
+.send-button { margin: 0; background-color: rgb(183, 153, 105); color: rgb(22, 30, 33); padding: 10px 19px; font-size: 14px; -unity-font-style: bold; border-width: 0; border-radius: 3px; }
+.send-button:hover { background-color: rgb(211, 182, 133); }
+.send-button:disabled { background-color: rgb(64, 75, 76); color: rgb(136, 148, 148); }
+.cancel-button { background-color: rgba(0, 0, 0, 0); border-width: 0; color: rgb(206, 182, 146); font-size: 12px; margin-right: 10px; }
+.keyboard-hint { margin-top: 12px; font-size: 10px; letter-spacing: .4px; color: rgb(112, 134, 141); -unity-text-align: middle-center; flex-shrink: 0; }
+.conversation-open .quest-card, .conversation-open .exploration-hint { display: none; }
+.compact .hud { left: 18px; right: 18px; top: 15px; }
+.compact .location { font-size: 17px; }
+.compact .quest-card { right: 18px; top: 100px; width: 245px; }
+.compact .dialogue-backdrop { padding: 76px 15px 16px; }
+.compact .dialogue-stage { max-height: none; }
+.compact .character-card { display: none; }
+.compact .conversation-panel { padding: 20px 18px 12px; }
+.compact .conversation-header { padding-bottom: 14px; }
+.compact .conversation-title { font-size: 24px; }
+.compact .ai-toggle { margin-right: 5px; font-size: 10px; }
+.compact .close-button { font-size: 12px; }
+.compact .speech-text { font-size: 17px; }
+.compact .keyboard-hint { display: none; }
+.compact .reply-composer { padding: 12px; }
+.compact .send-button { padding: 9px 12px; }
+.compact .exploration-hint { font-size: 11px; }
+.ambient-speech { position: absolute; translate: -50% -100%; width: 300px; max-width: 32%; padding: 13px 17px; background-color: rgba(16, 27, 34, .96); border-top-width: 2px; border-top-color: rgb(179, 148, 101); border-radius: 5px; }
+.ambient-speaker { color: rgb(201, 171, 123); font-size: 11px; -unity-font-style: bold; margin-bottom: 6px; }
+.ambient-text { color: rgb(238, 230, 214); font-size: 15px; white-space: normal; }

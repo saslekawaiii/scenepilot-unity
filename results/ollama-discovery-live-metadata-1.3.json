@@ -1,0 +1,69 @@
+{
+  "success": true,
+  "checkedUtc": "2026-11-01T08:31:53.069477+00:00",
+  "runtime": "Unity bundled .NET 6.0.21 outside Unity Editor",
+  "source_sha256": {
+    ".private/ollama-discovery-live/LiveDiscovery.cs": "054f3e5fe7efdf29b60a7fbbccfe206c9264833e2aa6c5833f73f772fa88d956",
+    "Packages/com.worldweaver.toolkit/Runtime/Core/Contracts.cs": "c668147ffc21c7dea44f2139e23a1a5bb8e8c03986440911f84a249adac76fad",
+    "Packages/com.worldweaver.toolkit/Runtime/Providers/JsonTransport.cs": "11b6300876c44cbe27704d46db3ca2307d75f97d1ce88a4941f70ff48d437d4a",
+    "Packages/com.worldweaver.toolkit/Editor/Assistant/OllamaModelDiscovery.cs": "e79cc07ac2a6ebca205190f6cc2c5120c88971ec697947aef4c372b0c073b383"
+  },
+  "metadata": {
+    "serverAvailable": true,
+    "Message": "Ollama: моделей для чата 3. Список обновляется автоматически.",
+    "CheckedUtc": "2026-11-01T08:31:52.984425Z",
+    "LoadedStateKnown": true,
+    "models": [
+      {
+        "Id": "embeddinggemma:latest",
+        "Completion": false,
+        "CapabilitiesKnown": true,
+        "Vision": false,
+        "Loaded": false,
+        "Remote": false,
+        "Parameters": "307.58M"
+      },
+      {
+        "Id": "qwen2.5-coder:latest",
+        "Completion": true,
+        "CapabilitiesKnown": true,
+        "Vision": false,
+        "Loaded": false,
+        "Remote": false,
+        "Parameters": "7.6B"
+      },
+      {
+        "Id": "qwen3.5:2b",
+        "Completion": true,
+        "CapabilitiesKnown": true,
+        "Vision": true,
+        "Loaded": false,
+        "Remote": false,
+        "Parameters": "1.9B"
+      },
+      {
+        "Id": "qwen3.5:9b",
+        "Completion": true,
+        "CapabilitiesKnown": true,
+        "Vision": true,
+        "Loaded": false,
+        "Remote": false,
+        "Parameters": "9.0B"
+      }
+    ],
+    "secondPollAvailable": true,
+    "generationRequested": false
+  },
+  "inferenceRequested": false,
+  "unityControllerLifecycleCoveredHere": false,
+  "notes": [
+    "Actual service source compiled with actual JsonTransport and Core Contracts, not a mocked provider.",
+    "Two installed/running/capability refreshes; model capability cache reused on the second refresh.",
+    "Unity controller lifetime, UI event loop and throttling require separate NUnit run."
+  ],
+  "harnessSource": "using System; using System.Linq; using System.Threading.Tasks; using Newtonsoft.Json; using WorldWeaver.Editor.Assistant;\nclass LiveDiscovery { static async Task<int> Main() { using(var discovery=new OllamaModelDiscovery()) { var first=await discovery.RefreshAsync(); var second=await discovery.RefreshAsync(); Console.WriteLine(JsonConvert.SerializeObject(new { serverAvailable=first.ServerAvailable, first.Message, first.CheckedUtc, first.LoadedStateKnown, models=first.Models.Select(m=>new { m.Id,m.Completion,m.CapabilitiesKnown,m.Vision,m.Loaded,m.Remote,m.Parameters }), secondPollAvailable=second.ServerAvailable, generationRequested=false },Formatting.Indented)); return first.ServerAvailable && first.Models.Any(m=>m.Completion) ? 0:1; } } }\n",
+  "limitations": [
+    "This standalone metadata run does not execute the Unity controller or UI lifecycle.",
+    "No model inference, no download, no speed or quality benchmark."
+  ]
+}

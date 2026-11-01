@@ -149,6 +149,13 @@ namespace WorldWeaver
             memory.Enqueue(doc);
             while (memory.Count > 32) { var expired = memory.Dequeue(); store.RemoveDocument(expired.Id, expired.Scope); }
         }
+        /// <summary>Always preserves a scoped transcript when embeddings are disabled or unavailable; a future reindex embeds it.</summary>
+        public void RememberLocally(string scope,string text,MemoryKind kind)
+        {
+            if(string.IsNullOrWhiteSpace(scope)||string.IsNullOrWhiteSpace(text)||kind==MemoryKind.StaticKnowledge||!Enum.IsDefined(typeof(MemoryKind),kind))throw new ArgumentException("Invalid local memory.");
+            memory.Enqueue(new KnowledgeDocument { Id=Guid.NewGuid().ToString("N"),Scope=scope,Title=kind.ToString(),Text=text.Substring(0,Math.Min(900,text.Length)),Kind=kind });
+            while(memory.Count>32) { var expired=memory.Dequeue(); store.RemoveDocument(expired.Id,expired.Scope); }
+        }
         public List<KnowledgeDocument> ExportMemory() => memory.Select(d => new KnowledgeDocument { Id=d.Id,Scope=d.Scope,Title=d.Title,Text=d.Text,Kind=d.Kind }).ToList();
         public void RestoreMemory(IEnumerable<KnowledgeDocument> saved, string scope)
         {
