@@ -1,0 +1,14 @@
+{
+  "utc": "2026-11-01T13:27:45.230706+00:00",
+  "kind": "r11-finite-layout-and-range-guard-static-compile-only",
+  "sourceFiles": {
+    "Packages/com.worldweaver.toolkit/Runtime/UI/WorldConversationUI.cs": "3b5ad5533b0f48836ea1955b5c16e7c623c55ff3831d93bd15cfc91ed6cc134c",
+    "Packages/com.worldweaver.toolkit/Editor/Assistant/WorldGameplayTools.cs": "00998ca8e2a5142bb82c3cd09ed34fc45d11e5d89b8806f0f842a3413ba5a7e8",
+    "Packages/com.worldweaver.toolkit/Tests/PlayMode/ConversationUiPlayTests.cs": "9818289964114a8c09a79a3c92c34e9bed25c7f00ede6f303ee6aee0912258cf"
+  },
+  "runtimeRoslynExitCode": 0,
+  "editorRoslynExitCode": 0,
+  "playModeRoslynExitCode": 0,
+  "actualUnityTestsRunByThisAgent": false,
+  "preservedPriorFailure": "results/dev-conversation-scroll-r11.xml"
+}

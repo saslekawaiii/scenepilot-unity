@@ -1,0 +1,16 @@
+{
+  "kind": "explicit-exact-reviewed-plan-replay-fixture",
+  "utc": "2026-11-01T12:20:01.168727+00:00",
+  "generationReceipt": "results/mechanic-state-acceptance-1.3-r8.json",
+  "generationReceiptSha256": "ed1a01892c149cb8440c37485594bef9152efc19970e36f26305250acf151710",
+  "generatedCodeSha256": "a03bb029368bddb68f3fce8e3cfb22c80eb2936a1de5a481fadf8c36d1554986",
+  "sourceHistoryBeforeCloneSha256": "e1ac4581c1ca0931866c0136bc04d1c7ec74c944eaa909b8a660652335fba94e",
+  "newPrivateFixtureHistorySha256": "cfb3feffda6322a17de8364276f89eb61b6f7cb4127af41383061a913ae5093e",
+  "derivedInputSha256": "d1a963ba2be423b9175d3e23d3d7c154ef7af8c4ced508bdf9a3d3118b4e9ec8",
+  "historyPlanRestoredFromUnmodifiedCapturedReviewOnlyPlans": true,
+  "originalHistoryModified": false,
+  "historicalGenerationReceiptModified": false,
+  "newModelGenerationPerformed": false,
+  "reason": "R9 successful review consumed the pending plan. The first R10 invocation correctly refused before any import. A separate private fixture now replays the exact already-reviewed R8 plan; it is not a fresh generated response or an untouched original pending review.",
+  "refusalReceipt": "results/chat-code-acceptance-1.3-r10.json"
+}

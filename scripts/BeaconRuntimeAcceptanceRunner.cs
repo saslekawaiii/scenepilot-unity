@@ -105,7 +105,7 @@ public static class BeaconRuntimeAcceptanceRunner
                 ["nativeInputWaitPerPhaseSeconds"]=manualInput?(JToken)NativeInputDeadlineSeconds:null,
                 ["maximumObservedFrames"]=manualInput?NativeMaximumSamples:MaximumSamples,
                 ["inputFocusDiagnostics"]="Each sample records application focus, focused Editor window type and any-key booleans. No input text or key content other than the required F state is captured.",
-                ["samplingPoint"]="An additional PostLateUpdate callback, after the normal generated Update; no generated method is invoked by the harness.",
+                ["samplingPoint"]="An additional final Update subsystem callback, after ScriptRunBehaviourUpdate and before the later PostLateUpdate.InputEndFrame; no generated method is invoked by the harness.",
                 ["holdFramesRequired"]=HoldFrames,["releasedFramesRequired"]=ReleasedFrames,["colorTolerancePerChannel"]=ColorTolerance,
                 ["samples"]=new JArray(),["queuedInputEvents"]=new JArray(),["nativeInputRequests"]=new JArray(),["runtimeErrors"]=new JArray(),["checks"]=new JObject(),
                 ["limitations"]=new JArray("One reviewed script and one authored keyboard/color mechanic, not general model reliability.",
@@ -159,19 +159,34 @@ public static class BeaconRuntimeAcceptanceRunner
         active=Load();if(active.Phase!="entering")return;
         positive=GameObject.Find(active.Positive)?.GetComponent<Renderer>();negative=GameObject.Find(active.Negative)?.GetComponent<Renderer>();
         if(!positive||!negative){Fail(active,new InvalidOperationException("Runtime fixture renderers are absent."));return;}
-        originalLoop=PlayerLoop.GetCurrentPlayerLoop();var loop=originalLoop;bool installed=false;
-        var systems=loop.subSystemList;
-        for(int i=0;i<systems.Length;i++)if(systems[i].type==typeof(PostLateUpdate))
-        {
-            var children=(systems[i].subSystemList??Array.Empty<PlayerLoopSystem>()).ToList();
-            children.Add(new PlayerLoopSystem {type=typeof(ObservationMarker),updateDelegate=Observe});systems[i].subSystemList=children.ToArray();installed=true;break;
-        }
-        if(!installed){Fail(active,new InvalidOperationException("PostLateUpdate was absent; no runtime observation installed."));return;}
-        loop.subSystemList=systems;PlayerLoop.SetPlayerLoop(loop);observing=true;Application.logMessageReceived+=Log;
+        originalLoop=PlayerLoop.GetCurrentPlayerLoop();PlayerLoopSystem loop;
+        try{loop=WithObservation(originalLoop,out var placement);active.Report["samplingPlacement"]=placement;}
+        catch(Exception error){Fail(active,error);return;}
+        PlayerLoop.SetPlayerLoop(loop);observing=true;Application.logMessageReceived+=Log;
         observedFrames=downEdges=upEdges=heldOne=heldTwo=colorChanges=0;
         startedTime=stageTime=Time.realtimeSinceStartup;stageFrame=0;stage="baseline";previous=EffectiveColor(positive);
         active.Phase="playing";Save(active);
         Cue("baseline");
+    }
+    static PlayerLoopSystem WithObservation(PlayerLoopSystem loop,out JObject placement)
+    {
+        // Copy the root array so restoring originalLoop really removes this sampler.
+        var systems=(loop.subSystemList??Array.Empty<PlayerLoopSystem>()).ToArray();
+        int update=Array.FindIndex(systems,s=>s.type==typeof(UnityEngine.PlayerLoop.Update));
+        int postLate=Array.FindIndex(systems,s=>s.type==typeof(PostLateUpdate));
+        if(update<0||postLate<=update)throw new InvalidOperationException("Expected Update before PostLateUpdate; no runtime observation installed.");
+        var children=systems[update].subSystemList??Array.Empty<PlayerLoopSystem>();
+        var later=systems[postLate].subSystemList??Array.Empty<PlayerLoopSystem>();
+        int behavior=Array.FindIndex(children,s=>s.type==typeof(UnityEngine.PlayerLoop.Update.ScriptRunBehaviourUpdate));
+        int inputEnd=Array.FindIndex(later,s=>s.type==typeof(PostLateUpdate.InputEndFrame));
+        if(behavior<0||inputEnd<0||children.Any(s=>s.type==typeof(ObservationMarker)))
+            throw new InvalidOperationException("Cannot verify a unique sampler after ScriptRunBehaviourUpdate and before PostLateUpdate.InputEndFrame.");
+        placement=new JObject {["phase"]=typeof(UnityEngine.PlayerLoop.Update).FullName,["updateRootIndex"]=update,["scriptRunBehaviourUpdateChildIndex"]=behavior,
+            ["observerChildIndex"]=children.Length,["inputEndFrameRootIndex"]=postLate,["inputEndFrameChildIndex"]=inputEnd,
+            ["afterNormalBehaviourUpdate"]=children.Length>behavior,["beforeInputEndFrame"]=update<postLate,
+            ["actualUpdateChildrenBeforeHook"]=new JArray(children.Select(s=>s.type?.FullName)),["actualPostLateUpdateChildren"]=new JArray(later.Select(s=>s.type?.FullName))};
+        systems[update].subSystemList=children.Concat(new[]{new PlayerLoopSystem {type=typeof(ObservationMarker),updateDelegate=Observe}}).ToArray();
+        loop.subSystemList=systems;return loop;
     }
     static void Observe()
     {

@@ -1,0 +1,106 @@
+{
+  "kind": "actual-fresh-tarball-consumer-compile-and-asset-loading",
+  "startedUtc": "2026-11-01T12:21:56.0125570Z",
+  "unity": "6000.3.27f1",
+  "sourceCommit": "e5dac6e51f81ff944ceed25be59e0df39180411f",
+  "networkInferenceUsed": false,
+  "onlineTextureDownloadUsed": false,
+  "renderingAcceptance": false,
+  "limitations": [
+    "This run checks actual UPM installation, resource loading and a persisted minimal scene; it does not render a screenshot or execute a Player build.",
+    "Compiler-error count must be attached from the full Unity log by the calling process; the audit records the compile state at execution."
+  ],
+  "expectedFileCount": 554,
+  "archiveProofSha256": "277de5374e8e5eb0d3895c70aa0b6c513ef4103870cfe6a25f3cfef06ae56fb9",
+  "distributionArchive": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/deliverables/com.worldweaver.toolkit-1.3.0.tgz",
+  "packageInfo": {
+    "name": "com.worldweaver.toolkit",
+    "version": "1.3.0",
+    "source": "LocalTarball",
+    "resolvedPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/upm-clean-install-1.3-r10/Library/PackageCache/com.worldweaver.toolkit@fd2462466f1f",
+    "packageId": "com.worldweaver.toolkit@file:/Users/kirillkovalenko/Documents/ChatGPT/Диплом/deliverables/com.worldweaver.toolkit-1.3.0.tgz"
+  },
+  "installedFileCount": 554,
+  "exactNonManifestFileByteCount": 553,
+  "installedManifestAccounting": {
+    "originalDistributionSha256": "8403ae1bdc54ecd329b6b12ea60618c4d68470ee5f84ea821a1a165a2c037bf3",
+    "installedManifestSha256": "b8e78d646d0080a37867113676b8048bc6addf803ed11273fd473a2bf4ba9e53",
+    "literalBytesEqual": false,
+    "allowedCacheField": "_fingerprint",
+    "observedFingerprint": "fd2462466f1f8d3da8cb73494008bfc2",
+    "expectedArchiveMd5Fingerprint": "fd2462466f1f8d3da8cb73494008bfc2",
+    "full32LowercaseHexFingerprintMatchesArchiveMd5": true,
+    "exactCacheDirectoryMatchesFingerprintPrefix": true,
+    "exactlyOneAddedField": true,
+    "allOriginalManifestContentUnchanged": true,
+    "accepted": true,
+    "scope": "Only the observed UPM cache fingerprint is accounted for; distribution bytes remain bound by SHA256 and all installed bytes are compared before/after scene generation."
+  },
+  "loadedStarterTextureMaps": 39,
+  "sceneToolResult": {
+    "Success": true,
+    "UndoGroup": 1,
+    "Summary": "Выполнено инструментов: 2. Создано объектов: 15. Undo отменяет пакет изменений сцены.",
+    "Error": null,
+    "Results": [
+      {
+        "Success": true,
+        "Tool": "create_world",
+        "Summary": "Мир создан: рельеф, вода, освещение, камера и окружение.",
+        "Target": "owned:6561f14c0cb3402f805c93f17a6ebcd1",
+        "Error": null,
+        "CreatedAssets": [
+          "Assets/WorldWeaverGenerated/Assistant/62b324df6d234bc4bbe0f1d8e94dddf0/Terrain.asset",
+          "Assets/WorldWeaverGenerated/Assistant/62b324df6d234bc4bbe0f1d8e94dddf0/TerrainMaterial.mat",
+          "Assets/WorldWeaverGenerated/Assistant/62b324df6d234bc4bbe0f1d8e94dddf0/GroundLayer0.terrainlayer",
+          "Assets/WorldWeaverGenerated/Assistant/62b324df6d234bc4bbe0f1d8e94dddf0/GroundLayer1.terrainlayer",
+          "Assets/WorldWeaverGenerated/Assistant/62b324df6d234bc4bbe0f1d8e94dddf0/GroundLayer2.terrainlayer",
+          "Assets/WorldWeaverGenerated/Assistant/62b324df6d234bc4bbe0f1d8e94dddf0/Lake.mat"
+        ],
+        "SourceHashes": {}
+      },
+      {
+        "Success": true,
+        "Tool": "create_object",
+        "Summary": "Создан объект «Clean Install House» (house).",
+        "Target": "owned:0298a8ce99a440ed9aa540fb313d8033",
+        "Error": null,
+        "CreatedAssets": [
+          "Assets/WorldWeaverGenerated/Assistant/62b324df6d234bc4bbe0f1d8e94dddf0/Stone.mat",
+          "Assets/WorldWeaverGenerated/Assistant/62b324df6d234bc4bbe0f1d8e94dddf0/Plaster.mat",
+          "Assets/WorldWeaverGenerated/Assistant/62b324df6d234bc4bbe0f1d8e94dddf0/GabledRoof.asset",
+          "Assets/WorldWeaverGenerated/Assistant/62b324df6d234bc4bbe0f1d8e94dddf0/Roof.mat",
+          "Assets/WorldWeaverGenerated/Assistant/62b324df6d234bc4bbe0f1d8e94dddf0/DoorWood.mat",
+          "Assets/WorldWeaverGenerated/Assistant/62b324df6d234bc4bbe0f1d8e94dddf0/Window.mat"
+        ],
+        "SourceHashes": {}
+      }
+    ]
+  },
+  "savedScene": "Assets/CleanInstall-WorldWeaver13.unity",
+  "checks": {
+    "distributionArchiveBytesMatchProof": true,
+    "packageNameAndVersion": true,
+    "packageInstalledFromLocalTarball": true,
+    "allInstalledPathsMatchArchiveProof": true,
+    "allNonManifestInstalledFileBytesMatchArchiveProof": true,
+    "originalDistributionManifestBytesMatchArchiveProof": true,
+    "installedManifestContentMatchesExceptValidatedUpmFingerprint": true,
+    "compileStateReadyAtExecution": true,
+    "all39StarterMapsAndImportSettingsLoad": true,
+    "bothDialogueFontsLoad": true,
+    "dialogueThemeAndStylesheetLoad": true,
+    "editorChatStylesheetLoads": true,
+    "newMaterialAndNpcToolsPresentInBothSchemas": true,
+    "actualWorldAndHouseToolsWork": true,
+    "terrainLayersHaveResolvedColorAndNormalMaps": true,
+    "allRenderersHaveSupportedNonErrorMaterials": true,
+    "houseWallAndRoofHaveActualPbrTextureMaps": true,
+    "roofUvAndTangentsPersist": true,
+    "undoPreservesExistingSceneMarker": true,
+    "sceneReloadRetainsTexturedWorldAndConsumerMarker": true,
+    "allInstalledBytesUnchangedAfterSceneGeneration": true
+  },
+  "passed": true,
+  "finishedUtc": "2026-11-01T12:21:57.3886860Z"
+}

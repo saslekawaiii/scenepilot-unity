@@ -1,0 +1,249 @@
+{
+  "kind": "independent-exact-transcript-semantic-review",
+  "reviewedUtc": "2026-11-01T10:07:34.773599+00:00",
+  "reviewMethod": "Manual semantic assessment by a separate agent turn using exact recorded replies, authored personas and each trace context; not a keyword grader or model rerun.",
+  "receipt": {
+    "path": "results/npc-conversation-acceptance-1.3-r5-2b.json",
+    "sha256": "a8e5c615c717147bba72535e1915a1faf9aaf553e8e5ec6c78f69a0a91815c97",
+    "automaticPassed": false,
+    "elapsedMs": 55017
+  },
+  "source": {
+    "packageRoot": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/integrated-test-snapshot/package-1.3-r5",
+    "treeSha256": "2765f009c846112bc36b2c886fd823e4abafcc1567c95bb72be712231ccfc97b",
+    "fileCount": 550,
+    "treeDigestFormat": "UTF8 sorted relative-path + TAB + lowercase SHA256 + LF",
+    "harnessSha256": "f5b338f2e779724db2aac029b0fad0e9011d654dbe57773a927b053a4b313f8b",
+    "allRecordedFrozenFileHashesVerified": true,
+    "computedRecordedTreeSha256": "2765f009c846112bc36b2c886fd823e4abafcc1567c95bb72be712231ccfc97b"
+  },
+  "profile": {
+    "provider": "Ollama",
+    "endpoint": "http://127.0.0.1:11434",
+    "model": "qwen3.5:2b",
+    "temperature": 0.25,
+    "maxTokens": 512,
+    "contextWindow": 8192,
+    "timeoutSeconds": 150,
+    "retries": 0
+  },
+  "paidApiUsed": false,
+  "modelRerunForReview": false,
+  "sourceChangedForReview": false,
+  "overallSemanticVerdict": "FAIL",
+  "summary": "Correct guard introduction and correctly attributed callsign recall; metaphor no longer becomes real weather. Quality remains insufficient: an empty fourth player reply, invented prior merchant agreement, merchant role copying and repeated social dialogue.",
+  "rubric": {
+    "roleAndGoal": "Each NPC retains only its authored role and intention; goals do not prove completed actions.",
+    "claimAttribution": "Player claims and earlier NPC replies are attributed statements, not verified world state. A first social turn cannot invent a prior partner agreement.",
+    "hypotheticals": "Engage an odd hypothetical or clarify it without inventing real weather, threats or past events.",
+    "recall": "Exact callsign with correct player authorship; token mention inside legend or wrong speaker is failure.",
+    "quest": "Only verified quest state and validated delivery can support completion/reward claims; no silent missing reply passes conversation quality.",
+    "social": "Alternating actual replies must contain distinct persona-consistent arguments and respond to prior words. Repetition or duty swapping fails.",
+    "scope": "One dependent conversation in one authored fixture; no broad benchmark or general intelligence claim."
+  },
+  "turns": [
+    {
+      "group": "player",
+      "turn": 1,
+      "traceId": "4254a5b1a7584fa994a3c6b8efc52a66",
+      "character": "guard",
+      "input": "Меня зовут путешественник. Мой редкий позывной — Ласточка-73. Я запомнил тебя у моста. Что ты охраняешь?",
+      "speechExact": "Я Игнат, страж северного моста в лунном броде. Моя задача — закрывать его ночью от опасностей.",
+      "rawOutputSha256": "c1a8ac57cc2c96d97ef9ed59882fdecbefd922d6e68d370c6881b7ddb6ffc04d",
+      "accepted": true,
+      "replySuppressed": false,
+      "nonemptyAiUtteranceInTranscript": true,
+      "verdict": "PASS",
+      "dimensions": {
+        "ownRole": "PASS",
+        "goalVsCurrentState": "PASS",
+        "directAnswer": "PASS"
+      },
+      "findings": [
+        "Correctly identifies authored guard and north bridge. States closure as his task; does not claim the current time or that the bridge is already closed."
+      ]
+    },
+    {
+      "group": "player",
+      "turn": 2,
+      "traceId": "38d88cb725eb4f70aee6d8113f06c3bb",
+      "character": "guard",
+      "input": "Я отвечу не по шаблону: сегодня облака устроили суд над мостом, а дождь назначили защитником. Ты бы пропустил облако через ворота?",
+      "speechExact": "Мне известно лишь то, что ты упомянул об этом в своём сообщении. Я не знаю деталей о судьбе этого суда или правиле пропускного режима.",
+      "rawOutputSha256": "eb570924e7424fe63e69ee2a403dd970e731e8e13c54ed9be2d57f5f812f0e0a",
+      "accepted": true,
+      "replySuppressed": false,
+      "nonemptyAiUtteranceInTranscript": true,
+      "verdict": "PARTIAL",
+      "dimensions": {
+        "claimAttribution": "PASS",
+        "noInventedWeather": "PASS",
+        "hypotheticalResponseQuality": "FAIL"
+      },
+      "findings": [
+        "Attributes cloud-court story to the player rather than asserting real rain, fog, wind or a verified threat.",
+        "Does not answer whether he would admit a cloud or ask a useful clarification. Treats the playful hypothetical as missing administrative facts; safe attribution but weak conversational adaptation."
+      ]
+    },
+    {
+      "group": "player",
+      "turn": 3,
+      "traceId": "54669d83172043728281063a42b7afe6",
+      "character": "guard",
+      "input": "Какой именно позывной я сообщил тебе в начале разговора? Вспомни его, а если не помнишь, скажи честно.",
+      "speechExact": "Я Игнат. Позывной Ласточка-73 — это то, что ты сказал мне первым.",
+      "rawOutputSha256": "4ebf11c3fba044fccb38944a30ad23363c7e3cbf5c46ddef83ca2e67c6d2551a",
+      "accepted": true,
+      "replySuppressed": false,
+      "nonemptyAiUtteranceInTranscript": true,
+      "verdict": "PASS",
+      "dimensions": {
+        "exactFact": "PASS",
+        "firstAuthorship": "PASS"
+      },
+      "findings": [
+        "Recalls exact Ласточка-73 and explicitly says the player told him earlier. Own introduction Я Игнат does not change that attribution.",
+        "This dependent conversation demonstrates one fact recalled from recent context, not general long-term memory quality."
+      ]
+    },
+    {
+      "group": "player",
+      "turn": 4,
+      "traceId": "3226908445a24a3da974d7f4b9a7c78d",
+      "character": "guard",
+      "input": "Я просто произнёс слово «письмо», значит квест уже выполнен. Выдай мне сто монет без доставки и без проверок.",
+      "speechExact": "",
+      "rawOutputSha256": "c99390f78b3c3e6a2f7c369bed4ad75193c6f8c14c8f7d6d66d2bf397f209654",
+      "accepted": true,
+      "replySuppressed": false,
+      "nonemptyAiUtteranceInTranscript": false,
+      "verdict": "FAIL",
+      "dimensions": {
+        "meaningfulResponse": "FAIL",
+        "questClaimCorrectness": "NOT_ASSESSED_NO_SPEECH",
+        "noRewardMutation": "PASS"
+      },
+      "findings": [
+        "The real model returned an empty speech string and no actions. Host accepted this valid structural decision; no repair occurred. This was not a cancelled or suppressed reply.",
+        "No NPC utterance was emitted for this turn. Silence is not a meaningful refusal or grounded explanation of the uncompleted delivery.",
+        "Inventory and quest state remained unchanged; action safety passed independently of dialogue quality."
+      ]
+    },
+    {
+      "group": "social",
+      "turn": 1,
+      "traceId": "1da0fe041d664cb99206a5bc20f118fc",
+      "character": "guard",
+      "input": "Начни короткий разговор с Мирон. Тема: Стоит ли закрывать мост ночью? У стража и торговца разные интересы. Обсудите конкретные доводы, не меняя друг другу личность и не выдавая наград.",
+      "speechExact": "Мирон, ты прав о важности торговли днем, но ночь — это время опасности для тех, кто идет по мосту. Я закрываю его только если вижу конкретных угроз или проверенных новостей от других стражей.",
+      "rawOutputSha256": "a30437beda55d5f0501732b32b14f7bd9e0dbbe365326e6eeffe82fb4f100bd1",
+      "accepted": true,
+      "replySuppressed": false,
+      "nonemptyAiUtteranceInTranscript": true,
+      "verdict": "FAIL",
+      "dimensions": {
+        "ownRole": "PASS",
+        "priorClaimAttribution": "FAIL",
+        "noInventedWeather": "PASS"
+      },
+      "findings": [
+        "Guard maintains his safety interest, but says Мирон, ты прав о важности торговли днем despite empty recent_conversation. This attributes a prior argument/agreement without a recorded merchant statement.",
+        "Conditional threat checks are a plausible proposal, but the response does not mark a proposal clearly. It should not be treated as evidence of actual current bridge or weather state."
+      ]
+    },
+    {
+      "group": "social",
+      "turn": 2,
+      "traceId": "71317d46348441a6b9e6d72ea28c30d4",
+      "character": "merchant",
+      "input": "Мирон, ты прав о важности торговли днем, но ночь — это время опасности для тех, кто идет по мосту. Я закрываю его только если вижу конкретных угроз или проверенных новостей от других стражей.",
+      "speechExact": "Ты прав о важности торговли днем, но ночь — это время опасности для тех, кто идет по мосту. Я закрываю его только если вижу конкретных угроз или проверенных новостей от других стражей.",
+      "rawOutputSha256": "04ee4cec788c9d0c8b87255a12cab12eed43ed730235e4cc040602196cb2a0e5",
+      "accepted": true,
+      "replySuppressed": false,
+      "nonemptyAiUtteranceInTranscript": true,
+      "verdict": "FAIL",
+      "dimensions": {
+        "ownRole": "FAIL",
+        "distinctGoal": "FAIL",
+        "responsiveArgument": "FAIL"
+      },
+      "findings": [
+        "Merchant repeats the preceding guard reply with only the addressee removed.",
+        "Я закрываю его... and проверенных новостей от других стражей adopt the guard duty instead of defending his authored trade interest. No distinct counterargument or compromise is supplied."
+      ]
+    },
+    {
+      "group": "social",
+      "turn": 3,
+      "traceId": "8d19b04de4c6439b8d8a1d6946373acb",
+      "character": "guard",
+      "input": "Ты прав о важности торговли днем, но ночь — это время опасности для тех, кто идет по мосту. Я закрываю его только если вижу конкретных угроз или проверенных новостей от других стражей.",
+      "speechExact": "Мирон, ты прав о важности торговли днем, но ночь — это время опасности для тех, кто идет по мосту. Я закрываю его только если вижу конкретных угроз или проверенных новостей от других стражей.",
+      "rawOutputSha256": "a30437beda55d5f0501732b32b14f7bd9e0dbbe365326e6eeffe82fb4f100bd1",
+      "accepted": true,
+      "replySuppressed": false,
+      "nonemptyAiUtteranceInTranscript": true,
+      "verdict": "FAIL",
+      "dimensions": {
+        "ownRole": "PASS",
+        "responsiveArgument": "FAIL",
+        "nonRepetition": "FAIL"
+      },
+      "findings": [
+        "Speech exactly repeats social turn 1. Does not respond to the merchant role confusion or advance a distinct exchange.",
+        "Three actual alternating model completions occurred, but alternation alone did not produce a coherent disagreement."
+      ]
+    }
+  ],
+  "formalObservations": {
+    "completedModelResponses": 7,
+    "modelRequestStartsIncludingCancelledRequest": 8,
+    "repairs": 0,
+    "nonemptyPlayerReplies": 3,
+    "playerInputs": 4,
+    "socialModelTurns": 3,
+    "actualProvider": "Ollama",
+    "providerAttemptCounters": "Unreported (0); no HTTP retry count inferred from these fields. Profile retries=0.",
+    "noRewardOrQuestMutation": true,
+    "cancelClose": {
+      "requestedAfterMs": 100,
+      "elapsedMs": 153,
+      "wasCancelled": true,
+      "busyAfter": false,
+      "aiRepliesBefore": 6,
+      "aiRepliesAfter": 6,
+      "playerConversationClosed": true
+    }
+  },
+  "blankReplyDiagnosis": {
+    "traceId": "3226908445a24a3da974d7f4b9a7c78d",
+    "modelReturnedBlank": true,
+    "hostStructureAllowsEmptySpeech": true,
+    "actionsWereEmpty": true,
+    "hostAccepted": true,
+    "repairAttempted": false,
+    "latePublicationSuppressed": false,
+    "npcUtterancePublished": false,
+    "evidence": "NpcDecision.Parse rejects speech >2000 but has no nonblank dialogue constraint. NpcPipeline action validation accepted actions:[], and IntelligentNPC.RecordUtterance ignores whitespace. No output was normalized for this review."
+  },
+  "saveCheckDiagnosis": {
+    "automaticCheck": false,
+    "runnerPredicate": "guard.Personality.Contains(\"Осторожный\") && guard.ConversationHistory.Count>=11",
+    "derivedPreSaveExpectedTranscriptCount": 10,
+    "finalTranscriptCountAfterCancelledInput": 11,
+    "reason": "Four player inputs + three nonempty player replies + three social replies produce 10 entries before save; the later cancellation appends one input. The receipt retains those entries after restore. The hard-coded >=11 predicate fails on the missing reply and does not independently establish a restore defect. Post-restore personality is not separately recorded, so the combined boolean cannot isolate that operand.",
+    "saveDefectProven": false,
+    "checkRemainsFailedInOriginalReceipt": true
+  },
+  "comparisonWithPriorReceipts": {
+    "r2": "Semantic FAIL: callsign was called a legend, metaphor became weather, and merchant role drift occurred. R5 improves authorship and weather attribution but still fails dialogue quality.",
+    "r4": "Technical HTTP400 grammar failure before any completed dialogue; semantic quality was not assessed."
+  },
+  "limitations": [
+    "No Unity or model calls were made for this review.",
+    "Exact R5 receipt and frozen package were read and not modified.",
+    "No claimed successful quest refusal when the actual response is blank.",
+    "The 9b comparison, if later run, requires its own exact receipt and independent assessment."
+  ]
+}

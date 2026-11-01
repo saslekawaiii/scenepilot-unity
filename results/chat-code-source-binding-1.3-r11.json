@@ -1,0 +1,17 @@
+{
+  "kind": "external-caller-exact-source-binding",
+  "sourceCommit": "399f1c62f17f7ab007452810b76f3108f8b143e5",
+  "snapshotManifest": "results/integration-1.3-snapshot-r11.json",
+  "snapshotManifestSha256": "592c4443d194f44a51aeffce78e0d01ad9f45a95c32801bef8e1a0a196423508",
+  "packageFileCount": 554,
+  "canonicalOrdinalNulTreeSha256": "18e8e430c6ce75490db6893455c30593b00626dfb13d9d8aa0c81eb399419f8f",
+  "packageFilesVerifiedAfterRun": true,
+  "actualReceipt": "results/chat-code-acceptance-1.3-r11-fresh-fixture.json",
+  "actualReceiptSha256": "1f4edbb9f58a904cb179ab156ef66dfb5c26819062f64ab5436d9935317693a0",
+  "generationReceipt": "results/mechanic-state-acceptance-1.3-r8.json",
+  "freshFixtureProvenance": "results/chat-code-fresh-fixture-provenance-1.3-r11.json",
+  "reviewedSourceSha256": "a03bb029368bddb68f3fce8e3cfb22c80eb2936a1de5a481fadf8c36d1554986",
+  "unityExitCode": 0,
+  "logSha256": "6d20e2f17e9ceaa753cc6d38171192f06eb7d230776077b3b8e368d59108a821",
+  "scope": "Fresh execution metadata fixture replayed the exact already-reviewed R8 plan against R11: imported, compiled, attached, reverted and restored; no new model generation and no F behavior proof in this receipt."
+}

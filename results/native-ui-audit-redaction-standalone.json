@@ -1,0 +1,56 @@
+{
+  "scope": "Standalone synthetic inputs passed to the actual compiled external audit SafeText method; no Unity launched, no UI/inference invoked, no product assets modified.",
+  "passed": true,
+  "caseCount": 10,
+  "cases": [
+    {
+      "case": "json_double_password",
+      "passed": true
+    },
+    {
+      "case": "json_single_api_key",
+      "passed": true
+    },
+    {
+      "case": "quoted_key_equals",
+      "passed": true
+    },
+    {
+      "case": "unquoted_assignment",
+      "passed": true
+    },
+    {
+      "case": "json_access_token",
+      "passed": true
+    },
+    {
+      "case": "escaped_json_value",
+      "passed": true
+    },
+    {
+      "case": "ordinary_russian",
+      "passed": true
+    },
+    {
+      "case": "password_hint_key",
+      "passed": true
+    },
+    {
+      "case": "ordinary_json",
+      "passed": true
+    },
+    {
+      "case": "embedded_key_preserved",
+      "passed": true
+    }
+  ],
+  "source": "scripts/NativeConversationUiAudit.cs",
+  "sourceSha256": "4522442d9195d661c77ed661e9c4138a37f8bc21fd050631c99b6b531b383a51",
+  "probeSourceSha256": "31319d2e425d56c9c42cb88d3709c6d42ced6bfab5710230746791ad65523aa9",
+  "previousSourceSha256": "a0e180da3bee76142c6dbc7c7e6125c1ae147ddb8146a0f8c2b67054c9813828",
+  "compilerExitCode": 0,
+  "processExitCode": 0,
+  "probeSource": "results/harness-history/NativeAuditRedactionProbe-31319d2e425d56c9c42cb88d3709c6d42ced6bfab5710230746791ad65523aa9.cs.txt",
+  "probeExeSha256": "fb8ea47b796832c18cc6d4c3f41e0441b1dd09d9a2d6a45a189e9e34efe92aef",
+  "compiledAuditSha256": "e31bff66b93ffa66ba26cd3341a4762075b9791aa461c65802cdc38d5adc989b"
+}

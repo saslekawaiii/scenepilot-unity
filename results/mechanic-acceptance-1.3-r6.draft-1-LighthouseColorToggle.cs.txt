@@ -1,0 +1,31 @@
+using UnityEngine;
+
+public class LighthouseColorToggle : MonoBehaviour
+{
+    private Color currentColor = new Color(0.235f, 0.286f, 1f);
+    private Color alternateColor = new Color(1f, 0.749f, 0.11f);
+    
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            ToggleColor();
+        }
+    }
+
+    private void ToggleColor()
+    {
+        Renderer renderer = GetComponent<Renderer>();
+        if (renderer != null)
+        {
+            Color nextColor = currentColor == alternateColor ? currentColor : alternateColor;
+            renderer.material.color = nextColor;
+            
+            // Сохраняем текущий цвет как следующий
+            if (currentColor == alternateColor)
+            {
+                currentColor = new Color(0.235f, 0.286f, 1f);
+            }
+        }
+    }
+}

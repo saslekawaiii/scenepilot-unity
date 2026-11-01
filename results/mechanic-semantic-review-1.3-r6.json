@@ -1,0 +1,59 @@
+{
+  "kind": "independent-static-semantic-review-of-exact-main-chat-mechanic-draft",
+  "reviewUtc": "2026-11-01T10:24:57.081652+00:00",
+  "reviewer": "independent fresh_code_review agent",
+  "verdict": "FAIL",
+  "accepted": false,
+  "sourceReceipt": "mechanic-acceptance-1.3-r6.json",
+  "sourceReceiptSha256": "0d1de3e0559baf1d860a999eb5331d8a99cacdc45ba191e229f65b40cfc364cf",
+  "reviewedSource": "mechanic-acceptance-1.3-r6.draft-1-LighthouseColorToggle.cs.txt",
+  "reviewedSourceSha256": "6536bcb057834901e80e8fd774081eafd102341a7aabee5b8d6133113f48d9a5",
+  "reviewedSourceBytes": 852,
+  "className": "LighthouseColorToggle",
+  "originalPrompt": "Создай синий куб «Маяк». Когда игрок нажимает F, цвет куба должен переключаться между синим и янтарным; повторное нажатие возвращает исходный синий цвет. На одно нажатие — одно переключение.",
+  "protocolReceiptSuccess": true,
+  "protocolSuccessScope": "Retained review-only candidate and static indicators, not correct mechanic behavior.",
+  "findings": [
+    {
+      "priority": "P1",
+      "area": "second_press_state_transition",
+      "lines": [
+        21,
+        25,
+        27
+      ],
+      "result": "fail",
+      "evidence": "currentColor starts blue and is never assigned alternateColor. Both comparisons with alternateColor remain false. Every F press therefore assigns alternateColor to the Renderer; the second press cannot restore blue.",
+      "symbolicSequence": [
+        "currentColor=blue; rendered color is not initialized by this component",
+        "first F edge: nextColor=amber; Renderer=amber; currentColor remains blue",
+        "second F edge: nextColor=amber again; Renderer stays amber; currentColor remains blue"
+      ]
+    },
+    {
+      "priority": "P2",
+      "area": "initial_render_color",
+      "lines": [
+        5,
+        8,
+        22
+      ],
+      "result": "not_initialized",
+      "evidence": "The blue value is only a private field initializer; there is no Awake/Start/OnEnable assignment to the Renderer. A neutral fixture does not become blue when the component starts.",
+      "scope": "A separately authored blue material could establish initial blue, but this component alone does not. The original acceptance receipt has no executed scene steps and objectCount=0."
+    }
+  ],
+  "positiveObservations": [
+    "Input.GetKeyDown(KeyCode.F) is an appropriate static press-edge indicator.",
+    "The source is one small MonoBehaviour and contains no file/network/process/reflection calls.",
+    "These observations do not fix the incorrect color-state transition."
+  ],
+  "notPerformed": [
+    "No source import or modification",
+    "No approval or attachment",
+    "No Unity compilation",
+    "No runtime F-key/color measurement"
+  ],
+  "scope": "Exact static state walkthrough of this852-byte source. No empirical runtime failure or model-reliability estimate is claimed.",
+  "nextStep": "Send factual review feedback in the original private chat; require a newly generated complete corrected candidate, then independently review its exact bytes before compilation and runtime acceptance."
+}

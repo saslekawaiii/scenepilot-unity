@@ -1,0 +1,45 @@
+{
+  "kind": "bounded-native-default-npc-failed-response-observation",
+  "recordedUtc": "2026-11-01T13:11:14.770962+00:00",
+  "productRevisionContext": "r10",
+  "productSourceCommitContext": "e5dac6e51f81ff944ceed25be59e0df39180411f",
+  "fullExecutableSourceMapCapturedByThisObservation": false,
+  "question": "Игнат, если мост сравнить с уставшим человеком, стоит ли ему дать отдых? Я не несу письмо — просто хочу поговорить.",
+  "viewportPreset": "Full HD 1920x1080; editor scale approximately .99",
+  "observedUiOutcome": "Error notice and original input restored; no NPC answer displayed for this attempt.",
+  "successfulModelReplyObserved": false,
+  "semanticQualityEvaluated": false,
+  "profile": {
+    "provider": "Ollama",
+    "model": "qwen3.5:9b",
+    "maxTokens": 1024,
+    "timeoutSeconds": 90,
+    "retries": 1,
+    "temperature": 0.0,
+    "contextWindow": 8192,
+    "strictSchema": true
+  },
+  "profileEvidence": {
+    "file": "results/screenshots-1.3/native-npc-profile-20261101T1258578693850Z-91f91cb2.json",
+    "sha256": "fcd28db394321f35b84b454809988f27bb15a4003d5469c1230a104d771a1ba7",
+    "scope": "Original unchanged demo route read in the subsequent Play session immediately before applying a temporary QA clone; not a trace captured at the first failed send."
+  },
+  "transportLogTimeZone": "UTC+03:00",
+  "transportLogExcerpts": [
+    "[GIN] 2026/11/01 - 15:37:29 | 200 |  7.497983166s |       127.0.0.1 | POST     \"/api/embed\"",
+    "[GIN] 2026/11/01 - 15:37:33 | 200 |  3.023871708s |       127.0.0.1 | POST     \"/api/embed\"",
+    "[GIN] 2026/11/01 - 15:37:33 | 200 |  723.650333ms |       127.0.0.1 | POST     \"/api/embed\"",
+    "[GIN] 2026/11/01 - 15:37:34 | 200 |  692.497959ms |       127.0.0.1 | POST     \"/api/embed\"",
+    "[GIN] 2026/11/01 - 15:39:09 | 499 |         1m35s |       127.0.0.1 | POST     \"/api/chat\"",
+    "[GIN] 2026/11/01 - 15:40:39 | 500 |         1m29s |       127.0.0.1 | POST     \"/api/chat\""
+  ],
+  "transportObservation": "Four embedding requests returned 200; first chat returned 499 after ~95s, next 500 after ~89s. This is transport failure/cancellation evidence, not an invalid semantic NPC response.",
+  "uiScreenshot": {
+    "file": "results/screenshots-1.3/npc-fullhd-timeout-restored-input-r10.png",
+    "sha256": "739a491875b85e2ec5afbbf63c28cd625bc0a04c05eb6ffbb95c9bd558c1547c"
+  },
+  "limitations": [
+    "Manual native UI observation plus bounded transport excerpts; no saved first-attempt PipelineTrace.",
+    "The later 512-token/150-second runtime-clone test is recorded separately; it does not overwrite this outcome."
+  ]
+}

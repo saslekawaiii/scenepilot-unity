@@ -1,0 +1,18 @@
+{
+  "kind": "external-caller-exact-source-binding",
+  "sourceCommit": "e5dac6e51f81ff944ceed25be59e0df39180411f",
+  "snapshotManifest": "results/integration-1.3-snapshot-r10.json",
+  "snapshotManifestSha256": "cdd105e0f05f98aeb895595161f0dcfba5d8e508c39e5ae3d2887dfbacf54797",
+  "packageFileCount": 554,
+  "canonicalOrdinalNulTreeSha256": "62c5f8b4080f1e1511dfcad4c3dec20d6dd050df7e34d94b70380a20c110a9a5",
+  "packageFilesVerifiedAfterRun": true,
+  "actualReceipt": "results/chat-code-acceptance-1.3-r10-fresh-fixture.json",
+  "actualReceiptSha256": "a70425379064fc72abf860ce917883af4e32ae8f71ad8f08e091f0821b44e242",
+  "generationReceipt": "results/mechanic-state-acceptance-1.3-r8.json",
+  "freshFixtureProvenance": "results/chat-code-fresh-fixture-provenance-1.3-r10.json",
+  "reviewedSourceSha256": "a03bb029368bddb68f3fce8e3cfb22c80eb2936a1de5a481fadf8c36d1554986",
+  "unityExitCode": 0,
+  "compilerErrors": 0,
+  "logSha256": "078b31ce928dd2269ecefcbe0f239d4c028896e843d6030a84f9452a97c18c56",
+  "scope": "A fresh execution-metadata fixture replayed the exact already-reviewed R8 plan against R10; 11 real import/compiler/attach/revert/restore checks. Not new model generation and not F behavior proof. Original consumed-review and stale-checkpoint refusals retained."
+}

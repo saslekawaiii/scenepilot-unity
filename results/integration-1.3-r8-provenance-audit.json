@@ -1,0 +1,1556 @@
+{
+  "schemaVersion": 1,
+  "kind": "independent-integration-source-and-proof-audit",
+  "checkedUtc": "2026-11-01T11:38:27.213273+00:00",
+  "examinedRoot": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source",
+  "auditorSource": {
+    "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/scripts/audit_integration_1_3.py",
+    "sha256": "fccefdf431ce80e85ecd3ccccf297007ae5b8582bee35dd4dacec5e49cf3e713"
+  },
+  "targetSnapshot": "r8",
+  "scope": "Byte/source/protocol integrity, not independent semantic validation of model answers or a benchmark.",
+  "snapshots": {
+    "r1": {
+      "manifest": "results/integration-1.3-snapshot-r1.json",
+      "manifestSha256": "856e5e4304c66e506b9f4c57970c0aa455fb11b1360a083a791dd0bc26522749",
+      "sourceCommit": "dbf1a4ca86c84a500744dfd0c57d4a04c25a220f",
+      "packageVersion": "1.3.0",
+      "fileCount": 544,
+      "declaredTreeSha256": "9167be360e9dad02e0cd1ab90592d177f5c0a303b0ca70b74eceeb0457e8a000",
+      "verifiedDeclaredTreeSha256": "9167be360e9dad02e0cd1ab90592d177f5c0a303b0ca70b74eceeb0457e8a000",
+      "canonicalOrdinalNulTreeSha256": "dc9e89386286436cee1ac535335ba0740e35c8e721f3c7b35e5fe5c5844f986a",
+      "treeOrderingNote": "Snapshot uses component-sorted manifest row order; an ordinal full-path NUL hash can legitimately differ.",
+      "harnessDeclarations": {
+        "MaterialAcceptanceRunner.cs": "e81256a0d0a001d8f30db1aed9cdc0dfc268960a9e9d59a5338f116f2ce73c69",
+        "MechanicAcceptanceRunner.cs": "086c6e01266fd2a0debf5ddcc12ecd9455a716b292f6755e04d6418a6db04310",
+        "NpcConversationAcceptanceRunner.cs": "13e338353a946c630f0a2ccf967ce7436c9f4f4a326ad2fe5d51e7884acd41b3"
+      },
+      "localImmutableSnapshotAvailable": false,
+      "sourceCommitDifference": {
+        "missing": [],
+        "extra": [],
+        "changed": []
+      }
+    },
+    "r2": {
+      "manifest": "results/integration-1.3-snapshot-r2.json",
+      "manifestSha256": "19193c3467f0a9bfd2313b1086921bf3a47822cb7186b629ca0627b2286c4c3e",
+      "sourceCommit": "8c78dec26400ca43133fa5622b88a35f973a511c",
+      "packageVersion": "1.3.0",
+      "fileCount": 544,
+      "declaredTreeSha256": "07b1be37a5b470f9870c046689b79761106df82992e4fb1a02f1b17ec30f329e",
+      "verifiedDeclaredTreeSha256": "07b1be37a5b470f9870c046689b79761106df82992e4fb1a02f1b17ec30f329e",
+      "canonicalOrdinalNulTreeSha256": "1d43db83b69fcd6777d83f551a27aff22f4015f485a3dd9bcdab292c276b5763",
+      "treeOrderingNote": "Snapshot uses component-sorted manifest row order; an ordinal full-path NUL hash can legitimately differ.",
+      "harnessDeclarations": {
+        "MaterialAcceptanceRunner.cs": "a59b8b006287baaf623ddb19ddf2248491a85eba018c10cc4ab71d3ba5f02c25",
+        "NpcConversationAcceptanceRunner.cs": "71fbdc45a14ae75aa378b869a1f653190d4354352e13ca34bcc28c9273a98ccd",
+        "MechanicAcceptanceRunner.cs": "ac48bb92f566511ac629d1c8880ad87a1cb53cbf6a777a7262a02ef05d593365"
+      },
+      "localImmutableSnapshotAvailable": false,
+      "sourceCommitDifference": {
+        "missing": [],
+        "extra": [],
+        "changed": []
+      }
+    },
+    "r3": {
+      "manifest": "results/integration-1.3-snapshot-r3.json",
+      "manifestSha256": "c137f2a4365245d050741ddb04f9422022d061a7e66a3ddcc20a80df9f737601",
+      "sourceCommit": "9e0ad02eb1189e9be273dc6b5789d568e9531d65",
+      "packageVersion": "1.3.0",
+      "fileCount": 546,
+      "declaredTreeSha256": "ec8fefd6a5f9c51c312791d05c1529110541892dc4381188e15cfd32ff2e45f7",
+      "verifiedDeclaredTreeSha256": "ec8fefd6a5f9c51c312791d05c1529110541892dc4381188e15cfd32ff2e45f7",
+      "canonicalOrdinalNulTreeSha256": "2ab7001240e5c650f636e9561313abbccbfd5775329c9b1e0085d0d0b78099fd",
+      "treeOrderingNote": "Snapshot uses component-sorted manifest row order; an ordinal full-path NUL hash can legitimately differ.",
+      "harnessDeclarations": {
+        "MaterialAcceptanceRunner.cs": "a59b8b006287baaf623ddb19ddf2248491a85eba018c10cc4ab71d3ba5f02c25",
+        "NpcConversationAcceptanceRunner.cs": "f5b338f2e779724db2aac029b0fad0e9011d654dbe57773a927b053a4b313f8b",
+        "MechanicAcceptanceRunner.cs": "ac48bb92f566511ac629d1c8880ad87a1cb53cbf6a777a7262a02ef05d593365"
+      },
+      "localImmutableSnapshotAvailable": false,
+      "sourceCommitDifference": {
+        "missing": [],
+        "extra": [],
+        "changed": []
+      }
+    },
+    "r4": {
+      "manifest": "results/integration-1.3-snapshot-r4.json",
+      "manifestSha256": "926435458590c0c2b77f484f7413252075e56bdce6a10b7ab6c4ec5fde132b79",
+      "sourceCommit": "b24c30bd2e30585143835ebac3754410c5d91b3e",
+      "packageVersion": "1.3.0",
+      "fileCount": 546,
+      "declaredTreeSha256": "4a9b2829c9b160af6b1595440da4d34e9ae508a0a70f9caea586400b02e043ee",
+      "verifiedDeclaredTreeSha256": "4a9b2829c9b160af6b1595440da4d34e9ae508a0a70f9caea586400b02e043ee",
+      "canonicalOrdinalNulTreeSha256": "f2f50b1aebb799004763d35887e974e9f51b15b2046d37dbe39d8faea37ff56d",
+      "treeOrderingNote": "Snapshot uses component-sorted manifest row order; an ordinal full-path NUL hash can legitimately differ.",
+      "harnessDeclarations": {
+        "MaterialAcceptanceRunner.cs": "a59b8b006287baaf623ddb19ddf2248491a85eba018c10cc4ab71d3ba5f02c25",
+        "NpcConversationAcceptanceRunner.cs": "f5b338f2e779724db2aac029b0fad0e9011d654dbe57773a927b053a4b313f8b",
+        "MechanicAcceptanceRunner.cs": "ac48bb92f566511ac629d1c8880ad87a1cb53cbf6a777a7262a02ef05d593365"
+      },
+      "localImmutableSnapshotAvailable": false,
+      "sourceCommitDifference": {
+        "missing": [],
+        "extra": [],
+        "changed": []
+      }
+    },
+    "r5": {
+      "manifest": "results/integration-1.3-snapshot-r5.json",
+      "manifestSha256": "909c2e98dc42344b139c3f64752606f614bf3736220be22476872e3042142dfc",
+      "sourceCommit": "ae623f7410fda29a225590b114019c856169a69a",
+      "packageVersion": "1.3.0",
+      "fileCount": 550,
+      "declaredTreeSha256": "126855624471629ceafd9b810ef73687cc4733b7b789c44ec167a37e86dd10ff",
+      "verifiedDeclaredTreeSha256": "126855624471629ceafd9b810ef73687cc4733b7b789c44ec167a37e86dd10ff",
+      "canonicalOrdinalNulTreeSha256": "769e5fb3895f45c07d04bc2b3336557fcdf14b98139b38e012227bf6c650e65a",
+      "treeOrderingNote": "Snapshot uses component-sorted manifest row order; an ordinal full-path NUL hash can legitimately differ.",
+      "harnessDeclarations": {
+        "MaterialAcceptanceRunner.cs": "a59b8b006287baaf623ddb19ddf2248491a85eba018c10cc4ab71d3ba5f02c25",
+        "NpcConversationAcceptanceRunner.cs": "f5b338f2e779724db2aac029b0fad0e9011d654dbe57773a927b053a4b313f8b",
+        "MechanicAcceptanceRunner.cs": "ac48bb92f566511ac629d1c8880ad87a1cb53cbf6a777a7262a02ef05d593365"
+      },
+      "localImmutableSnapshotAvailable": false,
+      "sourceCommitDifference": {
+        "missing": [],
+        "extra": [],
+        "changed": []
+      }
+    },
+    "r6": {
+      "manifest": "results/integration-1.3-snapshot-r6.json",
+      "manifestSha256": "83d854ff94f1ecbc3a56faefc3de0e741c9590ff527f53eec955b7c0b2394e44",
+      "sourceCommit": "acbd23c72c9e2061f3abcf9516d9d851701c3c82",
+      "packageVersion": "1.3.0",
+      "fileCount": 550,
+      "declaredTreeSha256": "9ba1a3c6447174dd4e695019d8b1018541b12621d20ca903d12e987fc1801ee9",
+      "verifiedDeclaredTreeSha256": "9ba1a3c6447174dd4e695019d8b1018541b12621d20ca903d12e987fc1801ee9",
+      "canonicalOrdinalNulTreeSha256": "e6cc2a4627a6a7c56252e52a35c6ff60d15c9ab67bea9b601027c8e455d12257",
+      "treeOrderingNote": "Snapshot uses component-sorted manifest row order; an ordinal full-path NUL hash can legitimately differ.",
+      "harnessDeclarations": {
+        "MaterialAcceptanceRunner.cs": "a59b8b006287baaf623ddb19ddf2248491a85eba018c10cc4ab71d3ba5f02c25",
+        "NpcConversationAcceptanceRunner.cs": "f5b338f2e779724db2aac029b0fad0e9011d654dbe57773a927b053a4b313f8b",
+        "MechanicAcceptanceRunner.cs": "ac48bb92f566511ac629d1c8880ad87a1cb53cbf6a777a7262a02ef05d593365"
+      },
+      "localImmutableSnapshotAvailable": false,
+      "sourceCommitDifference": {
+        "missing": [],
+        "extra": [],
+        "changed": []
+      }
+    },
+    "r7": {
+      "manifest": "results/integration-1.3-snapshot-r7.json",
+      "manifestSha256": "5e539481e1887d0569d25fbca5bfa9fb07a033adc1526bea34044854f4c039e5",
+      "sourceCommit": "882f753d79e5ce52afe93e3fde90e7a4d790a26b",
+      "packageVersion": "1.3.0",
+      "fileCount": 550,
+      "declaredTreeSha256": "0d0ab26d561c88503a7272ac32ab9199dfd3c03117e2a57a3d639189a2e95292",
+      "verifiedDeclaredTreeSha256": "0d0ab26d561c88503a7272ac32ab9199dfd3c03117e2a57a3d639189a2e95292",
+      "canonicalOrdinalNulTreeSha256": "39bb80dac9a00160d52283d107f0e129796f97b203b8ee90d0bf6de1ef1269f3",
+      "treeOrderingNote": "Snapshot uses component-sorted manifest row order; an ordinal full-path NUL hash can legitimately differ.",
+      "harnessDeclarations": {
+        "MaterialAcceptanceRunner.cs": "a59b8b006287baaf623ddb19ddf2248491a85eba018c10cc4ab71d3ba5f02c25",
+        "NpcConversationAcceptanceRunner.cs": "f5b338f2e779724db2aac029b0fad0e9011d654dbe57773a927b053a4b313f8b",
+        "MechanicAcceptanceRunner.cs": "ac48bb92f566511ac629d1c8880ad87a1cb53cbf6a777a7262a02ef05d593365",
+        "MechanicRepairAcceptanceRunner.cs": "24f6c0382e607b00041dac145b229e27e4c4fdda8e94a8aa9485d1158ab61c61",
+        "MaterialChatAcceptanceRunner.cs": "a8993b2ba8394cc8ae7e366aece2bfbaa2497bb349c6f35dca7dbbdeeaf107cc"
+      },
+      "localImmutableSnapshotAvailable": false,
+      "sourceCommitDifference": {
+        "missing": [],
+        "extra": [],
+        "changed": []
+      }
+    },
+    "r8": {
+      "manifest": "results/integration-1.3-snapshot-r8.json",
+      "manifestSha256": "1f376b544089ff935c9161ef917da06a701a41b91e4df1b9cc712d55c810a358",
+      "sourceCommit": "1499fc360e5f99120cdfca4f12ce7d03c43643f4",
+      "packageVersion": "1.3.0",
+      "fileCount": 550,
+      "declaredTreeSha256": "2d5b6a4bb05325f9ce8522b172c3836ae5c771a39b67049a9a3b139f7d93547b",
+      "verifiedDeclaredTreeSha256": "2d5b6a4bb05325f9ce8522b172c3836ae5c771a39b67049a9a3b139f7d93547b",
+      "canonicalOrdinalNulTreeSha256": "e12a1fe53149cbf2a37586f1c95bc8be3ff9b8b1ecc73956a00b127fefdbcddc",
+      "treeOrderingNote": "Snapshot uses component-sorted manifest row order; an ordinal full-path NUL hash can legitimately differ.",
+      "harnessDeclarations": {
+        "MaterialAcceptanceRunner.cs": "a59b8b006287baaf623ddb19ddf2248491a85eba018c10cc4ab71d3ba5f02c25",
+        "NpcConversationAcceptanceRunner.cs": "f5b338f2e779724db2aac029b0fad0e9011d654dbe57773a927b053a4b313f8b",
+        "MechanicAcceptanceRunner.cs": "ac48bb92f566511ac629d1c8880ad87a1cb53cbf6a777a7262a02ef05d593365",
+        "MechanicRepairAcceptanceRunner.cs": "24f6c0382e607b00041dac145b229e27e4c4fdda8e94a8aa9485d1158ab61c61",
+        "MaterialChatAcceptanceRunner.cs": "a8993b2ba8394cc8ae7e366aece2bfbaa2497bb349c6f35dca7dbbdeeaf107cc"
+      },
+      "localImmutableSnapshotAvailable": false,
+      "sourceCommitDifference": {
+        "missing": [],
+        "extra": [],
+        "changed": []
+      }
+    }
+  },
+  "issues": [],
+  "pendingEvidence": [],
+  "notes": [
+    "r1: private snapshot directory unavailable; public manifest self-hashes still checked",
+    "r2: private snapshot directory unavailable; public manifest self-hashes still checked",
+    "r3: private snapshot directory unavailable; public manifest self-hashes still checked",
+    "r4: private snapshot directory unavailable; public manifest self-hashes still checked",
+    "r5: private snapshot directory unavailable; public manifest self-hashes still checked",
+    "r6: private snapshot directory unavailable; public manifest self-hashes still checked",
+    "r7: private snapshot directory unavailable; public manifest self-hashes still checked",
+    "r8: private snapshot directory unavailable; public manifest self-hashes still checked"
+  ],
+  "actualAcceptanceProfile": "canonical-three",
+  "requiredActualSlots": [
+    "material",
+    "npc-conversation",
+    "mechanic"
+  ],
+  "canonicalThreeSlotsComplete": true,
+  "auditStatus": "verified",
+  "provenanceIntegrityVerified": true,
+  "allRequiredActualAcceptancesReportedPassed": true,
+  "allExplicitlyRequiredActualAcceptancesReportedPassed": true,
+  "currentPackageDifferenceFromTarget": {
+    "missing": [],
+    "extra": [],
+    "changed": []
+  },
+  "currentPackageEqualsTarget": true,
+  "currentPackageVersion": "1.3.0",
+  "currentPackageCanonicalOrdinalNulTreeSha256": "e12a1fe53149cbf2a37586f1c95bc8be3ff9b8b1ecc73956a00b127fefdbcddc",
+  "targetHarnesses": [
+    {
+      "name": "MaterialAcceptanceRunner.cs",
+      "sha256": "a59b8b006287baaf623ddb19ddf2248491a85eba018c10cc4ab71d3ba5f02c25",
+      "actualBytesLocated": true,
+      "currentScriptSha256": "a59b8b006287baaf623ddb19ddf2248491a85eba018c10cc4ab71d3ba5f02c25",
+      "location": "scripts/MaterialAcceptanceRunner.cs"
+    },
+    {
+      "name": "NpcConversationAcceptanceRunner.cs",
+      "sha256": "f5b338f2e779724db2aac029b0fad0e9011d654dbe57773a927b053a4b313f8b",
+      "actualBytesLocated": true,
+      "currentScriptSha256": "f5b338f2e779724db2aac029b0fad0e9011d654dbe57773a927b053a4b313f8b",
+      "location": "scripts/NpcConversationAcceptanceRunner.cs"
+    },
+    {
+      "name": "MechanicAcceptanceRunner.cs",
+      "sha256": "ac48bb92f566511ac629d1c8880ad87a1cb53cbf6a777a7262a02ef05d593365",
+      "actualBytesLocated": true,
+      "currentScriptSha256": "ac48bb92f566511ac629d1c8880ad87a1cb53cbf6a777a7262a02ef05d593365",
+      "location": "scripts/MechanicAcceptanceRunner.cs"
+    },
+    {
+      "name": "MechanicRepairAcceptanceRunner.cs",
+      "sha256": "24f6c0382e607b00041dac145b229e27e4c4fdda8e94a8aa9485d1158ab61c61",
+      "actualBytesLocated": true,
+      "currentScriptSha256": "24f6c0382e607b00041dac145b229e27e4c4fdda8e94a8aa9485d1158ab61c61",
+      "location": "scripts/MechanicRepairAcceptanceRunner.cs"
+    },
+    {
+      "name": "MaterialChatAcceptanceRunner.cs",
+      "sha256": "a8993b2ba8394cc8ae7e366aece2bfbaa2497bb349c6f35dca7dbbdeeaf107cc",
+      "actualBytesLocated": true,
+      "currentScriptSha256": "a8993b2ba8394cc8ae7e366aece2bfbaa2497bb349c6f35dca7dbbdeeaf107cc",
+      "location": "scripts/MaterialChatAcceptanceRunner.cs"
+    }
+  ],
+  "optionalTargetHarnessesDoNotAddRequiredSlots": [
+    "MaterialChatAcceptanceRunner.cs",
+    "MechanicRepairAcceptanceRunner.cs"
+  ],
+  "xmlRuns": {
+    "integration-1.3-edit-r2.xml": {
+      "sha256": "eb20e609d3a771eb8208a48d83eb09347b6d2d66bbe4ef13c0f711ff80a4f1fe",
+      "rootResult": "Passed",
+      "declared": {
+        "total": 479,
+        "passed": 479,
+        "failed": 0,
+        "skipped": 0,
+        "inconclusive": 0
+      },
+      "actual": {
+        "Passed": 479
+      },
+      "actualTotal": 479,
+      "allCasesPassedWithoutSkip": true,
+      "issues": [],
+      "bindingScope": "XML filename and companion snapshot manifest; NUnit XML itself contains no package SHA256.",
+      "path": "results/integration-1.3-edit-r2.xml"
+    },
+    "integration-1.3-edit-r4.xml": {
+      "sha256": "d21ebd9fd1f1a5cbf794c965b0d31a177ee90f56c2ed2f366263672ae2da8be3",
+      "rootResult": "Passed",
+      "declared": {
+        "total": 504,
+        "passed": 504,
+        "failed": 0,
+        "skipped": 0,
+        "inconclusive": 0
+      },
+      "actual": {
+        "Passed": 504
+      },
+      "actualTotal": 504,
+      "allCasesPassedWithoutSkip": true,
+      "issues": [],
+      "bindingScope": "XML filename and companion snapshot manifest; NUnit XML itself contains no package SHA256.",
+      "path": "results/integration-1.3-edit-r4.xml"
+    },
+    "integration-1.3-edit-r5.xml": {
+      "sha256": "2f87d0662a595918baac8d9704a9e078813c3fceb7ad423d25c64b675de00d49",
+      "rootResult": "Passed",
+      "declared": {
+        "total": 506,
+        "passed": 506,
+        "failed": 0,
+        "skipped": 0,
+        "inconclusive": 0
+      },
+      "actual": {
+        "Passed": 506
+      },
+      "actualTotal": 506,
+      "allCasesPassedWithoutSkip": true,
+      "issues": [],
+      "bindingScope": "XML filename and companion snapshot manifest; NUnit XML itself contains no package SHA256.",
+      "path": "results/integration-1.3-edit-r5.xml"
+    },
+    "integration-1.3-edit-r6.xml": {
+      "sha256": "79fa227c6fa2aae69d2258deb63e72b84d71ceb28bb0aa998012baa2d2c0a060",
+      "rootResult": "Passed",
+      "declared": {
+        "total": 510,
+        "passed": 510,
+        "failed": 0,
+        "skipped": 0,
+        "inconclusive": 0
+      },
+      "actual": {
+        "Passed": 510
+      },
+      "actualTotal": 510,
+      "allCasesPassedWithoutSkip": true,
+      "issues": [],
+      "bindingScope": "XML filename and companion snapshot manifest; NUnit XML itself contains no package SHA256.",
+      "path": "results/integration-1.3-edit-r6.xml"
+    },
+    "integration-1.3-edit-r7.xml": {
+      "sha256": "14e9556b55a168f12f3cf72e2e255e35cd8211ef9ee57b3021975a0f67aad130",
+      "rootResult": "Passed",
+      "declared": {
+        "total": 519,
+        "passed": 519,
+        "failed": 0,
+        "skipped": 0,
+        "inconclusive": 0
+      },
+      "actual": {
+        "Passed": 519
+      },
+      "actualTotal": 519,
+      "allCasesPassedWithoutSkip": true,
+      "issues": [],
+      "bindingScope": "XML filename and companion snapshot manifest; NUnit XML itself contains no package SHA256.",
+      "path": "results/integration-1.3-edit-r7.xml"
+    },
+    "integration-1.3-edit-r8.xml": {
+      "sha256": "f5bfc35758f6cb35ded569668e724fbdddb2799e53e9e6b4917088279a10e0ee",
+      "rootResult": "Passed",
+      "declared": {
+        "total": 522,
+        "passed": 522,
+        "failed": 0,
+        "skipped": 0,
+        "inconclusive": 0
+      },
+      "actual": {
+        "Passed": 522
+      },
+      "actualTotal": 522,
+      "allCasesPassedWithoutSkip": true,
+      "issues": [],
+      "bindingScope": "XML filename and companion snapshot manifest; NUnit XML itself contains no package SHA256.",
+      "path": "results/integration-1.3-edit-r8.xml"
+    },
+    "integration-1.3-focused-r1.xml": {
+      "sha256": "ab4912654153c04c4a595ef3428f2ad0a32a28188ec9caac24e2e20a831a3275",
+      "rootResult": "Failed(Child)",
+      "declared": {
+        "total": 83,
+        "passed": 80,
+        "failed": 3,
+        "skipped": 0,
+        "inconclusive": 0
+      },
+      "actual": {
+        "Passed": 80,
+        "Failed": 3
+      },
+      "actualTotal": 83,
+      "allCasesPassedWithoutSkip": false,
+      "issues": [],
+      "bindingScope": "XML filename and companion snapshot manifest; NUnit XML itself contains no package SHA256.",
+      "path": "results/integration-1.3-focused-r1.xml"
+    },
+    "integration-1.3-http-r4.xml": {
+      "sha256": "ffe99b4b411f717d63c1cdcd5ec81c36462b65830ca36653242e41baf240bcbc",
+      "rootResult": "Passed",
+      "declared": {
+        "total": 16,
+        "passed": 16,
+        "failed": 0,
+        "skipped": 0,
+        "inconclusive": 0
+      },
+      "actual": {
+        "Passed": 16
+      },
+      "actualTotal": 16,
+      "allCasesPassedWithoutSkip": true,
+      "issues": [],
+      "bindingScope": "XML filename and companion snapshot manifest; NUnit XML itself contains no package SHA256.",
+      "path": "results/integration-1.3-http-r4.xml"
+    },
+    "integration-1.3-play-r1.xml": {
+      "sha256": "0a63840a340914f22e87da86a234c30e4f22cdc372f47ce4c2f738f649ad2250",
+      "rootResult": "Failed(Child)",
+      "declared": {
+        "total": 11,
+        "passed": 9,
+        "failed": 2,
+        "skipped": 0,
+        "inconclusive": 0
+      },
+      "actual": {
+        "Passed": 9,
+        "Failed": 2
+      },
+      "actualTotal": 11,
+      "allCasesPassedWithoutSkip": false,
+      "issues": [],
+      "bindingScope": "XML filename and companion snapshot manifest; NUnit XML itself contains no package SHA256.",
+      "path": "results/integration-1.3-play-r1.xml"
+    },
+    "integration-1.3-play-r2.xml": {
+      "sha256": "5dfd3b664cd5d837c9fbe755593e75eb43e6e102f7b98e5ff8533205598c6ba2",
+      "rootResult": "Passed",
+      "declared": {
+        "total": 18,
+        "passed": 18,
+        "failed": 0,
+        "skipped": 0,
+        "inconclusive": 0
+      },
+      "actual": {
+        "Passed": 18
+      },
+      "actualTotal": 18,
+      "allCasesPassedWithoutSkip": true,
+      "issues": [],
+      "bindingScope": "XML filename and companion snapshot manifest; NUnit XML itself contains no package SHA256.",
+      "path": "results/integration-1.3-play-r2.xml"
+    },
+    "integration-1.3-play-r4.xml": {
+      "sha256": "7d09ff249f2f07ec28478749a32fe46d694eecebb6685bef226a655b92665c73",
+      "rootResult": "Passed",
+      "declared": {
+        "total": 19,
+        "passed": 19,
+        "failed": 0,
+        "skipped": 0,
+        "inconclusive": 0
+      },
+      "actual": {
+        "Passed": 19
+      },
+      "actualTotal": 19,
+      "allCasesPassedWithoutSkip": true,
+      "issues": [],
+      "bindingScope": "XML filename and companion snapshot manifest; NUnit XML itself contains no package SHA256.",
+      "path": "results/integration-1.3-play-r4.xml"
+    },
+    "integration-1.3-play-r5.xml": {
+      "sha256": "3273857f3b7d1a035014969cad23b87001530fbdc612d11fdc1a92dc8f903892",
+      "rootResult": "Passed",
+      "declared": {
+        "total": 19,
+        "passed": 19,
+        "failed": 0,
+        "skipped": 0,
+        "inconclusive": 0
+      },
+      "actual": {
+        "Passed": 19
+      },
+      "actualTotal": 19,
+      "allCasesPassedWithoutSkip": true,
+      "issues": [],
+      "bindingScope": "XML filename and companion snapshot manifest; NUnit XML itself contains no package SHA256.",
+      "path": "results/integration-1.3-play-r5.xml"
+    },
+    "integration-1.3-play-r6.xml": {
+      "sha256": "69a3c7d17a0878424582de045cd4a2b0dac199507549e4f0802ce5553a1a32e2",
+      "rootResult": "Passed",
+      "declared": {
+        "total": 20,
+        "passed": 20,
+        "failed": 0,
+        "skipped": 0,
+        "inconclusive": 0
+      },
+      "actual": {
+        "Passed": 20
+      },
+      "actualTotal": 20,
+      "allCasesPassedWithoutSkip": true,
+      "issues": [],
+      "bindingScope": "XML filename and companion snapshot manifest; NUnit XML itself contains no package SHA256.",
+      "path": "results/integration-1.3-play-r6.xml"
+    },
+    "integration-1.3-play-r7.xml": {
+      "sha256": "78fd0f5f6938c4b57bf2192e1604fbfd2a1efbc28459482d20e545c2aff7dd35",
+      "rootResult": "Passed",
+      "declared": {
+        "total": 20,
+        "passed": 20,
+        "failed": 0,
+        "skipped": 0,
+        "inconclusive": 0
+      },
+      "actual": {
+        "Passed": 20
+      },
+      "actualTotal": 20,
+      "allCasesPassedWithoutSkip": true,
+      "issues": [],
+      "bindingScope": "XML filename and companion snapshot manifest; NUnit XML itself contains no package SHA256.",
+      "path": "results/integration-1.3-play-r7.xml"
+    },
+    "integration-1.3-play-r8.xml": {
+      "sha256": "32fd3a8c8f68d4be82b32e0d0e34efc7ab0d5a12a1223734164176ebcd004fa4",
+      "rootResult": "Passed",
+      "declared": {
+        "total": 20,
+        "passed": 20,
+        "failed": 0,
+        "skipped": 0,
+        "inconclusive": 0
+      },
+      "actual": {
+        "Passed": 20
+      },
+      "actualTotal": 20,
+      "allCasesPassedWithoutSkip": true,
+      "issues": [],
+      "bindingScope": "XML filename and companion snapshot manifest; NUnit XML itself contains no package SHA256.",
+      "path": "results/integration-1.3-play-r8.xml"
+    }
+  },
+  "actualReceipts": [
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/material-acceptance-1.3-r2.json",
+      "sha256": "95cdbb9f0b06ad2934a9568420970fae38469cf8d50d8bc8567cc64626315545",
+      "snapshot": "r2",
+      "kind": "material",
+      "receiptKind": "actual-offline-and-polyhaven-material-acceptance",
+      "workflowVariant": "initial",
+      "sourceDifference": {
+        "missing": [],
+        "extra": [],
+        "changed": []
+      },
+      "completePackageSourceMatchesSnapshot": true,
+      "reportedPassed": false,
+      "reportedSuccess": null,
+      "failedChecks": [
+        "actualOnlineImportWithoutFallback",
+        "actualOnlineDownloadThisRunNotPreexistingCache"
+      ],
+      "originalReceiptUnmodified": true,
+      "resultIsForTargetSnapshotOnly": "r2",
+      "expectedRunnerForReceiptKind": "MaterialAcceptanceRunner.cs",
+      "receiptSelfDeclaredHarness": {
+        "name": "MaterialAcceptanceRunner.cs",
+        "sha256": "not supplied",
+        "actualBytesLocated": false,
+        "reason": "No valid harness SHA256 supplied"
+      },
+      "snapshotDeclaresThisHarness": true,
+      "harnessBindingComplete": false,
+      "harnessBindingGap": "Receipt did not supply its harness hash; an external declaration is not a self-binding receipt.",
+      "externalHarnessDeclaration": {
+        "name": "MaterialAcceptanceRunner.cs",
+        "sha256": "a59b8b006287baaf623ddb19ddf2248491a85eba018c10cc4ab71d3ba5f02c25",
+        "actualBytesLocated": true,
+        "currentScriptSha256": "a59b8b006287baaf623ddb19ddf2248491a85eba018c10cc4ab71d3ba5f02c25",
+        "location": "scripts/MaterialAcceptanceRunner.cs"
+      },
+      "reportedOutcome": "failed-or-incomplete",
+      "renderedImageArtifacts": []
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/material-acceptance-1.3-r4.json",
+      "sha256": "f0ff872bacbb667a50539ddda30a3755d371904a43e4b9c8711073943ecbd9f5",
+      "snapshot": "r4",
+      "kind": "material",
+      "receiptKind": "actual-offline-and-polyhaven-material-acceptance",
+      "workflowVariant": "initial",
+      "sourceDifference": {
+        "missing": [],
+        "extra": [],
+        "changed": []
+      },
+      "completePackageSourceMatchesSnapshot": true,
+      "reportedPassed": true,
+      "reportedSuccess": null,
+      "failedChecks": [],
+      "originalReceiptUnmodified": true,
+      "resultIsForTargetSnapshotOnly": "r4",
+      "expectedRunnerForReceiptKind": "MaterialAcceptanceRunner.cs",
+      "receiptSelfDeclaredHarness": {
+        "name": "MaterialAcceptanceRunner.cs",
+        "sha256": "a59b8b006287baaf623ddb19ddf2248491a85eba018c10cc4ab71d3ba5f02c25",
+        "actualBytesLocated": true,
+        "currentScriptSha256": "a59b8b006287baaf623ddb19ddf2248491a85eba018c10cc4ab71d3ba5f02c25",
+        "location": "scripts/MaterialAcceptanceRunner.cs"
+      },
+      "snapshotDeclaresThisHarness": true,
+      "harnessBindingScope": "Receipt hash, snapshot harness declaration and exact located runner bytes.",
+      "harnessBindingComplete": true,
+      "reportedOutcome": "passed",
+      "renderedImageArtifacts": [
+        {
+          "declaredPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/material-acceptance-1.3-r4.village.png",
+          "locatedPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/material-acceptance-1.3-r4.village.png",
+          "sha256": "05f4da4c06c16af289083ae12fc2cc2e229fe9fd11f33c70fbf140e9dfce5e6f",
+          "bytesHashMatches": true
+        },
+        {
+          "declaredPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/material-acceptance-1.3-r4.comparison.png",
+          "locatedPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/material-acceptance-1.3-r4.comparison.png",
+          "sha256": "4d911d0b06dd4993428bf8186d7452b1614ef1bdb5abc1a1cae6d4804b375a11",
+          "bytesHashMatches": true
+        }
+      ]
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/material-acceptance-1.3-r5.json",
+      "sha256": "ca40d2676e638ee2f7b0d0b6e668932a586b4a33377e4d366efd0dbadb229205",
+      "snapshot": "r5",
+      "kind": "material",
+      "receiptKind": "actual-offline-and-polyhaven-material-acceptance",
+      "workflowVariant": "initial",
+      "sourceDifference": {
+        "missing": [],
+        "extra": [],
+        "changed": []
+      },
+      "completePackageSourceMatchesSnapshot": true,
+      "reportedPassed": true,
+      "reportedSuccess": null,
+      "failedChecks": [],
+      "originalReceiptUnmodified": true,
+      "resultIsForTargetSnapshotOnly": "r5",
+      "expectedRunnerForReceiptKind": "MaterialAcceptanceRunner.cs",
+      "receiptSelfDeclaredHarness": {
+        "name": "MaterialAcceptanceRunner.cs",
+        "sha256": "a59b8b006287baaf623ddb19ddf2248491a85eba018c10cc4ab71d3ba5f02c25",
+        "actualBytesLocated": true,
+        "currentScriptSha256": "a59b8b006287baaf623ddb19ddf2248491a85eba018c10cc4ab71d3ba5f02c25",
+        "location": "scripts/MaterialAcceptanceRunner.cs"
+      },
+      "snapshotDeclaresThisHarness": true,
+      "harnessBindingScope": "Receipt hash, snapshot harness declaration and exact located runner bytes.",
+      "harnessBindingComplete": true,
+      "reportedOutcome": "passed",
+      "renderedImageArtifacts": [
+        {
+          "declaredPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/material-acceptance-1.3-r5.village.png",
+          "locatedPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/material-acceptance-1.3-r5.village.png",
+          "sha256": "05f4da4c06c16af289083ae12fc2cc2e229fe9fd11f33c70fbf140e9dfce5e6f",
+          "bytesHashMatches": true
+        },
+        {
+          "declaredPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/material-acceptance-1.3-r5.comparison.png",
+          "locatedPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/material-acceptance-1.3-r5.comparison.png",
+          "sha256": "4d911d0b06dd4993428bf8186d7452b1614ef1bdb5abc1a1cae6d4804b375a11",
+          "bytesHashMatches": true
+        }
+      ]
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/material-acceptance-1.3-r6.json",
+      "sha256": "a48f974995a8f0bb21f07f15676e095ed0a4f7d8268498a5b2a57de6d87447c1",
+      "snapshot": "r6",
+      "kind": "material",
+      "receiptKind": "actual-offline-and-polyhaven-material-acceptance",
+      "workflowVariant": "initial",
+      "sourceDifference": {
+        "missing": [],
+        "extra": [],
+        "changed": []
+      },
+      "completePackageSourceMatchesSnapshot": true,
+      "reportedPassed": true,
+      "reportedSuccess": null,
+      "failedChecks": [],
+      "originalReceiptUnmodified": true,
+      "resultIsForTargetSnapshotOnly": "r6",
+      "expectedRunnerForReceiptKind": "MaterialAcceptanceRunner.cs",
+      "receiptSelfDeclaredHarness": {
+        "name": "MaterialAcceptanceRunner.cs",
+        "sha256": "a59b8b006287baaf623ddb19ddf2248491a85eba018c10cc4ab71d3ba5f02c25",
+        "actualBytesLocated": true,
+        "currentScriptSha256": "a59b8b006287baaf623ddb19ddf2248491a85eba018c10cc4ab71d3ba5f02c25",
+        "location": "scripts/MaterialAcceptanceRunner.cs"
+      },
+      "snapshotDeclaresThisHarness": true,
+      "harnessBindingScope": "Receipt hash, snapshot harness declaration and exact located runner bytes.",
+      "harnessBindingComplete": true,
+      "reportedOutcome": "passed",
+      "renderedImageArtifacts": [
+        {
+          "declaredPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/material-acceptance-1.3-r6.village.png",
+          "locatedPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/material-acceptance-1.3-r6.village.png",
+          "sha256": "05f4da4c06c16af289083ae12fc2cc2e229fe9fd11f33c70fbf140e9dfce5e6f",
+          "bytesHashMatches": true
+        },
+        {
+          "declaredPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/material-acceptance-1.3-r6.comparison.png",
+          "locatedPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/material-acceptance-1.3-r6.comparison.png",
+          "sha256": "4d911d0b06dd4993428bf8186d7452b1614ef1bdb5abc1a1cae6d4804b375a11",
+          "bytesHashMatches": true
+        }
+      ]
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/material-acceptance-1.3-r8.json",
+      "sha256": "1406227a0abcb9939cf94f5cba75a74d18f71ff00d63c6144d1854799c0dd4d2",
+      "snapshot": "r8",
+      "kind": "material",
+      "receiptKind": "actual-offline-and-polyhaven-material-acceptance",
+      "workflowVariant": "initial",
+      "sourceDifference": {
+        "missing": [],
+        "extra": [],
+        "changed": []
+      },
+      "completePackageSourceMatchesSnapshot": true,
+      "reportedPassed": true,
+      "reportedSuccess": null,
+      "failedChecks": [],
+      "originalReceiptUnmodified": true,
+      "resultIsForTargetSnapshotOnly": "r8",
+      "expectedRunnerForReceiptKind": "MaterialAcceptanceRunner.cs",
+      "receiptSelfDeclaredHarness": {
+        "name": "MaterialAcceptanceRunner.cs",
+        "sha256": "a59b8b006287baaf623ddb19ddf2248491a85eba018c10cc4ab71d3ba5f02c25",
+        "actualBytesLocated": true,
+        "currentScriptSha256": "a59b8b006287baaf623ddb19ddf2248491a85eba018c10cc4ab71d3ba5f02c25",
+        "location": "scripts/MaterialAcceptanceRunner.cs"
+      },
+      "snapshotDeclaresThisHarness": true,
+      "harnessBindingScope": "Receipt hash, snapshot harness declaration and exact located runner bytes.",
+      "harnessBindingComplete": true,
+      "reportedOutcome": "passed",
+      "renderedImageArtifacts": [
+        {
+          "declaredPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/material-acceptance-1.3-r8.village.png",
+          "locatedPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/material-acceptance-1.3-r8.village.png",
+          "sha256": "05f4da4c06c16af289083ae12fc2cc2e229fe9fd11f33c70fbf140e9dfce5e6f",
+          "bytesHashMatches": true
+        },
+        {
+          "declaredPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/material-acceptance-1.3-r8.comparison.png",
+          "locatedPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/material-acceptance-1.3-r8.comparison.png",
+          "sha256": "4d911d0b06dd4993428bf8186d7452b1614ef1bdb5abc1a1cae6d4804b375a11",
+          "bytesHashMatches": true
+        }
+      ]
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/material-chat-acceptance-1.3-r6.json",
+      "sha256": "b7a2d55c46f7c292894c39d56acad208ae07ca09c27329f209408036e0463c9c",
+      "snapshot": "r6",
+      "kind": "material-chat",
+      "receiptKind": "actual-main-chat-polyhaven-search-import-and-selected-renderer",
+      "workflowVariant": "optional-main-chat",
+      "sourceDifference": {
+        "missing": [],
+        "extra": [],
+        "changed": []
+      },
+      "completePackageSourceMatchesSnapshot": true,
+      "reportedPassed": false,
+      "reportedSuccess": false,
+      "failedChecks": [
+        "assistantDidNotReportError",
+        "modelChoseSearchImportAndApply",
+        "actualSelectedRendererReferenceChanged",
+        "actualOnlineImportWithoutFallback",
+        "actualFreshDownloadNotPreexistingCache",
+        "actualOnlineIdAppliedToDoor",
+        "importedIdActuallyReturnedBySearch"
+      ],
+      "originalReceiptUnmodified": true,
+      "resultIsForTargetSnapshotOnly": "r6",
+      "expectedRunnerForReceiptKind": "MaterialChatAcceptanceRunner.cs",
+      "receiptTreeSha256Recomputed": "e6cc2a4627a6a7c56252e52a35c6ff60d15c9ab67bea9b601027c8e455d12257",
+      "receiptSelfDeclaredHarness": {
+        "name": "MaterialChatAcceptanceRunner.cs",
+        "sha256": "a8993b2ba8394cc8ae7e366aece2bfbaa2497bb349c6f35dca7dbbdeeaf107cc",
+        "actualBytesLocated": true,
+        "currentScriptSha256": "a8993b2ba8394cc8ae7e366aece2bfbaa2497bb349c6f35dca7dbbdeeaf107cc",
+        "location": "scripts/MaterialChatAcceptanceRunner.cs"
+      },
+      "snapshotDeclaresThisHarness": false,
+      "harnessBindingScope": "Receipt-only exact public runner bytes; absent from historical snapshot declaration; no runner-to-source-commit claim.",
+      "harnessBindingComplete": true,
+      "reportedOutcome": "failed-or-incomplete",
+      "renderedImageArtifacts": []
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/material-chat-acceptance-1.3-r8-2b.json",
+      "sha256": "afe8bd8171bf38e9d967fe41407133d743d159048c73a2b5a1c4c4c5c12e0315",
+      "snapshot": "r8",
+      "kind": "material-chat",
+      "receiptKind": "actual-main-chat-polyhaven-search-import-and-selected-renderer",
+      "workflowVariant": "optional-main-chat",
+      "sourceDifference": {
+        "missing": [],
+        "extra": [],
+        "changed": []
+      },
+      "completePackageSourceMatchesSnapshot": true,
+      "reportedPassed": false,
+      "reportedSuccess": false,
+      "failedChecks": [
+        "modelChoseSearchImportAndApply",
+        "actualSelectedRendererReferenceChanged",
+        "actualOnlineImportWithoutFallback",
+        "actualFreshDownloadNotPreexistingCache",
+        "actualOnlineIdAppliedToDoor",
+        "importedIdActuallyReturnedBySearch"
+      ],
+      "originalReceiptUnmodified": true,
+      "resultIsForTargetSnapshotOnly": "r8",
+      "expectedRunnerForReceiptKind": "MaterialChatAcceptanceRunner.cs",
+      "receiptTreeSha256Recomputed": "e12a1fe53149cbf2a37586f1c95bc8be3ff9b8b1ecc73956a00b127fefdbcddc",
+      "receiptSelfDeclaredHarness": {
+        "name": "MaterialChatAcceptanceRunner.cs",
+        "sha256": "a8993b2ba8394cc8ae7e366aece2bfbaa2497bb349c6f35dca7dbbdeeaf107cc",
+        "actualBytesLocated": true,
+        "currentScriptSha256": "a8993b2ba8394cc8ae7e366aece2bfbaa2497bb349c6f35dca7dbbdeeaf107cc",
+        "location": "scripts/MaterialChatAcceptanceRunner.cs"
+      },
+      "snapshotDeclaresThisHarness": true,
+      "harnessBindingScope": "Receipt hash, snapshot harness declaration and exact located runner bytes.",
+      "harnessBindingComplete": true,
+      "reportedOutcome": "failed-or-incomplete",
+      "renderedImageArtifacts": []
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/material-chat-acceptance-1.3-r8-coder.json",
+      "sha256": "f2178c60f51838a705b60b528f46236729ece7301c6f76e2ac71234fffd2c3e5",
+      "snapshot": "r8",
+      "kind": "material-chat",
+      "receiptKind": "actual-main-chat-polyhaven-search-import-and-selected-renderer",
+      "workflowVariant": "optional-main-chat",
+      "sourceDifference": {
+        "missing": [],
+        "extra": [],
+        "changed": []
+      },
+      "completePackageSourceMatchesSnapshot": true,
+      "reportedPassed": false,
+      "reportedSuccess": false,
+      "failedChecks": [
+        "modelChoseSearchImportAndApply",
+        "actualSelectedRendererReferenceChanged",
+        "actualOnlineIdAppliedToDoor",
+        "doorReferencesActualDownloadedAlbedoNormalAndPackedMap"
+      ],
+      "originalReceiptUnmodified": true,
+      "resultIsForTargetSnapshotOnly": "r8",
+      "expectedRunnerForReceiptKind": "MaterialChatAcceptanceRunner.cs",
+      "receiptTreeSha256Recomputed": "e12a1fe53149cbf2a37586f1c95bc8be3ff9b8b1ecc73956a00b127fefdbcddc",
+      "receiptSelfDeclaredHarness": {
+        "name": "MaterialChatAcceptanceRunner.cs",
+        "sha256": "a8993b2ba8394cc8ae7e366aece2bfbaa2497bb349c6f35dca7dbbdeeaf107cc",
+        "actualBytesLocated": true,
+        "currentScriptSha256": "a8993b2ba8394cc8ae7e366aece2bfbaa2497bb349c6f35dca7dbbdeeaf107cc",
+        "location": "scripts/MaterialChatAcceptanceRunner.cs"
+      },
+      "snapshotDeclaresThisHarness": true,
+      "harnessBindingScope": "Receipt hash, snapshot harness declaration and exact located runner bytes.",
+      "harnessBindingComplete": true,
+      "reportedOutcome": "failed-or-incomplete",
+      "renderedImageArtifacts": []
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/material-chat-acceptance-1.3-r8.json",
+      "sha256": "be7d5be7e7aaba05600a8075b7998476ea7f27a0f2acb67615fb3af9d8a7ebc1",
+      "snapshot": "r8",
+      "kind": "material-chat",
+      "receiptKind": "actual-main-chat-polyhaven-search-import-and-selected-renderer",
+      "workflowVariant": "optional-main-chat",
+      "sourceDifference": {
+        "missing": [],
+        "extra": [],
+        "changed": []
+      },
+      "completePackageSourceMatchesSnapshot": true,
+      "reportedPassed": false,
+      "reportedSuccess": false,
+      "failedChecks": [
+        "assistantDidNotReportError",
+        "modelChoseSearchImportAndApply",
+        "actualSelectedRendererReferenceChanged",
+        "actualOnlineIdAppliedToDoor",
+        "doorReferencesActualDownloadedAlbedoNormalAndPackedMap"
+      ],
+      "originalReceiptUnmodified": true,
+      "resultIsForTargetSnapshotOnly": "r8",
+      "expectedRunnerForReceiptKind": "MaterialChatAcceptanceRunner.cs",
+      "receiptTreeSha256Recomputed": "e12a1fe53149cbf2a37586f1c95bc8be3ff9b8b1ecc73956a00b127fefdbcddc",
+      "receiptSelfDeclaredHarness": {
+        "name": "MaterialChatAcceptanceRunner.cs",
+        "sha256": "a8993b2ba8394cc8ae7e366aece2bfbaa2497bb349c6f35dca7dbbdeeaf107cc",
+        "actualBytesLocated": true,
+        "currentScriptSha256": "a8993b2ba8394cc8ae7e366aece2bfbaa2497bb349c6f35dca7dbbdeeaf107cc",
+        "location": "scripts/MaterialChatAcceptanceRunner.cs"
+      },
+      "snapshotDeclaresThisHarness": true,
+      "harnessBindingScope": "Receipt hash, snapshot harness declaration and exact located runner bytes.",
+      "harnessBindingComplete": true,
+      "reportedOutcome": "failed-or-incomplete",
+      "renderedImageArtifacts": []
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/mechanic-acceptance-1.3-r2.json",
+      "sha256": "331b9162859c1ccbe60479f41a049617a1a751205b05414977ec1148765afc99",
+      "snapshot": "r2",
+      "kind": "mechanic",
+      "receiptKind": "actual-main-chat-proactive-mechanic-draft",
+      "workflowVariant": "initial",
+      "sourceDifference": {
+        "missing": [],
+        "extra": [],
+        "changed": []
+      },
+      "completePackageSourceMatchesSnapshot": true,
+      "reportedPassed": false,
+      "reportedSuccess": false,
+      "failedChecks": [
+        "assistantDidNotReportError",
+        "draftRemainsPendingForReview",
+        "atLeastOnePurposefulMonoBehaviourCandidate",
+        "draftRetainedByteExactlyInHistory"
+      ],
+      "originalReceiptUnmodified": true,
+      "resultIsForTargetSnapshotOnly": "r2",
+      "expectedRunnerForReceiptKind": "MechanicAcceptanceRunner.cs",
+      "receiptTreeSha256Recomputed": "1d43db83b69fcd6777d83f551a27aff22f4015f485a3dd9bcdab292c276b5763",
+      "receiptSelfDeclaredHarness": {
+        "name": "MechanicAcceptanceRunner.cs",
+        "sha256": "ac48bb92f566511ac629d1c8880ad87a1cb53cbf6a777a7262a02ef05d593365",
+        "actualBytesLocated": true,
+        "currentScriptSha256": "ac48bb92f566511ac629d1c8880ad87a1cb53cbf6a777a7262a02ef05d593365",
+        "location": "scripts/MechanicAcceptanceRunner.cs"
+      },
+      "snapshotDeclaresThisHarness": true,
+      "harnessBindingScope": "Receipt hash, snapshot harness declaration and exact located runner bytes.",
+      "harnessBindingComplete": true,
+      "reportedOutcome": "failed-or-incomplete",
+      "renderedImageArtifacts": []
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/mechanic-acceptance-1.3-r6.json",
+      "sha256": "0d1de3e0559baf1d860a999eb5331d8a99cacdc45ba191e229f65b40cfc364cf",
+      "snapshot": "r6",
+      "kind": "mechanic",
+      "receiptKind": "actual-main-chat-proactive-mechanic-draft",
+      "workflowVariant": "initial",
+      "sourceDifference": {
+        "missing": [],
+        "extra": [],
+        "changed": []
+      },
+      "completePackageSourceMatchesSnapshot": true,
+      "reportedPassed": true,
+      "reportedSuccess": true,
+      "failedChecks": [],
+      "originalReceiptUnmodified": true,
+      "resultIsForTargetSnapshotOnly": "r6",
+      "expectedRunnerForReceiptKind": "MechanicAcceptanceRunner.cs",
+      "receiptTreeSha256Recomputed": "e6cc2a4627a6a7c56252e52a35c6ff60d15c9ab67bea9b601027c8e455d12257",
+      "receiptSelfDeclaredHarness": {
+        "name": "MechanicAcceptanceRunner.cs",
+        "sha256": "ac48bb92f566511ac629d1c8880ad87a1cb53cbf6a777a7262a02ef05d593365",
+        "actualBytesLocated": true,
+        "currentScriptSha256": "ac48bb92f566511ac629d1c8880ad87a1cb53cbf6a777a7262a02ef05d593365",
+        "location": "scripts/MechanicAcceptanceRunner.cs"
+      },
+      "snapshotDeclaresThisHarness": true,
+      "harnessBindingScope": "Receipt hash, snapshot harness declaration and exact located runner bytes.",
+      "harnessBindingComplete": true,
+      "reportedOutcome": "passed",
+      "renderedImageArtifacts": []
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/mechanic-repair-acceptance-1.3-r7-coder.json",
+      "sha256": "036f6a9b59801f527c3ba43894f611278a591df6bc14341c1b1cd9a0c870c459",
+      "snapshot": "r7",
+      "kind": "mechanic",
+      "receiptKind": "actual-main-chat-review-feedback-mechanic-draft",
+      "workflowVariant": "review-feedback",
+      "sourceDifference": {
+        "missing": [],
+        "extra": [],
+        "changed": []
+      },
+      "completePackageSourceMatchesSnapshot": true,
+      "reportedPassed": true,
+      "reportedSuccess": true,
+      "failedChecks": [],
+      "originalReceiptUnmodified": true,
+      "resultIsForTargetSnapshotOnly": "r7",
+      "expectedRunnerForReceiptKind": "MechanicRepairAcceptanceRunner.cs",
+      "receiptTreeSha256Recomputed": "39bb80dac9a00160d52283d107f0e129796f97b203b8ee90d0bf6de1ef1269f3",
+      "receiptSelfDeclaredHarness": {
+        "name": "MechanicRepairAcceptanceRunner.cs",
+        "sha256": "24f6c0382e607b00041dac145b229e27e4c4fdda8e94a8aa9485d1158ab61c61",
+        "actualBytesLocated": true,
+        "currentScriptSha256": "24f6c0382e607b00041dac145b229e27e4c4fdda8e94a8aa9485d1158ab61c61",
+        "location": "scripts/MechanicRepairAcceptanceRunner.cs"
+      },
+      "snapshotDeclaresThisHarness": true,
+      "harnessBindingScope": "Receipt hash, snapshot harness declaration and exact located runner bytes.",
+      "harnessBindingComplete": true,
+      "reportedOutcome": "passed",
+      "reviewFeedbackInputLinks": [
+        {
+          "input": "originalReceiptPath",
+          "declaredPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/mechanic-acceptance-1.3-r6.json",
+          "locatedPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/mechanic-acceptance-1.3-r6.json",
+          "sha256": "0d1de3e0559baf1d860a999eb5331d8a99cacdc45ba191e229f65b40cfc364cf",
+          "available": true,
+          "hashMatches": true
+        },
+        {
+          "input": "reviewReceiptPath",
+          "declaredPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/mechanic-semantic-review-1.3-r6.json",
+          "locatedPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/mechanic-semantic-review-1.3-r6.json",
+          "sha256": "5b12445048459ceadb3012b79155c35315cb5eb6f755e9bdc7dde27db25beeed",
+          "available": true,
+          "hashMatches": true
+        },
+        {
+          "input": "rejectedSourcePath",
+          "declaredPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/mechanic-acceptance-1.3-r6.draft-1-LighthouseColorToggle.cs.txt",
+          "locatedPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/mechanic-acceptance-1.3-r6.draft-1-LighthouseColorToggle.cs.txt",
+          "sha256": "6536bcb057834901e80e8fd774081eafd102341a7aabee5b8d6133113f48d9a5",
+          "available": true,
+          "hashMatches": true
+        },
+        {
+          "reviewAccepted": false,
+          "oldFailureDoesNotDetermineNewCandidateOutcome": true
+        },
+        {
+          "originalProtocolReportedPassed": true,
+          "originalSemanticOutcomeRemainsSeparate": true
+        }
+      ],
+      "renderedImageArtifacts": []
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/mechanic-repair-acceptance-1.3-r7.json",
+      "sha256": "ce5d845312a771dc7bb340075c3cdf7ca1c5d1d16b5c3d0925f0f01dcd07ca01",
+      "snapshot": "r7",
+      "kind": "mechanic",
+      "receiptKind": "actual-main-chat-review-feedback-mechanic-draft",
+      "workflowVariant": "review-feedback",
+      "sourceDifference": {
+        "missing": [],
+        "extra": [],
+        "changed": []
+      },
+      "completePackageSourceMatchesSnapshot": true,
+      "reportedPassed": true,
+      "reportedSuccess": true,
+      "failedChecks": [],
+      "originalReceiptUnmodified": true,
+      "resultIsForTargetSnapshotOnly": "r7",
+      "expectedRunnerForReceiptKind": "MechanicRepairAcceptanceRunner.cs",
+      "receiptTreeSha256Recomputed": "39bb80dac9a00160d52283d107f0e129796f97b203b8ee90d0bf6de1ef1269f3",
+      "receiptSelfDeclaredHarness": {
+        "name": "MechanicRepairAcceptanceRunner.cs",
+        "sha256": "24f6c0382e607b00041dac145b229e27e4c4fdda8e94a8aa9485d1158ab61c61",
+        "actualBytesLocated": true,
+        "currentScriptSha256": "24f6c0382e607b00041dac145b229e27e4c4fdda8e94a8aa9485d1158ab61c61",
+        "location": "scripts/MechanicRepairAcceptanceRunner.cs"
+      },
+      "snapshotDeclaresThisHarness": true,
+      "harnessBindingScope": "Receipt hash, snapshot harness declaration and exact located runner bytes.",
+      "harnessBindingComplete": true,
+      "reportedOutcome": "passed",
+      "reviewFeedbackInputLinks": [
+        {
+          "input": "originalReceiptPath",
+          "declaredPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/mechanic-acceptance-1.3-r6.json",
+          "locatedPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/mechanic-acceptance-1.3-r6.json",
+          "sha256": "0d1de3e0559baf1d860a999eb5331d8a99cacdc45ba191e229f65b40cfc364cf",
+          "available": true,
+          "hashMatches": true
+        },
+        {
+          "input": "reviewReceiptPath",
+          "declaredPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/mechanic-semantic-review-1.3-r6.json",
+          "locatedPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/mechanic-semantic-review-1.3-r6.json",
+          "sha256": "5b12445048459ceadb3012b79155c35315cb5eb6f755e9bdc7dde27db25beeed",
+          "available": true,
+          "hashMatches": true
+        },
+        {
+          "input": "rejectedSourcePath",
+          "declaredPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/mechanic-acceptance-1.3-r6.draft-1-LighthouseColorToggle.cs.txt",
+          "locatedPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/mechanic-acceptance-1.3-r6.draft-1-LighthouseColorToggle.cs.txt",
+          "sha256": "6536bcb057834901e80e8fd774081eafd102341a7aabee5b8d6133113f48d9a5",
+          "available": true,
+          "hashMatches": true
+        },
+        {
+          "reviewAccepted": false,
+          "oldFailureDoesNotDetermineNewCandidateOutcome": true
+        },
+        {
+          "originalProtocolReportedPassed": true,
+          "originalSemanticOutcomeRemainsSeparate": true
+        }
+      ],
+      "renderedImageArtifacts": []
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/mechanic-state-acceptance-1.3-r8.json",
+      "sha256": "ed1a01892c149cb8440c37485594bef9152efc19970e36f26305250acf151710",
+      "snapshot": "r8",
+      "kind": "mechanic",
+      "receiptKind": "actual-main-chat-explicit-state-mechanic-draft",
+      "workflowVariant": "explicit-state-guided",
+      "sourceDifference": {
+        "missing": [],
+        "extra": [],
+        "changed": []
+      },
+      "completePackageSourceMatchesSnapshot": true,
+      "reportedPassed": true,
+      "reportedSuccess": true,
+      "failedChecks": [],
+      "originalReceiptUnmodified": true,
+      "resultIsForTargetSnapshotOnly": "r8",
+      "expectedRunnerForReceiptKind": "MechanicStateAcceptanceRunner.cs",
+      "receiptTreeSha256Recomputed": "e12a1fe53149cbf2a37586f1c95bc8be3ff9b8b1ecc73956a00b127fefdbcddc",
+      "receiptSelfDeclaredHarness": {
+        "name": "MechanicStateAcceptanceRunner.cs",
+        "sha256": "07db3054867e42942dbd53bd360561ff8401d327d27f377c422a0013731e03e5",
+        "actualBytesLocated": true,
+        "currentScriptSha256": "07db3054867e42942dbd53bd360561ff8401d327d27f377c422a0013731e03e5",
+        "location": "scripts/MechanicStateAcceptanceRunner.cs"
+      },
+      "snapshotDeclaresThisHarness": false,
+      "harnessBindingScope": "Receipt-only exact public runner bytes; absent from historical snapshot declaration; no runner-to-source-commit claim.",
+      "harnessBindingComplete": true,
+      "reportedOutcome": "passed",
+      "algorithmGuidanceDisclosure": {
+        "algorithmGuided": true,
+        "freshConversation": true,
+        "priorFailedAttempts": 3,
+        "promptSha256": "a0e3c97866d3358878b77f463b26adee34ae301ddc0f700b4a9f65d7d490ebd8",
+        "scope": "Explicit boolean state algorithm supplied after earlier failed model attempts; not unassisted first-attempt success.",
+        "valid": true,
+        "promptHashMatches": true,
+        "notUnassistedFirstAttempt": true,
+        "independentSemanticReviewStillRequired": true
+      },
+      "renderedImageArtifacts": []
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/npc-conversation-acceptance-1.3-r2.json",
+      "sha256": "aba3d45d818fe072ff3ae44bc6144c3187770bb41f216c244c1f77a23ce869e5",
+      "snapshot": "r2",
+      "kind": "npc-conversation",
+      "receiptKind": "actual-local-freeform-and-social-npc-acceptance",
+      "workflowVariant": "initial",
+      "sourceDifference": {
+        "missing": [],
+        "extra": [],
+        "changed": []
+      },
+      "completePackageSourceMatchesSnapshot": true,
+      "reportedPassed": false,
+      "reportedSuccess": null,
+      "failedChecks": [],
+      "originalReceiptUnmodified": true,
+      "resultIsForTargetSnapshotOnly": "r2",
+      "expectedRunnerForReceiptKind": "NpcConversationAcceptanceRunner.cs",
+      "receiptTreeSha256Recomputed": "712e00622b93aa3f8cd9388a58d3581bc76b9626debdf9f173e07a66cbfe76bd",
+      "receiptSelfDeclaredHarness": {
+        "name": "NpcConversationAcceptanceRunner.cs",
+        "sha256": "71fbdc45a14ae75aa378b869a1f653190d4354352e13ca34bcc28c9273a98ccd",
+        "actualBytesLocated": true,
+        "currentScriptSha256": "f5b338f2e779724db2aac029b0fad0e9011d654dbe57773a927b053a4b313f8b",
+        "location": "results/harness-history/NpcConversationAcceptanceRunner-r2.cs.txt",
+        "byteLocationScope": "Archived/reconstructed historical source; reconstruction metadata, when present, is separate."
+      },
+      "snapshotDeclaresThisHarness": true,
+      "harnessBindingScope": "Receipt hash, snapshot harness declaration and exact located runner bytes.",
+      "harnessBindingComplete": true,
+      "reportedOutcome": "failed-or-incomplete",
+      "renderedImageArtifacts": []
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/npc-conversation-acceptance-1.3-r4-2b.json",
+      "sha256": "756400dfe1d23af78e87f58f220bf1fe19585d7d901b3c9f43526f56c89ac4c5",
+      "snapshot": "r4",
+      "kind": "npc-conversation",
+      "receiptKind": "actual-local-freeform-and-social-npc-acceptance",
+      "workflowVariant": "initial",
+      "sourceDifference": {
+        "missing": [],
+        "extra": [],
+        "changed": []
+      },
+      "completePackageSourceMatchesSnapshot": true,
+      "reportedPassed": false,
+      "reportedSuccess": null,
+      "failedChecks": [],
+      "originalReceiptUnmodified": true,
+      "resultIsForTargetSnapshotOnly": "r4",
+      "expectedRunnerForReceiptKind": "NpcConversationAcceptanceRunner.cs",
+      "receiptTreeSha256Recomputed": "b88535b29dd8e3d20f65a2051fae231566ed8fde45ad2bbaabc5409a54bb6587",
+      "receiptSelfDeclaredHarness": {
+        "name": "NpcConversationAcceptanceRunner.cs",
+        "sha256": "f5b338f2e779724db2aac029b0fad0e9011d654dbe57773a927b053a4b313f8b",
+        "actualBytesLocated": true,
+        "currentScriptSha256": "f5b338f2e779724db2aac029b0fad0e9011d654dbe57773a927b053a4b313f8b",
+        "location": "scripts/NpcConversationAcceptanceRunner.cs"
+      },
+      "snapshotDeclaresThisHarness": true,
+      "harnessBindingScope": "Receipt hash, snapshot harness declaration and exact located runner bytes.",
+      "harnessBindingComplete": true,
+      "reportedOutcome": "failed-or-incomplete",
+      "renderedImageArtifacts": []
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/npc-conversation-acceptance-1.3-r5-2b.json",
+      "sha256": "a8e5c615c717147bba72535e1915a1faf9aaf553e8e5ec6c78f69a0a91815c97",
+      "snapshot": "r5",
+      "kind": "npc-conversation",
+      "receiptKind": "actual-local-freeform-and-social-npc-acceptance",
+      "workflowVariant": "initial",
+      "sourceDifference": {
+        "missing": [],
+        "extra": [],
+        "changed": []
+      },
+      "completePackageSourceMatchesSnapshot": true,
+      "reportedPassed": false,
+      "reportedSuccess": null,
+      "failedChecks": [
+        "saveRestoresPersonaAndTranscript"
+      ],
+      "originalReceiptUnmodified": true,
+      "resultIsForTargetSnapshotOnly": "r5",
+      "expectedRunnerForReceiptKind": "NpcConversationAcceptanceRunner.cs",
+      "receiptTreeSha256Recomputed": "2765f009c846112bc36b2c886fd823e4abafcc1567c95bb72be712231ccfc97b",
+      "receiptSelfDeclaredHarness": {
+        "name": "NpcConversationAcceptanceRunner.cs",
+        "sha256": "f5b338f2e779724db2aac029b0fad0e9011d654dbe57773a927b053a4b313f8b",
+        "actualBytesLocated": true,
+        "currentScriptSha256": "f5b338f2e779724db2aac029b0fad0e9011d654dbe57773a927b053a4b313f8b",
+        "location": "scripts/NpcConversationAcceptanceRunner.cs"
+      },
+      "snapshotDeclaresThisHarness": true,
+      "harnessBindingScope": "Receipt hash, snapshot harness declaration and exact located runner bytes.",
+      "harnessBindingComplete": true,
+      "reportedOutcome": "failed-or-incomplete",
+      "renderedImageArtifacts": []
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/npc-conversation-acceptance-1.3-r5-9b.json",
+      "sha256": "b5a336878b57fbd05e5a5f6330d77a16998e45377a81428c7de488e817795ebf",
+      "snapshot": "r5",
+      "kind": "npc-conversation",
+      "receiptKind": "actual-local-freeform-and-social-npc-acceptance",
+      "workflowVariant": "initial",
+      "sourceDifference": {
+        "missing": [],
+        "extra": [],
+        "changed": []
+      },
+      "completePackageSourceMatchesSnapshot": true,
+      "reportedPassed": true,
+      "reportedSuccess": null,
+      "failedChecks": [],
+      "originalReceiptUnmodified": true,
+      "resultIsForTargetSnapshotOnly": "r5",
+      "expectedRunnerForReceiptKind": "NpcConversationAcceptanceRunner.cs",
+      "receiptTreeSha256Recomputed": "2765f009c846112bc36b2c886fd823e4abafcc1567c95bb72be712231ccfc97b",
+      "receiptSelfDeclaredHarness": {
+        "name": "NpcConversationAcceptanceRunner.cs",
+        "sha256": "f5b338f2e779724db2aac029b0fad0e9011d654dbe57773a927b053a4b313f8b",
+        "actualBytesLocated": true,
+        "currentScriptSha256": "f5b338f2e779724db2aac029b0fad0e9011d654dbe57773a927b053a4b313f8b",
+        "location": "scripts/NpcConversationAcceptanceRunner.cs"
+      },
+      "snapshotDeclaresThisHarness": true,
+      "harnessBindingScope": "Receipt hash, snapshot harness declaration and exact located runner bytes.",
+      "harnessBindingComplete": true,
+      "reportedOutcome": "passed",
+      "renderedImageArtifacts": []
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/npc-conversation-acceptance-1.3-r6-9b.json",
+      "sha256": "a79e854c895d39ed98fa0c14e87ae823d44f6ab2ff45bb960256cfea5f4a0f92",
+      "snapshot": "r6",
+      "kind": "npc-conversation",
+      "receiptKind": "actual-local-freeform-and-social-npc-acceptance",
+      "workflowVariant": "initial",
+      "sourceDifference": {
+        "missing": [],
+        "extra": [],
+        "changed": []
+      },
+      "completePackageSourceMatchesSnapshot": true,
+      "reportedPassed": true,
+      "reportedSuccess": null,
+      "failedChecks": [],
+      "originalReceiptUnmodified": true,
+      "resultIsForTargetSnapshotOnly": "r6",
+      "expectedRunnerForReceiptKind": "NpcConversationAcceptanceRunner.cs",
+      "receiptTreeSha256Recomputed": "f1c85af3fc78c218382ea93d8d4798f5b9c66f5d9630dd40d92d2a1c561837bc",
+      "receiptSelfDeclaredHarness": {
+        "name": "NpcConversationAcceptanceRunner.cs",
+        "sha256": "f5b338f2e779724db2aac029b0fad0e9011d654dbe57773a927b053a4b313f8b",
+        "actualBytesLocated": true,
+        "currentScriptSha256": "f5b338f2e779724db2aac029b0fad0e9011d654dbe57773a927b053a4b313f8b",
+        "location": "scripts/NpcConversationAcceptanceRunner.cs"
+      },
+      "snapshotDeclaresThisHarness": true,
+      "harnessBindingScope": "Receipt hash, snapshot harness declaration and exact located runner bytes.",
+      "harnessBindingComplete": true,
+      "reportedOutcome": "passed",
+      "renderedImageArtifacts": []
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/npc-conversation-acceptance-1.3-r8-9b.json",
+      "sha256": "b63b3ec365bb46e28ed1260053d4254f392650df9d07c08a9e142feff7ac2d2e",
+      "snapshot": "r8",
+      "kind": "npc-conversation",
+      "receiptKind": "actual-local-freeform-and-social-npc-acceptance",
+      "workflowVariant": "initial",
+      "sourceDifference": {
+        "missing": [],
+        "extra": [],
+        "changed": []
+      },
+      "completePackageSourceMatchesSnapshot": true,
+      "reportedPassed": true,
+      "reportedSuccess": null,
+      "failedChecks": [],
+      "originalReceiptUnmodified": true,
+      "resultIsForTargetSnapshotOnly": "r8",
+      "expectedRunnerForReceiptKind": "NpcConversationAcceptanceRunner.cs",
+      "receiptTreeSha256Recomputed": "a8adf455c32bb16d9d9561165aed93d5602dc21512e79f19cd18e57d925c24f2",
+      "receiptSelfDeclaredHarness": {
+        "name": "NpcConversationAcceptanceRunner.cs",
+        "sha256": "f5b338f2e779724db2aac029b0fad0e9011d654dbe57773a927b053a4b313f8b",
+        "actualBytesLocated": true,
+        "currentScriptSha256": "f5b338f2e779724db2aac029b0fad0e9011d654dbe57773a927b053a4b313f8b",
+        "location": "scripts/NpcConversationAcceptanceRunner.cs"
+      },
+      "snapshotDeclaresThisHarness": true,
+      "harnessBindingScope": "Receipt hash, snapshot harness declaration and exact located runner bytes.",
+      "harnessBindingComplete": true,
+      "reportedOutcome": "passed",
+      "renderedImageArtifacts": []
+    }
+  ],
+  "manualSemanticReviews": [
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/material-chat-semantic-review-1.3-r8-2b.json",
+      "sha256": "c7098d02a47d476750a71421dc8ec35c99e445679a5c0e811b7c2e4fd75228ad",
+      "sourceReceipt": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/material-chat-acceptance-1.3-r8-2b.json",
+      "sourceReceiptHashMatches": true,
+      "accepted": false,
+      "verdict": "FAIL",
+      "scope": "End-to-end completion of the unchanged natural Russian material request on one local2B Deep run. A syntactically accepted empty plan is not task completion. This separate failed case does not replace the failed9B run or establish a general model ranking.",
+      "automatedAuditDidNotRejudgeSemantics": true
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/material-chat-semantic-review-1.3-r8-coder.json",
+      "sha256": "966d2dec1c9800b00ff0146c8876de869585ef70c76af11d0a466740e382aa28",
+      "sourceReceipt": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/material-chat-acceptance-1.3-r8-coder.json",
+      "sourceReceiptHashMatches": true,
+      "accepted": false,
+      "verdict": "FAIL",
+      "scope": "End-to-end completion of the unchanged natural Russian weathered-wood/selected-door task on one local coder Deep run. Both material meaning and actual selected-Renderer application must match the request. Successful downloads alone are not completion or an art benchmark.",
+      "automatedAuditDidNotRejudgeSemantics": true
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/material-chat-semantic-review-1.3-r8.json",
+      "sha256": "282719e5d52a726a77375e4cd28711f4e49df1fb56de22386f8ebc240900fd6b",
+      "sourceReceipt": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/material-chat-acceptance-1.3-r8.json",
+      "sourceReceiptHashMatches": true,
+      "accepted": false,
+      "verdict": "FAIL",
+      "scope": "End-to-end completion of one natural Russian main-chat request to find Poly Haven weathered wood and apply it to the selected door. Search/import success is retained separately; this is not an art, GPU, reliability or speed benchmark.",
+      "automatedAuditDidNotRejudgeSemantics": true
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/mechanic-repair-semantic-review-1.3-r7-coder.json",
+      "sha256": "193baeadca36b15500d10af129f961d28b5dd4d0b8fd37a89ae36fd65f6da31b",
+      "sourceReceipt": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/mechanic-repair-acceptance-1.3-r7-coder.json",
+      "sourceReceiptHashMatches": true,
+      "accepted": false,
+      "verdict": "FAIL",
+      "scope": "One source generated with review feedback in the same dependent prior conversation. This does not isolate model identity from conversation history and is not a general model-quality comparison.",
+      "automatedAuditDidNotRejudgeSemantics": true
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/mechanic-repair-semantic-review-1.3-r7.json",
+      "sha256": "60239d92f9b4b2d97dfed8d36b376d313b0d449502a9c8d6d4e6c4262342ef74",
+      "sourceReceipt": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/mechanic-repair-acceptance-1.3-r7.json",
+      "sourceReceiptHashMatches": true,
+      "accepted": false,
+      "verdict": "FAIL",
+      "scope": "Independent exact-source static state walkthrough. No empirical runtime failure, proof about a different model, or general reliability comparison is claimed.",
+      "automatedAuditDidNotRejudgeSemantics": true
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/mechanic-semantic-review-1.3-r6.json",
+      "sha256": "5b12445048459ceadb3012b79155c35315cb5eb6f755e9bdc7dde27db25beeed",
+      "sourceReceipt": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/mechanic-acceptance-1.3-r6.json",
+      "sourceReceiptHashMatches": true,
+      "accepted": false,
+      "verdict": "FAIL",
+      "scope": "Exact static state walkthrough of this852-byte source. No empirical runtime failure or model-reliability estimate is claimed.",
+      "automatedAuditDidNotRejudgeSemantics": true
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/mechanic-state-semantic-review-1.3-r8.json",
+      "sha256": "b696aa864190aa97953d72822e918e2e3f12901d3b35e960167fbeb236596f8f",
+      "sourceReceipt": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/mechanic-state-acceptance-1.3-r8.json",
+      "sourceReceiptHashMatches": true,
+      "accepted": true,
+      "verdict": "PASS",
+      "scope": null,
+      "automatedAuditDidNotRejudgeSemantics": true
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/npc-conversation-semantic-review-1.3-r2.json",
+      "sha256": "97448be345c3910e45b4b2411842fb9a079950fcef6a13bfa2dc35eb8800cc77",
+      "sourceReceipt": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/npc-conversation-acceptance-1.3-r2.json",
+      "sourceReceiptHashMatches": true,
+      "accepted": false,
+      "verdict": null,
+      "scope": "One dependent authored conversation; not a benchmark or an estimate of general model quality.",
+      "automatedAuditDidNotRejudgeSemantics": true
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/npc-conversation-semantic-review-1.3-r5-2b.json",
+      "sha256": "46f99a9857da4e31b30fbb3ebb71ce6954b5ff7b6fdb473afe6a43825a5ec4c9",
+      "sourceReceipt": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/npc-conversation-acceptance-1.3-r5-2b.json",
+      "sourceReceiptHashMatches": true,
+      "accepted": null,
+      "verdict": "FAIL",
+      "scope": null,
+      "automatedAuditDidNotRejudgeSemantics": true
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/npc-conversation-semantic-review-1.3-r5-9b.json",
+      "sha256": "726337681866e1a36c2fd4c5fad01bc087cdb04cdb6a309ebcd1fe718ff30e1b",
+      "sourceReceipt": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/npc-conversation-acceptance-1.3-r5-9b.json",
+      "sourceReceiptHashMatches": true,
+      "accepted": null,
+      "verdict": "PARTIAL",
+      "scope": null,
+      "automatedAuditDidNotRejudgeSemantics": true
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/npc-conversation-semantic-review-1.3-r6-9b.json",
+      "sha256": "59cce546cd990e54f9ec0bdc2466ea53da65da00fde49f2700528213b4ee66bd",
+      "sourceReceipt": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/npc-conversation-acceptance-1.3-r6-9b.json",
+      "sourceReceiptHashMatches": true,
+      "accepted": null,
+      "verdict": "PARTIAL",
+      "scope": null,
+      "automatedAuditDidNotRejudgeSemantics": true
+    },
+    {
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/npc-conversation-semantic-review-1.3-r8-9b.json",
+      "sha256": "102ee303c7795ec9b5cef7c1fdae61bc0514ed59924d664539cea5ca033ec6ea",
+      "sourceReceipt": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/npc-conversation-acceptance-1.3-r8-9b.json",
+      "sourceReceiptHashMatches": true,
+      "accepted": null,
+      "verdict": "PARTIAL",
+      "scope": "One dependent real local-model conversation on frozen R8; protocol integrity, bounded semantic behavior, strict factual/history grounding and in-world natural speech are separate conclusions.",
+      "automatedAuditDidNotRejudgeSemantics": true
+    }
+  ],
+  "manualReviewsDoNotRewriteAutomaticOutcome": true,
+  "automaticAcceptanceFlagExcludesManualSemanticJudgment": true,
+  "finalAcceptanceSelection": [
+    {
+      "kind": "material",
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/material-acceptance-1.3-r8.json",
+      "reportedOutcome": "passed",
+      "snapshot": "r8",
+      "harnessBindingComplete": true,
+      "completePackageSourceMatchesSnapshot": true,
+      "receiptKind": "actual-offline-and-polyhaven-material-acceptance",
+      "workflowVariant": "initial",
+      "selection": "only candidate"
+    },
+    {
+      "kind": "npc-conversation",
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/npc-conversation-acceptance-1.3-r8-9b.json",
+      "reportedOutcome": "passed",
+      "snapshot": "r8",
+      "harnessBindingComplete": true,
+      "completePackageSourceMatchesSnapshot": true,
+      "receiptKind": "actual-local-freeform-and-social-npc-acceptance",
+      "workflowVariant": "initial",
+      "selection": "explicit CLI"
+    },
+    {
+      "kind": "mechanic",
+      "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/results/mechanic-state-acceptance-1.3-r8.json",
+      "reportedOutcome": "passed",
+      "snapshot": "r8",
+      "harnessBindingComplete": true,
+      "completePackageSourceMatchesSnapshot": true,
+      "receiptKind": "actual-main-chat-explicit-state-mechanic-draft",
+      "workflowVariant": "explicit-state-guided",
+      "selection": "explicit CLI"
+    }
+  ],
+  "tgz": {
+    "path": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/audit-r8-source/deliverables/com.worldweaver.toolkit-1.3.0-r8.tgz",
+    "sha256": "9eed34950ea8fcee9a3dc5160e5c40c0530d9e688ad71f3d8fb5d1d70b23ccc1",
+    "difference": {
+      "missing": [],
+      "extra": [],
+      "changed": []
+    }
+  },
+  "engineeringXmlReportedPassed": true,
+  "interpretation": "A verified provenance audit may contain faithfully preserved failed historical/model acceptances. It must not be presented as product acceptance."
+}

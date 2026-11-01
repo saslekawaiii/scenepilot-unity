@@ -1,0 +1,50 @@
+{
+  "kind": "byte-exact-historical-delivery-preservation",
+  "sourceCommit": "1499fc360e5f99120cdfca4f12ce7d03c43643f4",
+  "recordedUtc": "2026-11-01T11:34:41.897781+00:00",
+  "files": [
+    {
+      "originalPath": "deliverables/com.worldweaver.toolkit-1.3.0.tgz",
+      "historicalPath": "deliverables/com.worldweaver.toolkit-1.3.0-r8.tgz",
+      "sha256": "9eed34950ea8fcee9a3dc5160e5c40c0530d9e688ad71f3d8fb5d1d70b23ccc1",
+      "bytes": 2788480,
+      "byteIdenticalCopy": true
+    },
+    {
+      "originalPath": "results/upm-package-1.3.json",
+      "historicalPath": "results/upm-package-1.3-r8.json",
+      "sha256": "319d7855bed3176d4317bfd1447dcca53dd5023597e5840a4832f89f88f42693",
+      "bytes": 102690,
+      "byteIdenticalCopy": true
+    },
+    {
+      "originalPath": "results/clean-install-1.3.0.json",
+      "historicalPath": "results/clean-install-1.3.0-r8.json",
+      "sha256": "50541ca991a9a53bdce6517fc56bf0188459e0a46ba0cb8b1955c844b15867c3",
+      "bytes": 677,
+      "byteIdenticalCopy": true
+    },
+    {
+      "originalPath": "results/clean-install-1.3.0.final.raw.json",
+      "historicalPath": "results/clean-install-1.3.0-r8.final.raw.json",
+      "sha256": "d5dbf2a11aa0ba0bb07720886b13e9097e01dfe6dd2993a6694e9d98271c6bbe",
+      "bytes": 5454,
+      "byteIdenticalCopy": true
+    },
+    {
+      "originalPath": "results/clean-install-1.3.0.raw.json",
+      "historicalPath": "results/clean-install-1.3.0-r8.raw.json",
+      "sha256": "faca12e415706523bfcfbdaa52be7ae6052403ed7893dfe62e363f8e6f7b98c3",
+      "bytes": 4221,
+      "byteIdenticalCopy": true
+    },
+    {
+      "originalPath": "results/clean-install-1.3.0-failure-analysis.json",
+      "historicalPath": "results/clean-install-1.3.0-r8-failure-analysis.json",
+      "sha256": "aa6b6775b34de41a412311cad8ecefc651979615b9f60a4245178c7a76190800",
+      "bytes": 5506,
+      "byteIdenticalCopy": true
+    }
+  ],
+  "scope": "Copies only; original receipt bytes and their embedded original canonical filenames remain unchanged. This relocation note does not report new packaging, installation, inference or runtime execution."
+}

@@ -1,0 +1,234 @@
+{
+  "kind": "actual-open-native-conversation-ui-read-only-audit",
+  "recordedUtc": "2026-11-01T12:35:50.6455600Z",
+  "unity": "6000.3.27f1",
+  "sourceSha256": "7ce0e6c143b54f8911612900fe686809a7cc79013a0470146ce5a8d1aee42322",
+  "isPlaying": true,
+  "layoutMode": "wide",
+  "coordinateSpace": "UI Toolkit worldBound panel points; not desktop screen coordinates",
+  "screenPixels": {
+    "width": 1899,
+    "height": 1341
+  },
+  "panelScale": 1.2,
+  "playerInstanceId": -5668,
+  "npcInstanceId": -5538,
+  "npcCharacterIdSha256": "08a8b4bad2d53a3c22e374448e037e9a415423573e6c99e9e18349fd5542fc79",
+  "npcNameSha256": "dae572beaebe4f4b9de3302a9f6b3810fb78bbe835c14bfbd67a191e5f44dcd3",
+  "npcAiEnabled": true,
+  "npcBusy": false,
+  "historyEntryCount": 0,
+  "input": {
+    "characterCount": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "containsNewline": false,
+    "enabled": true,
+    "hasFocusWithinInput": true
+  },
+  "sendEnabled": false,
+  "elements": {
+    "viewport": {
+      "exists": true,
+      "name": "worldweaver-game-ui",
+      "type": "UIDocumentRootElement",
+      "visible": true,
+      "enabled": true,
+      "display": "Flex",
+      "visibility": "Visible",
+      "bounds": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1599.99988,
+        "height": 899.999939
+      }
+    },
+    "backdrop": {
+      "exists": true,
+      "name": "conversation-backdrop",
+      "type": "VisualElement",
+      "visible": true,
+      "enabled": true,
+      "display": "Flex",
+      "visibility": "Visible",
+      "bounds": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 1599.99988,
+        "height": 899.999939
+      }
+    },
+    "stage": {
+      "exists": true,
+      "name": "",
+      "type": "VisualElement",
+      "visible": true,
+      "enabled": true,
+      "display": "Flex",
+      "visibility": "Visible",
+      "bounds": {
+        "x": 170.0,
+        "y": 138.333328,
+        "width": 1260.0,
+        "height": 720.0
+      }
+    },
+    "profile": {
+      "exists": true,
+      "name": "",
+      "type": "VisualElement",
+      "visible": true,
+      "enabled": true,
+      "display": "Flex",
+      "visibility": "Visible",
+      "bounds": {
+        "x": 170.0,
+        "y": 138.333328,
+        "width": 299.999969,
+        "height": 720.0
+      }
+    },
+    "panel": {
+      "exists": true,
+      "name": "",
+      "type": "VisualElement",
+      "visible": true,
+      "enabled": true,
+      "display": "Flex",
+      "visibility": "Visible",
+      "bounds": {
+        "x": 488.3333,
+        "y": 138.333328,
+        "width": 941.6667,
+        "height": 720.0
+      }
+    },
+    "header": {
+      "exists": true,
+      "name": "",
+      "type": "VisualElement",
+      "visible": true,
+      "enabled": true,
+      "display": "Flex",
+      "visibility": "Visible",
+      "bounds": {
+        "x": 520.0,
+        "y": 168.333328,
+        "width": 878.333252,
+        "height": 99.16667
+      }
+    },
+    "history": {
+      "exists": true,
+      "name": "conversation-history",
+      "type": "ScrollView",
+      "visible": true,
+      "enabled": true,
+      "display": "Flex",
+      "visibility": "Visible",
+      "bounds": {
+        "x": 520.0,
+        "y": 289.166656,
+        "width": 878.333252,
+        "height": 259.999969
+      }
+    },
+    "composer": {
+      "exists": true,
+      "name": "",
+      "type": "VisualElement",
+      "visible": true,
+      "enabled": true,
+      "display": "Flex",
+      "visibility": "Visible",
+      "bounds": {
+        "x": 520.0,
+        "y": 635.0,
+        "width": 878.333252,
+        "height": 170.833313
+      }
+    },
+    "input": {
+      "exists": true,
+      "name": "conversation-input",
+      "type": "TextField",
+      "visible": true,
+      "enabled": true,
+      "display": "Flex",
+      "visibility": "Visible",
+      "bounds": {
+        "x": 537.5,
+        "y": 690.0,
+        "width": 843.333252,
+        "height": 56.666626
+      }
+    },
+    "inputSurface": {
+      "exists": true,
+      "name": "unity-text-input",
+      "type": "TextInput",
+      "visible": true,
+      "enabled": true,
+      "display": "Flex",
+      "visibility": "Visible",
+      "bounds": {
+        "x": 537.5,
+        "y": 690.0,
+        "width": 843.333252,
+        "height": 56.666626
+      }
+    },
+    "send": {
+      "exists": true,
+      "name": "conversation-send",
+      "type": "Button",
+      "visible": true,
+      "enabled": false,
+      "display": "Flex",
+      "visibility": "Visible",
+      "bounds": {
+        "x": 1243.33325,
+        "y": 755.0,
+        "width": 137.5,
+        "height": 39.99994
+      }
+    },
+    "close": {
+      "exists": true,
+      "name": "",
+      "type": "Button",
+      "visible": true,
+      "enabled": true,
+      "display": "Flex",
+      "visibility": "Visible",
+      "bounds": {
+        "x": 1303.33325,
+        "y": 189.166656,
+        "width": 90.833374,
+        "height": 35.0
+      }
+    }
+  },
+  "checks": {
+    "viewportHasFinitePositiveBounds": true,
+    "coreControlsVisible": true,
+    "coreControlsInsideViewport": true,
+    "controlsInsideConversationPanel": true,
+    "inputAndSendInsideComposer": true,
+    "inputAndSendDoNotOverlap": true,
+    "closeAndInputDoNotOverlap": true,
+    "closeAndSendDoNotOverlap": true,
+    "headerAndComposerDoNotOverlap": true,
+    "historyAndComposerDoNotOverlap": true,
+    "compactClassMatchesActualViewport": true,
+    "profileVisibilityMatchesLayout": true,
+    "actualMultilineInputAvailable": true,
+    "documentTargetsGameViewport": true
+  },
+  "passed": true,
+  "openedUiByAudit": false,
+  "requestedInferenceByAudit": false,
+  "sentMessageByAudit": false,
+  "changedUiByAudit": false,
+  "nativeKeyboardInputProven": false,
+  "scope": "One observed open layout only. Input content is recorded as length/SHA256, without dialogue text or NPC names. Native keyboard and screenshot evidence must be captured separately."
+}

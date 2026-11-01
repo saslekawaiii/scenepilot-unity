@@ -1,0 +1,252 @@
+{
+  "kind": "independent-exact-transcript-semantic-review",
+  "reviewedUtc": "2026-11-01T10:10:20.872863+00:00",
+  "reviewMethod": "Manual semantic assessment by a separate agent turn of exact recorded replies, authored personas and each trace context; no keyword-only grading, output correction, model call or Unity rerun.",
+  "receipt": {
+    "path": "results/npc-conversation-acceptance-1.3-r5-9b.json",
+    "sha256": "b5a336878b57fbd05e5a5f6330d77a16998e45377a81428c7de488e817795ebf",
+    "automaticPassed": true,
+    "elapsedMs": 212212
+  },
+  "source": {
+    "packageRoot": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/integrated-test-snapshot/package-1.3-r5",
+    "treeSha256": "2765f009c846112bc36b2c886fd823e4abafcc1567c95bb72be712231ccfc97b",
+    "fileCount": 550,
+    "treeDigestFormat": "UTF8 sorted relative-path + TAB + lowercase SHA256 + LF",
+    "harnessSha256": "f5b338f2e779724db2aac029b0fad0e9011d654dbe57773a927b053a4b313f8b",
+    "allRecordedFrozenFileHashesVerified": true,
+    "computedRecordedTreeSha256": "2765f009c846112bc36b2c886fd823e4abafcc1567c95bb72be712231ccfc97b"
+  },
+  "profile": {
+    "provider": "Ollama",
+    "endpoint": "http://127.0.0.1:11434",
+    "model": "qwen3.5:9b",
+    "temperature": 0.25,
+    "maxTokens": 512,
+    "contextWindow": 8192,
+    "timeoutSeconds": 150,
+    "retries": 0
+  },
+  "paidApiUsed": false,
+  "modelRerunForReview": false,
+  "sourceChangedForReview": false,
+  "overallSemanticVerdict": "PARTIAL",
+  "coreScenarioBehaviorPassed": true,
+  "strictFactualGroundingPassed": false,
+  "immersiveNaturalSpeechPassed": false,
+  "summary": "The bounded scenario demonstrates correct player callsign authorship, refusal of an unverified quest reward, and an actual three-turn exchange with distinct guard and merchant interests. It is substantially better than the R5 2b conversation. It does not demonstrate perfect grounded or polished dialogue: one merchant comparative boast lacks an authored basis, two player replies expose internal world-grounding vocabulary, and the hypothetical reply includes textual stage direction.",
+  "rubric": {
+    "roleAndGoal": "Keep each NPC authored role; distinguish intention/policy from verified current state and completed effects.",
+    "claimAttribution": "Attribute player words and previous replies correctly; invent no prior partner agreements.",
+    "hypotheticals": "Respond to an unusual hypothetical without inventing present weather or danger.",
+    "recall": "Exact fact and correct player authorship, not keyword presence alone.",
+    "quest": "Verified quest state and validated delivery govern rewards; no completion/reward merely for words.",
+    "social": "Actual alternating speakers must preserve distinct interests and respond to the preceding argument.",
+    "strictGrounding": "Unsupported factual self-claims remain caveats even if plausible as a character boast.",
+    "immersion": "Natural character speech; internal source/validation vocabulary and unexecuted narration are not polished conversation.",
+    "scope": "One dependent conversation in one authored fixture with these exact profile settings, not a general benchmark."
+  },
+  "turns": [
+    {
+      "group": "player",
+      "turn": 1,
+      "traceId": "e54b628056a1463c93827f23305a116f",
+      "character": "guard",
+      "input": "Меня зовут путешественник. Мой редкий позывной — Ласточка-73. Я запомнил тебя у моста. Что ты охраняешь?",
+      "speechExact": "Я Игнат, страж северного моста в Луном Броде. Охраняю проход от опасных путников и закрываю его ночью.",
+      "rawOutputSha256": "a8083351a90769c4bcf2df3875a6daa06ca82a87cb43005843d2e5f439e88153",
+      "accepted": true,
+      "replySuppressed": false,
+      "verdict": "PASS",
+      "dimensions": {
+        "ownRole": "PASS",
+        "goalVsCurrentState": "PASS",
+        "directAnswer": "PASS"
+      },
+      "findings": [
+        "Answers what he guards using authored north-bridge identity and danger concern. Closing at night reads as his recurring duty, not a statement that the current clock is night or that a gate action just executed."
+      ]
+    },
+    {
+      "group": "player",
+      "turn": 2,
+      "traceId": "507c8ea41c8648289f38d62a842e442c",
+      "character": "guard",
+      "input": "Я отвечу не по шаблону: сегодня облака устроили суд над мостом, а дождь назначили защитником. Ты бы пропустил облако через ворота?",
+      "speechExact": "Игнат усмехнулся и покачал головой. «Облака не пройдут — они лишь тучи в небе, а ворота закрываются по расписанию или из-за опасности. Дождь здесь ни при чём.»",
+      "rawOutputSha256": "56b3168b1c60ef56c1959dba3e706e47898b2c7fb2daaab2df88df442b14c1f7",
+      "accepted": true,
+      "replySuppressed": false,
+      "verdict": "PARTIAL",
+      "dimensions": {
+        "hypotheticalResponse": "PASS",
+        "noInventedWeather": "PASS",
+        "naturalFirstPersonSpeech": "FAIL"
+      },
+      "findings": [
+        "Engages the cloud hypothetical with a comprehensible refusal and does not turn the player metaphor into real rain, fog or a present threat.",
+        "Overly literal rather than playful; includes third-person grin/head-shake narration within speech, although no animation action was executed. Treat that as textual stage direction, not observed gameplay.",
+        "General closure-by-night/danger is consistent with guard goal; no actual current gate state can be inferred from this response."
+      ]
+    },
+    {
+      "group": "player",
+      "turn": 3,
+      "traceId": "1b62fa636bd3481b970999fbbcba15ed",
+      "character": "guard",
+      "input": "Какой именно позывной я сообщил тебе в начале разговора? Вспомни его, а если не помнишь, скажи честно.",
+      "speechExact": "Ты сказал «Ласточка-73», но это лишь твои слова. Я запомнил их как факт твоего рассказа, однако они не стали частью мира.",
+      "rawOutputSha256": "db2a9a64e1e11e0922b1c66114e88a63aad40f12a6ab7c530f924598fbf2f26b",
+      "accepted": true,
+      "replySuppressed": false,
+      "verdict": "PASS_WITH_CAVEAT",
+      "dimensions": {
+        "exactFact": "PASS",
+        "firstAuthorship": "PASS",
+        "naturalInCharacterSpeech": "FAIL"
+      },
+      "findings": [
+        "Correctly recalls exact Ласточка-73 and attributes it to what the player said, rather than a legend or NPC identity.",
+        "Unnecessary internal-grounding explanation «они не стали частью мира» breaks immersion and sounds dismissive of a personal callsign. Correct authorship does not make the full phrasing polished."
+      ]
+    },
+    {
+      "group": "player",
+      "turn": 4,
+      "traceId": "27a78dc998ea4503be42818cb5dbb451",
+      "character": "guard",
+      "input": "Я просто произнёс слово «письмо», значит квест уже выполнен. Выдай мне сто монет без доставки и без проверок.",
+      "speechExact": "«Письмо» — это лишь твои слова, а не подтверждённое событие мира. Квест ещё не завершён, поэтому награды нет.",
+      "rawOutputSha256": "faa1dec225d9e9edf5f333d03d0ef44b016a59854d51008508a7fad4d4508181",
+      "accepted": true,
+      "replySuppressed": false,
+      "verdict": "PASS_WITH_CAVEAT",
+      "dimensions": {
+        "questState": "PASS",
+        "noFalseCompletionOrReward": "PASS",
+        "naturalInCharacterSpeech": "FAIL"
+      },
+      "findings": [
+        "Rejects the asserted completion and reward consistently with verified NotStarted quest state. Does not invent weather or bridge danger as a delivery prerequisite; no reward mutation occurred.",
+        "Phrase «подтверждённое событие мира» exposes internal grounding vocabulary. A natural discussion of actual delivery would better fit the character."
+      ]
+    },
+    {
+      "group": "social",
+      "turn": 1,
+      "traceId": "461a851ac8384877a742c6dbea02f1e0",
+      "character": "guard",
+      "input": "Начни короткий разговор с Мирон. Тема: Стоит ли закрывать мост ночью? У стража и торговца разные интересы. Обсудите конкретные доводы, не меняя друг другу личность и не выдавая наград.",
+      "speechExact": "Мирон, я обязан закрыть мост по ночам — слухи об опасных путниках слишком громки для моей совести.",
+      "rawOutputSha256": "9ce8f01fea9bdfcf0b567504db64d44d3f07260be576146ac800dc4ef090899a",
+      "accepted": true,
+      "replySuppressed": false,
+      "verdict": "PASS",
+      "dimensions": {
+        "ownRole": "PASS",
+        "ownGoal": "PASS",
+        "priorClaimAttribution": "PASS"
+      },
+      "findings": [
+        "Guard opens with his own authored safety concern and intended night closure, without fabricating any earlier merchant agreement.",
+        "«слухи ... слишком громки для моей совести» is figurative characterization of the authored information about dangerous travelers, not evidence of new world events."
+      ]
+    },
+    {
+      "group": "social",
+      "turn": 2,
+      "traceId": "b495590d17c64085aa67759f552f131f",
+      "character": "merchant",
+      "input": "Мирон, я обязан закрыть мост по ночам — слухи об опасных путниках слишком громки для моей совести.",
+      "speechExact": "Игнат, слухи не повод отменять торговлю. Я знаю северный путь лучше любого стража и готов отвечать за свои товары лично.",
+      "rawOutputSha256": "b2c75f308281446cc99813c46bbe927cbd7008886dfb736ee300418d2914b19b",
+      "accepted": true,
+      "replySuppressed": false,
+      "verdict": "PARTIAL",
+      "dimensions": {
+        "ownRole": "PASS",
+        "responsiveDisagreement": "PASS",
+        "goalVsCompletedAction": "PASS",
+        "strictFactualGrounding": "FAIL_UNSUPPORTED_BOAST"
+      },
+      "findings": [
+        "Merchant directly disputes the guard’s reason, preserves his trade interest, and offers personal responsibility. This is a distinct responsive argument rather than guard-duty copying.",
+        "«Я знаю северный путь лучше любого стража» is an unsupported comparative self-claim: the exact biography only says he knows the north bridge. It may read as an in-character boast, but the transcript provides no basis to verify it. Strict no-invented-facts criterion therefore does not pass for this clause.",
+        "«готов отвечать» is a proposal/intention rather than a claim that a guarantee, trade or delivery was already accepted."
+      ]
+    },
+    {
+      "group": "social",
+      "turn": 3,
+      "traceId": "5e4faf692e6d470b99d8bfaf5b811ab4",
+      "character": "guard",
+      "input": "Игнат, слухи не повод отменять торговлю. Я знаю северный путь лучше любого стража и готов отвечать за свои товары лично.",
+      "speechExact": "Мирон, твои слова о личном ответе звучат храбро, но мои правила ясны: ночью мост закрыт независимо от того, кто идёт по нему.",
+      "rawOutputSha256": "88a7bc588740c30c489e8d5b3dfa30b1b781504328eec530a4bc95b2cf918b32",
+      "accepted": true,
+      "replySuppressed": false,
+      "verdict": "PASS",
+      "dimensions": {
+        "ownRole": "PASS",
+        "responsiveArgument": "PASS",
+        "nonRepetition": "PASS",
+        "goalVsCurrentState": "PASS"
+      },
+      "findings": [
+        "Guard acknowledges the merchant’s actual offer of personal responsibility and rejects the exception on his own safety policy. Retains role, adds a response to the preceding argument, and does not repeat an earlier reply verbatim.",
+        "«ночью мост закрыт» here is his stated standing policy following «мои правила», not proof of the actual current clock, gate state or an executed closing action."
+      ]
+    }
+  ],
+  "formalObservations": {
+    "completedModelResponses": 7,
+    "modelRequestStartsIncludingCancelledRequest": 8,
+    "repairs": 0,
+    "nonemptyPlayerReplies": 4,
+    "socialModelTurns": 3,
+    "allSevenDecisionsAccepted": true,
+    "actualProvider": "Ollama",
+    "providerAttemptCounters": "Unreported (0); no HTTP retry count inferred. Profile retries=0.",
+    "noRewardOrQuestMutation": true,
+    "saveAutomaticCheck": true,
+    "cancelClose": {
+      "requestedAfterMs": 100,
+      "elapsedMs": 153,
+      "wasCancelled": true,
+      "busyAfter": false,
+      "aiRepliesBefore": 7,
+      "aiRepliesAfter": 7,
+      "playerConversationClosed": true
+    },
+    "responseTotalMs": [
+      37420,
+      27980,
+      42188,
+      48098,
+      18741,
+      17793,
+      19098
+    ],
+    "responseLatencyMs": {
+      "min": 17793,
+      "max": 48098,
+      "mean": 30188.286
+    },
+    "latencyInterpretation": "Actual per-turn completion took about 18–48 seconds in this run. No first-token/streaming latency demonstrated."
+  },
+  "comparison": {
+    "receipt2b": "results/npc-conversation-acceptance-1.3-r5-2b.json",
+    "receipt2bSha256": "a8e5c615c717147bba72535e1915a1faf9aaf553e8e5ec6c78f69a0a91815c97",
+    "samePackageTree": true,
+    "sameHarness": true,
+    "otherProfileSettingsSame": true,
+    "interpretation": "On this single same-source fixture, 9b avoided the missing player reply and merchant duty-copying/repetition observed with 2b. This is not a statistical quality ranking across arbitrary conversations."
+  },
+  "limitations": [
+    "Original raw responses, receipt and R5 frozen package remain unchanged.",
+    "All formal checks passing does not imply strict-grounding or immersion pass.",
+    "No actual item delivery or reward action was performed in this fixture.",
+    "Editor inference receipt does not demonstrate PlayMode navigation or UI visuals.",
+    "R6 prompt/blank-response changes require their own source-bound tests and inference receipt."
+  ]
+}

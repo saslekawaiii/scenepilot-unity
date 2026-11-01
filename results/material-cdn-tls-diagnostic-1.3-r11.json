@@ -1,0 +1,84 @@
+{
+  "kind": "ordinary-tls-official-polyhaven-read-only-diagnostic",
+  "recordedUtc": "2026-11-01T13:38:59.587781+00:00",
+  "sourceCommit": "399f1c62f17f7ab007452810b76f3108f8b143e5",
+  "originalFailedUnityReceipt": "results/material-acceptance-1.3-r11.json",
+  "originalFailedUnityReceiptSha256": "f8886bb5531a7d02781d0e2f17502c235b4cc91285e3e00926982a151850f011",
+  "openssl": "OpenSSL 3.0.13 30 Jan 2024",
+  "probes": [
+    {
+      "host": "api.polyhaven.com",
+      "method": "Python ssl.create_default_context + verified SNI socket",
+      "checkHostname": true,
+      "verifyMode": "CERT_REQUIRED",
+      "customTrustOverridesUsed": false,
+      "passed": false,
+      "errorType": "SSLCertVerificationError",
+      "error": "[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1033)",
+      "ms": 198
+    },
+    {
+      "url": "https://api.polyhaven.com/info/wooden_garage_door",
+      "method": "system curl with normal trust/hostname verification",
+      "requestedRange": null,
+      "tlsValidationDisabled": false,
+      "redirectsFollowed": false,
+      "exitCode": 0,
+      "stderr": "",
+      "httpCode": 200,
+      "sslVerifyResult": 0,
+      "timeTotal": 0.308177,
+      "sizeDownload": 1024,
+      "bodyBytes": 1024,
+      "bodySha256": "e51136d8914d599c7bf96bede8a29750efb69aaf292e77e69afb7468134f9f88",
+      "responseHeaderSubset": [
+        "HTTP/2 200 ",
+        "content-type: application/json; charset=utf-8",
+        "content-length: 1024",
+        "etag: W/\"400-JCGRu4RP2xHi0fbOEwINPUo5uRA\""
+      ],
+      "passed": true
+    },
+    {
+      "host": "dl.polyhaven.org",
+      "method": "Python ssl.create_default_context + verified SNI socket",
+      "checkHostname": true,
+      "verifyMode": "CERT_REQUIRED",
+      "customTrustOverridesUsed": false,
+      "passed": false,
+      "errorType": "SSLCertVerificationError",
+      "error": "[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1033)",
+      "ms": 199
+    },
+    {
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/wooden_garage_door/wooden_garage_door_diff_1k.jpg",
+      "method": "system curl with normal trust/hostname verification",
+      "requestedRange": "0-1023",
+      "tlsValidationDisabled": false,
+      "redirectsFollowed": false,
+      "exitCode": 0,
+      "stderr": "",
+      "httpCode": 206,
+      "sslVerifyResult": 0,
+      "timeTotal": 0.235634,
+      "sizeDownload": 1024,
+      "bodyBytes": 1024,
+      "bodySha256": "f63b882fb369390d435146263b9d04da5689f902d7823803cf273c936090154a",
+      "responseHeaderSubset": [
+        "HTTP/2 206 ",
+        "content-type: image/jpeg",
+        "content-length: 1024",
+        "content-range: bytes 0-1023/880352"
+      ],
+      "passed": true
+    }
+  ],
+  "tlsValidationDisabled": false,
+  "packageSourcesModified": false,
+  "unityStarted": false,
+  "llmInferenceUsed": false,
+  "limitations": [
+    "Current curl/Python reachability probes do not replace or relabel the failed actual Unity/Mono material import.",
+    "This is a later bounded observation of two official URLs; it does not establish the underlying cause or guarantee CDN availability."
+  ]
+}

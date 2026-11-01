@@ -1,0 +1,387 @@
+{
+  "schemaVersion": 2,
+  "kind": "actual-open-native-conversation-ui-read-only-audit",
+  "recordedUtc": "2026-11-01T13:02:47.2171450Z",
+  "unity": "6000.3.27f1",
+  "sourceSha256": "a0e180da3bee76142c6dbc7c7e6125c1ae147ddb8146a0f8c2b67054c9813828",
+  "isPlaying": true,
+  "layoutMode": "compact",
+  "coordinateSpace": "UI Toolkit worldBound panel points; not desktop screen coordinates",
+  "screenPixels": {
+    "width": 1899,
+    "height": 1341
+  },
+  "panelScale": 0.8,
+  "playerInstanceId": -5668,
+  "npcInstanceId": -5538,
+  "npcCharacterIdSha256": "08a8b4bad2d53a3c22e374448e037e9a415423573e6c99e9e18349fd5542fc79",
+  "npcNameSha256": "dae572beaebe4f4b9de3302a9f6b3810fb78bbe835c14bfbd67a191e5f44dcd3",
+  "npcAiEnabled": true,
+  "npcBusy": false,
+  "historyEntryCount": 2,
+  "uiLastError": null,
+  "npcLastError": null,
+  "npcAiStatus": "Ответ готов",
+  "npcState": "Idle",
+  "npcDialogueProfile": {
+    "exists": true,
+    "provider": "Ollama",
+    "model": "qwen3.5:9b",
+    "maxTokens": 512,
+    "contextWindow": 8192,
+    "timeoutSeconds": 150,
+    "retries": 0,
+    "temperature": 0.25,
+    "strictSchema": true,
+    "responseMode": "JsonObject"
+  },
+  "npcUseRag": true,
+  "npcTopK": 3,
+  "conversationHistory": [
+    {
+      "id": "cc3ec23ea3ce4660bd494fd11e82c899",
+      "speakerId": "Player",
+      "speakerName": "Вы",
+      "targetId": "b8afba16530b410d8d2275e56d48be68",
+      "text": "Игнат, если мост сравнить с уставшим человеком, стоит ли ему дать отдых? Я не несу письмо — просто хочу поговорить.",
+      "timestamp": "2026-11-01T12:59:08.7468280Z",
+      "isPlayer": true,
+      "isAi": false,
+      "sourceTextSha256": "f13e8cd0340351d60ea1c2b53ff100847e13f474e868e7ce98f635ecce14ed78",
+      "textWasRedacted": false
+    },
+    {
+      "id": "b6801999dd524e1e9fe8bf273962d42e",
+      "speakerId": "b8afba16530b410d8d2275e56d48be68",
+      "speakerName": "Игнат",
+      "targetId": "Player",
+      "text": "Мост и так держит себя сам. Если хочешь поболтать — я слушаю.",
+      "timestamp": "2026-11-01T13:01:09.3033840Z",
+      "isPlayer": false,
+      "isAi": true,
+      "sourceTextSha256": "86175a9da5d5ba2e708722ee0375fd69936d11d0d2d8a2b33daa1b14b0c841e7",
+      "textWasRedacted": false
+    }
+  ],
+  "recentTraceLog": {
+    "selection": "Last completed TraceLog entry whose Character exactly equals the active NPC CharacterId; no trace is fabricated while inference is in flight.",
+    "globalEntryCount": 1,
+    "activeNpcEntryCount": 1,
+    "globalLastEntryMatchesActiveNpc": true,
+    "activeNpcLastEntry": {
+      "id": "a8ce6d7ac4264ee4bd3255130507d213",
+      "timestamp": "2026-11-01T12:59:08.7708350Z",
+      "characterIdSha256": "08a8b4bad2d53a3c22e374448e037e9a415423573e6c99e9e18349fd5542fc79",
+      "input": {
+        "text": "Игнат, если мост сравнить с уставшим человеком, стоит ли ему дать отдых? Я не несу письмо — просто хочу поговорить.",
+        "sourceCharacterCount": 115,
+        "sourceTextSha256": "f13e8cd0340351d60ea1c2b53ff100847e13f474e868e7ce98f635ecce14ed78",
+        "wasRedacted": false,
+        "wasNull": false
+      },
+      "route": "Dialogue",
+      "raw": {
+        "text": "{\"speech\":\"Мост и так держит себя сам. Если хочешь поболтать — я слушаю.\",\"actions\":[]}",
+        "sourceCharacterCount": 87,
+        "sourceTextSha256": "beb161db7d33fd6ef9735f1baa35e908681fd198f2f3cbea0f36e52b1cf00385",
+        "wasRedacted": false,
+        "wasNull": false
+      },
+      "speech": {
+        "text": "Мост и так держит себя сам. Если хочешь поболтать — я слушаю.",
+        "sourceCharacterCount": 61,
+        "sourceTextSha256": "86175a9da5d5ba2e708722ee0375fd69936d11d0d2d8a2b33daa1b14b0c841e7",
+        "wasRedacted": false,
+        "wasNull": false
+      },
+      "error": null,
+      "totalMs": 120522,
+      "retrievalMs": 4886,
+      "retrievedChunkCount": 3,
+      "contextCharacterCount": 4572,
+      "contextSha256": "9687f22b2e32610e7bff60dad05cdcfe54cab232e731bea6fb7184340acfa359",
+      "modelRequestStarts": 1,
+      "completedModelRequests": 1,
+      "completedInputTokens": 2822,
+      "completedOutputTokens": 27,
+      "completedReportedProviderAttempts": null,
+      "replySuppressed": false,
+      "completion": {
+        "provider": "Ollama",
+        "model": "qwen3.5:9b",
+        "text": {
+          "text": "{\"speech\":\"Мост и так держит себя сам. Если хочешь поболтать — я слушаю.\",\"actions\":[]}",
+          "sourceCharacterCount": 87,
+          "sourceTextSha256": "beb161db7d33fd6ef9735f1baa35e908681fd198f2f3cbea0f36e52b1cf00385",
+          "wasRedacted": false,
+          "wasNull": false
+        },
+        "elapsedMs": 103691,
+        "firstTokenMs": 0,
+        "inputTokens": 2822,
+        "outputTokens": 27,
+        "providerAttemptsRecorded": 0,
+        "tokensPerSecond": 3.58968897738137
+      },
+      "validation": {
+        "accepted": true,
+        "reason": "All preconditions satisfied.",
+        "executed": []
+      },
+      "attempts": [
+        {
+          "number": 1,
+          "isRepair": false,
+          "status": "accepted",
+          "startedUtc": "2026-11-01T12:59:13.6794760Z",
+          "finishedUtc": "2026-11-01T13:00:57.3798110Z",
+          "elapsedMs": 103699,
+          "raw": {
+            "text": "{\"speech\":\"Мост и так держит себя сам. Если хочешь поболтать — я слушаю.\",\"actions\":[]}",
+            "sourceCharacterCount": 87,
+            "sourceTextSha256": "beb161db7d33fd6ef9735f1baa35e908681fd198f2f3cbea0f36e52b1cf00385",
+            "wasRedacted": false,
+            "wasNull": false
+          },
+          "error": null,
+          "completion": {
+            "provider": "Ollama",
+            "model": "qwen3.5:9b",
+            "text": {
+              "text": "{\"speech\":\"Мост и так держит себя сам. Если хочешь поболтать — я слушаю.\",\"actions\":[]}",
+              "sourceCharacterCount": 87,
+              "sourceTextSha256": "beb161db7d33fd6ef9735f1baa35e908681fd198f2f3cbea0f36e52b1cf00385",
+              "wasRedacted": false,
+              "wasNull": false
+            },
+            "elapsedMs": 103691,
+            "firstTokenMs": 0,
+            "inputTokens": 2822,
+            "outputTokens": 27,
+            "providerAttemptsRecorded": 0,
+            "tokensPerSecond": 3.58968897738137
+          },
+          "validation": {
+            "accepted": true,
+            "reason": "All preconditions satisfied.",
+            "executed": []
+          }
+        }
+      ],
+      "metricsScope": "Observed public trace fields. Missing completion or provider attempt counters remain null; a started request does not imply a completed response. No provider endpoint, environment variable or retrieval text is included."
+    }
+  },
+  "input": {
+    "characterCount": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "containsNewline": false,
+    "enabled": true,
+    "hasFocusWithinInput": true
+  },
+  "sendEnabled": false,
+  "elements": {
+    "viewport": {
+      "exists": true,
+      "name": "worldweaver-game-ui",
+      "type": "UIDocumentRootElement",
+      "visible": true,
+      "enabled": true,
+      "display": "Flex",
+      "visibility": "Visible",
+      "bounds": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 800.0,
+        "height": 600.0
+      }
+    },
+    "backdrop": {
+      "exists": true,
+      "name": "conversation-backdrop",
+      "type": "VisualElement",
+      "visible": true,
+      "enabled": true,
+      "display": "Flex",
+      "visibility": "Visible",
+      "bounds": {
+        "x": 0.0,
+        "y": 0.0,
+        "width": 800.0,
+        "height": 600.0
+      }
+    },
+    "stage": {
+      "exists": true,
+      "name": "",
+      "type": "VisualElement",
+      "visible": true,
+      "enabled": true,
+      "display": "Flex",
+      "visibility": "Visible",
+      "bounds": {
+        "x": 15.0,
+        "y": 76.25,
+        "width": 770.0,
+        "height": 507.5
+      }
+    },
+    "profile": {
+      "exists": true,
+      "name": "",
+      "type": "VisualElement",
+      "visible": false,
+      "enabled": true,
+      "display": "None",
+      "visibility": "Visible",
+      "bounds": {
+        "x": 15.0,
+        "y": 76.25,
+        "width": 0.0,
+        "height": 0.0
+      }
+    },
+    "panel": {
+      "exists": true,
+      "name": "",
+      "type": "VisualElement",
+      "visible": true,
+      "enabled": true,
+      "display": "Flex",
+      "visibility": "Visible",
+      "bounds": {
+        "x": 15.0,
+        "y": 76.25,
+        "width": 770.0,
+        "height": 507.5
+      }
+    },
+    "header": {
+      "exists": true,
+      "name": "",
+      "type": "VisualElement",
+      "visible": true,
+      "enabled": true,
+      "display": "Flex",
+      "visibility": "Visible",
+      "bounds": {
+        "x": 32.5,
+        "y": 98.75,
+        "width": 735.0,
+        "height": 90.0
+      }
+    },
+    "history": {
+      "exists": true,
+      "name": "conversation-history",
+      "type": "ScrollView",
+      "visible": true,
+      "enabled": true,
+      "display": "Flex",
+      "visibility": "Visible",
+      "bounds": {
+        "x": 32.5,
+        "y": 211.25,
+        "width": 735.0,
+        "height": 105.0
+      }
+    },
+    "composer": {
+      "exists": true,
+      "name": "",
+      "type": "VisualElement",
+      "visible": true,
+      "enabled": true,
+      "display": "Flex",
+      "visibility": "Visible",
+      "bounds": {
+        "x": 32.5,
+        "y": 401.25,
+        "width": 735.0,
+        "height": 168.75
+      }
+    },
+    "input": {
+      "exists": true,
+      "name": "conversation-input",
+      "type": "TextField",
+      "visible": true,
+      "enabled": true,
+      "display": "Flex",
+      "visibility": "Visible",
+      "bounds": {
+        "x": 46.25,
+        "y": 455.0,
+        "width": 707.5,
+        "height": 57.5
+      }
+    },
+    "inputSurface": {
+      "exists": true,
+      "name": "unity-text-input",
+      "type": "TextInput",
+      "visible": true,
+      "enabled": true,
+      "display": "Flex",
+      "visibility": "Visible",
+      "bounds": {
+        "x": 46.25,
+        "y": 455.0,
+        "width": 707.5,
+        "height": 57.5
+      }
+    },
+    "send": {
+      "exists": true,
+      "name": "conversation-send",
+      "type": "Button",
+      "visible": true,
+      "enabled": false,
+      "display": "Flex",
+      "visibility": "Visible",
+      "bounds": {
+        "x": 632.5,
+        "y": 520.0,
+        "width": 121.25,
+        "height": 36.25
+      }
+    },
+    "close": {
+      "exists": true,
+      "name": "",
+      "type": "Button",
+      "visible": true,
+      "enabled": true,
+      "display": "Flex",
+      "visibility": "Visible",
+      "bounds": {
+        "x": 678.75,
+        "y": 120.0,
+        "width": 85.0,
+        "height": 32.5
+      }
+    }
+  },
+  "checks": {
+    "viewportHasFinitePositiveBounds": true,
+    "coreControlsVisible": true,
+    "coreControlsInsideViewport": true,
+    "controlsInsideConversationPanel": true,
+    "inputAndSendInsideComposer": true,
+    "inputAndSendDoNotOverlap": true,
+    "closeAndInputDoNotOverlap": true,
+    "closeAndSendDoNotOverlap": true,
+    "headerAndComposerDoNotOverlap": true,
+    "historyAndComposerDoNotOverlap": true,
+    "compactClassMatchesActualViewport": true,
+    "profileVisibilityMatchesLayout": true,
+    "actualMultilineInputAvailable": true,
+    "documentTargetsGameViewport": true
+  },
+  "passed": true,
+  "openedUiByAudit": false,
+  "requestedInferenceByAudit": false,
+  "sentMessageByAudit": false,
+  "changedUiByAudit": false,
+  "nativeKeyboardInputProven": false,
+  "scope": "One observed open layout, active NPC profile limits, controlled native QA transcript and latest active-NPC trace. This reads existing state only; it does not infer, send, cancel, configure or approve anything. Input field content remains length/SHA256 only. Transcript/trace strings retain the observed text except conservative secret/URL redaction, explicitly disclosed with raw-text SHA256. No endpoint or API-key environment-variable fields are serialized. Geometry passed does not mean model response or conversation quality passed. Native keyboard and screenshot evidence remain separate."
+}

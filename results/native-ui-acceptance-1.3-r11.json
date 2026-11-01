@@ -1,0 +1,96 @@
+{
+  "kind": "actual-native-ui-observations-and-exact-package-source-binding",
+  "recordedUtc": "2026-11-01T13:49:52.668837+00:00",
+  "sourceCommit": "399f1c62f17f7ab007452810b76f3108f8b143e5",
+  "packageFileCount": 554,
+  "snapshotManifest": "results/integration-1.3-snapshot-r11.json",
+  "snapshotManifestSha256": "592c4443d194f44a51aeffce78e0d01ad9f45a95c32801bef8e1a0a196423508",
+  "canonicalOrdinalNulTreeSha256": "18e8e430c6ce75490db6893455c30593b00626dfb13d9d8aa0c81eb399419f8f",
+  "mainManifestUsesReviewedWorkingPackage": true,
+  "all554CurrentPackageFilesVerifiedBeforeAndAfterNativeRun": true,
+  "normalEditorExitedWithCode": 0,
+  "actualActions": "Normal GUI Editor. Created unique Village3 through existing Tools menu; resized native chat wide/compact; selected real640x480; Cmd+P, held W4400ms then E180ms; read-only audit saw empty focused input; pasted controlled arbitrary Russian question and pressed Return; waited without scrolling until real response; entire latest reply was visible automatically. Selected real1920x1080 with nativeFit0.99 and captured full dialogue. Stopped Play and quit Editor. Removed only owned QA helper copies from Main Assets.",
+  "syntheticInputQueueUsed": false,
+  "runtimeProfileOverrideUsed": false,
+  "persistentModelSettingsEditedForTest": false,
+  "actualDefaultProfile": {
+    "exists": true,
+    "provider": "Ollama",
+    "model": "qwen3.5:9b",
+    "maxTokens": 512,
+    "contextWindow": 8192,
+    "timeoutSeconds": 150,
+    "retries": 0,
+    "temperature": 0.25,
+    "strictSchema": true,
+    "responseMode": "JsonObject"
+  },
+  "npcUseRag": true,
+  "responseSummary": {
+    "totalMs": 142789,
+    "completionMs": 102777,
+    "retrievalMs": 5600,
+    "retrievedChunkCount": 3,
+    "modelRequestStarts": 1,
+    "completedModelRequests": 1,
+    "inputTokens": 2821,
+    "outputTokens": 28,
+    "validationAccepted": true,
+    "worldActionsExecuted": []
+  },
+  "files": [
+    {
+      "path": "results/screenshots-1.3/native-conversation-ui-20261101T1342536291120Z-8710c579.json",
+      "bytes": 7017,
+      "sha256": "88ca4e6694634aff2b59ca6262dbe2e9ca86c37972fa67aca80d467270760374"
+    },
+    {
+      "path": "results/screenshots-1.3/native-conversation-ui-20261101T1345487857120Z-ff429af6.json",
+      "bytes": 12699,
+      "sha256": "d69d1ea9f94c4b06f3ec1987f2eb3c6fe53e833ed3be38541e4beb2b15a39b0e"
+    },
+    {
+      "path": "results/screenshots-1.3/native-conversation-ui-20261101T1346444774630Z-544752fa.json",
+      "bytes": 12829,
+      "sha256": "a2dc61e4155ca6a5136f5ca33bf3bb2f8a714e1c19f50cf7b97bd8de698355a9"
+    },
+    {
+      "path": "results/screenshots-1.3/native-game-view-size-20261101T1346024734670Z-846678c2.json",
+      "bytes": 1825,
+      "sha256": "8fed07f8cb38086c63bcebb8bcc2925f4d86675a7b1a75db4e00d0243f788fec"
+    },
+    {
+      "path": "results/screenshots-1.3/chat-wide-r11.png",
+      "bytes": 262095,
+      "sha256": "1600e87785cce8c2eb8787b2a0da78576facaefadee59ffa75bc2a6f569064a2"
+    },
+    {
+      "path": "results/screenshots-1.3/chat-compact-r11.png",
+      "bytes": 142662,
+      "sha256": "7ecb786c58ef3fc40478f03c925f775ea9186f97be7444a651dfe00941e25436"
+    },
+    {
+      "path": "results/screenshots-1.3/npc-640x480-empty-after-e-r11.png",
+      "bytes": 402612,
+      "sha256": "668c78d3e19d5d31bca0f0f87aa15ea3d086599a909cb9a6c88b4554ac8ebbf0"
+    },
+    {
+      "path": "results/screenshots-1.3/npc-640x480-response-visible-r11.png",
+      "bytes": 429102,
+      "sha256": "d3a37730f1ac457d3208c2ebc8208b7a994b8f5b50f0f25d192e1a0bd9d114c3"
+    },
+    {
+      "path": "results/screenshots-1.3/npc-fullhd-response-fit-r11.png",
+      "bytes": 490753,
+      "sha256": "d36f063b0f49fc40951fbaa39fa1e9558e79fd59e594c4238ff609dc94930fd4"
+    }
+  ],
+  "limitations": [
+    "Native key input and whole-reply visibility are bounded operator observations with original uncropped PNGs, not automated screenshot semantic evaluation.",
+    "Each read-only layout audit checks14 geometry conditions; model semantics are independently reviewed separately.",
+    "One arbitrary native NPC question/response; no general conversational reliability, art-quality, multiplayer or Player-build benchmark.",
+    "Total142789ms and completion102777ms on this Mac; not a speed guarantee.",
+    "Existing generated NPC profiles are not automatically overwritten by the new fallback defaults."
+  ],
+  "success": true
+}

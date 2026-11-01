@@ -1,0 +1,18 @@
+using UnityEngine;
+
+public class ToggleLighthouseColor : MonoBehaviour {
+    private Color blueColor = new Color(0.235f, 0.286f, 1f, 1f);
+    private Color amberColor = new Color(1f, 0.749f, 0.11f, 1f);
+    private bool isAmber = false;
+
+    void Start() {
+        GetComponent<Renderer>().material.color = blueColor;
+    }
+
+    void Update() {
+        if (Input.GetKeyDown(KeyCode.F)) {
+            isAmber = !isAmber;
+            GetComponent<Renderer>().material.color = isAmber ? amberColor : blueColor;
+        }
+    }
+}

@@ -1,0 +1,11 @@
+{
+  "event": "cleaned",
+  "domainReload": false,
+  "allOwnedClonesDestroyed": true,
+  "persistentAssetsWritten": false,
+  "kind": "explicit-runtime-only-native-npc-profile-qa",
+  "recordedUtc": "2026-11-01T13:08:32.4089010Z",
+  "sessionId": "fab798cd543a448fbee98710f066608e",
+  "sourceSha256": "ed784d098b28500a354a662b1cd2a3ad94d12a8b9a2df568f31e7d92e8b878f5",
+  "unity": "6000.3.27f1"
+}
