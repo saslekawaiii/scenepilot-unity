@@ -1,0 +1,5 @@
+{
+  "aborted": true,
+  "source": "general-agent-coder-1.4.0-r2.json",
+  "reason": "Model repeatedly claimed completion after only discovery/planning, then repeated the same metadata reads. No false success was accepted. Adding a task-agnostic implementation-step constraint after premature completion, without supplying a tool plan or parameters."
+}

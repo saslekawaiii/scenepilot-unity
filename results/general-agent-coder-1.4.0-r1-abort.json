@@ -1,0 +1,5 @@
+{
+  "aborted": true,
+  "source": "general-agent-coder-1.4.0-r1.json",
+  "reason": "Shared continuation prompt still told every task to check NPC goals; Coder followed it during mesh creation. Fixed task-agnostic continuation and removed rejected-plan anchoring before rerunning the heterogeneous corpus."
+}

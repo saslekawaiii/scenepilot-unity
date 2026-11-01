@@ -1,0 +1,5 @@
+{
+  "aborted": true,
+  "source": "general-agent-9b-1.4.0-r1.json",
+  "reason": "Ollama server logged number of repetitions exceeds sane defaults for large mesh arrays. Stopped corpus to repair the shared decoder dialect; no manual tool plans."
+}

@@ -1,0 +1,133 @@
+{
+  "source": "general-agent-9b-1.4.0-r4.json",
+  "sourcePackageUnchanged": true,
+  "strictPasses": 1,
+  "total": 6,
+  "cases": [
+    {
+      "case": "mesh",
+      "strictHarnessPassed": true,
+      "elapsedMs": 224084,
+      "autoLoadedVerifiedSkillIds": [
+        "ww-mesh-authoring",
+        "ww-compound-planning"
+      ],
+      "actualSteps": [
+        "plan_task",
+        "create_node",
+        "create_node",
+        "create_mesh",
+        "verify_scene"
+      ],
+      "status": "Изменения применены",
+      "checks": {
+        "realModelUsed": true,
+        "noError": true,
+        "actualCustomBridge": true
+      }
+    },
+    {
+      "case": "physics",
+      "strictHarnessPassed": false,
+      "elapsedMs": 184959,
+      "autoLoadedVerifiedSkillIds": [
+        "ww-physics-authoring",
+        "ww-cave-construction"
+      ],
+      "actualSteps": [],
+      "status": "Не выполнено",
+      "checks": {
+        "realModelUsed": true,
+        "noError": false,
+        "actualBody": false,
+        "physicalGround": false
+      }
+    },
+    {
+      "case": "ui",
+      "strictHarnessPassed": false,
+      "elapsedMs": 404319,
+      "autoLoadedVerifiedSkillIds": [
+        "ww-ui-composition",
+        "ww-ugui-layout"
+      ],
+      "actualSteps": [
+        "create_ui_element",
+        "create_ui_element",
+        "create_ui_element",
+        "read_skill"
+      ],
+      "status": "План готов",
+      "checks": {
+        "realModelUsed": true,
+        "noError": true,
+        "realBoundButtonAndCanvas": false
+      }
+    },
+    {
+      "case": "terrain",
+      "strictHarnessPassed": false,
+      "elapsedMs": 229933,
+      "autoLoadedVerifiedSkillIds": [
+        "ww-lunar-terrain",
+        "ww-procedural-generation"
+      ],
+      "actualSteps": [
+        "create_world"
+      ],
+      "status": "Не выполнено",
+      "checks": {
+        "realModelUsed": true,
+        "noError": false,
+        "actualTerrain": true,
+        "craterRecord": false,
+        "physicalCave": false
+      }
+    },
+    {
+      "case": "code",
+      "strictHarnessPassed": false,
+      "elapsedMs": 162878,
+      "autoLoadedVerifiedSkillIds": [
+        "ww-components",
+        "ww-scene-hierarchy",
+        "ww-script-review"
+      ],
+      "actualSteps": [],
+      "status": "План готов",
+      "checks": {
+        "realModelUsed": true,
+        "noError": true,
+        "actualEmptyNode": false,
+        "completeReviewedTimerDraft": true
+      }
+    },
+    {
+      "case": "discovery",
+      "strictHarnessPassed": false,
+      "elapsedMs": 63815,
+      "autoLoadedVerifiedSkillIds": [
+        "ww-mesh-authoring",
+        "ww-capability-discovery"
+      ],
+      "actualSteps": [
+        "discover_tools"
+      ],
+      "status": "Готово",
+      "checks": {
+        "realModelUsed": true,
+        "noError": true,
+        "discoveryUsed": true,
+        "skillLoaded": false,
+        "sceneUntouched": true
+      }
+    }
+  ],
+  "discoveryCriterionCorrection": "The request is to load a relevant skill, not to invoke a specific function. Verified automatic Markdown context also counts as loading; the next harness records whether loading was automatic or via read_skill. Original R4 receipt is unchanged.",
+  "realFailures": [
+    "physics: height keyword incorrectly selected terrain; empty names unsupported on legacy creations",
+    "ui: no update/bind operation for an existing button, unnecessary incomplete C# draft",
+    "terrain: negative crater depth convention rejected repeatedly",
+    "code: missing empty host before prepared code; primitive substitute in rejected plan"
+  ]
+}

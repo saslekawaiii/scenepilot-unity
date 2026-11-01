@@ -1,0 +1,5 @@
+{
+  "aborted": true,
+  "source": "general-agent-cloud-1.4.0-r2.json",
+  "reason": "Free cloud returned HTTP 400 on repair calls. Preserved raw attempts; switching heterogeneous corpus to local Ollama. No manual substitute plans."
+}

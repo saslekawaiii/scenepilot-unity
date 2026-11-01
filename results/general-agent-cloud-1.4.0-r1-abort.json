@@ -1,0 +1,5 @@
+{
+  "source": "general-agent-cloud-1.4.0-r1.json",
+  "aborted": true,
+  "reason": "Repeated invalid action envelopes with missing name; vague host diagnostic. Stopped owned batch process before any scene changes to repair general diagnostics and phase splitting. No response or failed attempt was replaced."
+}

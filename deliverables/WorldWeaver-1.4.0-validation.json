@@ -1,0 +1,349 @@
+{
+  "version": "1.4.0",
+  "releaseStatus": "preview",
+  "sourceCommit": "b4c9dc7282f39d451153a7cc90a8d4fdc0674d59",
+  "packageFiles": 688,
+  "archive": {
+    "path": "deliverables/com.worldweaver.toolkit-1.4.0.tgz",
+    "bytes": 3098210,
+    "sha256": "9d862e7ff78ea1aa4239dda7155475fb9aee0e033877df8bb9b2630b1a28042f"
+  },
+  "skills": 80,
+  "capabilityGroups": 12,
+  "editorTests": {
+    "total": 678,
+    "passed": 678,
+    "failed": 0,
+    "skipped": 0,
+    "path": "results/compound-agent-edit-1.4.0-r15.xml",
+    "sha256": "75a62b9eb965208434d16388c931ae3059695d488529a192e0da94f158f0673c"
+  },
+  "packagedEditorTests": {
+    "total": 678,
+    "passed": 678,
+    "failed": 0,
+    "skipped": 0,
+    "path": "results/compound-agent-edit-packaged-1.4.0-r4.xml",
+    "sha256": "099e37128fc5ab9dfa377f1c75d2b1d040017d1928b6565458b53be48adfa4b2"
+  },
+  "packagedPlayTests": {
+    "total": 28,
+    "passed": 26,
+    "failed": 0,
+    "skipped": 2,
+    "path": "results/compound-agent-play-packaged-1.4.0-r4.xml",
+    "sha256": "111ee3ae84415f1e3caa1bc4e10ba2e9029c87a175ab5144029a43f215c4c869"
+  },
+  "liveRuns": [
+    {
+      "path": "results/general-agent-9b-1.4.0-r6.json",
+      "sha256": "209f04673b5931bc68c1ef00ba686c227a32dd6f463e7880e430c59647ed8f0a",
+      "model": "ollama:qwen3.5:9b",
+      "sourceCommit": "c0d2d46894a1afbe93c99ad1c527083319636656",
+      "harnessSha256": "ec52bac47b0646d06fdad9b8d5a6b470c13429afcbcbdbab6aa38429af96cd7a",
+      "criteriaVersion": "legacy (known false negatives documented)",
+      "completed": true,
+      "sourceUnchanged": true,
+      "passedCases": 4,
+      "totalCases": 6,
+      "cases": [
+        {
+          "case": "mesh",
+          "passed": true,
+          "status": "Изменения применены",
+          "elapsedMs": 547781,
+          "checks": {
+            "realModelUsed": true,
+            "noError": true,
+            "actualCustomBridge": true
+          }
+        },
+        {
+          "case": "physics",
+          "passed": true,
+          "status": "Изменения применены",
+          "elapsedMs": 358559,
+          "checks": {
+            "realModelUsed": true,
+            "noError": true,
+            "redAppearance": true,
+            "actualBody": true,
+            "physicalGround": true
+          }
+        },
+        {
+          "case": "ui",
+          "passed": true,
+          "status": "Изменения применены",
+          "elapsedMs": 449976,
+          "checks": {
+            "realModelUsed": true,
+            "noError": true,
+            "realBoundButtonAndCanvas": true,
+            "toggleRemainsReachable": true,
+            "panelVisibleAroundButton": true
+          }
+        },
+        {
+          "case": "terrain",
+          "passed": false,
+          "status": "Лимит времени",
+          "elapsedMs": 900089,
+          "checks": {
+            "realModelUsed": true,
+            "noError": false,
+            "actualTerrain": true,
+            "craterRecord": true,
+            "physicalCave": false,
+            "actualCraterDepth": false
+          }
+        },
+        {
+          "case": "code",
+          "passed": false,
+          "status": "План готов",
+          "elapsedMs": 166805,
+          "checks": {
+            "realModelUsed": true,
+            "noError": true,
+            "actualEmptyNode": true,
+            "completeReviewedTimerDraft": false
+          }
+        },
+        {
+          "case": "discovery",
+          "passed": true,
+          "status": "Готово",
+          "elapsedMs": 180542,
+          "checks": {
+            "realModelUsed": true,
+            "noError": true,
+            "discoveryUsed": true,
+            "skillLoaded": true,
+            "sceneUntouched": true
+          }
+        }
+      ]
+    },
+    {
+      "path": "results/general-agent-cloud-1.4.0-r4.json",
+      "sha256": "2a0f84a660a5d9d599b7b2c389da78b43bc2dc654150982b151848ec7629bbf5",
+      "model": "pollinations:openai-fast",
+      "sourceCommit": "c0d2d46894a1afbe93c99ad1c527083319636656",
+      "harnessSha256": "ec52bac47b0646d06fdad9b8d5a6b470c13429afcbcbdbab6aa38429af96cd7a",
+      "criteriaVersion": "legacy (known false negatives documented)",
+      "completed": true,
+      "sourceUnchanged": true,
+      "passedCases": 2,
+      "totalCases": 6,
+      "cases": [
+        {
+          "case": "mesh",
+          "passed": false,
+          "status": "Не выполнено",
+          "elapsedMs": 159229,
+          "checks": {
+            "realModelUsed": true,
+            "noError": false,
+            "actualCustomBridge": true
+          }
+        },
+        {
+          "case": "physics",
+          "passed": false,
+          "status": "Не выполнено",
+          "elapsedMs": 180030,
+          "checks": {
+            "realModelUsed": true,
+            "noError": false,
+            "redAppearance": true,
+            "actualBody": true,
+            "physicalGround": true
+          }
+        },
+        {
+          "case": "ui",
+          "passed": false,
+          "status": "Не выполнено",
+          "elapsedMs": 224395,
+          "checks": {
+            "realModelUsed": true,
+            "noError": false,
+            "realBoundButtonAndCanvas": false,
+            "toggleRemainsReachable": false,
+            "panelVisibleAroundButton": false
+          }
+        },
+        {
+          "case": "terrain",
+          "passed": false,
+          "status": "Не выполнено",
+          "elapsedMs": 149098,
+          "checks": {
+            "realModelUsed": true,
+            "noError": false,
+            "actualTerrain": true,
+            "craterRecord": true,
+            "physicalCave": false,
+            "actualCraterDepth": false
+          }
+        },
+        {
+          "case": "code",
+          "passed": true,
+          "status": "План готов",
+          "elapsedMs": 79901,
+          "checks": {
+            "realModelUsed": true,
+            "noError": true,
+            "actualEmptyNode": true,
+            "completeReviewedTimerDraft": true
+          }
+        },
+        {
+          "case": "discovery",
+          "passed": true,
+          "status": "Готово",
+          "elapsedMs": 135715,
+          "checks": {
+            "realModelUsed": true,
+            "noError": true,
+            "discoveryUsed": true,
+            "skillLoaded": true,
+            "sceneUntouched": true
+          }
+        }
+      ]
+    },
+    {
+      "path": "results/general-agent-beam-1.4.0-r6.json",
+      "sha256": "974a0e1ad3cad51fa18daf3ba053693828af57aa9d5ea17e217291075e36fc3f",
+      "model": "ollama:beam:cloud",
+      "sourceCommit": "b4c9dc7282f39d451153a7cc90a8d4fdc0674d59",
+      "harnessSha256": "e49874b8f27226ceb88706266aab61bbc611bcc5754fd049df98265585178f77",
+      "criteriaVersion": "measured surface / timer APIs",
+      "completed": true,
+      "sourceUnchanged": true,
+      "passedCases": 4,
+      "totalCases": 6,
+      "cases": [
+        {
+          "case": "mesh",
+          "passed": true,
+          "status": "Изменения применены",
+          "elapsedMs": 11884,
+          "checks": {
+            "realModelUsed": true,
+            "noError": true,
+            "actualCustomBridge": true
+          }
+        },
+        {
+          "case": "physics",
+          "passed": true,
+          "status": "Изменения применены",
+          "elapsedMs": 12638,
+          "checks": {
+            "realModelUsed": true,
+            "noError": true,
+            "redAppearance": true,
+            "actualBody": true,
+            "physicalGround": true
+          }
+        },
+        {
+          "case": "ui",
+          "passed": true,
+          "status": "Изменения применены",
+          "elapsedMs": 11219,
+          "checks": {
+            "realModelUsed": true,
+            "noError": true,
+            "realBoundButtonAndCanvas": true,
+            "toggleRemainsReachable": true,
+            "panelVisibleAroundButton": true
+          }
+        },
+        {
+          "case": "terrain",
+          "passed": false,
+          "status": "Не выполнено",
+          "elapsedMs": 20112,
+          "checks": {
+            "realModelUsed": true,
+            "noError": false,
+            "actualTerrain": true,
+            "craterRecord": true,
+            "physicalCave": true,
+            "actualCraterDepth": true
+          }
+        },
+        {
+          "case": "code",
+          "passed": true,
+          "status": "План готов",
+          "elapsedMs": 4205,
+          "checks": {
+            "realModelUsed": true,
+            "noError": true,
+            "actualEmptyNode": true,
+            "completeTimerDraftForReview": true
+          }
+        },
+        {
+          "case": "discovery",
+          "passed": false,
+          "status": "Не выполнено",
+          "elapsedMs": 2620,
+          "checks": {
+            "realModelUsed": true,
+            "noError": false,
+            "discoveryUsed": true,
+            "skillLoaded": true,
+            "sceneUntouched": true
+          }
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "No guarantee of arbitrary tasks. Live model failures retained.",
+    "Code case validates a review draft, not compiled or running gameplay.",
+    "Scene-object checks do not establish visual quality or all gameplay requirements.",
+    "Native user Editor refresh and physical input were not visually confirmed: Mac locked."
+  ],
+  "userSavedSceneUnchanged": true,
+  "historicalEvidence": [
+    "results/general-agent-9b-1.4.0-r1-abort.json",
+    "results/general-agent-9b-1.4.0-r1.json",
+    "results/general-agent-9b-1.4.0-r2-abort.json",
+    "results/general-agent-9b-1.4.0-r2.json",
+    "results/general-agent-9b-1.4.0-r3-abort.json",
+    "results/general-agent-9b-1.4.0-r3.json",
+    "results/general-agent-9b-1.4.0-r4-review.json",
+    "results/general-agent-9b-1.4.0-r4.json",
+    "results/general-agent-9b-1.4.0-r5-interrupted.json",
+    "results/general-agent-9b-1.4.0-r5.json",
+    "results/general-agent-9b-1.4.0-r6-semantic-review.json",
+    "results/general-agent-9b-1.4.0-r6.json",
+    "results/general-agent-beam-1.4.0-r1.json",
+    "results/general-agent-beam-1.4.0-r2.json",
+    "results/general-agent-beam-1.4.0-r3-interrupted.json",
+    "results/general-agent-beam-1.4.0-r3.json",
+    "results/general-agent-beam-1.4.0-r4.json",
+    "results/general-agent-beam-1.4.0-r5.json",
+    "results/general-agent-beam-1.4.0-r6.json",
+    "results/general-agent-cloud-1.4.0-r1-abort.json",
+    "results/general-agent-cloud-1.4.0-r1.json",
+    "results/general-agent-cloud-1.4.0-r2-abort.json",
+    "results/general-agent-cloud-1.4.0-r2.json",
+    "results/general-agent-cloud-1.4.0-r3-interrupted.json",
+    "results/general-agent-cloud-1.4.0-r3.json",
+    "results/general-agent-cloud-1.4.0-r4.json",
+    "results/general-agent-coder-1.4.0-r1-abort.json",
+    "results/general-agent-coder-1.4.0-r1.json",
+    "results/general-agent-coder-1.4.0-r2-abort.json",
+    "results/general-agent-coder-1.4.0-r2.json"
+  ],
+  "createdUtc": "2026-11-01T21:09:41.481596+00:00"
+}

@@ -9,7 +9,8 @@
 просмотр C# и восстановление изменений.
 
 [![Unity](https://img.shields.io/badge/Unity-6000.3-222C37?logo=unity&logoColor=white)](Packages/com.worldweaver.toolkit/package.json)
-[![UPM](https://img.shields.io/badge/UPM-1.4.0-47876A)](docs/general-agent-workflow.md)
+[![UPM](https://img.shields.io/badge/UPM-1.4.0_preview-47876A)](docs/general-agent-workflow.md)
+[![Agent checks](https://img.shields.io/badge/1.4_preview-678_Edit-536DFE)](results/compound-agent-edit-1.4.0-r15.xml)
 [![Character fix checks](https://img.shields.io/badge/1.3.1_checks-645_Edit_%2B_23_Play-47876A)](docs/character-workflow-fix.md)
 [![Base schema checks 1.2](https://img.shields.io/badge/1.2_base_schema-33%2F33-586373)](results/editor-schema-verification-1.2.json)
 [![MD skills license](https://img.shields.io/badge/MD_skills-MIT-536DFE)](Packages/com.worldweaver.toolkit/Editor/Skills/THIRD-PARTY-NOTICES.md)
@@ -18,7 +19,7 @@
 
 </div>
 
-> **Развитие общего агента 1.4.0** — 80 MD-навыков с привязкой к реальным командам, поиск инструментов по ходу задачи, этапы составного запроса, собственные меши, кисти и повышение разрешения Terrain, пещеры, физика и создание/настройка UGUI. [Устройство, проверка и ограничения](docs/general-agent-workflow.md).
+> **Предварительный выпуск 1.4.0** — 80 MD-навыков с привязкой к реальным командам, поиск инструментов по ходу задачи, этапы составного запроса, собственные меши, кисти и повышение разрешения Terrain, пещеры, физика и создание/настройка UGUI. Сквозные прогоны выявляют ошибки моделей и бесплатного API; полная автономность не достигнута. [Устройство, проверка и ограничения](docs/general-agent-workflow.md).
 
 > **Исправление 1.3.1** — настоящий анимированный герой из встроенного ассета, короткий план вместо большого JSON с C#, правдивые состояния ошибок и поддержка обоих Unity Input backend. Точный запрос проверен на Qwen 9B и бесплатном GPT-OSS; отдельно проверен URP-проект с программной клавиатурой Input System. [Исправление и протоколы](docs/character-workflow-fix.md) · [Выпуск](https://github.com/saslekawaiii/worldweaver-thesis/releases/tag/v1.3.1).
 
@@ -43,7 +44,7 @@
 
 **1. Установите пакет.** Целевая среда — Unity 6000.3; разработка ведётся в 6000.3.27f1. В Package Manager выберите **Install package from disk** и `Packages/com.worldweaver.toolkit/package.json`, либо откройте `UnityProject`.
 
-Установка 1.4.0 из Git:
+Установка предварительного выпуска 1.4.0 из Git:
 
 ```text
 https://github.com/saslekawaiii/worldweaver-thesis.git?path=/Packages/com.worldweaver.toolkit#v1.4.0
