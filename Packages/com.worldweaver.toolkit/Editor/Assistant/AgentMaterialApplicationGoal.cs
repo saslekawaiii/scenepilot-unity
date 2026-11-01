@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -33,6 +34,49 @@ namespace WorldWeaver.Editor.Assistant
             if (!target || target.scene != SceneManager.GetActiveScene() || (!target.GetComponent<Renderer>() && !target.GetComponent<Terrain>())) return null;
             return new AgentRequirement { Kind = Kind, Target = ProjectContextIndex.StableTarget(target), Expected = target.GetComponent<Terrain>() ? "terrain" : "renderer", Number = 1,
                 Description = "Материал фактически применён к исходному выделенному объекту «" + target.name + "». Поиск и импорт без применения недостаточны." };
+        }
+
+        static AgentRequirement Captured(AgentTaskState task)
+        {
+            if (task?.MutationAuthorized != true) return null;
+            var goals = task.Requirements.Where(r => r.Kind == Kind).Take(2).ToArray();
+            return goals.Length == 1 && !string.IsNullOrEmpty(goals[0].Target) ? goals[0] : null;
+        }
+
+        internal static void BindTarget(JObject schema, AgentTaskState task)
+        {
+            var goal = Captured(task);
+            var branches = schema?["properties"]?["actions"]?["items"]?["anyOf"] as JArray;
+            if (goal == null || branches == null) return;
+            for (int i = 0; i < branches.Count; i++)
+            {
+                if (!(branches[i] is JObject branch) || EditorToolSchema.ToolName(branch) != "material_apply") continue;
+                var specialized = (JObject)branch.DeepClone();
+                if (!(specialized["properties"]?["target"] is JObject target)) continue;
+                target["const"] = goal.Target;
+                branches[i] = specialized; // Never mutate the caller's earlier branch or introduce a disallowed tool.
+            }
+        }
+
+        internal static void ValidateTarget(AgentTaskState task, EditorPlan plan)
+        {
+            var goal = Captured(task); if (goal == null) return;
+            var rewrittenAliases = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var command in plan.actions)
+            {
+                // Existing-light edits register names at execution too; common virtual preflight only registers creations.
+                if (command.tool == "set_lighting" && !string.IsNullOrEmpty(command.target) && !string.IsNullOrEmpty(command.name))
+                { rewrittenAliases.Add(command.name); rewrittenAliases.Add("@" + command.name); }
+                if (command.tool != "material_apply") continue;
+                if (rewrittenAliases.Contains(command.target))
+                    throw new ArgumentException("Предыдущая команда затеняет цель material_apply временным именем. Уберите конфликтующее имя; исходная сохранённая цель: " + goal.Target);
+                GameObject captured, actual;
+                try { captured = SceneToolExecutor.ResolveTarget(goal.Target); actual = SceneToolExecutor.ResolveTarget(command.target); }
+                catch (Exception error) when (error is ArgumentException || error is InvalidOperationException)
+                { throw new ArgumentException("material_apply должен адресовать исходный выделенный объект. Точная сохранённая цель: " + goal.Target + ". Она и цель команды должны существовать в активной сцене.", error); }
+                if (!captured || !actual || actual != captured)
+                    throw new ArgumentException("material_apply не должен менять другой объект или новое выделение. Используйте исходную сохранённую цель: " + goal.Target);
+            }
         }
 
         internal static AgentCheckResult Verify(AgentRequirement requirement, IEnumerable<EditorCommandResult> steps)

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -12,6 +13,7 @@ using NUnit.Framework;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using WorldWeaver.Editor.Assistant;
 using Object = UnityEngine.Object;
@@ -25,12 +27,14 @@ namespace WorldWeaver.Tests
         HashSet<string> originalFolders;
         readonly List<TerrainData> data = new List<TerrainData>();
         string history;
+        string savedFixture;
         int undo;
 
         [SetUp] public void Setup()
         {
             if (!Application.isBatchMode) Assert.Ignore("Material-goal integration uses a disposable batch project, preserving user scenes.");
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+            savedFixture = null;
             originalFolders = Folders(); history = Path.GetFullPath("UserSettings/MaterialGoalTests/" + Guid.NewGuid().ToString("N"));
             Undo.IncrementCurrentGroup(); undo = Undo.GetCurrentGroup();
             door = GameObject.CreatePrimitive(PrimitiveType.Cube); door.name = "Дверь";
@@ -42,6 +46,7 @@ namespace WorldWeaver.Tests
             if (!Application.isBatchMode) return;
             Selection.objects = Array.Empty<Object>(); Undo.FlushUndoRecordObjects(); Undo.RevertAllDownToGroup(undo);
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+            if (!string.IsNullOrEmpty(savedFixture)) { AssetDatabase.DeleteAsset(savedFixture); savedFixture = null; }
             foreach (var value in data) if (value) Object.DestroyImmediate(value); data.Clear();
             foreach (string path in Folders().Where(p => !originalFolders.Contains(p))) AssetDatabase.DeleteAsset(path.Replace('\\', '/'));
             if (Directory.Exists(history)) Directory.Delete(history, true);
@@ -51,6 +56,19 @@ namespace WorldWeaver.Tests
         static EditorPlan Plan(bool complete, params EditorCommand[] actions) => new EditorPlan { reply = "Controlled material-goal fixture", complete = complete, actions = actions.ToList() };
         static EditorCommand Apply(string target = "selected") => Command("material_apply", target, new JObject { ["material_id"] = "builtin:wood" });
         static AssistantMessage Answer(string request = Request) => new AssistantMessage { Task = AgentTaskVerifier.Create(request, true) };
+        void SaveFixture()
+        {
+            if (!string.IsNullOrEmpty(savedFixture)) return;
+            string name = "MaterialGoalTargetTests-" + Guid.NewGuid().ToString("N"); savedFixture = "Assets/" + name;
+            AssetDatabase.CreateFolder("Assets", name); Assert.IsTrue(EditorSceneManager.SaveScene(door.scene, savedFixture + "/Fixture.unity"));
+        }
+        static object SchemaCall(string method, params object[] args)
+        {
+            var type = typeof(ChatController).Assembly.GetType("WorldWeaver.Editor.Assistant.AgentTaskSchema", true);
+            try { return type.GetMethod(method, BindingFlags.Static | BindingFlags.NonPublic).Invoke(null, args); }
+            catch (TargetInvocationException error) when (error.InnerException != null) { ExceptionDispatchInfo.Capture(error.InnerException).Throw(); throw; }
+        }
+        static JObject ApplyBranch(JObject schema) => ((JArray)schema["properties"]["actions"]["items"]["anyOf"]).OfType<JObject>().Single(b => EditorToolSchema.ToolName(b) == "material_apply");
         static AgentCheckResult Check(AssistantMessage answer)
         {
             var method = typeof(ChatController).GetMethod("VerifyTask", BindingFlags.Static | BindingFlags.NonPublic);
@@ -138,6 +156,131 @@ namespace WorldWeaver.Tests
             var terrain = Terrain.CreateTerrainGameObject(original).GetComponent<Terrain>(); Selection.activeGameObject = terrain.gameObject;
             var answer = Answer("Примени текстуру травы к выделенному Terrain."); ExecuteApply(answer); Assert.IsTrue(Check(answer).Passed);
             Assert.AreNotSame(original, terrain.terrainData); terrain.terrainData = original; Assert.IsFalse(Check(answer).Passed);
+        }
+
+        [Test] public void FullCapturedTargetIsPinnedInClonedExistingBranchAndDecoder()
+        {
+            SaveFixture(); var task = AgentTaskVerifier.Create(Request, true); string target = task.Requirements.Single().Target;
+            Assert.That(target, Does.StartWith("global:GlobalObjectId_"));
+            var source = EditorPlan.Schema(); var sourceBefore = source.DeepClone(); var schema = (JObject)source.DeepClone();
+            var originalBranch = ApplyBranch(schema); var branchBefore = originalBranch.DeepClone();
+            var otherBranches = ((JArray)schema["properties"]["actions"]["items"]["anyOf"]).Where(b => b != originalBranch).Select(b => b.DeepClone()).ToArray();
+            SchemaCall("Bind", schema, task);
+            Assert.AreEqual(target, (string)ApplyBranch(schema)["properties"]["target"]["const"]);
+            Assert.IsTrue(JToken.DeepEquals(sourceBefore, source)); Assert.IsTrue(JToken.DeepEquals(branchBefore, originalBranch), "Specialization replaces a clone, not an earlier branch reference.");
+            var afterOthers = ((JArray)schema["properties"]["actions"]["items"]["anyOf"]).Where(b => b != ApplyBranch(schema)).ToArray();
+            Assert.IsTrue(otherBranches.Zip(afterOthers, JToken.DeepEquals).All(same => same));
+            var decoder = OllamaDecoderSchema.FromHost(schema);
+            Assert.AreEqual(target, (string)ApplyBranch(decoder)["properties"]["target"]["const"]);
+            Selection.activeGameObject = control; var later = EditorPlan.Schema(); SchemaCall("Bind", later, task);
+            Assert.AreEqual(target, (string)ApplyBranch(later)["properties"]["target"]["const"]);
+            Assert.AreEqual(target, (string)ApplyBranch(schema)["properties"]["target"]["const"]);
+        }
+        [Test] public void TargetPinNeverIntroducesADisallowedToolOrPinsAskAndAmbiguousTasks()
+        {
+            var task = AgentTaskVerifier.Create(Request, true);
+            var allowed = EditorPlan.Schema(true, new[] { "material_search", "material_import" }); var before = allowed.DeepClone();
+            SchemaCall("Bind", allowed, task); Assert.IsTrue(JToken.DeepEquals(before, allowed));
+            foreach (var excluded in new[] { AgentTaskVerifier.Create(Request, false), AgentTaskVerifier.Create("Импортируй материал дерева.", true), new AgentTaskState { MutationAuthorized = true } })
+            {
+                var schema = EditorPlan.Schema(); var original = schema.DeepClone(); SchemaCall("Bind", schema, excluded);
+                Assert.IsTrue(JToken.DeepEquals(original, schema));
+            }
+            task.Requirements.Add(new AgentRequirement { Kind = "material_application", Target = ProjectContextIndex.StableTarget(control) });
+            var ambiguous = EditorPlan.Schema(); SchemaCall("Bind", ambiguous, task); Assert.IsNull(ApplyBranch(ambiguous)["properties"]["target"]["const"]);
+        }
+        [TestCase("stable")]
+        [TestCase("id")]
+        [TestCase("selected")]
+        [TestCase("name")]
+        public void HostAcceptsEquivalentTargetsOnlyWhenTheyResolveToCapturedObject(string spelling)
+        {
+            SaveFixture(); var task = AgentTaskVerifier.Create(Request, true);
+            string target = spelling == "stable" ? task.Requirements.Single().Target : spelling == "id" ? "id:" + door.GetInstanceID() : spelling == "name" ? "@" + door.name : "selected";
+            Assert.DoesNotThrow(() => SchemaCall("Validate", task, Plan(true, Apply(target))));
+        }
+        [Test] public void WrongOrChangedSelectedTargetIsRejectedBeforeAnyAssetsOrControlMutation()
+        {
+            SaveFixture(); var task = AgentTaskVerifier.Create(Request, true); var folders = Folders(); var controlMaterial = control.GetComponent<Renderer>().sharedMaterial;
+            Selection.activeGameObject = control;
+            foreach (string target in new[] { "selected", "id:" + control.GetInstanceID(), ProjectContextIndex.StableTarget(control), "missing", "", null, "global:GlobalObjectId_V1-2-00000000000000000000000000000000-0" })
+                Assert.Throws<ArgumentException>(() => SchemaCall("Validate", task, Plan(true, Apply(target))));
+            CollectionAssert.AreEquivalent(folders, Folders()); Assert.AreSame(controlMaterial, control.GetComponent<Renderer>().sharedMaterial);
+        }
+        [Test] public void DeletedAndNonActiveCapturedTargetsAreRejected()
+        {
+            SaveFixture(); var task = AgentTaskVerifier.Create(Request, true); string target = task.Requirements.Single().Target;
+            var originalScene = door.scene; var other = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Additive);
+            SceneManager.SetActiveScene(other);
+            try { Assert.Throws<ArgumentException>(() => SchemaCall("Validate", task, Plan(true, Apply(target)))); }
+            finally { SceneManager.SetActiveScene(originalScene); EditorSceneManager.CloseScene(other, true); }
+            Object.DestroyImmediate(door); Assert.Throws<ArgumentException>(() => SchemaCall("Validate", task, Plan(true, Apply(target))));
+        }
+        [TestCase("selected")]
+        [TestCase("stable")]
+        public void ExistingLightEditCannotShadowTheApplicationTarget(string spelling)
+        {
+            SaveFixture(); var task = AgentTaskVerifier.Create(Request, true); var folders = Folders();
+            var light = control.AddComponent<Light>(); light.intensity = .5f;
+            string target = spelling == "selected" ? "selected" : task.Requirements.Single().Target;
+            var edit = Command("set_lighting", "id:" + control.GetInstanceID(), new JObject { ["intensity"] = 1 }); edit.name = target;
+            var plan = Plan(true, edit, Apply(target)); var original = control.GetComponent<Renderer>().sharedMaterial;
+            Assert.DoesNotThrow(() => SceneToolExecutor.Validate(plan), "Existing-light name aliases are not modeled by common creation-only preflight.");
+            Assert.Throws<ArgumentException>(() => SchemaCall("Validate", task, plan));
+            CollectionAssert.AreEquivalent(folders, Folders()); Assert.AreSame(original, control.GetComponent<Renderer>().sharedMaterial); Assert.AreEqual(.5f, light.intensity);
+        }
+
+        sealed class TargetProvider : ILLMProvider
+        {
+            public string ExpectedTarget, InvalidRaw;
+            public GameObject ChangeSelection;
+            public bool WrongSelectionOnly, InitialPin, RepairPin;
+            public int Calls;
+            public Task<CompletionResult> CompleteAsync(CompletionRequest request, CancellationToken token)
+            {
+                token.ThrowIfCancellationRequested(); Calls++;
+                bool pinned = (string)ApplyBranch(request.Schema)["properties"]["target"]["const"] == ExpectedTarget;
+                if (Calls == 1)
+                {
+                    InitialPin = pinned; Selection.activeGameObject = ChangeSelection;
+                    InvalidRaw = JsonConvert.SerializeObject(Plan(true, Apply(WrongSelectionOnly ? "selected" : "global:GlobalObjectId_V1-2-00000000000000000000000000000000-0")));
+                    return Task.FromResult(new CompletionResult { Text = InvalidRaw, Model = "controlled-target-fixture", Provider = "controlled-target-fixture" });
+                }
+                RepairPin = pinned;
+                return Task.FromResult(new CompletionResult { Text = JsonConvert.SerializeObject(Calls == 2 ? Plan(true, Apply(ExpectedTarget)) : Plan(true)), Model = "controlled-target-fixture", Provider = "controlled-target-fixture" });
+            }
+            public Task<bool> HealthAsync(CancellationToken token) => Task.FromResult(true);
+            public void Dispose() { }
+        }
+        [UnityTest] public IEnumerator ControllerRejectsChangedSelectionBeforeWritesEvenIfProviderIgnoresConst() => Await(ControllerTarget(false));
+        [UnityTest] public IEnumerator ControllerRetainsMalformedRawAndRetriesWithExactPinnedTarget() => Await(ControllerTarget(true));
+        async Task ControllerTarget(bool repair)
+        {
+            SaveFixture(); var originalDoorMaterial = door.GetComponent<Renderer>().sharedMaterial; var originalControlMaterial = control.GetComponent<Renderer>().sharedMaterial; var folders = Folders();
+            var provider = new TargetProvider { ExpectedTarget = ProjectContextIndex.StableTarget(door), ChangeSelection = control, WrongSelectionOnly = !repair }; string checkpoint = null;
+            try
+            {
+                using (var controller = new ChatController(_ => provider, history + "/history", history + "/models"))
+                {
+                    controller.Settings.Mode = AssistantMode.Execute; controller.Settings.Power = repair ? AssistantPower.Balanced : AssistantPower.Fast;
+                    controller.Settings.AutoApply = controller.Settings.AutoVerify = true; controller.Settings.UseSkills = false;
+                    await controller.SendAsync("Примени материал дерева к выделенной двери."); var answer = controller.Current.Messages.Last(); checkpoint = answer.Task.CheckpointId;
+                    Assert.IsTrue(provider.InitialPin); Assert.IsFalse(answer.Attempts[0].Accepted); Assert.AreEqual(provider.InvalidRaw, answer.Attempts[0].RawResponse);
+                    Assert.IsNull(answer.Attempts[0].NormalizedResponse); Assert.AreSame(originalControlMaterial, control.GetComponent<Renderer>().sharedMaterial);
+                    if (repair)
+                    {
+                        Assert.AreEqual(3, provider.Calls); Assert.IsTrue(provider.RepairPin); Assert.IsFalse(answer.IsError, answer.Text);
+                        Assert.IsTrue(answer.Steps.Any(s => s.Success && s.Tool == "material_apply" && s.Target == provider.ExpectedTarget));
+                        Assert.IsTrue(answer.Task.Checks.All(c => c.Passed)); Assert.AreNotSame(originalDoorMaterial, door.GetComponent<Renderer>().sharedMaterial);
+                    }
+                    else
+                    {
+                        Assert.IsTrue(answer.IsError); Assert.IsEmpty(answer.Steps); Assert.AreSame(originalDoorMaterial, door.GetComponent<Renderer>().sharedMaterial);
+                        CollectionAssert.AreEquivalent(folders, Folders());
+                    }
+                }
+            }
+            finally { if (Guid.TryParseExact(checkpoint, "N", out _)) { string path = Path.Combine("UserSettings/WorldWeaverCheckpoints", checkpoint); if (Directory.Exists(path)) Directory.Delete(path, true); } }
         }
 
         sealed class SixRoundProvider : ILLMProvider

@@ -25,8 +25,8 @@ using Object=UnityEngine.Object;
 public static class BeaconRuntimeAcceptanceRunner
 {
     const string StateName="WorldWeaverBeaconRuntimeAcceptance.json";
-    const int HoldFrames=30,ReleasedFrames=15,InputDeadlineFrames=180,MaximumSamples=700;
-    const double RuntimeDeadlineSeconds=45,NativeRuntimeDeadlineSeconds=180,PhaseDeadlineSeconds=120;
+    const int HoldFrames=30,ReleasedFrames=15,InputDeadlineFrames=180,MaximumSamples=700,NativeMaximumSamples=160000;
+    const double RuntimeDeadlineSeconds=45,NativeRuntimeDeadlineSeconds=300,PhaseDeadlineSeconds=120,NativePhaseDeadlineSeconds=600,NativeInputDeadlineSeconds=90;
     const float ColorTolerance=.025f;
     [Serializable] sealed class State
     {
@@ -93,13 +93,18 @@ public static class BeaconRuntimeAcceptanceRunner
             FixtureFolder=folder,FixtureScene=folder+"/Fixture.unity",Positive="Exact reviewed beacon",Negative="Stationary sentinel negative control",
             Blue=ParseColor(Environment.GetEnvironmentVariable("WW_BEACON_BLUE_RGBA")??"0,0,1,1"),
             Amber=ParseColor(Required("WW_BEACON_AMBER_RGBA")),Sentinel=ParseColor(Environment.GetEnvironmentVariable("WW_BEACON_SENTINEL_RGBA")??"0.85,0.10,0.65,1"),PackageRoot=package,PackageFiles=Files(package),
-            DeadlineUtc=DateTime.UtcNow.AddSeconds(manualInput?240:PhaseDeadlineSeconds).ToString("O"),
+            DeadlineUtc=DateTime.UtcNow.AddSeconds(manualInput?NativePhaseDeadlineSeconds:PhaseDeadlineSeconds).ToString("O"),
             Report=new JObject { ["schemaVersion"]=1,["kind"]="exact-reviewed-beacon-real-input-and-color-runtime",["startedUtc"]=DateTime.UtcNow.ToString("O"),
                 ["unity"]=Application.unityVersion,["success"]=false,["llmInferencePerformed"]=false,["reviewedClassName"]=className,["reviewedSourcePath"]=source,["reviewedSourceSha256"]=hash,
                 ["sourceUnmodifiedByHarness"]=true,["harnessSourceSha256"]=File.Exists("Assets/Editor/BeaconRuntimeAcceptanceRunner.cs")?Sha(File.ReadAllBytes("Assets/Editor/BeaconRuntimeAcceptanceRunner.cs")):"not found at standard installation path",
                 ["inputMode"]=manualInput?"native-manual-GameView":"batch-queued-GameView",["nativeInputRequested"]=manualInput,
                 ["inputInjectionApi"]=manualInput?"None: external native keyboard events; actual legacy Input state is observed":"UnityEditor.EditorGUIUtility.QueueGameViewInputEvent",
                 ["nativePhaseCueFile"]=manualInput?output+".phase.json":null,
+                ["runtimeDeadlineSeconds"]=manualInput?NativeRuntimeDeadlineSeconds:RuntimeDeadlineSeconds,
+                ["lifecyclePhaseDeadlineSeconds"]=manualInput?NativePhaseDeadlineSeconds:PhaseDeadlineSeconds,
+                ["nativeInputWaitPerPhaseSeconds"]=manualInput?(JToken)NativeInputDeadlineSeconds:null,
+                ["maximumObservedFrames"]=manualInput?NativeMaximumSamples:MaximumSamples,
+                ["inputFocusDiagnostics"]="Each sample records application focus, focused Editor window type and any-key booleans. No input text or key content other than the required F state is captured.",
                 ["samplingPoint"]="An additional PostLateUpdate callback, after the normal generated Update; no generated method is invoked by the harness.",
                 ["holdFramesRequired"]=HoldFrames,["releasedFramesRequired"]=ReleasedFrames,["colorTolerancePerChannel"]=ColorTolerance,
                 ["samples"]=new JArray(),["queuedInputEvents"]=new JArray(),["nativeInputRequests"]=new JArray(),["runtimeErrors"]=new JArray(),["checks"]=new JObject(),
@@ -180,8 +185,10 @@ public static class BeaconRuntimeAcceptanceRunner
             var color=EffectiveColor(positive);var control=EffectiveColor(negative);
             if(observedFrames>1&&Distance(color,previous)>ColorTolerance)colorChanges++;previous=color;
             ((JArray)active.Report["samples"]).Add(new JObject { ["frame"]=Time.frameCount,["observedFrame"]=observedFrames,["time"]=Time.realtimeSinceStartup-startedTime,
-                ["phase"]=stage,["fDown"]=down,["fHeld"]=held,["fUp"]=up,["color"]=ColorArray(color),["negativeColor"]=ColorArray(control) });
-            if(observedFrames>(active.ManualInput?12000:MaximumSamples)||Time.realtimeSinceStartup-startedTime>(active.ManualInput?NativeRuntimeDeadlineSeconds:RuntimeDeadlineSeconds))
+                ["phase"]=stage,["fDown"]=down,["fHeld"]=held,["fUp"]=up,
+                ["applicationIsFocused"]=Application.isFocused,["focusedEditorWindowType"]=FocusedWindowType(),["anyKey"]=Input.anyKey,["anyKeyDown"]=Input.anyKeyDown,
+                ["color"]=ColorArray(color),["negativeColor"]=ColorArray(control) });
+            if(observedFrames>(active.ManualInput?NativeMaximumSamples:MaximumSamples)||Time.realtimeSinceStartup-startedTime>(active.ManualInput?NativeRuntimeDeadlineSeconds:RuntimeDeadlineSeconds))
                 throw new TimeoutException("Runtime/input-delivery deadline reached; missing input is not a generated-code failure.");
             switch(stage)
             {
@@ -200,7 +207,7 @@ public static class BeaconRuntimeAcceptanceRunner
         catch(Exception error){Fail(active,error);}
     }
     static void InputTimeout()
-    {if(active.ManualInput?Time.realtimeSinceStartup-stageTime>=30:observedFrames-stageFrame>=InputDeadlineFrames)throw new TimeoutException("Requested F input was not observed by the legacy Input API; runtime behavior was not evaluated.");}
+    {if(active.ManualInput?Time.realtimeSinceStartup-stageTime>=NativeInputDeadlineSeconds:observedFrames-stageFrame>=InputDeadlineFrames)throw new TimeoutException("Requested F input was not observed by the legacy Input API; runtime behavior was not evaluated.");}
     static void Phase(string next){stage=next;stageFrame=observedFrames;stageTime=Time.realtimeSinceStartup;Cue(next);}
     static void Queue(EventType type)
     {
@@ -254,7 +261,7 @@ public static class BeaconRuntimeAcceptanceRunner
             {
                 if(observing){PlayerLoop.SetPlayerLoop(originalLoop);Application.logMessageReceived-=Log;observing=false;}
                 if(Application.isPlaying&&!state.ManualInput)EditorGUIUtility.QueueGameViewInputEvent(new Event {type=EventType.KeyUp,keyCode=KeyCode.F,character='f'});
-                state.Phase="exiting";state.DeadlineUtc=DateTime.UtcNow.AddSeconds(PhaseDeadlineSeconds).ToString("O");Save(state);EditorApplication.isPlaying=false;
+                state.Phase="exiting";state.DeadlineUtc=DateTime.UtcNow.AddSeconds(state.ManualInput?NativePhaseDeadlineSeconds:PhaseDeadlineSeconds).ToString("O");Save(state);EditorApplication.isPlaying=false;
             }
             else if(state.Phase=="exiting"&&!EditorApplication.isPlayingOrWillChangePlaymode&&!EditorApplication.isCompiling&&!EditorApplication.isUpdating)Finish(state);
             else if(state.Phase=="exiting"&&DateTime.UtcNow>DateTime.Parse(state.DeadlineUtc).ToUniversalTime())
@@ -308,8 +315,10 @@ public static class BeaconRuntimeAcceptanceRunner
             phase=="first_up"||phase=="second_up"?"Release F now; do not press again until a new down cue.":
             phase=="held_amber"||phase=="held_blue"?"Keep F held until a release cue.":
             phase=="failed_release_any_held_key"?"Release any held key. Measurement failed; inspect the receipt.":"Keep F released and wait.";
-        Write(active.CueFile,new JObject {["phase"]=phase,["instruction"]=instruction,["utc"]=DateTime.UtcNow.ToString("O"),["reviewedSourceSha256"]=active.SourceSha256,["output"]=active.Output,["actualDownEdges"]=downEdges,["actualUpEdges"]=upEdges,["observedFrames"]=observedFrames});
+        Write(active.CueFile,new JObject {["phase"]=phase,["instruction"]=instruction,["utc"]=DateTime.UtcNow.ToString("O"),["reviewedSourceSha256"]=active.SourceSha256,["output"]=active.Output,["actualDownEdges"]=downEdges,["actualUpEdges"]=upEdges,["observedFrames"]=observedFrames,
+            ["applicationIsFocused"]=Application.isFocused,["focusedEditorWindowType"]=FocusedWindowType()});
     }
+    static string FocusedWindowType(){var window=EditorWindow.focusedWindow;return window?window.GetType().FullName:null;}
     static float Distance(Color a,Color b)=>Mathf.Max(Mathf.Abs(a.r-b.r),Mathf.Abs(a.g-b.g),Mathf.Abs(a.b-b.b),Mathf.Abs(a.a-b.a));
     static JArray ColorArray(Color c)=>new JArray(c.r,c.g,c.b,c.a);
     static Color ReadColor(JToken array)=>new Color((float)array[0],(float)array[1],(float)array[2],(float)array[3]);
