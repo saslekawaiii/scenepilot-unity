@@ -150,6 +150,7 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
         }
         public static void Validate(EditorPlan plan)
         {
+            plan=SceneCreationDefaults.Resolve(plan);
             if(PrefabStageUtility.GetCurrentPrefabStage()!=null)throw new InvalidOperationException("Завершите редактирование Prefab перед изменением сцены.");
             if(EditorApplication.isPlayingOrWillChangePlaymode)throw new InvalidOperationException("Editor scene tools require Edit Mode.");
             if(plan?.actions==null||plan.actions.Count>24)throw new ArgumentException("Plan requires <=24 actions.");
@@ -296,6 +297,7 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
             var result=new EditorBatchResult();var tx=new SceneBuildTransaction();int undo=-1;
             try
             {
+                plan=SceneCreationDefaults.Resolve(plan);
                 Validate(plan);
                 if(plan.actions.Any(a=>WorldMaterialTools.IsAsync(a.tool)))throw new ArgumentException("Use await SceneToolExecutor.ExecuteAsync for material search/import; synchronous scene transactions never wait for network I/O.");
                 if(plan.actions.Count==0){result.Success=true;result.Summary="Нет редакторских действий.";return result;}

@@ -3,7 +3,7 @@ name: ww-assembly-boundaries
 description: Границы runtime, editor и тестовых сборок без лишней перестройки проекта.
 category: code
 keywords: asmdef assembly сборк editor runtime references циклическ
-tools: read_script,draft_script,patch_script,attach_script,inspect_component,add_component,set_component
+tools: create_node,read_script,draft_script,patch_script,attach_script,inspect_component,add_component,set_component
 source: https://github.com/Besty0728/Unity-Skills/blob/fb7a8d4208671bca1d1013b2776eb2e4917f4964/SkillsForUnity/unity-skills~/skills/asmdef/SKILL.md
 license: MIT
 mode: advisory
@@ -17,7 +17,7 @@ mode: advisory
 3. Проверка: Editor и Player собираются отдельно, тестовая сборка обнаруживается Test Runner, необязательный пакет не стал скрытой зависимостью.
 
 ## Доступные действия WorldWeaver
-При необходимости вызови discover_tools с names: read_script,draft_script,patch_script,attach_script,inspect_component,add_component,set_component. Это ссылки на существующие команды, а не разрешение на их автоматическое выполнение. После создания читай реальный target, затем применяй зависимые действия отдельным шагом.
+При необходимости вызови discover_tools с names: create_node,read_script,draft_script,patch_script,attach_script,inspect_component,add_component,set_component. Это ссылки на существующие команды, а не разрешение на их автоматическое выполнение. После создания читай реальный target, затем применяй зависимые действия отдельным шагом.
 
 ## Граница применения
 Это справочный Markdown для встроенного агента WorldWeaver. Используй только объявленные в текущем запросе инструменты и их фактические схемы. Навык не добавляет shell, сеть, доступ к секретам, новые разрешения или автоматическое выполнение кода. Если операции нет, дай совет либо подготовь C# для просмотра в поддерживаемом процессе; не выдавай совет за выполненное действие.

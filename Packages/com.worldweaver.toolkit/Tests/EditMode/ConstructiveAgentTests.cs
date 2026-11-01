@@ -67,6 +67,22 @@ namespace WorldWeaver.Editor.Assistant.Tests
         {
             Assert.DoesNotThrow(()=>OllamaDecoderSchema.FromHost(EditorPlan.Schema(true,new[]{"inspect_component","create_mesh"})));
         }
+        [Test] public void ExplicitEmptyHostCanBePlannedBeforeNewCodeWithoutExecutingRejectedActions()
+        {
+            var plan=new EditorPlan{actions=new List<EditorCommand>{new EditorCommand{tool="create_object",name="HiddenPrimitive",args=new JObject{["kind"]="cube"}},new EditorCommand{tool="draft_script",name="Timer",args=new JObject{["code"]="using UnityEngine; public class Timer : MonoBehaviour {}"}}}};
+            string original=JObject.FromObject(plan).ToString();var request=new CompletionRequest{Schema=EditorPlan.Schema(true,new[]{"create_node","create_object","draft_script"})};
+            var method=typeof(ChatController).Assembly.GetType("WorldWeaver.Editor.Assistant.AgentImplementationPolicy").GetMethod("BindSceneBeforeCode",BindingFlags.Static|BindingFlags.NonPublic);var args=new object[]{request,plan,false,"Создай пустой узел и подготовь компонент таймера",null};
+            Assert.That((bool)method.Invoke(null,args),Is.True);Assert.That(((JArray)request.Schema["properties"]["actions"]["items"]["anyOf"]).OfType<JObject>().Select(EditorToolSchema.ToolName),Is.EquivalentTo(new[]{"create_node"}));Assert.That(JObject.FromObject(plan).ToString(),Is.EqualTo(original));Assert.That(scene.rootCount,Is.Zero);
+        }
+        [Test] public void ReadbackSupportsMeshesWhoseCpuDataWasReleased()
+        {
+            Run("create_node","Imported");var go=Named("Imported");var mesh=new Mesh{vertices=new[]{Vector3.zero,Vector3.right,Vector3.forward},triangles=new[]{0,1,2}};go.AddComponent<MeshFilter>().sharedMesh=mesh;mesh.UploadMeshData(true);
+            try
+            {
+                var method=typeof(ChatController).Assembly.GetType("WorldWeaver.Editor.Assistant.ToolStateReadback").GetMethod("Add",BindingFlags.Static|BindingFlags.NonPublic);var report=new JObject();Assert.DoesNotThrow(()=>method.Invoke(null,new object[]{report,go}));Assert.That((int)report["mesh"]["indexCount"],Is.EqualTo(3));
+            }
+            finally{UnityEngine.Object.DestroyImmediate(mesh);}
+        }
         [Test] public void MeshPersistsAndCollisionMatchesAndBadIndicesCannotPartiallyMutate()
         {
             var args=new JObject{["vertices"]=new JArray(new JArray(-2,0,-2),new JArray(-2,0,2),new JArray(2,0,2),new JArray(2,0,-2)),["triangles"]=new JArray(0,1,2,0,2,3)};
@@ -88,11 +104,29 @@ namespace WorldWeaver.Editor.Assistant.Tests
             var second=Run("create_node");Assert.That(second.Success,Is.True,second.Error);Assert.That(first.Results.Single().Target,Is.Not.EqualTo(second.Results.Single().Target));
             Assert.That(Named("Узел"),Is.Not.Null);Assert.That(Named("Узел 2"),Is.Not.Null);
         }
-        [Test] public void TerrainBrushChangesActualHeightsAndPreservesOriginalSharedAsset()
+        [Test] public void LegacyCreationToolsAlsoResolveEmptyNames()
+        {
+            var result=Run("create_world",args:new JObject{["resolution"]=33,["trees"]=0,["rocks"]=0,["buildings"]=0});Assert.That(result.Success,Is.True,result.Error);Assert.That(Named("Мир").GetComponentInChildren<Terrain>(),Is.Not.Null);
+            var sphere=Run("create_object",args:new JObject{["kind"]="sphere",["position"]=new JArray(0,5,0),["on_terrain"]=false});Assert.That(sphere.Success,Is.True,sphere.Error);Assert.That(Named("Сфера").transform.position.y,Is.EqualTo(5));
+        }
+        [Test] public void HeightOfAnObjectDoesNotOfferWorldCreation()
+        {
+            var method=typeof(ChatController).GetMethod("SelectTools",BindingFlags.Static|BindingFlags.NonPublic);
+            var tools=(IEnumerable<string>)method.Invoke(null,new object[]{"Создай красный мяч на высоте 5 метров с физикой и отскоком",AssistantMode.Execute});
+            Assert.That(tools,Does.Contain("configure_physics"));Assert.That(tools,Does.Not.Contain("create_world"));Assert.That(tools,Does.Not.Contain("shape_terrain"));
+        }
+        [TestCase(3)] [TestCase(-3)] public void TerrainBrushChangesActualHeightsAndPreservesOriginalSharedAsset(float amount)
         {
             var terrain=World().GetComponentInChildren<Terrain>();var original=terrain.terrainData;float before=terrain.SampleHeight(Vector3.zero);
-            var r=Run("shape_terrain",target:"World",args:new JObject{["operation"]="crater",["center"]=new JArray(0,0),["radius"]=12,["amount"]=3});Assert.That(r.Success,Is.True,r.Error);
+            var r=Run("shape_terrain",target:"World",args:new JObject{["operation"]="crater",["center"]=new JArray(0,0),["radius"]=12,["amount"]=amount});Assert.That(r.Success,Is.True,r.Error);
             Assert.That(terrain.SampleHeight(Vector3.zero),Is.LessThan(before-2.5f));Assert.That(terrain.terrainData,Is.Not.SameAs(original));Assert.That(original.GetInterpolatedHeight(.5f,.5f),Is.EqualTo(before).Within(.01f));
+        }
+        [Test] public void ResolutionRefinementPreservesExistingCraterHeightsAndHoles()
+        {
+            var terrain=World().GetComponentInChildren<Terrain>();Run("shape_terrain",target:"World",args:new JObject{["operation"]="crater",["radius"]=12,["amount"]=-3});float before=terrain.SampleHeight(Vector3.zero);
+            int hn=terrain.terrainData.holesResolution;var holes=terrain.terrainData.GetHoles(0,0,hn,hn);holes[5,5]=false;terrain.terrainData.SetHoles(0,0,holes);
+            var result=Run("shape_terrain",target:"World",args:new JObject{["operation"]="refine",["resolution"]=513});Assert.That(result.Success,Is.True,result.Error);
+            Assert.That(terrain.SampleHeight(Vector3.zero),Is.EqualTo(before).Within(.01f));Assert.That(terrain.terrainData.heightmapResolution,Is.EqualTo(513));Assert.That(terrain.terrainData.GetHoles(22,22,1,1)[0,0],Is.False);Assert.That(terrain.GetComponent<GeneratedTerrain>().Specification.resolution,Is.EqualTo(513));
         }
         [Test] public void ProceduralMoonIsSeededAndHasCraterBowlAndRim()
         {
@@ -119,6 +153,20 @@ namespace WorldWeaver.Editor.Assistant.Tests
             var result=Run("create_ui_element","Toggle","Canvas",new JObject{["kind"]="button",["text"]="Toggle",["toggle_target"]="Target"});Assert.That(result.Success,Is.True,result.Error);
             var button=Named("Toggle").GetComponent<Button>();Assert.That(button.onClick.GetPersistentEventCount(),Is.EqualTo(1));Assert.That(Named("Canvas").GetComponent<CanvasScaler>().referenceResolution,Is.EqualTo(new Vector2(1440,900)));
             Named("Toggle").GetComponent<WorldUIButton>().Toggle();Assert.That(Named("Target").activeSelf,Is.False);
+        }
+        [Test] public void ExistingButtonCanBeBoundAndConfiguredWithoutDraftingCode()
+        {
+            Run("create_ui_element","Canvas",args:new JObject{["kind"]="canvas"});Run("create_ui_element","Panel","Canvas",new JObject{["kind"]="panel"});Run("create_ui_element","Button","Canvas",new JObject{["kind"]="button",["text"]="Toggle"});
+            var result=Run("configure_ui",target:"Button",args:new JObject{["toggle_target"]="Panel",["position"]=new JArray(0,-120)});Assert.That(result.Success,Is.True,result.Error);
+            var button=Named("Button");Assert.That(button.GetComponent<WorldUIButton>().Target,Is.SameAs(Named("Panel")));Assert.That(button.GetComponent<Button>().onClick.GetPersistentEventCount(),Is.EqualTo(1));
+            Run("configure_ui",target:"Button",args:new JObject{["toggle_target"]="Panel"});Assert.That(button.GetComponent<Button>().onClick.GetPersistentEventCount(),Is.EqualTo(1));
+            var panelSize=Named("Panel").GetComponent<RectTransform>().sizeDelta;var buttonSize=button.GetComponent<RectTransform>().sizeDelta;Assert.That(panelSize.x*panelSize.y,Is.GreaterThan(2*buttonSize.x*buttonSize.y));
+            Assert.That((bool)JObject.Parse(result.Results.Single().Summary)["ui"]["toggleBound"],Is.True);
+        }
+        [Test] public void ExplicitPhysicsShapeChangeIsAppliedAndReadBack()
+        {
+            Run("create_object","Shape",args:new JObject{["kind"]="cube"});var result=Run("configure_physics",target:"Shape",args:new JObject{["collider"]="sphere",["mass"]=2});Assert.That(result.Success,Is.True,result.Error);
+            Assert.That(Named("Shape").GetComponent<SphereCollider>(),Is.Not.Null);Assert.That(Named("Shape").GetComponent<BoxCollider>(),Is.Null);Assert.That((string)JObject.Parse(result.Results.Single().Summary)["physics"]["collider"],Is.EqualTo("SphereCollider"));
         }
         [Test] public void FailedIndependentAssertionReturnsFailureWithoutChangingScene()
         {

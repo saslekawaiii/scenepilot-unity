@@ -3,7 +3,7 @@ name: ww-custom-mechanics
 description: Новые игровые механики через компилируемые компоненты вместо отказа.
 category: code
 keywords: новая механика произвольный функционал умение способность кастомный
-tools: read_script,draft_script,patch_script,attach_script,inspect_component,add_component,set_component
+tools: create_node,read_script,draft_script,patch_script,attach_script,inspect_component,add_component,set_component
 source: https://github.com/Nice-Wolf-Studio/unity-claude-skills/blob/a149d3e995420432f52b0899092daa4b069f441f/skills/unity-foundations/SKILL.md
 license: MIT
 mode: advisory
@@ -17,7 +17,7 @@ mode: advisory
 3. Проверь события, зависимости, включение и выключение компонента и наблюдаемое поведение. До результата компиляции запрещено считать импорт и подключение завершёнными.
 
 ## Доступные действия WorldWeaver
-При необходимости вызови discover_tools с names: read_script,draft_script,patch_script,attach_script,inspect_component,add_component,set_component. Это ссылки на существующие команды, а не разрешение на их автоматическое выполнение. После создания читай реальный target, затем применяй зависимые действия отдельным шагом.
+При необходимости вызови discover_tools с names: create_node,read_script,draft_script,patch_script,attach_script,inspect_component,add_component,set_component. Это ссылки на существующие команды, а не разрешение на их автоматическое выполнение. После создания читай реальный target, затем применяй зависимые действия отдельным шагом.
 
 ## Граница применения
 Это справочный Markdown для встроенного агента WorldWeaver. Используй только объявленные в текущем запросе инструменты и их фактические схемы. Навык не добавляет shell, сеть, доступ к секретам, новые разрешения или автоматическое выполнение кода. Если операции нет, дай совет либо подготовь C# для просмотра в поддерживаемом процессе; не выдавай совет за выполненное действие.

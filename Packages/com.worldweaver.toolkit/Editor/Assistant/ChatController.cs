@@ -228,11 +228,17 @@ namespace WorldWeaver.Editor.Assistant
                             // A malformed assistant message can anchor the next generation to
                             // the same broken prefix. Keep the raw answer in the audit trail;
                             // give the repair turn a fresh request and an error as data.
-                            bool singleScriptRepair=AgentImplementationPolicy.BindSingleScriptRepair(request,plan,completion.Text,readOnlyRequest,out string codePhaseRepair);
-                            if(!singleScriptRepair&&!readOnlyRequest&&SelectTools(text,Settings.Mode).Contains("draft_script"))codePhaseRepair=AgentImplementationPolicy.CodePhaseRepair(plan);
+                            bool scenePhaseRepair=!completion.OutputTruncated&&AgentImplementationPolicy.BindSceneBeforeCode(request,plan,readOnlyRequest,text,out _);
+                            string codePhaseRepair="";
+                            bool singleScriptRepair=false;
+                            if(scenePhaseRepair)AgentImplementationPolicy.BindSceneBeforeCode(request,plan,readOnlyRequest,text,out codePhaseRepair);
+                            else singleScriptRepair=AgentImplementationPolicy.BindSingleScriptRepair(request,plan,completion.Text,readOnlyRequest,out codePhaseRepair);
+                            if(!scenePhaseRepair&&!singleScriptRepair&&!readOnlyRequest&&SelectTools(text,Settings.Mode).Contains("draft_script"))codePhaseRepair=AgentImplementationPolicy.CodePhaseRepair(plan);
+                            if(Settings.Power==AssistantPower.Fast&&(!completion.OutputTruncated&&plan==null&&!singleScriptRepair&&!scenePhaseRepair||readOnlyRequest&&plan?.actions.Any(a=>!SceneToolExecutor.IsReadOnlyTool(a.tool))==true))
+                                throw new ArgumentException("Модель не составила допустимый план: "+error.Message);
                             if(round+1>=rounds)
                             {
-                                if(!(completion.OutputTruncated||singleScriptRepair)||planningRepairs++>=1)throw new ArgumentException("Модель не составила допустимый план: "+error.Message);
+                                if(!(completion.OutputTruncated||singleScriptRepair||scenePhaseRepair)||planningRepairs++>=1)throw new ArgumentException("Модель не составила допустимый план: "+error.Message);
                                 round--; // A cut response may retry planning within the deadline, before any mutation.
                             }
                             var schemaTools = (request.Schema["properties"]?["actions"]?["items"]?["anyOf"] as JArray ?? new JArray()).OfType<JObject>().Select(EditorToolSchema.ToolName);

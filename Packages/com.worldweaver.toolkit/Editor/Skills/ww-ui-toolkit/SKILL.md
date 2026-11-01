@@ -3,7 +3,7 @@ name: ww-ui-toolkit
 description: UI Toolkit UXML и USS с корректной жизнью подписок и адаптацией окна.
 category: ui
 keywords: UIToolkit UXML USS VisualElement ListView ScrollView чат интерфейс
-tools: create_ui_element,inspect_component,set_component,draft_script,attach_script
+tools: create_ui_element,configure_ui,inspect_component,set_component,draft_script,attach_script
 source: https://github.com/Besty0728/Unity-Skills/blob/fb7a8d4208671bca1d1013b2776eb2e4917f4964/SkillsForUnity/unity-skills~/skills/uitoolkit/SKILL.md
 license: MIT
 mode: advisory
@@ -17,7 +17,7 @@ mode: advisory
 3. Проверка: окно можно уменьшить, прокрутка не перескакивает при вводе, Enter и Shift+Enter имеют явное поведение, focus восстанавливается.
 
 ## Доступные действия WorldWeaver
-При необходимости вызови discover_tools с names: create_ui_element,inspect_component,set_component,draft_script,attach_script. Это ссылки на существующие команды, а не разрешение на их автоматическое выполнение. После создания читай реальный target, затем применяй зависимые действия отдельным шагом.
+При необходимости вызови discover_tools с names: create_ui_element,configure_ui,inspect_component,set_component,draft_script,attach_script. Это ссылки на существующие команды, а не разрешение на их автоматическое выполнение. После создания читай реальный target, затем применяй зависимые действия отдельным шагом.
 
 ## Граница применения
 Это справочный Markdown для встроенного агента WorldWeaver. Используй только объявленные в текущем запросе инструменты и их фактические схемы. Навык не добавляет shell, сеть, доступ к секретам, новые разрешения или автоматическое выполнение кода. Если операции нет, дай совет либо подготовь C# для просмотра в поддерживаемом процессе; не выдавай совет за выполненное действие.

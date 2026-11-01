@@ -136,7 +136,7 @@ namespace WorldWeaver.Editor.Assistant
             void Add(params string[] names){foreach(string name in names)selected.Add(name);}
             bool goalOnly=AgentTaskSchema.GoalOnlyNpcUpdate(input);
             bool code=!goalOnly&&(Has(@"скрипт|\bкод\b|C#|компонент|механик|здоров|урон|интерфейс|\bUI\b|canvas|script|component|compile")||AgentImplementationPolicy.IsMechanicRequest(input));
-            bool village=Has(@"деревн|поселен|village|settlement"),world=Has(@"мир|рельеф|ландшафт|террейн|террен|долин|гор[ауы]|terrain|world|valley|heightmap|высот|кратер|пещер|лун");
+            bool village=Has(@"деревн|поселен|village|settlement"),world=Has(@"мир|рельеф|ландшафт|террейн|террен|долин|гор[ауы]|terrain|world|valley|heightmap|карт\p{L}*\s+высот|кратер|пещер|лун");
             bool npc=Has(@"NPC|персонаж|страж|торгов|жител|character|guard|merchant|патрул|цель|goal");
             bool objects=Has(@"объект|куб|сфер|дом|дерев|кам[ен]|мяч|площадк|платформ|мост|\bпол\b|object|cube|sphere|house|tree|rock|ball|platform|bridge");
             if(code)Add("read_script","inspect_component","read_console");
@@ -172,7 +172,7 @@ namespace WorldWeaver.Editor.Assistant
             if(Has(@"квест|письм|quest|letter"))Add("create_delivery_quest","validate_world");
             if(Has(@"игрок|играбельн|главн\p{L}*\s+геро|протагонист|player|playable"))Add("create_player",AnimatedCharacterTools.ToolName);
             if(Has(@"prefab|префаб"))Add("instantiate_prefab");
-            if(code)Add("draft_script","attach_script","patch_script","add_component","set_component","run_tests","poll_job","run_play_check");
+            if(code)Add("create_node","draft_script","attach_script","patch_script","add_component","set_component","run_tests","poll_job","run_play_check");
             if(Has(@"тест|провер|test|verify"))Add("run_tests","poll_job");
             if(Has(@"собери|сборк|build"))Add("save_scene","set_build_scenes","build_player","poll_job");
             if(Has(@"сохран.{0,40}сцен|сцен.{0,40}сохран|save.{0,20}scene"))Add("save_scene");
@@ -191,7 +191,7 @@ namespace WorldWeaver.Editor.Assistant
             if(effectiveMode!=AssistantMode.Ask&&SimpleAnimatedPlayerRequest(input)&&
                 session.Messages.LastOrDefault(m=>m.Role=="user")?.Attachments?.Count==0)
                 return BuildAnimatedPlayerRequest(session,input,answer);
-            if(AgentCapabilities.NeedsExtendedWorkflow(input)&&!AgentTaskSchema.GoalOnlyNpcUpdate(input)&&
+            if((AgentCapabilities.NeedsExtendedWorkflow(input)||AgentImplementationPolicy.IsMechanicRequest(input)||Regex.IsMatch(input,@"(?i)C#|скрипт|\bкод\b|\bscript\b"))&&!AgentTaskSchema.GoalOnlyNpcUpdate(input)&&
                 session.Messages.LastOrDefault(m=>m.Role=="user")?.Attachments?.Count==0)
                 return BuildConstructiveRequest(session,input,answer,effectiveMode);
             var tools=expandToolSelection&&effectiveMode!=AssistantMode.Ask?new HashSet<string>(((JArray)EditorToolSchema.CommandSchema()["anyOf"]).OfType<JObject>().Select(EditorToolSchema.ToolName)):SelectTools(input,effectiveMode);bool local=models.FirstOrDefault(m=>m.Key==Settings.ModelKey)?.Provider==ProviderKind.Ollama;

@@ -3,7 +3,7 @@ name: ww-ui-screen-flow
 description: Экранные состояния, чат, списки и понятная обратная связь пользователя.
 category: ui
 keywords: UI UX screen navigation chat чат интерфейс loading error retry list
-tools: create_ui_element,inspect_component,set_component,draft_script,attach_script
+tools: create_ui_element,configure_ui,inspect_component,set_component,draft_script,attach_script
 source: https://github.com/Nice-Wolf-Studio/unity-claude-skills/blob/a149d3e995420432f52b0899092daa4b069f441f/skills/unity-ui-patterns/SKILL.md
 license: MIT
 mode: advisory
@@ -17,7 +17,7 @@ mode: advisory
 3. Проверка: пустое состояние, загрузка, ошибка, повтор, отмена и успешное завершение понятны в узком и широком окне, клавиатурный focus не теряется.
 
 ## Доступные действия WorldWeaver
-При необходимости вызови discover_tools с names: create_ui_element,inspect_component,set_component,draft_script,attach_script. Это ссылки на существующие команды, а не разрешение на их автоматическое выполнение. После создания читай реальный target, затем применяй зависимые действия отдельным шагом.
+При необходимости вызови discover_tools с names: create_ui_element,configure_ui,inspect_component,set_component,draft_script,attach_script. Это ссылки на существующие команды, а не разрешение на их автоматическое выполнение. После создания читай реальный target, затем применяй зависимые действия отдельным шагом.
 
 ## Граница применения
 Это справочный Markdown для встроенного агента WorldWeaver. Используй только объявленные в текущем запросе инструменты и их фактические схемы. Навык не добавляет shell, сеть, доступ к секретам, новые разрешения или автоматическое выполнение кода. Если операции нет, дай совет либо подготовь C# для просмотра в поддерживаемом процессе; не выдавай совет за выполненное действие.

@@ -15,12 +15,12 @@ namespace WorldWeaver.Editor.Assistant
         {
             var terrain=TerrainOf(target);
             if(!terrain||!terrain.GetComponent<GeneratedTerrain>())throw new ArgumentException("An owned generated Terrain is required.");
-            if(c.tool=="shape_terrain"&&terrain.transform.parent.GetComponentsInChildren<WorldCave>().Length>0)throw new ArgumentException("This terrain has caves. Sculpt before cave creation so entrances and collision stay aligned.");
+            if(c.tool=="shape_terrain"&&(string)c.args["operation"]!="refine"&&terrain.transform.parent.GetComponentsInChildren<WorldCave>().Length>0)throw new ArgumentException("This terrain has caves. Sculpt before cave creation so entrances and collision stay aligned.");
             if(c.tool=="create_cave")
             {
                 float x=(float)c.args["position"][0],z=(float)c.args["position"][1],width=(float?)c.args["width"]??7,length=(float?)c.args["length"]??24;
                 var start=terrain.transform.position;var size=terrain.terrainData.size;
-                if(size.x/(terrain.terrainData.heightmapResolution-1)>width/4||size.z/(terrain.terrainData.heightmapResolution-1)>width/4)throw new ArgumentException("Increase terrain resolution: cave width requires at least four heightmap cells.");
+                if(size.x/(terrain.terrainData.heightmapResolution-1)>width/4||size.z/(terrain.terrainData.heightmapResolution-1)>width/4){int needed=Mathf.NextPowerOfTwo(Mathf.CeilToInt(Mathf.Max(size.x,size.z)/(width/4)))+1;throw new ArgumentException("Cave width needs four heightmap cells. Current resolution="+terrain.terrainData.heightmapResolution+"; required resolution="+needed+". Use shape_terrain operation refine, resolution "+needed+" BEFORE create_cave; refine preserves existing craters and holes. Maximum supported resolution is 513; use a smaller map or wider cave if more is required.");}
                 if(x-width<start.x||x+width>start.x+size.x||z-2<start.z||z+length+2>start.z+size.z)throw new ArgumentException("Cave and approach must fit inside terrain.");
                 foreach(var cave in terrain.transform.parent.GetComponentsInChildren<WorldCave>())if(Mathf.Abs(cave.transform.position.x-x)<width+cave.Size.x&&Mathf.Abs(cave.transform.position.z-z)<length+cave.Size.z)throw new ArgumentException("Cave footprints overlap.");
             }
@@ -34,6 +34,7 @@ namespace WorldWeaver.Editor.Assistant
             var terrain=TerrainOf(target);var data=Clone(tx,terrain);var a=c.args;string operation=(string)a["operation"];var generated=terrain.GetComponent<GeneratedTerrain>();
             var env=terrain.transform.parent.GetComponent<WorldEnvironment>()??Undo.AddComponent<WorldEnvironment>(terrain.transform.parent.gameObject);Undo.RecordObject(env,"Record terrain features");env.Terrain=terrain;
             int n=data.heightmapResolution;var heights=data.GetHeights(0,0,n,n);
+            if(operation=="refine")return Refine(c,terrain,data,generated);
             if(operation=="lunar")
             {
                 var spec=JObject.FromObject(generated.Specification).ToObject<TerrainSpec>();spec.seed=(int?)a["seed"]??spec.seed;
@@ -44,7 +45,7 @@ namespace WorldWeaver.Editor.Assistant
             else
             {
                 float cx=a["center"]!=null?(float)a["center"][0]:0,cz=a["center"]!=null?(float)a["center"][1]:0;
-                float radius=(float?)a["radius"]??8,amount=(float?)a["amount"]??3;
+                float radius=(float?)a["radius"]??8,amount=(float?)a["amount"]??3;if(operation=="crater")amount=Mathf.Abs(amount);if(Mathf.Abs(amount)<.1f)throw new ArgumentException("Brush amount magnitude must be 0.1..30 metres; crater depth accepts either sign.");
                 float level=(terrain.SampleHeight(new Vector3(cx,0,cz)))/data.size.y;
                 for(int z=0;z<n;z++)for(int x=0;x<n;x++)
                 {
@@ -57,7 +58,18 @@ namespace WorldWeaver.Editor.Assistant
                 if(operation=="crater")env.Craters.Add(new ImpactCrater{Center=new Vector2(cx,cz),Radius=radius,Depth=amount});
             }
             data.SetHeights(0,0,heights);WorldComposer.Alpha(data,generated.Specification);WorldGameplayTools.RevalidateAfterTerrainUpdate(tx,target);EditorUtility.SetDirty(data);
-            return new JObject{["operation"]=operation,["heightmapResolution"]=n,["craters"]=env.Craters.Count,["source"]=env.HeightmapSource,["terrain"]=ProjectContextIndex.StableTarget(terrain.gameObject)};
+            return new JObject{["operation"]=operation,["heightmapResolution"]=n,["craters"]=env.Craters.Count,["appliedDepthMetres"]=operation=="crater"?Mathf.Abs((float?)a["amount"]??3):0,["source"]=env.HeightmapSource,["terrain"]=ProjectContextIndex.StableTarget(terrain.gameObject)};
+        }
+        static JObject Refine(EditorCommand c,Terrain terrain,TerrainData data,GeneratedTerrain generated)
+        {
+            int old=data.heightmapResolution,n=(int?)c.args["resolution"]??Mathf.Min(513,(old-1)*2+1);Vector3 originalSize=data.size;
+            if(n<old)throw new ArgumentException("Refine cannot discard existing heightmap detail; choose an equal or higher resolution.");
+            var samples=new float[n,n];for(int z=0;z<n;z++)for(int x=0;x<n;x++)samples[z,x]=data.GetInterpolatedHeight(x/(float)(n-1),z/(float)(n-1))/data.size.y;
+            int hn=data.holesResolution;var previousHoles=data.GetHoles(0,0,hn,hn);var holes=new bool[n-1,n-1];
+            for(int z=0;z<n-1;z++)for(int x=0;x<n-1;x++)holes[z,x]=previousHoles[Mathf.Min(hn-1,Mathf.FloorToInt((z+.5f)/(n-1)*hn)),Mathf.Min(hn-1,Mathf.FloorToInt((x+.5f)/(n-1)*hn))];
+            data.heightmapResolution=n;data.size=originalSize;data.SetHeights(0,0,samples);data.SetHoles(0,0,holes);
+            Undo.RecordObject(generated,"Refine owned terrain resolution");var spec=JObject.FromObject(generated.Specification).ToObject<TerrainSpec>();spec.resolution=n;generated.Specification=spec;EditorUtility.SetDirty(generated);EditorUtility.SetDirty(data);
+            return new JObject{["operation"]="refine",["previousResolution"]=old,["heightmapResolution"]=n,["preservedHeights"]=true,["preservedHoles"]=true};
         }
         internal static GameObject Cave(EditorCommand c,SceneBuildTransaction tx,GameObject target)
         {

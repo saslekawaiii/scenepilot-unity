@@ -313,8 +313,8 @@ namespace WorldWeaver.Editor.Assistant
         private static JObject Name() => Text(160);
         private static JObject CreationName()
         {
-            var result = Text(160, 1);
-            result["description"] = "Unique non-whitespace scene name, without control characters, slash or backslash.";
+            var result = Text(160);
+            result["description"] = "Optional unique scene name; empty gets an automatic unique default. Explicit names cannot contain control characters, slash or backslash.";
             return result;
         }
         private static JObject ClassName()

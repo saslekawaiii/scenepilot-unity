@@ -3,7 +3,7 @@ name: ww-component-composition
 description: Сборка нового поведения из существующих зарегистрированных компонентов.
 category: code
 keywords: composition компонование привязки сериализованные поля ссылки
-tools: read_script,draft_script,patch_script,attach_script,inspect_component,add_component,set_component
+tools: create_node,read_script,draft_script,patch_script,attach_script,inspect_component,add_component,set_component
 source: https://github.com/Besty0728/Unity-Skills/blob/fb7a8d4208671bca1d1013b2776eb2e4917f4964/SkillsForUnity/unity-skills~/skills/component/SKILL.md
 license: MIT
 mode: advisory
@@ -17,7 +17,7 @@ mode: advisory
 3. Проверь read-back каждой ссылки и отсутствие Missing Script. Произвольные методы не вызываются; новую доменную логику реализует скомпилированный компонент.
 
 ## Доступные действия WorldWeaver
-При необходимости вызови discover_tools с names: read_script,draft_script,patch_script,attach_script,inspect_component,add_component,set_component. Это ссылки на существующие команды, а не разрешение на их автоматическое выполнение. После создания читай реальный target, затем применяй зависимые действия отдельным шагом.
+При необходимости вызови discover_tools с names: create_node,read_script,draft_script,patch_script,attach_script,inspect_component,add_component,set_component. Это ссылки на существующие команды, а не разрешение на их автоматическое выполнение. После создания читай реальный target, затем применяй зависимые действия отдельным шагом.
 
 ## Граница применения
 Это справочный Markdown для встроенного агента WorldWeaver. Используй только объявленные в текущем запросе инструменты и их фактические схемы. Навык не добавляет shell, сеть, доступ к секретам, новые разрешения или автоматическое выполнение кода. Если операции нет, дай совет либо подготовь C# для просмотра в поддерживаемом процессе; не выдавай совет за выполненное действие.

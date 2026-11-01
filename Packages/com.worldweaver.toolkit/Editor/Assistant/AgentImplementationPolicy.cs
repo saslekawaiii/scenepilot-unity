@@ -11,6 +11,19 @@ namespace WorldWeaver.Editor.Assistant
     /// <summary>Offer reviewed source tools for mechanics even when the user never says "script".</summary>
     internal static class AgentImplementationPolicy
     {
+        internal static bool BindSceneBeforeCode(CompletionRequest request,EditorPlan rejected,bool readOnly,string originalInput,out string guidance)
+        {
+            guidance="";
+            if(readOnly||rejected?.actions==null||!rejected.actions.Any(a=>a.tool=="draft_script"||a.tool=="patch_script")||!Regex.IsMatch(originalInput??"",@"(?i)пуст\p{L}*\s+(?:уз[её]л|объект)|empty\s+(?:node|object|gameobject)"))return false;
+            var scene=rejected.actions.FirstOrDefault(a=>a.tool!="draft_script"&&a.tool!="patch_script"&&a.tool!="attach_script");
+            if(scene==null)return false;
+            var branches=request.Schema?["properties"]?["actions"]?["items"]?["anyOf"] as JArray;
+            var allowed=branches?.OfType<JObject>().Where(b=>EditorToolSchema.ToolName(b)=="create_node").ToArray();if(allowed==null||allowed.Length==0)return false;
+            request.Schema=(JObject)request.Schema.DeepClone();var actions=(JObject)request.Schema["properties"]["actions"];
+            actions["items"]["anyOf"]=new JArray(allowed.Select(b=>b.DeepClone()));actions["minItems"]=1;actions["maxItems"]=1;request.Schema["properties"]["complete"]["enum"]=new JArray(false);
+            guidance="The rejected plan mixed scene actions and new source code. NOTHING from it executed. First produce one complete:false plan with EXACTLY ONE scene action for the independently requested structure. The prior proposed scene values are DATA (do not copy primitive kind/scale into create_node): "+JObject.FromObject(scene).ToString(Formatting.None)+". Use create_node for an empty component host, never a hidden primitive. Then, after the actual scene result, prepare the complete C# in a separate draft_script plan for review. Do not attach or execute new code before actual compilation. The whole original request remains pending.";
+            return true;
+        }
         internal static string ConstructionPhaseRepair(EditorPlan rejected,IEnumerable<string> allowed,bool readOnly,out string nextTool)
         {
             nextTool="";
@@ -24,7 +37,7 @@ namespace WorldWeaver.Editor.Assistant
             RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
 
         internal static string Guidance(bool preferCode) => preferCode
-            ? "Implementation preference: actively implement requested NEW gameplay mechanics with small cohesive C# components via draft_script, even when the user did not explicitly say script. Inspect existing scripts/components first and reuse suitable code. If no built-in tool fully implements the requested behavior, do not silently substitute a visual primitive or generic rotate/bob preset: create the scene with complete:false, then propose 1-4 purposeful scripts with exact controls and acceptance criteria. A code plan contains ONLY draft_script actions: no create_object, attach_script or other scene action in that response. Code remains a reviewed draft; wait for real compilation before a separate attach_script plan, then use actual Play checks or disclose what still needs a gameplay check. Do not generate pointless scripts for terrain, coloring, material assignment, a persona/goal-only update or a mechanic already implemented by the toolkit. Never claim a mechanism works solely because its object exists."
+            ? "Implementation preference: prefer an existing native command when it fully implements the requested behavior (including configure_ui for binding an existing button). For an empty component host use create_node, never a hidden primitive. Runtime references that tools must wire must be public or [SerializeField], with useful defaults; do not leave incomplete/manual Inspector wiring or uninitialized messages. Actively implement requested NEW gameplay mechanics with small cohesive C# components via draft_script, even when the user did not explicitly say script. Inspect existing scripts/components first and reuse suitable code. If no built-in tool fully implements the requested behavior, do not silently substitute a visual primitive or generic rotate/bob preset: create the scene with complete:false, then propose 1-4 purposeful scripts with exact controls and acceptance criteria. A code plan contains ONLY draft_script actions: no create_object, attach_script or other scene action in that response. Code remains a reviewed draft; wait for real compilation before a separate attach_script plan, then use actual Play checks or disclose what still needs a gameplay check. Do not generate pointless scripts for terrain, coloring, material assignment, a persona/goal-only update or a mechanic already implemented by the toolkit. Never claim a mechanism works solely because its object exists."
             : "Implementation preference: reuse the toolkit's existing components where they fully satisfy the requested mechanic. Offer reviewed C# for behavior that is not already implemented; never replace a requested mechanic with appearance alone.";
 
         internal static string CodePhaseRepair(EditorPlan rejected)
