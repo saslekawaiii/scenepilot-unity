@@ -35,7 +35,17 @@ namespace WorldWeaver
                     using (var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, timeout.Token))
                     {
                         int status = (int)response.StatusCode;
-                        if (!response.IsSuccessStatusCode) throw new ProviderException("Ollama stream HTTP " + status + ".", status, status == 408 || status == 429 || status >= 500);
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            // Expose only a recognized diagnostic category, never arbitrary server body text.
+                            string category="";
+                            if(status==400)
+                            {
+                                using(var errorStream=await response.Content.ReadAsStreamAsync())
+                                {var bytes=new byte[4096];int count=await errorStream.ReadAsync(bytes,0,bytes.Length,timeout.Token);string error=Encoding.UTF8.GetString(bytes,0,count);if(error.IndexOf("grammar",StringComparison.OrdinalIgnoreCase)>=0)category=" (SCHEMA_GRAMMAR)";}
+                            }
+                            throw new ProviderException("Ollama stream HTTP " + status + category+".", status, status == 408 || status == 429 || status >= 500);
+                        }
                         if (response.Content.Headers.ContentLength > MaximumResponseBytes) throw new ProviderException("Ollama stream response too large.");
                         // Disposing the response also interrupts handlers whose body ReadAsync ignores its token.
                         using (timeout.Token.Register(response.Dispose))

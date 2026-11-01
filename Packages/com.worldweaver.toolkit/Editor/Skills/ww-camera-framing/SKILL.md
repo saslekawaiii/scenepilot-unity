@@ -3,6 +3,7 @@ name: ww-camera-framing
 description: Кадрирование камеры по границам сцены и проверяемой видимости.
 category: scene
 keywords: camera камера кадр framing viewport clipping FOV
+tools: create_node,set_parent,set_transform,find_scene_objects,inspect_object
 source: https://github.com/Besty0728/Unity-Skills/blob/fb7a8d4208671bca1d1013b2776eb2e4917f4964/SkillsForUnity/unity-skills~/skills/camera/SKILL.md
 license: MIT
 mode: advisory
@@ -14,6 +15,9 @@ mode: advisory
 1. Используй реальные bounds цели, aspect, FOV или orthographic size. Near/far clip согласуй с масштабом мира.
 2. Не перемещай игровую камеру, когда пользователь просит только осмотреть объект. Уточни активную камеру среди нескольких по наблюдаемой сцене.
 3. Проверка: нужные объекты попадают в кадр, не обрезаны землёй и clip planes; одна доступная картинка подтверждает только этот ракурс.
+
+## Доступные действия WorldWeaver
+При необходимости вызови discover_tools с names: create_node,set_parent,set_transform,find_scene_objects,inspect_object. Это ссылки на существующие команды, а не разрешение на их автоматическое выполнение. После создания читай реальный target, затем применяй зависимые действия отдельным шагом.
 
 ## Граница применения
 Это справочный Markdown для встроенного агента WorldWeaver. Используй только объявленные в текущем запросе инструменты и их фактические схемы. Навык не добавляет shell, сеть, доступ к секретам, новые разрешения или автоматическое выполнение кода. Если операции нет, дай совет либо подготовь C# для просмотра в поддерживаемом процессе; не выдавай совет за выполненное действие.

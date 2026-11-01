@@ -3,6 +3,7 @@ name: ww-prefab-editing
 description: Prefab, экземпляры и overrides с явным выбором области изменения.
 category: assets
 keywords: prefab префаб override instance variant apply
+tools: catalog_assets,search_project,instantiate_prefab,material_search,material_import,material_apply
 source: https://github.com/Besty0728/Unity-Skills/blob/fb7a8d4208671bca1d1013b2776eb2e4917f4964/SkillsForUnity/unity-skills~/skills/prefab/SKILL.md
 license: MIT
 mode: advisory
@@ -14,6 +15,9 @@ mode: advisory
 1. Выясни, меняется один экземпляр, prefab asset или variant. Не применяй локальные overrides ко всем экземплярам без явной цели.
 2. При редактировании prefab сохраняй связи и исходный asset; вложенный prefab может иметь отдельного владельца изменений.
 3. Проверка: второй экземпляр меняется только если это требовалось; повторное открытие сохраняет компоненты и ссылки без неожиданного распаковывания.
+
+## Доступные действия WorldWeaver
+При необходимости вызови discover_tools с names: catalog_assets,search_project,instantiate_prefab,material_search,material_import,material_apply. Это ссылки на существующие команды, а не разрешение на их автоматическое выполнение. После создания читай реальный target, затем применяй зависимые действия отдельным шагом.
 
 ## Граница применения
 Это справочный Markdown для встроенного агента WorldWeaver. Используй только объявленные в текущем запросе инструменты и их фактические схемы. Навык не добавляет shell, сеть, доступ к секретам, новые разрешения или автоматическое выполнение кода. Если операции нет, дай совет либо подготовь C# для просмотра в поддерживаемом процессе; не выдавай совет за выполненное действие.

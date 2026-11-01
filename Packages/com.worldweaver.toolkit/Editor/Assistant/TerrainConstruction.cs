@@ -1,0 +1,106 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Newtonsoft.Json.Linq;
+using UnityEditor;
+using UnityEngine;
+using Object=UnityEngine.Object;
+
+namespace WorldWeaver.Editor.Assistant
+{
+    internal static class TerrainConstruction
+    {
+        static Terrain TerrainOf(GameObject go)=>go.GetComponentInChildren<Terrain>();
+        internal static void Validate(EditorCommand c,GameObject target)
+        {
+            var terrain=TerrainOf(target);
+            if(!terrain||!terrain.GetComponent<GeneratedTerrain>())throw new ArgumentException("An owned generated Terrain is required.");
+            if(c.tool=="shape_terrain"&&terrain.transform.parent.GetComponentsInChildren<WorldCave>().Length>0)throw new ArgumentException("This terrain has caves. Sculpt before cave creation so entrances and collision stay aligned.");
+            if(c.tool=="create_cave")
+            {
+                float x=(float)c.args["position"][0],z=(float)c.args["position"][1],width=(float?)c.args["width"]??7,length=(float?)c.args["length"]??24;
+                var start=terrain.transform.position;var size=terrain.terrainData.size;
+                if(size.x/(terrain.terrainData.heightmapResolution-1)>width/4||size.z/(terrain.terrainData.heightmapResolution-1)>width/4)throw new ArgumentException("Increase terrain resolution: cave width requires at least four heightmap cells.");
+                if(x-width<start.x||x+width>start.x+size.x||z-2<start.z||z+length+2>start.z+size.z)throw new ArgumentException("Cave and approach must fit inside terrain.");
+                foreach(var cave in terrain.transform.parent.GetComponentsInChildren<WorldCave>())if(Mathf.Abs(cave.transform.position.x-x)<width+cave.Size.x&&Mathf.Abs(cave.transform.position.z-z)<length+cave.Size.z)throw new ArgumentException("Cave footprints overlap.");
+            }
+        }
+        static TerrainData Clone(SceneBuildTransaction tx,Terrain terrain)
+        {
+            var data=tx.Asset(Object.Instantiate(terrain.terrainData),"Edited terrain");Undo.RecordObject(terrain,"Assign owned terrain data");var collider=terrain.GetComponent<TerrainCollider>();Undo.RecordObject(collider,"Assign terrain collision data");terrain.terrainData=data;collider.terrainData=data;return data;
+        }
+        internal static JObject Shape(EditorCommand c,SceneBuildTransaction tx,GameObject target)
+        {
+            var terrain=TerrainOf(target);var data=Clone(tx,terrain);var a=c.args;string operation=(string)a["operation"];var generated=terrain.GetComponent<GeneratedTerrain>();
+            var env=terrain.transform.parent.GetComponent<WorldEnvironment>()??Undo.AddComponent<WorldEnvironment>(terrain.transform.parent.gameObject);Undo.RecordObject(env,"Record terrain features");env.Terrain=terrain;
+            int n=data.heightmapResolution;var heights=data.GetHeights(0,0,n,n);
+            if(operation=="lunar")
+            {
+                var spec=JObject.FromObject(generated.Specification).ToObject<TerrainSpec>();spec.seed=(int?)a["seed"]??spec.seed;
+                env.Craters=ExplorationTerrain.Craters(spec.seed,(int?)a["craters"]??8,spec.width,spec.length);
+                heights=ExplorationTerrain.Generate(spec,env.Craters,true);env.Profile="moon";
+                WorldComposer.Layers(tx,data,spec,"moon");
+            }
+            else
+            {
+                float cx=a["center"]!=null?(float)a["center"][0]:0,cz=a["center"]!=null?(float)a["center"][1]:0;
+                float radius=(float?)a["radius"]??8,amount=(float?)a["amount"]??3;
+                float level=(terrain.SampleHeight(new Vector3(cx,0,cz)))/data.size.y;
+                for(int z=0;z<n;z++)for(int x=0;x<n;x++)
+                {
+                    var p=new Vector2(terrain.transform.position.x+x/(float)(n-1)*data.size.x,terrain.transform.position.z+z/(float)(n-1)*data.size.z);
+                    float r=Vector2.Distance(p,new Vector2(cx,cz))/radius;
+                    if(operation=="flatten"&&r<1)heights[z,x]=Mathf.Lerp(heights[z,x],level,Mathf.SmoothStep(1,0,r));
+                    else if(operation=="hill"&&r<1)heights[z,x]=Mathf.Clamp01(heights[z,x]+amount/data.size.y*Mathf.Pow(1-r*r,2));
+                    else if(operation=="crater")heights[z,x]=Mathf.Clamp01(heights[z,x]+amount/data.size.y*((r<1?-Mathf.Pow(1-r*r,2):0)+.35f*Mathf.Exp(-Mathf.Pow((r-1)/.16f,2))));
+                }
+                if(operation=="crater")env.Craters.Add(new ImpactCrater{Center=new Vector2(cx,cz),Radius=radius,Depth=amount});
+            }
+            data.SetHeights(0,0,heights);WorldComposer.Alpha(data,generated.Specification);WorldGameplayTools.RevalidateAfterTerrainUpdate(tx,target);EditorUtility.SetDirty(data);
+            return new JObject{["operation"]=operation,["heightmapResolution"]=n,["craters"]=env.Craters.Count,["source"]=env.HeightmapSource,["terrain"]=ProjectContextIndex.StableTarget(terrain.gameObject)};
+        }
+        internal static GameObject Cave(EditorCommand c,SceneBuildTransaction tx,GameObject target)
+        {
+            var terrain=TerrainOf(target);var data=Clone(tx,terrain);float width=(float?)c.args["width"]??7,length=(float?)c.args["length"]??24;
+            var at=new Vector3((float)c.args["position"][0],0,(float)c.args["position"][1]);at.y=terrain.SampleHeight(at)+terrain.transform.position.y;
+            var go=tx.Empty(c.name,terrain.transform.parent,"cave");go.transform.position=at;
+            // A rectangular physical cut removes Terrain from the ramp/tube, including the approach.
+            // The generated closed floor/walls/ceiling provide replacement collision and cover all cut edges.
+            int n=data.holesResolution;var holes=data.GetHoles(0,0,n,n);var origin=terrain.transform.position;
+            for(int z=0;z<n;z++)for(int x=0;x<n;x++)
+            {
+                float px=origin.x+(x+.5f)/n*data.size.x,pz=origin.z+(z+.5f)/n*data.size.z;
+                if(px>at.x-width/2&&px<at.x+width/2&&pz>at.z&&pz<at.z+length)holes[z,x]=false;
+            }
+            data.SetHoles(0,0,holes);
+            var vertices=new List<Vector3>();var triangles=new List<int>();var uv=new List<Vector2>();
+            void Quad(Vector3 a,Vector3 b,Vector3 cc,Vector3 d)
+            {int i=vertices.Count;vertices.AddRange(new[]{a,b,cc,d});uv.AddRange(new[]{Vector2.zero,Vector2.right,Vector2.one,Vector2.up});triangles.AddRange(new[]{i,i+1,i+2,i,i+2,i+3,i+2,i+1,i,i+3,i+2,i});}
+            float half=width/2+.6f;
+            // Continuous shallow ramp: 3 m descent over 12 m, then a level, walkable chamber.
+            float Floor(float z)=>-3*Mathf.Clamp01(z/12);
+            for(int segment=0;segment<12;segment++)
+            {
+                float z0=length*segment/12,z1=length*(segment+1)/12,y0=Floor(z0),y1=Floor(z1);
+                Quad(new Vector3(-half,y0,z0),new Vector3(-half,y1,z1),new Vector3(half,y1,z1),new Vector3(half,y0,z0));
+                Quad(new Vector3(-half,y0,z0),new Vector3(-half,y0+5,z0),new Vector3(-half,y1+5,z1),new Vector3(-half,y1,z1));
+                Quad(new Vector3(half,y0,z0),new Vector3(half,y1,z1),new Vector3(half,y1+5,z1),new Vector3(half,y0+5,z0));
+                if(segment>=2)
+                {
+                    for(int arch=0;arch<8;arch++)
+                    {
+                        float a0=arch*Mathf.PI/8,a1=(arch+1)*Mathf.PI/8;
+                        Vector3 Roof(float a,float z,float y)=>new Vector3(-Mathf.Cos(a)*half,y+2+Mathf.Sin(a)*3,z);
+                        Quad(Roof(a0,z0,y0),Roof(a0,z1,y1),Roof(a1,z1,y1),Roof(a1,z0,y0));
+                    }
+                }
+            }
+            Quad(new Vector3(-half,Floor(length),length),new Vector3(-half,Floor(length)+5,length),new Vector3(half,Floor(length)+5,length),new Vector3(half,Floor(length),length));
+            var mesh=tx.Asset(new Mesh{name="Walkable cave",vertices=vertices.ToArray(),triangles=triangles.ToArray(),uv=uv.ToArray()},"Cave geometry");mesh.RecalculateNormals();mesh.RecalculateBounds();
+            Undo.AddComponent<MeshFilter>(go).sharedMesh=mesh;Undo.AddComponent<MeshRenderer>(go).sharedMaterial=tx.Material("Cave stone",new Color(.32f,.34f,.37f));Undo.AddComponent<MeshCollider>(go).sharedMesh=mesh;
+            var caveState=Undo.AddComponent<WorldCave>(go);caveState.Terrain=terrain;caveState.Size=new Vector3(width,5,length);caveState.Entrance=at+new Vector3(0,.1f,-1);caveState.Interior=at+new Vector3(0,-2.9f,length*.7f);
+            var lamp=tx.Empty("Cave beacon",go.transform,"light");lamp.transform.localPosition=new Vector3(0,0,length*.6f);var light=Undo.AddComponent<Light>(lamp);light.type=LightType.Point;light.color=new Color(.4f,.65f,1);light.intensity=2;light.range=12;
+            EditorUtility.SetDirty(data);return go;
+        }
+    }
+}

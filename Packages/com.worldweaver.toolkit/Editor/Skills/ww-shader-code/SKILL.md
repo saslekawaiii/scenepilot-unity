@@ -3,6 +3,7 @@ name: ww-shader-code
 description: Генерация ShaderLab и HLSL с проверкой pipeline и целевой платформы.
 category: render
 keywords: shader HLSL ShaderLab шейдер compile keyword render
+tools: discover_tools,list_skills,read_skill,inspect_object
 source: https://github.com/Besty0728/Unity-Skills/blob/fb7a8d4208671bca1d1013b2776eb2e4917f4964/SkillsForUnity/unity-skills~/skills/shader/SKILL.md
 license: MIT
 mode: advisory
@@ -14,6 +15,9 @@ mode: advisory
 1. Перед draft зафиксируй pipeline, pass, shader target, свойства и поддерживаемые платформы. Не смешивай include и макросы Built-in с URP/HDRP.
 2. Делай минимальный материал-пример; не меняй глобальный pipeline ради исправления одного shader. Ограничивай варианты ключевых слов реальной нуждой.
 3. Проверка: shader компилируется в используемом pipeline и сборке, а материал не розовый. Если проверка недоступна, пометь её явно.
+
+## Доступные действия WorldWeaver
+При необходимости вызови discover_tools с names: discover_tools,list_skills,read_skill,inspect_object. Это ссылки на существующие команды, а не разрешение на их автоматическое выполнение. После создания читай реальный target, затем применяй зависимые действия отдельным шагом.
 
 ## Граница применения
 Это справочный Markdown для встроенного агента WorldWeaver. Используй только объявленные в текущем запросе инструменты и их фактические схемы. Навык не добавляет shell, сеть, доступ к секретам, новые разрешения или автоматическое выполнение кода. Если операции нет, дай совет либо подготовь C# для просмотра в поддерживаемом процессе; не выдавай совет за выполненное действие.

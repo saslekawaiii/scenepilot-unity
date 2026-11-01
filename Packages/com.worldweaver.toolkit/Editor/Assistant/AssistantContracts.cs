@@ -60,12 +60,15 @@ namespace WorldWeaver.Editor.Assistant
                 value["reply"]?.Type != JTokenType.String || value["complete"]?.Type != JTokenType.Boolean || value["actions"]?.Type != JTokenType.Array)
                 throw new ArgumentException("Ответ должен содержать reply, complete и actions.");
             if (((JArray)value["actions"]).Count > 24) throw new ArgumentException("Не более 24 инструментов в одном шаге.");
+            int index=0;
             foreach (var action in (JArray)value["actions"])
             {
-                if (!(action is JObject obj) || obj.Properties().Any(p => p.Name != "tool" && p.Name != "name" && p.Name != "target" && p.Name != "args") ||
-                    obj["tool"]?.Type != JTokenType.String || obj["name"]?.Type != JTokenType.String ||
-                    obj["target"]?.Type != JTokenType.String || obj["args"]?.Type != JTokenType.Object)
-                    throw new ArgumentException("Неверный контракт инструмента.");
+                if (!(action is JObject obj))throw new ArgumentException("actions["+index+"] должен быть объектом {tool,name,target,args}.");
+                foreach(var property in obj.Properties())
+                    if(property.Name!="tool"&&property.Name!="name"&&property.Name!="target"&&property.Name!="args")throw new ArgumentException("Неизвестное поле actions["+index+"]."+property.Name+". Разрешены только tool,name,target,args.");
+                foreach(string key in new[]{"tool","name","target","args"})
+                    if(obj[key]?.Type!=(key=="args"?JTokenType.Object:JTokenType.String))throw new ArgumentException("Поле actions["+index+"]."+key+" обязательно и должно быть "+(key=="args"?"объектом":"строкой")+". Даже в команде чтения/правки указывай name:\"\" и target:\"\" явно, если они пустые.");
+                index++;
             }
             var result = value.ToObject<EditorPlan>();
             if (result.reply.Length > 12000 || result.actions.Any(a => a.tool.Length > 64 || a.name.Length > 160 || a.target.Length > 200 || a.args.ToString().Length > 40000))

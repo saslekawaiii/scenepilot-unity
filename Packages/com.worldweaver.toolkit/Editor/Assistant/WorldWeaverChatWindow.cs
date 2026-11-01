@@ -1200,6 +1200,12 @@ namespace WorldWeaver.Editor.Assistant
                 task.Add(Text(presentation.Title, "task-title"));
                 task.Add(Text(presentation.Status, "task-state"));
                 if (!string.IsNullOrEmpty(presentation.Detail)) task.Add(Text(presentation.Detail, "task-check-pending"));
+                if(value.Approach?.Count>0)
+                {
+                    var approach=new Foldout{text="Этапы задачи · план, не отметки выполнения",value=false};
+                    foreach(string stage in value.Approach.Take(12))approach.Add(Text(stage,"task-evidence"));
+                    task.Add(approach);
+                }
                 if (checks.Count > 0)
                 {
                     foreach (var check in checks.Take(20))

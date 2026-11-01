@@ -3,6 +3,7 @@ name: ww-game-loop
 description: Core loop, начало, победа, поражение и повторный запуск игровой сессии.
 category: gameplay
 keywords: game loop core gameplay win lose restart побед пораж сессия
+tools: create_node,draft_script,attach_script,configure_survival,create_resource
 source: https://github.com/Nice-Wolf-Studio/unity-claude-skills/blob/a149d3e995420432f52b0899092daa4b069f441f/skills/unity-game-loop/SKILL.md
 license: MIT
 mode: advisory
@@ -14,6 +15,9 @@ mode: advisory
 1. Опиши действия игрока, обратную связь, прогресс и условие окончания. UI должен отображать состояние, а не быть единственным владельцем правил.
 2. Повторный Start/Restart сбрасывает таймеры, подписки, цели и спавн. Победа или награда должна срабатывать один раз.
 3. Проверка: проигрыш, победа, Pause/Resume и Restart не оставляют старых объектов и не продолжают завершённую сессию.
+
+## Доступные действия WorldWeaver
+При необходимости вызови discover_tools с names: create_node,draft_script,attach_script,configure_survival,create_resource. Это ссылки на существующие команды, а не разрешение на их автоматическое выполнение. После создания читай реальный target, затем применяй зависимые действия отдельным шагом.
 
 ## Граница применения
 Это справочный Markdown для встроенного агента WorldWeaver. Используй только объявленные в текущем запросе инструменты и их фактические схемы. Навык не добавляет shell, сеть, доступ к секретам, новые разрешения или автоматическое выполнение кода. Если операции нет, дай совет либо подготовь C# для просмотра в поддерживаемом процессе; не выдавай совет за выполненное действие.

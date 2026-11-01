@@ -125,9 +125,9 @@ namespace WorldWeaver.Editor.Assistant
             Shader terrainShader = Shader.Find(urp ? "Universal Render Pipeline/Terrain/Lit" : "Nature/Terrain/Standard");
             if (terrainShader) terrain.materialTemplate = tx.Asset(new Material(terrainShader), "TerrainMaterial", ".mat");
             Layers(tx, data, spec, style);
-            Water(tx, root.transform, spec);
+            if(style!="moon")Water(tx, root.transform, spec);
             var random = new System.Random(spec.seed); var positions = new List<Vector3>();
-            int buildings = (int?)args["buildings"] ?? 4, trees = (int?)args["trees"] ?? (style == "desert" ? 12 : 40), rocks = (int?)args["rocks"] ?? 18;
+            int buildings = (int?)args["buildings"] ?? (style=="moon"?0:4), trees = (int?)args["trees"] ?? (style=="moon"?0:style == "desert" ? 12 : 40), rocks = (int?)args["rocks"] ?? 18;
             Populate(tx, root.transform, terrain, "house", buildings, random, positions, style);
             Populate(tx, root.transform, terrain, "tree", trees, random, positions, style);
             Populate(tx, root.transform, terrain, "rock", rocks, random, positions, style);
@@ -137,7 +137,7 @@ namespace WorldWeaver.Editor.Assistant
             var camera = tx.Empty("World Camera", root.transform, "camera"); var cam = Undo.AddComponent<Camera>(camera);
             camera.transform.position = new Vector3(spec.width * .55f, spec.height + spec.width * .36f, -spec.length * .58f);
             camera.transform.LookAt(new Vector3(0, spec.height * .22f, 0)); cam.fieldOfView = 50; cam.nearClipPlane = .3f; cam.farClipPlane = 4000;
-            cam.clearFlags = CameraClearFlags.SolidColor; cam.backgroundColor = style == "desert" ? new Color(.80f, .72f, .59f) : new Color(.49f, .70f, .84f);
+            cam.clearFlags = CameraClearFlags.SolidColor; cam.backgroundColor = style=="moon"?new Color(.006f,.009f,.018f):style == "desert" ? new Color(.80f, .72f, .59f) : new Color(.49f, .70f, .84f);
             // Respect the consumer's existing active camera rather than stacking views.
             cam.enabled = !Object.FindObjectsByType<Camera>(FindObjectsSortMode.None).Any(c => c != cam && c.enabled && c.gameObject.scene == root.scene);
             if(cam.enabled && !Object.FindObjectsByType<AudioListener>(FindObjectsSortMode.None).Any(l=>l.enabled && l.gameObject.scene==root.scene)) Undo.AddComponent<AudioListener>(camera);
@@ -149,7 +149,7 @@ namespace WorldWeaver.Editor.Assistant
         }
         internal static void Layers(SceneBuildTransaction tx, TerrainData data, TerrainSpec spec, string style)
         {
-            string[] surfaces = style == "desert" ? new[] { "sand", "stone", "sand" } : new[] { "grass", "stone", "snow" };
+            string[] surfaces = style=="moon"?new[]{"stone","stone","stone"}:style == "desert" ? new[] { "sand", "stone", "sand" } : new[] { "grass", "stone", "snow" };
             var layers = new TerrainLayer[3];
             for (int i = 0; i < 3; i++)
             {

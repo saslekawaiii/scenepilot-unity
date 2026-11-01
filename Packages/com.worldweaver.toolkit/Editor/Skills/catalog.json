@@ -4,7 +4,7 @@
   "skills": [
     {
       "id": "ww-architecture",
-      "sha256": "64edff86093d0d9a83f6eae875577612ea5a16d1e51f652d5ab4764762098c4f",
+      "sha256": "5f054556c135d42ecc4b50ea375db31e24fc64c4f2271830b189d20e20e88054",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/architecture/SKILL.md",
@@ -13,7 +13,7 @@
     },
     {
       "id": "ww-patterns",
-      "sha256": "2b530bcf42b9141428b1ee4d91cf5f26a5d6555fd4f64bcad36bab39885183a0",
+      "sha256": "d60468eab9f70a82d6084a83541395c7d71f7e9c63721711053a2b8d807e8c27",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/patterns/SKILL.md",
@@ -22,7 +22,7 @@
     },
     {
       "id": "ww-script-roles",
-      "sha256": "4ad6a75ca28da570175f299a00d6c06864e84fbe829d1604e4f883e186646114",
+      "sha256": "d0a7dd6a082cdffae32b5f3273d9cd3a86227f90dcabfe714d29a5ff80d8b249",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/script-roles/SKILL.md",
@@ -31,7 +31,7 @@
     },
     {
       "id": "ww-script-review",
-      "sha256": "d3b1998b75c4550f24d1d21869e0d52ea784712e17699af704dfa59ddc3a83c5",
+      "sha256": "a9db970ff4d3fa85fd1f7c1c92d6926a20e59d705abad84fa6a6c8a583ef0880",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/scriptdesign/SKILL.md",
@@ -40,7 +40,7 @@
     },
     {
       "id": "ww-async-lifetime",
-      "sha256": "780c71dd556189b4426a48f81f7d6eba854e9ed24e719f07683c635aa5c00737",
+      "sha256": "5b1f8732a0b328afefae74392ab29b7a6908773ba54af5d1f8a0bc511dac048e",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/async/SKILL.md",
@@ -49,7 +49,7 @@
     },
     {
       "id": "ww-assembly-boundaries",
-      "sha256": "21409bed1e46b0418fa4dc399793ef03dac05bccd7b399dbba7469c6a5fbe750",
+      "sha256": "bc15b8b33a32dfe6d44fdf650438d2f693e065ed1d4764719634d2c91a2d7434",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/asmdef/SKILL.md",
@@ -58,7 +58,7 @@
     },
     {
       "id": "ww-scriptable-config",
-      "sha256": "e19bc533868b56a0d86c80a70897f29dfe4662342b103ac48e3d88bea4d7afeb",
+      "sha256": "8e2af19c025a7f71f144ee470c77c6908d4b6f33a16ed6cba482cd66d7dfe957",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/scriptableobject/SKILL.md",
@@ -67,7 +67,7 @@
     },
     {
       "id": "ww-inspector-authoring",
-      "sha256": "cf8de5ea27b2af3dfff9c2d9c43518353cbae0b6a33da99c825e07293ecdd631",
+      "sha256": "7473ad80a4f81a1f12bcb1ba0c93079b96d89583ac50fa27e23cb59071df3cd7",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/inspector/SKILL.md",
@@ -76,7 +76,7 @@
     },
     {
       "id": "ww-scene-contracts",
-      "sha256": "5fc1095dcc8872945cc9ce80252b48105923d6997318faa3abc53c27f34ca344",
+      "sha256": "5a1417e5af3ad8cf7a08ed9e769156470027b1c9114c52a36b93451fc5d0fb13",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/scene-contracts/SKILL.md",
@@ -85,7 +85,7 @@
     },
     {
       "id": "ww-scene-objects",
-      "sha256": "23d5804fb891b37171467e2dc4d0cac77876884870484438f670e67063434087",
+      "sha256": "e05d1c435549fb9db773f59ef7790ef93aceb70d964d60d40d86081700142705",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/gameobject/SKILL.md",
@@ -94,7 +94,7 @@
     },
     {
       "id": "ww-components",
-      "sha256": "cc542b03b377e52d258310ad76d0d4b970959d7ddfad8b67242ac5d14df26e2b",
+      "sha256": "5f3af64760986a2d2fe1c455aa17f0968f953651351a25b0890c8f5cae7ad69a",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/component/SKILL.md",
@@ -103,7 +103,7 @@
     },
     {
       "id": "ww-asset-lifecycle",
-      "sha256": "378447b1cf6d7ca2b59d44f1eea08abbfc01cc1e1fedb93860bf1a7025e8df8d",
+      "sha256": "4a0480aea207a1ee80ae66e531eaf4fdc5cabbd855b560ef67e71e0511dd6af3",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/asset/SKILL.md",
@@ -112,7 +112,7 @@
     },
     {
       "id": "ww-import-settings",
-      "sha256": "ee833a7030a71ed0fc3a80f93a24bf198040c9c78a10625eae1585ee41df3af8",
+      "sha256": "4560e9013dcefeff97f796f8a3200c52c874f5d168ae0059049316c590f42282",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/importer/SKILL.md",
@@ -121,7 +121,7 @@
     },
     {
       "id": "ww-prefab-editing",
-      "sha256": "75414d0fa96567a733ca1d337a07a81a6f1b421c29fb22bcbd0949508d81a72c",
+      "sha256": "ccd1de0b3829dda024f85875c4bd11251ddd3f551e0dec1dbc906fc6574e09f7",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/prefab/SKILL.md",
@@ -130,7 +130,7 @@
     },
     {
       "id": "ww-materials",
-      "sha256": "30d1951528403a494f591c754ae51bc3b829d54065db1397b6996f57d50d3e02",
+      "sha256": "a159d096a6c8b311480260ca04b1655b8f5770226b9d329e02535563f726db27",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/material/SKILL.md",
@@ -139,7 +139,7 @@
     },
     {
       "id": "ww-shader-code",
-      "sha256": "e308ed9e8d32370b30d68f4d4b6bdf97972385e803d5e4c5d045ad42fec41a78",
+      "sha256": "1f3046b745e86ebf60486d0d6be76bdcb7f18e6b0d1c133c479e673cb901054b",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/shader/SKILL.md",
@@ -148,7 +148,7 @@
     },
     {
       "id": "ww-shadergraph-design",
-      "sha256": "9ff27336471eaaef44a11597893d0958ef715ce9fb6cb50f2c3e5d8447ecc88e",
+      "sha256": "00d61e29adbe432b74df67675dd175133cf7dc9537f21d27a82f76ce5898fc6c",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/shadergraph-design/SKILL.md",
@@ -157,7 +157,7 @@
     },
     {
       "id": "ww-lighting",
-      "sha256": "8b8418620ec54d65bf9e74fef832614b8d14e30a31c809560a6b780a52e73e09",
+      "sha256": "27cf71afff6aa28e5cbd484964bf596a554bde3fb99bf60cdf0f1292a04001cf",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/light/SKILL.md",
@@ -166,7 +166,7 @@
     },
     {
       "id": "ww-graphics-settings",
-      "sha256": "9e5665d735b96a37c5e490803a97be9ae1a1f3cbcfdd433a3df9dddf6e09ad5d",
+      "sha256": "e4770a4c863ac343de896e2632979364af2141b06ad3b3f179ec63c531b4581a",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/graphics/SKILL.md",
@@ -175,7 +175,7 @@
     },
     {
       "id": "ww-urp-versioning",
-      "sha256": "c7beb995f41ba0230ffea073c6b2a383c2ba0afe83337aa5a4d25f5c06a21f8f",
+      "sha256": "a3488a8793840147c4d4b98eec2e65d285fe602549fa41246930bad0f9231d69",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/urp/SKILL.md",
@@ -184,7 +184,7 @@
     },
     {
       "id": "ww-post-processing",
-      "sha256": "db649292d25745536b8b6abd87dbb76063fd020fc738d6c6aa4cfa7378bbb661",
+      "sha256": "b45df1865a2a341370a631206da3bd5010d5a6bf0b2fdf54a88f2bb49488631d",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/postprocess/SKILL.md",
@@ -193,7 +193,7 @@
     },
     {
       "id": "ww-camera-framing",
-      "sha256": "995a45db4f6e3d227425a633ecb872ed10473a7937aa9efd294ef19d27874eb0",
+      "sha256": "ac1e03a6603423e363110254c5a5df2844b059c20564ae3164f97573f76a995a",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/camera/SKILL.md",
@@ -202,7 +202,7 @@
     },
     {
       "id": "ww-cinemachine",
-      "sha256": "0af0655f2195a8ad065e8e0368ff4dfa013bab56cc17060df0813409b6cbdb29",
+      "sha256": "78632af6a246082c895f149e1916cda2d569a4f9885993935affed25872aa0ce",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/cinemachine/SKILL.md",
@@ -211,7 +211,7 @@
     },
     {
       "id": "ww-ugui-layout",
-      "sha256": "cdfb6c965b8283c90394fb73970a5dd4a5b45e04b554e35cdf66a1857b49fdfc",
+      "sha256": "2c835acb14969f58d398784ac0413e1fc9cbcb8df97e71c0eed30c1f63d2eaa9",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/ui/SKILL.md",
@@ -220,7 +220,7 @@
     },
     {
       "id": "ww-ui-toolkit",
-      "sha256": "beb77aa4abb0f085a69b403445bc62ccae98af7bba38ec0d81efa8f875f9138f",
+      "sha256": "8d7f293369666152b3b08d0182b12daff84d7a1da03783e0ca1692797eebe046",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/uitoolkit/SKILL.md",
@@ -229,7 +229,7 @@
     },
     {
       "id": "ww-animator-states",
-      "sha256": "3c2fb8f41bef05cf725139377aa7e5d248d9d940e86420e0f2e14268a7240b8a",
+      "sha256": "80fa73359627ace76b80d658e3d46887cbfa7dfb5ecdd4f2c66ac5907249ac83",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/animator/SKILL.md",
@@ -238,7 +238,7 @@
     },
     {
       "id": "ww-timeline",
-      "sha256": "8245fe0e80913ddf551fb3d9c1f3b318db52ded4fa490e06106733cfcf01b290",
+      "sha256": "7f806f5759ac2b9e653c8806f41883b55ad9f86b9025534745a78ffd936cf303",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/timeline/SKILL.md",
@@ -247,7 +247,7 @@
     },
     {
       "id": "ww-physics-behavior",
-      "sha256": "27221d5a2981df3c54dad1bc35898476506a4bc537e185c8bcb0603bd9a83b97",
+      "sha256": "1faa76adaab95ee1c662b8797663157d250698474041ecbdc60ef9d090a8d13f",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/physics/SKILL.md",
@@ -256,7 +256,7 @@
     },
     {
       "id": "ww-terrain-shaping",
-      "sha256": "c9c953be21ad1e029c4b23f01f64b00853021061c1035a18ba742d660ea860fe",
+      "sha256": "3892690c269b97cc11f255a2a98cbec18a796041366cb98ae00d06fb8fa157f9",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/terrain/SKILL.md",
@@ -265,7 +265,7 @@
     },
     {
       "id": "ww-navmesh-baking",
-      "sha256": "6cc61b0a82e8b924624166cb93e7b1358cdc9a7c86165b724f8180abb2156b2f",
+      "sha256": "d21ad19b0a0db55a9fcf27577bab8d6d79004f0212404d3233e80e202dd839fc",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/navmesh/SKILL.md",
@@ -274,7 +274,7 @@
     },
     {
       "id": "ww-asset-optimization",
-      "sha256": "2645ab3da5111d6e573e8facdd6f544c8304e3516b546b69c5f7b39b3f91be60",
+      "sha256": "18d07f714aff989e459299392fa7e5115a6b2fd03b3e3f136416d8031207d86e",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/optimization/SKILL.md",
@@ -283,7 +283,7 @@
     },
     {
       "id": "ww-runtime-performance",
-      "sha256": "612884e13f0d17ac4758853c67f0a4ad942bbb2c9075e1660ff4427150bb25f4",
+      "sha256": "2a78ee5eae1d1973a0f0be19c4d9722536983f708b5aa43a82c177fd2a06767b",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/performance/SKILL.md",
@@ -292,7 +292,7 @@
     },
     {
       "id": "ww-profiler-evidence",
-      "sha256": "bd20e5da80b810884c20ac448db36f124fc6334a36a7aebcbbf0a5eb5050362f",
+      "sha256": "0f19a8d9fe594bac7b8bfc01e411deea1bc9c0d7b0e70454decd3107e1464415",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/profiler/SKILL.md",
@@ -301,7 +301,7 @@
     },
     {
       "id": "ww-test-runner",
-      "sha256": "9d837d2a5cf34a015446832694cdcb490b45f7de5aaf4a6a03f0b1367c0834fe",
+      "sha256": "311ff60d844eb01be4a11cd4d6cf931df095b6b37b4cb0ac7e33713c39e89353",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/test/SKILL.md",
@@ -310,7 +310,7 @@
     },
     {
       "id": "ww-testability",
-      "sha256": "9bbdd55ebb6b39a408385aed83e3fd9ec2b72277168628ba90ab0d04ceec4810",
+      "sha256": "ddcf39abc6ec85335ac20be61492fc8594b4ce16eaf5e33f05bd6e0ef1d88703",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/testability/SKILL.md",
@@ -319,7 +319,7 @@
     },
     {
       "id": "ww-console-triage",
-      "sha256": "ac024882a34ae7cbee8d277b89e294fabf7101871546e8076997f80b4c7b7634",
+      "sha256": "37178af08a304dc63f3f099490311072918fafbea2e279b1c15415275ed559f0",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/console/SKILL.md",
@@ -328,7 +328,7 @@
     },
     {
       "id": "ww-debug-reproduction",
-      "sha256": "2380094eb1381459c92bf035348ddc8b46170384b87b796750e8eb8c1255fa9e",
+      "sha256": "ff23b346a580f0913e850fbff7adf6ef2eac590b0f6a856a51b124c89bd71224",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/debug/SKILL.md",
@@ -337,7 +337,7 @@
     },
     {
       "id": "ww-project-scout",
-      "sha256": "65223327cf00009f2668b79d374f58de09691a3ba9ba6e559e1df9ebac5bbac7",
+      "sha256": "34ad8c0c61c281f1d805fbb89add224a21e9e423f108167bd14d876fad60af57",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/project-scout/SKILL.md",
@@ -346,7 +346,7 @@
     },
     {
       "id": "ww-task-workflow",
-      "sha256": "717fddaba8eba1acd69cdf3d3cd7028a80ef87a358709a33ce0422362868bf87",
+      "sha256": "a8b90327ec6e01f1c30da3fc046b5e084f10da5650a85e29fd120745719f3d3f",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/workflow/SKILL.md",
@@ -355,7 +355,7 @@
     },
     {
       "id": "ww-undo-journal",
-      "sha256": "51d3136e4bcb36baf7a4c6d6427716c847fef311fd41eff511da8a5d19663e61",
+      "sha256": "e35c038c15710741e247b12a94dfa70b8b5f22f28e79dd81c9253a7f30e54658",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/history/SKILL.md",
@@ -364,7 +364,7 @@
     },
     {
       "id": "ww-scene-validation",
-      "sha256": "79988cfa03a5905f90d38f79ff0ed276aa7aee6e848dd78d8d5a443fdc8e3896",
+      "sha256": "6f5510c3b7216feff3f9c2de51caa1eb4a29ce4ca3089166d32a90f669fbb08c",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/validation/SKILL.md",
@@ -373,7 +373,7 @@
     },
     {
       "id": "ww-package-compatibility",
-      "sha256": "ae0591d17b108bd92e969cca4c04914837684a68f6fde202663ae20e9c07f40e",
+      "sha256": "da2c6198b9fc2bfa410b2bbf742430d311bdad1fd95d34cca970038ab42f8104",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/package/SKILL.md",
@@ -382,7 +382,7 @@
     },
     {
       "id": "ww-addressables-design",
-      "sha256": "9bd8a637ea7e96b5524bf09dfd69d7d64e9536015f85eff54170c5201a671df4",
+      "sha256": "174468b5b9758ff0689c6161d92d11f6c441f88f4cc5cdb36e5d4fb381654d6e",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/addressables-design/SKILL.md",
@@ -391,7 +391,7 @@
     },
     {
       "id": "ww-architecture-decisions",
-      "sha256": "820d0f049a85317871f3b2e76eab5467f915a05dbf65493374ee965b8964487b",
+      "sha256": "4a505d40e97c9ade7146e9b45605e05a58d37248bf6348a1f7e82fb3f792683f",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/adr/SKILL.md",
@@ -400,7 +400,7 @@
     },
     {
       "id": "ww-npc-behavior",
-      "sha256": "b70b36bfe5a3f576a1397e10ec29fcc5d5c1a004e1a7765bba847bebd30e9f8d",
+      "sha256": "890ce2bb8e4f8790d8dd3be1827453f4e66332079d79c14c34ebaef7cdf1ebf7",
       "source_repo": "Nice-Wolf-Studio/unity-claude-skills",
       "source_commit": "a149d3e995420432f52b0899092daa4b069f441f",
       "source_path": "skills/unity-npc-behavior/SKILL.md",
@@ -409,7 +409,7 @@
     },
     {
       "id": "ww-navigation-behavior",
-      "sha256": "ceb7cd373640589d49cd49c0fd13ff0db36ebb920586f19e3adcf9b7bc8e00f8",
+      "sha256": "fe8daedda205917c5d6afd862287698bbaa58969028793efce4b7f68d466fbe6",
       "source_repo": "Nice-Wolf-Studio/unity-claude-skills",
       "source_commit": "a149d3e995420432f52b0899092daa4b069f441f",
       "source_path": "skills/unity-ai-navigation/SKILL.md",
@@ -418,7 +418,7 @@
     },
     {
       "id": "ww-procedural-generation",
-      "sha256": "b2e1093a676e154e38691824352d2829540f15ab059e3a4b24b7da2bd6adcd79",
+      "sha256": "252df5ce4a54369e32a72520507f0b8b5ac87fcce10e2a614c150ce88b1e4536",
       "source_repo": "Nice-Wolf-Studio/unity-claude-skills",
       "source_commit": "a149d3e995420432f52b0899092daa4b069f441f",
       "source_path": "skills/unity-procedural-gen/SKILL.md",
@@ -427,7 +427,7 @@
     },
     {
       "id": "ww-save-load",
-      "sha256": "8ddd8a041ae87168daa737596351266b072cdc6de4e3159365a542eec86fee9a",
+      "sha256": "ff682499aa331865273df703b666edfd4a51d5e34a366d6d7bf7dd2e0d159e08",
       "source_repo": "Nice-Wolf-Studio/unity-claude-skills",
       "source_commit": "a149d3e995420432f52b0899092daa4b069f441f",
       "source_path": "skills/unity-save-system/SKILL.md",
@@ -436,7 +436,7 @@
     },
     {
       "id": "ww-state-machines",
-      "sha256": "05c9f33d9a3e6bcc20bdf99545835be5f21469a2cbdd506499fedc5eb0813db1",
+      "sha256": "1a8f1d5717c2da5e5f2938038e5ff280920c4e5afffee9087ae5445c69034ffc",
       "source_repo": "Nice-Wolf-Studio/unity-claude-skills",
       "source_commit": "a149d3e995420432f52b0899092daa4b069f441f",
       "source_path": "skills/unity-state-machines/SKILL.md",
@@ -445,7 +445,7 @@
     },
     {
       "id": "ww-game-loop",
-      "sha256": "4990c333da19b1c3e45d89e56f91b99df7ddce2ecd039b6de811adf4745750c4",
+      "sha256": "0436fe24acf05c68f86a14ce594368056ba2054f5028ce89131bd9a363a903a7",
       "source_repo": "Nice-Wolf-Studio/unity-claude-skills",
       "source_commit": "a149d3e995420432f52b0899092daa4b069f441f",
       "source_path": "skills/unity-game-loop/SKILL.md",
@@ -454,7 +454,7 @@
     },
     {
       "id": "ww-input-correctness",
-      "sha256": "f5e24222b00690dc0d5a9e2cdd9c49c0038c90c7d609201f5cbd6d13f5437f9c",
+      "sha256": "621a27fe5c5e3171162205b2c256c43b2675feac8b52558a91e7f8886e1c3ac2",
       "source_repo": "Nice-Wolf-Studio/unity-claude-skills",
       "source_commit": "a149d3e995420432f52b0899092daa4b069f441f",
       "source_path": "skills/unity-input-correctness/SKILL.md",
@@ -463,7 +463,7 @@
     },
     {
       "id": "ww-audio-spatial",
-      "sha256": "2daffc1f9d2bd92b57e08f0f93d0f8491551ca1513e62860c9feaea4d1ff46c4",
+      "sha256": "d806112a00084da18ed64f04dda292476d5901cb217bbf1e22c9cfd16dadb8d7",
       "source_repo": "Nice-Wolf-Studio/unity-claude-skills",
       "source_commit": "a149d3e995420432f52b0899092daa4b069f441f",
       "source_path": "skills/unity-audio/SKILL.md",
@@ -472,7 +472,7 @@
     },
     {
       "id": "ww-lifecycle-correctness",
-      "sha256": "7410bbfc0b313a3fa2fddf4d0cf91ae09a61570b5a1cf5092d2723a7bae675cd",
+      "sha256": "90222f2069c7fc9478061ca37b38b42cc4d663d6bb74cb1f6d080b225ff64435",
       "source_repo": "Nice-Wolf-Studio/unity-claude-skills",
       "source_commit": "a149d3e995420432f52b0899092daa4b069f441f",
       "source_path": "skills/unity-lifecycle/SKILL.md",
@@ -481,7 +481,7 @@
     },
     {
       "id": "ww-quests-level-events",
-      "sha256": "25d2cccf152a8b080db7910c450fe436b131692046cf5ae4bd407d02b6425e68",
+      "sha256": "ff720d7e400a5e26c68f38b360df7a4f907706adcf6165701670942ec90b80f6",
       "source_repo": "Nice-Wolf-Studio/unity-claude-skills",
       "source_commit": "a149d3e995420432f52b0899092daa4b069f441f",
       "source_path": "skills/unity-level-design/SKILL.md",
@@ -490,7 +490,7 @@
     },
     {
       "id": "ww-data-versioning",
-      "sha256": "2dbdc9662a7a77b39bcc8ae0e9c274ae256034a78e55ea10ca84c3d56009490a",
+      "sha256": "229dc6ac3fb92dd1e01d7ec4f683761c9ead8c2b8c287b7dda17950aebbbe8dc",
       "source_repo": "Nice-Wolf-Studio/unity-claude-skills",
       "source_commit": "a149d3e995420432f52b0899092daa4b069f441f",
       "source_path": "skills/unity-data-driven/SKILL.md",
@@ -499,7 +499,7 @@
     },
     {
       "id": "ww-editor-tools",
-      "sha256": "abc08fa2d6e5a7c72282243c80d61c84715be63e706989a78ed3b0ce3062c08d",
+      "sha256": "e88f834f9317726ad9c20d5c3eb7abad88fa2d675e3511f855513ef8c13c3f2f",
       "source_repo": "Nice-Wolf-Studio/unity-claude-skills",
       "source_commit": "a149d3e995420432f52b0899092daa4b069f441f",
       "source_path": "skills/unity-editor-tools/SKILL.md",
@@ -508,7 +508,7 @@
     },
     {
       "id": "ww-build-platforms",
-      "sha256": "48ac3451d027fbcb2fc0263266ba7c106c51f526e55692205ba64ba63441b2e4",
+      "sha256": "51d8c074d29e936d862b283d15d76ccee1e418a66baac8e9a1f01a0bc6f2c4e8",
       "source_repo": "Nice-Wolf-Studio/unity-claude-skills",
       "source_commit": "a149d3e995420432f52b0899092daa4b069f441f",
       "source_path": "skills/unity-platforms/SKILL.md",
@@ -517,7 +517,7 @@
     },
     {
       "id": "ww-physics-queries",
-      "sha256": "e59682d8305e553b72316fabb26d78d0273feb56fb2c6b888b05527816295f0c",
+      "sha256": "c16b1e0b83edae0e226d7598ff402866bb03688129aeae644466bcdeb8847d84",
       "source_repo": "Nice-Wolf-Studio/unity-claude-skills",
       "source_commit": "a149d3e995420432f52b0899092daa4b069f441f",
       "source_path": "skills/unity-physics-queries/SKILL.md",
@@ -526,7 +526,7 @@
     },
     {
       "id": "ww-ui-screen-flow",
-      "sha256": "f92694f253e184277e4f79049491904e700ad0953946c7764860529d0b5180f5",
+      "sha256": "8cb10bfdcc95edc9c1aa30f1555d7f035cf4116b25350906095319d6301aa714",
       "source_repo": "Nice-Wolf-Studio/unity-claude-skills",
       "source_commit": "a149d3e995420432f52b0899092daa4b069f441f",
       "source_path": "skills/unity-ui-patterns/SKILL.md",
@@ -535,11 +535,191 @@
     },
     {
       "id": "ww-unity-foundations",
-      "sha256": "8c8c60dcbe647922a02e54254248b9d3e015919e838c66928bfd5e1d5ea4a106",
+      "sha256": "132decff79cae22887670d6267d2c0e20db1e8b936eb8c7acebe64b4a80c9ba1",
       "source_repo": "Nice-Wolf-Studio/unity-claude-skills",
       "source_commit": "a149d3e995420432f52b0899092daa4b069f441f",
       "source_path": "skills/unity-foundations/SKILL.md",
       "source_sha256": "14d5fc71d21a26c7cd1a60383cd4e1f5d3d9c868d781bfbf8c4d1e66cee79133",
+      "license": "MIT"
+    },
+    {
+      "id": "ww-mesh-authoring",
+      "sha256": "3c71f9b2ec6360cf9e4072ae7e796b3bedd38881feeeacd69c6a9cbc83a41726",
+      "source_repo": "Besty0728/Unity-Skills",
+      "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
+      "source_path": "SkillsForUnity/unity-skills~/skills/gameobject/SKILL.md",
+      "source_sha256": "4583427893d4031550f65a888b028c348b0fbe7e8efee5f85157cbaa6098daa8",
+      "license": "MIT"
+    },
+    {
+      "id": "ww-terrain-brushes",
+      "sha256": "d0ad510905f8b1eca8dc0ac24b05126e04228dd670db9da78b309ee6d6390657",
+      "source_repo": "Besty0728/Unity-Skills",
+      "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
+      "source_path": "SkillsForUnity/unity-skills~/skills/terrain/SKILL.md",
+      "source_sha256": "691b695af062b27769c1f1bdc60a051c391eff0893c846102ecbc4873a26bd7a",
+      "license": "MIT"
+    },
+    {
+      "id": "ww-cave-construction",
+      "sha256": "88be7d4a0ccdda8f8c1abbd508f3fcafee602dd5e4d3ef7af2210ef77f03fff4",
+      "source_repo": "Besty0728/Unity-Skills",
+      "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
+      "source_path": "SkillsForUnity/unity-skills~/skills/terrain/SKILL.md",
+      "source_sha256": "691b695af062b27769c1f1bdc60a051c391eff0893c846102ecbc4873a26bd7a",
+      "license": "MIT"
+    },
+    {
+      "id": "ww-survival-loops",
+      "sha256": "a03c44833b0cd2a3417a9549947c05089b1ac952a57e76afb47c5438c43593ff",
+      "source_repo": "Nice-Wolf-Studio/unity-claude-skills",
+      "source_commit": "a149d3e995420432f52b0899092daa4b069f441f",
+      "source_path": "skills/unity-game-loop/SKILL.md",
+      "source_sha256": "9622d509c57c98dd2a68e2e80a64c26aa5b274c44d8b25d523b4e1ed7a54144b",
+      "license": "MIT"
+    },
+    {
+      "id": "ww-physics-authoring",
+      "sha256": "1611f3838b0ae05ae43c4b583b721f386080b229db97c5bc8a4cf2b7e441dc19",
+      "source_repo": "Besty0728/Unity-Skills",
+      "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
+      "source_path": "SkillsForUnity/unity-skills~/skills/physics/SKILL.md",
+      "source_sha256": "2ee3f66161280b34d8a91b03dd252251ff229b952aa0b36af3e3cfe50e57b236",
+      "license": "MIT"
+    },
+    {
+      "id": "ww-ui-composition",
+      "sha256": "f61e4b2c6bd15a08c11e4c199d555412f2a0e91ac0dde902bc701bd7e7b1cd14",
+      "source_repo": "Besty0728/Unity-Skills",
+      "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
+      "source_path": "SkillsForUnity/unity-skills~/skills/ui/SKILL.md",
+      "source_sha256": "5427b3f083e9c9c18a8220d6720fdde4b022b5f0cd0dd4772c5e4f71f33f2218",
+      "license": "MIT"
+    },
+    {
+      "id": "ww-scene-hierarchy",
+      "sha256": "7189e46a5402ecdb1219f7e5f32f5700a895f3eccfd6dc3cc59661908412d248",
+      "source_repo": "Besty0728/Unity-Skills",
+      "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
+      "source_path": "SkillsForUnity/unity-skills~/skills/gameobject/SKILL.md",
+      "source_sha256": "4583427893d4031550f65a888b028c348b0fbe7e8efee5f85157cbaa6098daa8",
+      "license": "MIT"
+    },
+    {
+      "id": "ww-animation-binding",
+      "sha256": "3b18f5c69d9ca6e97a1edee440a47bee77ad404fab65a325a33291989a33546d",
+      "source_repo": "Besty0728/Unity-Skills",
+      "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
+      "source_path": "SkillsForUnity/unity-skills~/skills/animator/SKILL.md",
+      "source_sha256": "cf55d9ff600ee979f53563836112e7ff4c369ae133bf61ee47748fb68c38b657",
+      "license": "MIT"
+    },
+    {
+      "id": "ww-audio-binding",
+      "sha256": "ef59fa491aa1ab57a5ccb81f33bcd5aa1c2cffc8458b5ebf5b2358630c2fd8c8",
+      "source_repo": "Nice-Wolf-Studio/unity-claude-skills",
+      "source_commit": "a149d3e995420432f52b0899092daa4b069f441f",
+      "source_path": "skills/unity-audio/SKILL.md",
+      "source_sha256": "f17e25c439615bd7afaddd412f1831e076e5563e286f99c278c92f91bab61fd9",
+      "license": "MIT"
+    },
+    {
+      "id": "ww-capability-discovery",
+      "sha256": "075469b5e475b96b91c754016c8e6aada40adf0549f4e196a00ffee0540f2662",
+      "source_repo": "Besty0728/Unity-Skills",
+      "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
+      "source_path": "SkillsForUnity/unity-skills~/skills/workflow/SKILL.md",
+      "source_sha256": "1a0f4b953ae0a99c56a575ad26cd234247b7a1e678bfa53aa58e557d639e81ca",
+      "license": "MIT"
+    },
+    {
+      "id": "ww-compound-planning",
+      "sha256": "426b8f83ba9da2937591171c0923493485d8475c44f4348b1d1688f57613b595",
+      "source_repo": "Besty0728/Unity-Skills",
+      "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
+      "source_path": "SkillsForUnity/unity-skills~/skills/workflow/SKILL.md",
+      "source_sha256": "1a0f4b953ae0a99c56a575ad26cd234247b7a1e678bfa53aa58e557d639e81ca",
+      "license": "MIT"
+    },
+    {
+      "id": "ww-custom-mechanics",
+      "sha256": "4fd58ad08b2cb0a6edec202566ab2fa86a388add596383a6f1b5cdc4fa0dd6ed",
+      "source_repo": "Nice-Wolf-Studio/unity-claude-skills",
+      "source_commit": "a149d3e995420432f52b0899092daa4b069f441f",
+      "source_path": "skills/unity-foundations/SKILL.md",
+      "source_sha256": "14d5fc71d21a26c7cd1a60383cd4e1f5d3d9c868d781bfbf8c4d1e66cee79133",
+      "license": "MIT"
+    },
+    {
+      "id": "ww-independent-assertions",
+      "sha256": "b3bda5486119e0e07e9d03fba8c96aca18417ed06c49064b0f5c72d8f688b09f",
+      "source_repo": "Besty0728/Unity-Skills",
+      "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
+      "source_path": "SkillsForUnity/unity-skills~/skills/validation/SKILL.md",
+      "source_sha256": "42afdcabd37134561cb625242104d3c15fd4dcf21270ea11ee72dcd74374b835",
+      "license": "MIT"
+    },
+    {
+      "id": "ww-asset-first-workflow",
+      "sha256": "7cba6cdd389755897f91c8aa176d2cd5902b095fb100851156ed253d55b8cb7b",
+      "source_repo": "Besty0728/Unity-Skills",
+      "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
+      "source_path": "SkillsForUnity/unity-skills~/skills/asset/SKILL.md",
+      "source_sha256": "89b838bebc86d0a801456b2d0f13f09ec1f769ac15f270e719d3a47361bc747c",
+      "license": "MIT"
+    },
+    {
+      "id": "ww-lunar-terrain",
+      "sha256": "ce209bea4f703bd5c30642f2064a358a23e6471484e84ed0b52329e2e6c7d190",
+      "source_repo": "Besty0728/Unity-Skills",
+      "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
+      "source_path": "SkillsForUnity/unity-skills~/skills/terrain/SKILL.md",
+      "source_sha256": "691b695af062b27769c1f1bdc60a051c391eff0893c846102ecbc4873a26bd7a",
+      "license": "MIT"
+    },
+    {
+      "id": "ww-interaction-design",
+      "sha256": "b74ed6144f1c630da20bb56cdffd0d81b6e9c78921794e118a49a1ae078abc20",
+      "source_repo": "Nice-Wolf-Studio/unity-claude-skills",
+      "source_commit": "a149d3e995420432f52b0899092daa4b069f441f",
+      "source_path": "skills/unity-game-loop/SKILL.md",
+      "source_sha256": "9622d509c57c98dd2a68e2e80a64c26aa5b274c44d8b25d523b4e1ed7a54144b",
+      "license": "MIT"
+    },
+    {
+      "id": "ww-component-composition",
+      "sha256": "b69b751531a0a0d6b6a81e3f2d2ef106709381e4cc0092a3527ca4f5666e2d78",
+      "source_repo": "Besty0728/Unity-Skills",
+      "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
+      "source_path": "SkillsForUnity/unity-skills~/skills/component/SKILL.md",
+      "source_sha256": "ab218c450bf84bf75bf0abacab3caf6d122170fadba7c5706c133894565a810d",
+      "license": "MIT"
+    },
+    {
+      "id": "ww-iteration-recovery",
+      "sha256": "bf62be79dff7a53c258bd66c4ea665911a60d5456d5867a1ee85a0c6b0b221a7",
+      "source_repo": "Besty0728/Unity-Skills",
+      "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
+      "source_path": "SkillsForUnity/unity-skills~/skills/debug/SKILL.md",
+      "source_sha256": "6d7bf1b1bf67a9ee9c81847771525aa1ea3563148b5648cdec7502238b73c6a9",
+      "license": "MIT"
+    },
+    {
+      "id": "ww-scene-presentation",
+      "sha256": "f091407dd486f5081817694e93f8cea18141a05c0982b2c9ac005ab6f6081fcd",
+      "source_repo": "Besty0728/Unity-Skills",
+      "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
+      "source_path": "SkillsForUnity/unity-skills~/skills/camera/SKILL.md",
+      "source_sha256": "d2716da0b4be320ee12bcafa9a6043b8ed0ab1248438ef22e7470eaaef83698f",
+      "license": "MIT"
+    },
+    {
+      "id": "ww-npc-context-routing",
+      "sha256": "c2842929e63a74c34f204f241606afd9a4ed72cab8e5615a4814ff5e1ac2ba21",
+      "source_repo": "Nice-Wolf-Studio/unity-claude-skills",
+      "source_commit": "a149d3e995420432f52b0899092daa4b069f441f",
+      "source_path": "skills/unity-npc-behavior/SKILL.md",
+      "source_sha256": "01a6af737203c4c5e0c8f7442ea3f676eb9eb967bc3d2fa7c76d21399cc42f53",
       "license": "MIT"
     }
   ]

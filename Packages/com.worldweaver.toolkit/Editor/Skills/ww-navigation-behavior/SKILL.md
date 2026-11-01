@@ -3,6 +3,7 @@ name: ww-navigation-behavior
 description: Runtime путь, перепланирование и остановка NPC на NavMesh.
 category: npc
 keywords: pathfinding destination pathPending remainingDistance patrol маршрут патрул ворот площадь
+tools: create_npc,update_npc,configure_npc_ai,set_navigation,validate_world
 source: https://github.com/Nice-Wolf-Studio/unity-claude-skills/blob/a149d3e995420432f52b0899092daa4b069f441f/skills/unity-ai-navigation/SKILL.md
 license: MIT
 mode: advisory
@@ -14,6 +15,9 @@ mode: advisory
 1. До движения проверь наличие агента на NavMesh и вычисление полного пути. Пока pathPending, remainingDistance может не доказывать прибытие.
 2. Разделяй принятие команды, начало движения и фактическое прибытие. Для следования ограничь частоту SetDestination и обрабатывай исчезновение цели.
 3. Проверка: препятствие обходится, Stop прекращает движение, заблокированная цель возвращает failure; поведение не заменяется прямым Transform.MoveTowards сквозь стены.
+
+## Доступные действия WorldWeaver
+При необходимости вызови discover_tools с names: create_npc,update_npc,configure_npc_ai,set_navigation,validate_world. Это ссылки на существующие команды, а не разрешение на их автоматическое выполнение. После создания читай реальный target, затем применяй зависимые действия отдельным шагом.
 
 ## Граница применения
 Это справочный Markdown для встроенного агента WorldWeaver. Используй только объявленные в текущем запросе инструменты и их фактические схемы. Навык не добавляет shell, сеть, доступ к секретам, новые разрешения или автоматическое выполнение кода. Если операции нет, дай совет либо подготовь C# для просмотра в поддерживаемом процессе; не выдавай совет за выполненное действие.

@@ -3,6 +3,7 @@ name: ww-physics-queries
 description: Raycast, overlap и NonAlloc без ошибок масок и неполного результата.
 category: physics
 keywords: raycast overlap spherecast NonAlloc LayerMask Physics запрос луч коллайдер
+tools: configure_physics,inspect_component,set_component,verify_scene
 source: https://github.com/Nice-Wolf-Studio/unity-claude-skills/blob/a149d3e995420432f52b0899092daa4b069f441f/skills/unity-physics-queries/SKILL.md
 license: MIT
 mode: advisory
@@ -14,6 +15,9 @@ mode: advisory
 1. Выбирай cast для пути и overlap для наличия в области. LayerMask — битовая маска; индекс слоя не равен маске.
 2. Не полагайся на порядок hits, если API его не гарантирует. Для NonAlloc обрабатывай только возвращённое число элементов и переполнение буфера.
 3. Проверка: луч изнутри collider, trigger filtering и целевой слой имеют отдельные примеры; попадание не приписывается первому произвольному объекту.
+
+## Доступные действия WorldWeaver
+При необходимости вызови discover_tools с names: configure_physics,inspect_component,set_component,verify_scene. Это ссылки на существующие команды, а не разрешение на их автоматическое выполнение. После создания читай реальный target, затем применяй зависимые действия отдельным шагом.
 
 ## Граница применения
 Это справочный Markdown для встроенного агента WorldWeaver. Используй только объявленные в текущем запросе инструменты и их фактические схемы. Навык не добавляет shell, сеть, доступ к секретам, новые разрешения или автоматическое выполнение кода. Если операции нет, дай совет либо подготовь C# для просмотра в поддерживаемом процессе; не выдавай совет за выполненное действие.

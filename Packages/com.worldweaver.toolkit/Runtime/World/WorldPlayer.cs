@@ -9,6 +9,9 @@ namespace WorldWeaver
     {
         public Camera View;
         public float Speed = 5, LookSpeed = 120, InteractDistance = 3;
+        [Min(.1f)] public float Gravity = 9.81f;
+        public bool UseLocalGravity;
+        public bool MovementLocked;
         [Min(1)] public float SprintMultiplier = 1.6f;
         [Min(0)] public float JumpHeight = 1.1f;
         private CharacterController motor;
@@ -34,22 +37,24 @@ namespace WorldWeaver
         private void Update()
         {
             if (!motor || !motor.enabled) return;
-            if (conversation && conversation.IsOpen) return;
+            if (MovementLocked || (conversation && conversation.IsOpen)) return;
             var movement = WorldInput.Movement;
             yaw += WorldInput.TurnDegrees(LookSpeed,Time.deltaTime);
             transform.rotation = Quaternion.Euler(0,yaw,0);
             MoveFrame(movement,WorldInput.SprintHeld,WorldInput.JumpPressed,Time.deltaTime);
-            if (WorldInput.InteractPressed) OpenNearestConversation();
+            if (WorldInput.InteractPressed)
+            {var survival=GetComponent<WorldSurvival>();if(!survival||!survival.TryInteract())OpenNearestConversation();}
         }
         /// <summary>The same movement path is used by keyboard input and deterministic Play Mode checks.</summary>
         public void MoveFrame(Vector2 input, bool sprint, bool jump, float deltaTime)
         {
-            if (!motor || !motor.enabled || (conversation && conversation.IsOpen) || deltaTime <= 0 || float.IsNaN(deltaTime) || float.IsInfinity(deltaTime)) return;
+            if (MovementLocked || !motor || !motor.enabled || (conversation && conversation.IsOpen) || deltaTime <= 0 || float.IsNaN(deltaTime) || float.IsInfinity(deltaTime)) return;
             deltaTime = Mathf.Min(deltaTime,.1f);
+            float gravity=UseLocalGravity?-Mathf.Max(.1f,Gravity):Physics.gravity.y;
             bool grounded = motor.isGrounded;
             if (grounded && vertical < 0) vertical = -2;
-            if (grounded && jump && JumpHeight > 0) vertical = Mathf.Sqrt(2 * Mathf.Abs(Physics.gravity.y) * JumpHeight);
-            vertical += Physics.gravity.y * deltaTime;
+            if (grounded && jump && JumpHeight > 0) vertical = Mathf.Sqrt(2 * Mathf.Abs(gravity) * JumpHeight);
+            vertical += gravity * deltaTime;
             var direction = Vector3.ClampMagnitude(new Vector3(input.x,0,input.y),1);
             float speed = Mathf.Max(0,Speed) * (sprint ? Mathf.Max(1,SprintMultiplier) : 1);
             motor.Move((transform.TransformDirection(direction)*speed + Vector3.up*vertical)*deltaTime);

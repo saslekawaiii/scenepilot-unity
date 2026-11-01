@@ -56,8 +56,8 @@ namespace WorldWeaver.Editor.Assistant
             bool allRequirementsChecked = requirements.All(requirement => !string.IsNullOrEmpty(requirement.Id) && checks.Any(check => check.Passed && check.RequirementId == requirement.Id));
             bool terminal = Is(outcome, "done", "complete", "completed", "готово", "проверки пройдены", "изменения применены", "шаг выполнен", "checks_passed", "literal_checks_passed");
             if (checks.Length > 0 && allRequirementsChecked && terminal && Is(state, "checks_passed", "literal_checks_passed"))
-                return new ChatTaskPresentation(true, "task-card-success", "Проверено " + checks.Length + " из " + checks.Length,
-                    state == "literal_checks_passed" ? "Критерии запроса подтверждены по сцене" : "Проверки запроса пройдены");
+                return new ChatTaskPresentation(true, requirements.Any(r=>r.Kind=="task_change")?"task-card-neutral":"task-card-success", "Проверено " + checks.Length + " из " + checks.Length,
+                    requirements.Any(r=>r.Kind=="task_change")?"Изменения применены; полное поведение требует проверки":state == "literal_checks_passed" ? "Критерии запроса подтверждены по сцене" : "Проверки запроса пройдены");
             return new ChatTaskPresentation(true, "task-card-neutral", hasResults ? "Результаты действий" : "Статус задачи", "Выполнение задачи не подтверждено",
                 hasResults ? "Действия перечислены ниже. Итог задачи отдельно не подтверждён." : "Применённый и проверенный результат этого запроса пока не получен.");
         }

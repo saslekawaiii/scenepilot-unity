@@ -41,6 +41,7 @@ namespace WorldWeaver.Editor.Assistant
         public List<AgentCheckResult> Checks = new List<AgentCheckResult>();
         public List<string> Evidence = new List<string>();
         public List<string> OpenQuestions = new List<string>();
+        public List<string> Approach = new List<string>();
     }
     /// <summary>Observable literal constraints are checked by code, independently of model completion prose.</summary>
     public static class AgentTaskVerifier
@@ -109,6 +110,8 @@ namespace WorldWeaver.Editor.Assistant
             if(materialApplication!=null)task.Requirements.Add(materialApplication);
             var animatedPlayer=AgentAnimatedPlayerGoal.Capture(input,mutationAuthorized);
             if(animatedPlayer!=null)task.Requirements.Add(animatedPlayer);
+            if(mutationAuthorized&&task.Requirements.Count==0&&AgentCapabilities.IsChangeRequest(input))
+                task.Requirements.Add(new AgentRequirement{Kind="task_change",Number=1,Description="Запрошенные изменения действительно применены инструментами текущей задачи"});
             return task;
         }
         static bool MatchesKind(GameObject go,string expected)=>expected=="light"?go.GetComponent<Light>()!=null:Kind(go)==expected;
@@ -122,7 +125,7 @@ namespace WorldWeaver.Editor.Assistant
             task.Checks.Clear();
             foreach(var requirement in task.Requirements)
             {
-                if(requirement.Kind=="rotation_speed"||requirement.Kind==AgentMaterialApplicationGoal.Kind||requirement.Kind==AgentAnimatedPlayerGoal.Kind)continue; // Controller combines tool evidence with actual read-back.
+                if(requirement.Kind=="task_change"||requirement.Kind=="rotation_speed"||requirement.Kind==AgentMaterialApplicationGoal.Kind||requirement.Kind==AgentAnimatedPlayerGoal.Kind)continue; // Controller combines tool evidence with actual read-back.
                 double actual=double.NaN;string evidence="live Unity scene";
                 if(missingScope){task.Checks.Add(new AgentCheckResult{RequirementId=requirement.Id,Description=requirement.Description,Actual="Мир задания отсутствует",Evidence="Не разрешён ScopeTarget; чужие объекты не учитываются",Passed=false});continue;}
                 if(requirement.Kind=="count")

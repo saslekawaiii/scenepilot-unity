@@ -228,7 +228,7 @@ namespace WorldWeaver.Tests
         public void ActualGoalRequestEnvelopeOffersOnlyReadsProfileUpdateAndDesignMemory(string input,AssistantMode mode,bool cloud)
         {
             var request=RequestEnvelope(input,mode,cloud);
-            Assert.That(ExposedTools(request),Is.EquivalentTo(new[]{"find_scene_objects","inspect_object","inspect_project","update_npc","remember_design"}));
+            Assert.That(ExposedTools(request),Is.EquivalentTo(new[]{"plan_task","discover_tools","list_skills","read_skill","find_scene_objects","inspect_object","inspect_project","update_npc","remember_design"}));
             var args=Arguments(request.Schema,"update_npc");Assert.That(((JObject)args["properties"]).Properties().Select(p=>p.Name),Is.EqualTo(new[]{"goals"}));Assert.That(args["required"].Values<string>(),Is.EqualTo(new[]{"goals"}));Assert.That((bool)args["additionalProperties"],Is.False);
             Assert.That(((JObject)Arguments(EditorPlan.Schema(true,new[]{"update_npc"}),"update_npc")["properties"]).Property("role"),Is.Not.Null,"A task-specific scope must not alter the shared NPC schema.");
             Assert.That(request.Messages.Any(m=>m.Content.Contains(input)),Is.True,"Narrowing must preserve the actual request.");
@@ -284,7 +284,7 @@ namespace WorldWeaver.Tests
             provider.Plan=new EditorPlan{reply="Обновлена только цель",complete=true,actions=new List<EditorCommand>{new EditorCommand{tool="update_npc",target=ProjectContextIndex.StableTarget(npc.gameObject),args=new JObject{["goals"]="Патрулировать площадь и северные ворота"}}}};
             yield return Finish(controller.SendAsync(ActualGoalRequest));var answer=controller.Current.Messages.Last();
             Assert.That(answer.IsError,Is.False,answer.Text);Assert.That(answer.Steps.Single().Tool,Is.EqualTo("update_npc"));
-            Assert.That(ExposedTools(provider.LastRequest),Is.EquivalentTo(new[]{"find_scene_objects","inspect_object","inspect_project","update_npc","remember_design"}));
+            Assert.That(ExposedTools(provider.LastRequest),Is.EquivalentTo(new[]{"plan_task","discover_tools","list_skills","read_skill","find_scene_objects","inspect_object","inspect_project","update_npc","remember_design"}));
             Assert.That(npc.Goals,Is.EqualTo("Патрулировать площадь и северные ворота"));Assert.That(npc.Role,Is.EqualTo("Страж"));Assert.That(npc.Personality,Is.EqualTo("Осторожный"));
             Assert.That(npc.Biography,Is.EqualTo("Живёт у моста"));Assert.That(npc.Constraints,Is.EqualTo("Не брать чужие вещи"));Assert.That(npc.Autonomous,Is.False);
             Assert.That(npc.Knowledge,Is.SameAs(knowledge));Assert.That(EditorJsonUtility.ToJson(knowledge),Is.EqualTo(knowledgeBefore));Assert.That(npc.Models,Is.SameAs(models));

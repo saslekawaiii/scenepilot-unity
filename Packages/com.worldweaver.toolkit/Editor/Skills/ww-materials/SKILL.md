@@ -3,6 +3,7 @@ name: ww-materials
 description: Материалы и шейдерные свойства для установленного render pipeline.
 category: render
 keywords: material shader цвет материал pink розовый pipeline sharedMaterial
+tools: discover_tools,list_skills,read_skill,inspect_object
 source: https://github.com/Besty0728/Unity-Skills/blob/fb7a8d4208671bca1d1013b2776eb2e4917f4964/SkillsForUnity/unity-skills~/skills/material/SKILL.md
 license: MIT
 mode: advisory
@@ -14,6 +15,9 @@ mode: advisory
 1. Определи Built-in, URP или HDRP до выбора shader и свойств. Имена свойств проверяй по реальному shader, а не по универсальному предположению.
 2. Различай sharedMaterial и runtime-копию material. Правка общего материала влияет на всех пользователей; множество случайных копий расходует память.
 3. Проверка: нет розовых материалов и пропавших текстур, изменились только заданные renderer; цвет подтверждён чтением и доступным снимком.
+
+## Доступные действия WorldWeaver
+При необходимости вызови discover_tools с names: discover_tools,list_skills,read_skill,inspect_object. Это ссылки на существующие команды, а не разрешение на их автоматическое выполнение. После создания читай реальный target, затем применяй зависимые действия отдельным шагом.
 
 ## Граница применения
 Это справочный Markdown для встроенного агента WorldWeaver. Используй только объявленные в текущем запросе инструменты и их фактические схемы. Навык не добавляет shell, сеть, доступ к секретам, новые разрешения или автоматическое выполнение кода. Если операции нет, дай совет либо подготовь C# для просмотра в поддерживаемом процессе; не выдавай совет за выполненное действие.

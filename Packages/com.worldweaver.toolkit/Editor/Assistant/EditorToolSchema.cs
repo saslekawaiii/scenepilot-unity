@@ -56,6 +56,7 @@ namespace WorldWeaver.Editor.Assistant
                 Command("attach_script", Object(new JObject()), ClassName(), ExplicitTarget())
             };
             foreach (var schema in WorldGameplayTools.CommandSchemas()) commands.Add(schema);
+            foreach (var schema in ConstructiveTools.CommandSchemas()) commands.Add(schema);
             foreach (var schema in AnimatedCharacterTools.CommandSchemas()) commands.Add(schema);
             foreach (var schema in WorldMaterialTools.CommandSchemas()) commands.Add(schema);
             foreach (var schema in AgentProjectTools.CommandSchemas()) commands.Add(schema);
@@ -116,7 +117,7 @@ namespace WorldWeaver.Editor.Assistant
             // llama.cpp emits declared optional keys in schema order. A model that
             // starts with style must still be able to emit the dimensions after it.
             var terrain = TerrainFields();
-            var properties = new JObject { ["style"] = Enum("forest", "alpine", "desert") };
+            var properties = new JObject { ["style"] = Enum("forest", "alpine", "desert", "moon") };
             foreach (string key in new[] { "width", "length", "height" })
             { properties[key] = terrain[key]; terrain.Remove(key); }
             if (creation)

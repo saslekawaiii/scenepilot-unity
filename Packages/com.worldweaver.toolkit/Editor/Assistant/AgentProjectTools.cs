@@ -20,12 +20,13 @@ namespace WorldWeaver.Editor.Assistant
     /// <summary>Typed project operations: no shell, arbitrary reflection invocation or credential file reader.</summary>
     internal static class AgentProjectTools
     {
-        static readonly string[] Names={"find_scene_objects","inspect_project","inspect_component","set_component","add_component","read_console","capture_scene","run_tests","run_play_check","poll_job","set_build_scenes","build_player","remember_design","list_skills","read_skill","open_scene"};
+        static readonly string[] Names={"plan_task","discover_tools","find_scene_objects","inspect_project","inspect_component","set_component","add_component","read_console","capture_scene","run_tests","run_play_check","poll_job","set_build_scenes","build_player","remember_design","list_skills","read_skill","open_scene"};
         internal static bool Handles(string tool)=>Names.Contains(tool);
-        internal static bool IsReadOnly(string tool)=>new[]{"find_scene_objects","inspect_project","inspect_component","read_console","capture_scene","poll_job","list_skills","read_skill"}.Contains(tool);
+        internal static bool IsReadOnly(string tool)=>new[]{"plan_task","discover_tools","find_scene_objects","inspect_project","inspect_component","read_console","capture_scene","poll_job","list_skills","read_skill"}.Contains(tool);
         internal static bool IsDeferred(string tool)=>tool=="run_tests"||tool=="run_play_check"||tool=="build_player"||tool=="open_scene";
         internal static bool RequiresReview(EditorCommand c)=>c.tool=="open_scene"||c.tool=="set_build_scenes"||c.tool=="add_component"&&ResolveType((string)c.args["type"]).IsSubclassOf(typeof(MonoBehaviour));
         internal const string ToolInstructions=@"PROJECT TOOLS (exact typed args):
+plan_task: target empty,args {steps:[string...]}, 1-12 stages covering ALL parts of a compound request. Records a proposed approach only; never marks stages completed. Plan before complex creation, then use actual tools and live checks.
 find_scene_objects: target empty,args {query:string,limit?:1..50}. Addressed retrieval over all loaded scenes/assets, returns stable targets. Editing remains restricted to active scene.
 inspect_project: target empty,args {}. Actual Unity/platform/packages/build-scenes metadata, no environment files.
 inspect_component: target existing object,args {type:string}. Read actual serialized component fields; credentials are masked.
@@ -48,6 +49,8 @@ open_scene: target empty,args {path:Assets/...unity}. Standalone reviewed action
         internal static IEnumerable<JObject> CommandSchemas()
         {
             var schema=new Dictionary<string,JObject>{
+                ["plan_task"]=Obj(new JObject{["steps"]=new JObject{["type"]="array",["minItems"]=1,["maxItems"]=12,["items"]=Text(300)}},"steps"),
+                ["discover_tools"]=Obj(new JObject{["query"]=Text(500),["names"]=new JObject{["type"]="array",["maxItems"]=16,["items"]=Text(64)}}),
                 ["find_scene_objects"]=Obj(new JObject{["query"]=Text(500),["limit"]=Integer(1,50)},"query"),
                 ["inspect_project"]=Obj(new JObject()),["inspect_component"]=Obj(new JObject{["type"]=Text()},"type"),
                 ["set_component"]=Obj(new JObject{["type"]=Text(),["property"]=Text(),["value"]=new JObject{["anyOf"]=new JArray(new JObject{["type"]="string",["maxLength"]=4000},new JObject{["type"]="number"},new JObject{["type"]="boolean"},new JObject{["type"]="null"},new JObject{["type"]="array",["items"]=new JObject{["type"]="number"},["minItems"]=2,["maxItems"]=4},Obj(new JObject{["target"]=Text(),["component"]=Text()},"target"),Obj(new JObject{["asset"]=Text()},"asset"))}},"type","property","value"),
@@ -93,6 +96,8 @@ open_scene: target empty,args {path:Assets/...unity}. Standalone reviewed action
                 var serialized=new SerializedObject(Component(c,resolve));var field=serialized.FindProperty(property)??throw new ArgumentException("Serialized property not found. Inspect the component first.");
                 if(!field.editable)throw new ArgumentException("Serialized property is read-only.");ValidateProperty(field,c.args["value"],resolve);
             }
+            if(c.tool=="plan_task" && (!(c.args["steps"] is JArray stages)||stages.Count<1||stages.Count>12||stages.Any(n=>n.Type!=JTokenType.String||string.IsNullOrWhiteSpace((string)n)||((string)n).Length>300)))throw new ArgumentException("A task plan needs 1-12 bounded steps.");
+            if(c.tool=="discover_tools" && c.args["names"]!=null && (!(c.args["names"] is JArray names)||names.Count>16||names.Any(n=>n.Type!=JTokenType.String||((string)n).Length>64)))throw new ArgumentException("Invalid discovery tool names.");
             if(c.tool=="poll_job"&&!ChatHistoryStore.ValidId((string)c.args["id"]))throw new ArgumentException("Invalid job id.");
             if(c.tool=="run_tests"&&string.IsNullOrWhiteSpace((string)c.args["filter"]))throw new ArgumentException("An explicit test filter is required.");
             if(c.tool=="open_scene")ScenePath((string)c.args["path"]);
@@ -169,6 +174,8 @@ open_scene: target empty,args {path:Assets/...unity}. Standalone reviewed action
             Validate(c,resolve);string summary;GameObject target=null;var a=c.args;
             switch(c.tool)
             {
+                case "plan_task":if(context?.Message?.Task==null)throw new InvalidOperationException("A task context is required.");context.Message.Task.Approach=a["steps"].Values<string>().ToList();summary=new JObject{["stages"]=a["steps"].DeepClone(),["status"]="proposed, not completed",["changesApplied"]=false}.ToString(Formatting.None);break;
+                case "discover_tools":summary=AgentCapabilities.Discover(a).ToString(Formatting.None);break;
                 case "find_scene_objects":summary=ProjectContextIndex.Search((string)a["query"],(int?)a["limit"]??20).ToString(Formatting.None);break;
                 case "inspect_project":summary=ProjectContextIndex.Summary().ToString(Formatting.None);break;
                 case "inspect_component":summary=InspectComponent(Component(c,resolve)).ToString(Formatting.None);break;
@@ -195,7 +202,7 @@ open_scene: target empty,args {path:Assets/...unity}. Standalone reviewed action
                     EditorBuildSettings.scenes=((JArray)a["paths"]).Values<string>().Select(path=>new EditorBuildSettingsScene(path,true)).ToArray();summary="Сцены сборки: "+string.Join(",",EditorBuildSettings.scenes.Select(s=>s.path));break;
                 case "remember_design":if(context?.Session==null)throw new InvalidOperationException("Memory requires session context.");AgentDesignMemory.Remember(context.Session,(string)a["key"],(string)a["value"],context.Message.Id,(string)a["category"]??"decision");summary="Решение сохранено в памяти проекта с источником текущего запроса.";break;
                 case "list_skills":var catalog=AgentSkillCatalog.CreateDefault(context?.Session?.Settings?.SkillFolders);summary=JsonConvert.SerializeObject(string.IsNullOrWhiteSpace((string)a["query"])?catalog.List().Take((int?)a["limit"]??20):catalog.Search((string)a["query"],(int?)a["limit"]??20));break;
-                case "read_skill":summary=AgentSkillCatalog.CreateDefault(context?.Session?.Settings?.SkillFolders).ReadStrict((string)a["id"],6000);break;
+                case "read_skill":var skills=AgentSkillCatalog.CreateDefault(context?.Session?.Settings?.SkillFolders);var skillId=(string)a["id"];summary=new JObject{["id"]=skillId,["body"]=skills.ReadStrict(skillId,6000),["enabledTools"]=new JArray(skills.ToolsFor(skillId)),["changesApplied"]=false}.ToString(Formatting.None);break;
                 case "open_scene":if(context?.Reviewed!=true)throw new InvalidOperationException("Opening another scene requires review.");EditorSceneManager.OpenScene(ScenePath((string)a["path"]));summary="Открыта сцена "+(string)a["path"];break;
                 default:throw new ArgumentException("Unknown project tool.");
             }

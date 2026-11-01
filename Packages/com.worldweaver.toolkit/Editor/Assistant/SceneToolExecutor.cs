@@ -20,7 +20,7 @@ namespace WorldWeaver.Editor.Assistant
         private static readonly string[] TerrainKeys = typeof(TerrainSpec).GetFields().Select(f => f.Name).ToArray();
         private static readonly string[] Kinds = { "cube", "sphere", "capsule", "cylinder", "plane", "tree", "rock", "house" };
         public static string ToolInstructions => @"You edit only the active scene. Never say work was done before tool results. Each action is {tool,name,target,args}. All args are STRICT: unknown keys are rejected. Numbers must be finite. Use target id:<instanceId> from context; @Name refers to an earlier creation in this plan; exact unique scene names and selected also work. Use unique nonempty name on creations. New objects live under the owned WorldWeaverGenerated group. Existing objects are editable only by explicit target. Delete accepts only owned objects with no foreign children. No reflection, arbitrary code, shell commands, arbitrary URLs/downloads, or new/cleared scenes. The only network asset import is the bounded CC0 material_import tool. At most24 actions,300 scatter placements,600 actual GameObjects per batch and2000 owned objects in the scene. Trees cost4 objects,houses9,NPCs8. Batch failure rolls back scene and new assets. No scene save without explicit save_scene. Tools:
-create_world: name; target empty. args {style?:alpine|forest|desert,width?:32..2048,length?:32..2048,height?:4..512,trees?:0..300,buildings?:0..100,rocks?:0..300,seed?:integer,resolution?:33|65|129|257|513,scale?:0.1..32,octaves?:1..8,persistence?:0.1..0.9,lacunarity?:1..4,mountainStrength?:0.0..1.0,valleyDepth?:0.0..0.8,waterLevel?:0.0..0.8,southSlope?:0.0..1.0,smoothingPasses?:0..8}. Width,length,height are METRES. valleyDepth,waterLevel,mountainStrength,southSlope are NORMALIZED FRACTIONS, not metres; valleyDepth and waterLevel must not exceed 0.8. Partial TerrainSpec has consistent defaults: keep optional terrain noise/water factors at defaults unless the user asks to change them. Creates textured terrain,lake,spaced trees/rocks/houses,sun and camera. Preserves all existing scene objects. Presets alter geometry and colors; these are original low-poly primitives, not imported art.
+create_world: name; target empty. args {style?:alpine|forest|desert|moon,width?:32..2048,length?:32..2048,height?:4..512,trees?:0..300,buildings?:0..100,rocks?:0..300,seed?:integer,resolution?:33|65|129|257|513,scale?:0.1..32,octaves?:1..8,persistence?:0.1..0.9,lacunarity?:1..4,mountainStrength?:0.0..1.0,valleyDepth?:0.0..0.8,waterLevel?:0.0..0.8,southSlope?:0.0..1.0,smoothingPasses?:0..8}. Width,length,height are METRES. valleyDepth,waterLevel,mountainStrength,southSlope are NORMALIZED FRACTIONS, not metres; valleyDepth and waterLevel must not exceed 0.8. Partial TerrainSpec has consistent defaults: keep optional terrain noise/water factors at defaults unless the user asks to change them. Creates textured terrain,lake,spaced trees/rocks/houses,sun and camera. Preserves all existing scene objects. Presets alter geometry and colors; these are original low-poly primitives, not imported art.
 update_world: target owned world or terrain. args same partial TerrainSpec fields and optional style. Rebuilds heights/ground layers/water, keeps existing contents anchored to new ground. To lower mountains use mountainStrength or height. Does not add/remove decoration.
 create_npc: name; target optional owned parent world/group. args {role?:text,personality?:text,biography?:text,goals?:text,constraints?:text,knowledge?:text|array of strings,position?:[x,y,z],rotation?:[x,y,z],scale?:[x,y,z],on_terrain?:bool,inventory?:{item:integer},autonomous?:bool}. Creates visible character plus real IntelligentNPC,Inventory,WorldEntity,scoped KnowledgeBase and valid model routes; defaults are local Ollama. With on_terrain=true(default), deterministically snaps to nearby dry, moderately sloped ground (up to20 radial search steps); x/z may shift away from water. on_terrain=false preserves explicit xyz for special placements.
 create_object: name; target optional owned parent. args {kind:cube|sphere|capsule|cylinder|plane|tree|rock|house,position?:[x,y,z],rotation?:[x,y,z],scale?:[x,y,z],color?:#RRGGBB|#RRGGBBAA|[r,g,b,a],on_terrain?:bool,inventory?:{item:integer}}. Also registers WorldEntity with id=name.
@@ -175,6 +175,13 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
                     if(AgentProjectTools.IsDeferred(command.tool)&&plan.actions.Count!=1)throw new ArgumentException("Test/build/open-scene operations require a standalone plan.");
                     continue;
                 }
+                if(ConstructiveTools.Handles(command.tool))
+                {
+                    ConstructiveTools.Validate(command,s=>Resolve(s,aliases).Object??throw new ArgumentException("Constructive targets must exist; run creation and dependent operations in separate steps."));
+                    if(command.tool=="verify_scene"&&plan.actions.Count!=1)throw new ArgumentException("Verification is a standalone read-only step.");
+                    created+=ConstructiveTools.Cost(command);if(created>BatchLimit||owned+created>SceneLimit)throw new ArgumentException("Constructive object budget exceeded.");
+                    continue;
+                }
                 if(AnimatedCharacterTools.Handles(command.tool))
                 {
                     AnimatedCharacterTools.Validate(command,s=>Resolve(s,aliases).Object??throw new ArgumentException("Character target must already exist; create the world in a prior step."));
@@ -201,12 +208,12 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
                 {
                     case "create_world":
                         EmptyTarget(command);Keys(a,TerrainKeys.Concat(new[]{"style","trees","rocks","buildings"}));
-                        string style=Choice(a,"style",new[]{"forest","alpine","desert"},"forest");WorldComposer.Specification(a,style).Validate();
-                        cost=5+4*Integer(a,"trees",0,300,style=="desert"?12:40)+Integer(a,"rocks",0,300,18)+9*Integer(a,"buildings",0,100,4);
+                        string style=Choice(a,"style",new[]{"forest","alpine","desert","moon"},"forest");WorldComposer.Specification(a,style).Validate();
+                        cost=5+4*Integer(a,"trees",0,300,style=="moon"?0:style=="desert"?12:40)+Integer(a,"rocks",0,300,18)+9*Integer(a,"buildings",0,100,4);
                         target=new VirtualTarget{Owned=true,Terrain=true,Renderer=true};creation=true;break;
                     case "update_world":
                         Keys(a,TerrainKeys.Concat(new[]{"style"}));target=Resolve(command.target,aliases);if(!target.Owned||!target.Terrain)throw new ArgumentException("update_world requires owned terrain/world.");
-                        string nextStyle=Choice(a,"style",new[]{"forest","alpine","desert"},"forest");
+                        string nextStyle=Choice(a,"style",new[]{"forest","alpine","desert","moon"},"forest");
                         var oldSpec=target.Object?target.Object.GetComponentInChildren<GeneratedTerrain>(true)?.Specification:null;
                         WorldComposer.Specification(a,nextStyle,oldSpec).Validate();break;
                     case "create_npc":
@@ -264,7 +271,7 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
         private static void Parent(EditorCommand command,Dictionary<string,VirtualTarget> aliases)
         {if(!string.IsNullOrEmpty(command.target)&&!Resolve(command.target,aliases).Owned)throw new ArgumentException("Creation parent must be owned WorldWeaver group/world.");}
 
-        public static bool IsReadOnlyTool(string tool)=>tool=="inspect_object"||tool=="search_project"||tool=="read_script"||WorldGameplayTools.IsReadOnly(tool)||AgentProjectTools.IsReadOnly(tool)||WorldMaterialTools.IsReadOnly(tool);
+        public static bool IsReadOnlyTool(string tool)=>tool=="inspect_object"||tool=="search_project"||tool=="read_script"||WorldGameplayTools.IsReadOnly(tool)||AgentProjectTools.IsReadOnly(tool)||WorldMaterialTools.IsReadOnly(tool)||ConstructiveTools.IsReadOnly(tool);
 
         public static async Task<EditorBatchResult> ExecuteAsync(EditorPlan plan,OrchestratorProfile routes=null,AgentExecutionContext executionContext=null,CancellationToken token=default,Action beforeMutation=null)
         {
@@ -306,6 +313,13 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
                     if(AgentProjectTools.Handles(command.tool))
                     {
                         result.Results.Add(AgentProjectTools.Execute(command,resolve,executionContext));continue;
+                    }
+                    if(ConstructiveTools.Handles(command.tool))
+                    {
+                        var outcome=ConstructiveTools.Execute(command,tx,ConstructiveTools.IsReadOnly(command.tool)?null:getGroup().transform,resolve);go=outcome.Target;
+                        if(command.tool=="verify_scene"&&(bool?)JObject.Parse(outcome.Summary)["success"]!=true)throw new InvalidOperationException("Scene assertions failed: "+outcome.Summary);
+                        if(go&&!string.IsNullOrWhiteSpace(command.name)){aliases["@"+command.name]=go;aliases[command.name]=go;}
+                        result.Results.Add(new EditorCommandResult{Success=true,Tool=command.tool,Target=go?Id(go):command.target,Summary=outcome.Summary,CreatedAssets=tx.Assets.Skip(assetStart).ToList()});continue;
                     }
                     if(AnimatedCharacterTools.Handles(command.tool))
                     {

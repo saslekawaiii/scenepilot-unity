@@ -3,6 +3,7 @@ name: ww-cinemachine
 description: Cinemachine follow и look-at с проверкой major version и приоритетов.
 category: scene
 keywords: Cinemachine follow camera orbit камера слежение virtual
+tools: create_node,set_parent,set_transform,find_scene_objects,inspect_object
 source: https://github.com/Besty0728/Unity-Skills/blob/fb7a8d4208671bca1d1013b2776eb2e4917f4964/SkillsForUnity/unity-skills~/skills/cinemachine/SKILL.md
 license: MIT
 mode: advisory
@@ -14,6 +15,9 @@ mode: advisory
 1. Проверь установленную major version: Cinemachine 2 и 3 имеют разные классы и компоненты. Не создавай зависимость автоматически.
 2. Разделяй Follow, LookAt, damping и активный приоритет; проверь CinemachineBrain на выходной камере.
 3. Проверка: перемещение игрока меняет кадр плавно, препятствия и границы уровня учтены, возврат управления не оставляет две активные системы.
+
+## Доступные действия WorldWeaver
+При необходимости вызови discover_tools с names: create_node,set_parent,set_transform,find_scene_objects,inspect_object. Это ссылки на существующие команды, а не разрешение на их автоматическое выполнение. После создания читай реальный target, затем применяй зависимые действия отдельным шагом.
 
 ## Граница применения
 Это справочный Markdown для встроенного агента WorldWeaver. Используй только объявленные в текущем запросе инструменты и их фактические схемы. Навык не добавляет shell, сеть, доступ к секретам, новые разрешения или автоматическое выполнение кода. Если операции нет, дай совет либо подготовь C# для просмотра в поддерживаемом процессе; не выдавай совет за выполненное действие.

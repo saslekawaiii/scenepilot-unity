@@ -15,6 +15,10 @@ namespace WorldWeaver
             {
                 if(value["type"]?.Type==JTokenType.String&&(string)value["type"]=="string")
                 { value.Remove("minLength");value.Remove("maxLength"); }
+                // Native llama.cpp grammar rejects huge bounded repetitions (observed with
+                // create_mesh's 2048 vertices / 12000 indices on Ollama 0.32.6). Keep vector
+                // arity and small arrays constrained; the unchanged host schema checks all bounds.
+                if(value["type"]?.Type==JTokenType.String&&(string)value["type"]=="array"&&((int?)value["maxItems"]??0)>256)value.Remove("maxItems");
                 foreach(var property in value.Properties())RemoveStringRepetitions(property.Value);
             }
             else if(node is JArray array)foreach(var child in array)RemoveStringRepetitions(child);

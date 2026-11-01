@@ -11,6 +11,14 @@ namespace WorldWeaver.Editor.Assistant
     /// <summary>Offer reviewed source tools for mechanics even when the user never says "script".</summary>
     internal static class AgentImplementationPolicy
     {
+        internal static string ConstructionPhaseRepair(EditorPlan rejected,IEnumerable<string> allowed,bool readOnly,out string nextTool)
+        {
+            nextTool="";
+            if(readOnly||rejected?.actions==null||rejected.actions.Count<2||!rejected.actions.Any(a=>ConstructiveTools.Handles(a.tool)))return "";
+            var first=rejected.actions[0];if(!(allowed??Enumerable.Empty<string>()).Contains(first.tool))return "";
+            nextTool=first.tool;
+            return "The rejected proposal combined dependent creation/edit/verification phases. NOTHING from it was executed. Return a fresh complete:false EditorPlan with EXACTLY ONE "+first.tool+" action for the first step. Every action MUST explicitly contain tool,name,target,args, including empty name/target strings. Preserve the original first-step parameter values as DATA: "+JObject.FromObject(first).ToString(Formatting.None)+". Do not include later actions or assertions against objects that do not yet exist. After the first tool result, inspect the actual target and continue remaining stages; the original task is still pending. Do not repeat the whole rejected batch.";
+        }
         internal static bool IsMechanicRequest(string text) => Regex.IsMatch(text ?? "",
             @"интерактив|механик|нажат|нажим|клавиш|подбор|подбира|спавн|респавн|перезаряд|стрельб|выстрел|сражен|\bбо[еяй]\b|\bвраг|противник|здоров|урон|таймер|обратн.{0,10}отсч|\bочки\b|побед|поражен|чекпоинт|контрольн.{0,10}точк|портал|телепорт|открыва.{0,30}(двер|ворот)|двер.{0,30}(откры|ключ)|процедурн.{0,20}анимац|\b(gameplay|mechanic|interactive|trigger|spawn|respawn|combat|damage|health|cooldown|pickup|teleport|checkpoint|score|timer)\b",
             RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);

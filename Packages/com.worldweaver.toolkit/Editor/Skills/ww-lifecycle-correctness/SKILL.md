@@ -3,6 +3,7 @@ name: ww-lifecycle-correctness
 description: Unity lifecycle, destroyed-object null и симметрия подписок.
 category: code
 keywords: Awake Start OnEnable OnDisable OnDestroy lifecycle null жизненн цикл
+tools: read_script,draft_script,patch_script,attach_script,inspect_component,add_component,set_component
 source: https://github.com/Nice-Wolf-Studio/unity-claude-skills/blob/a149d3e995420432f52b0899092daa4b069f441f/skills/unity-lifecycle/SKILL.md
 license: MIT
 mode: advisory
@@ -14,6 +15,9 @@ mode: advisory
 1. UnityEngine.Object использует особую проверку уничтоженного объекта: ?. и ?? не заменяют нужную Unity null-проверку.
 2. Подписки обычно парны OnEnable/OnDisable; Destroy отложен, поэтому не используй объект как будто он уже исчез в том же кадре.
 3. Проверка: disable/enable, unload и уничтожение не оставляют подписок, задач или поздних callback; порядок Awake не используется как случайный контракт.
+
+## Доступные действия WorldWeaver
+При необходимости вызови discover_tools с names: read_script,draft_script,patch_script,attach_script,inspect_component,add_component,set_component. Это ссылки на существующие команды, а не разрешение на их автоматическое выполнение. После создания читай реальный target, затем применяй зависимые действия отдельным шагом.
 
 ## Граница применения
 Это справочный Markdown для встроенного агента WorldWeaver. Используй только объявленные в текущем запросе инструменты и их фактические схемы. Навык не добавляет shell, сеть, доступ к секретам, новые разрешения или автоматическое выполнение кода. Если операции нет, дай совет либо подготовь C# для просмотра в поддерживаемом процессе; не выдавай совет за выполненное действие.

@@ -2,7 +2,8 @@
   "name": "WorldWeaver.EditMode",
   "references": [
     "WorldWeaver.Runtime",
-    "WorldWeaver.Editor"
+    "WorldWeaver.Editor",
+    "Unity.ugui"
   ],
   "includePlatforms": [
     "Editor"

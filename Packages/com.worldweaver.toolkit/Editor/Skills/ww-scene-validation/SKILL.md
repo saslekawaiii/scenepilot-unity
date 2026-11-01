@@ -3,6 +3,7 @@ name: ww-scene-validation
 description: Проверка missing scripts, ссылок, чисел и состояния перед сохранением.
 category: scene
 keywords: validation missing scripts references проверк валидац NaN infinity
+tools: create_node,set_parent,set_transform,find_scene_objects,inspect_object
 source: https://github.com/Besty0728/Unity-Skills/blob/fb7a8d4208671bca1d1013b2776eb2e4917f4964/SkillsForUnity/unity-skills~/skills/validation/SKILL.md
 license: MIT
 mode: advisory
@@ -14,6 +15,9 @@ mode: advisory
 1. Проверяй missing components, обязательные ссылки, finite transform, активные камеры и зависимости сцены. Отчёт должен указывать конкретную цель.
 2. Не исправляй массово все найденные проблемы без связи с запросом. Отсутствие текстового GUID-совпадения не доказывает отсутствие runtime-загрузки.
 3. Проверка: после минимальной правки снова прочитай проблемный объект; непроверенные типы ресурсов не входят в заявленное покрытие.
+
+## Доступные действия WorldWeaver
+При необходимости вызови discover_tools с names: create_node,set_parent,set_transform,find_scene_objects,inspect_object. Это ссылки на существующие команды, а не разрешение на их автоматическое выполнение. После создания читай реальный target, затем применяй зависимые действия отдельным шагом.
 
 ## Граница применения
 Это справочный Markdown для встроенного агента WorldWeaver. Используй только объявленные в текущем запросе инструменты и их фактические схемы. Навык не добавляет shell, сеть, доступ к секретам, новые разрешения или автоматическое выполнение кода. Если операции нет, дай совет либо подготовь C# для просмотра в поддерживаемом процессе; не выдавай совет за выполненное действие.

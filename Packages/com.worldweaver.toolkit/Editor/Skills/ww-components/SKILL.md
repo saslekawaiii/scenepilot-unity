@@ -3,6 +3,7 @@ name: ww-components
 description: Настройка существующих компонентов с проверкой типа свойства и зависимостей.
 category: scene
 keywords: component Rigidbody Collider serialized property компонент mass
+tools: create_node,set_parent,set_transform,find_scene_objects,inspect_object
 source: https://github.com/Besty0728/Unity-Skills/blob/fb7a8d4208671bca1d1013b2776eb2e4917f4964/SkillsForUnity/unity-skills~/skills/component/SKILL.md
 license: MIT
 mode: advisory
@@ -14,6 +15,9 @@ mode: advisory
 1. Узнай фактический тип компонента и поля, enum и требуемые peer-компоненты до записи. Не выводи имя API из похожего названия.
 2. Добавляй компонент только через объявленный инструмент. Если нужной операции нет, подготовь ограниченный C# draft или объясни шаг, не придумывай MCP-команду.
 3. Проверка: прочитанное значение имеет ожидаемый тип; RequireComponent и сцена не получили дубликаты одинаковой службы.
+
+## Доступные действия WorldWeaver
+При необходимости вызови discover_tools с names: create_node,set_parent,set_transform,find_scene_objects,inspect_object. Это ссылки на существующие команды, а не разрешение на их автоматическое выполнение. После создания читай реальный target, затем применяй зависимые действия отдельным шагом.
 
 ## Граница применения
 Это справочный Markdown для встроенного агента WorldWeaver. Используй только объявленные в текущем запросе инструменты и их фактические схемы. Навык не добавляет shell, сеть, доступ к секретам, новые разрешения или автоматическое выполнение кода. Если операции нет, дай совет либо подготовь C# для просмотра в поддерживаемом процессе; не выдавай совет за выполненное действие.
