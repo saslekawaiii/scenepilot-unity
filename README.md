@@ -17,7 +17,7 @@
 
 </div>
 
-> **WorldWeaver 1.2.0.** [Файлы выпуска](https://github.com/saslekawaiii/worldweaver-thesis/releases/tag/v1.2.0) · [Проверка комплекта](results/delivery-validation-1.2.json). Репозиторий приватный; результаты относятся к явно указанным версиям и условиям.
+> **WorldWeaver 1.2.0.** [Файлы поставки 1.2.1](https://github.com/saslekawaiii/worldweaver-thesis/releases/tag/v1.2.1) · [Проверка комплекта](results/delivery-validation-1.2.json). Репозиторий приватный; результаты относятся к явно указанным версиям и условиям.
 
 ![WorldWeaver 1.2 — чат в Unity с выбором модели и режима](docs/screenshots/1.2/chat-final-ready.jpg)
 
@@ -124,7 +124,7 @@ flowchart LR
 
 На R3 отдельно [измерено вращение просмотренного исходника](results/rotation-runtime-acceptance-final-1.2.json): около 60° за 2 с, неподвижный контроль отклонён. Один [image-only ответ](results/vision-agent-acceptance-1.2.json) верно связал стороны и цвета, но назвал куб параллелепипедом: строгий критерий формы не пройден; [независимый разбор](results/vision-agent-semantic-review-1.2.json) сохраняет этот неуспех.
 
-Base schema относится к одной матрице из 33 случаев для полной и decoder-схемы. [Пакет R3 установлен в новый consumer-проект](results/clean-install-1.2.0.json): exit 0, ошибок компиляции нет. Общая надёжность LLM и экономия времени разработчика по этим данным не установлены; исторические показатели не переносятся на новый код. [Итоговая проверка документов и продукта](results/delivery-validation-1.2.json); исходный commit, ZIP и Git bundle фиксируются в [составе поставки](https://github.com/saslekawaiii/worldweaver-thesis/releases/download/v1.2.0/%D0%A1%D0%BE%D1%81%D1%82%D0%B0%D0%B2_%D0%BF%D0%BE%D1%81%D1%82%D0%B0%D0%B2%D0%BA%D0%B8.json).
+Base schema относится к одной матрице из 33 случаев для полной и decoder-схемы. [Пакет R3 установлен в новый consumer-проект](results/clean-install-1.2.0.json): exit 0, ошибок компиляции нет. Общая надёжность LLM и экономия времени разработчика по этим данным не установлены; исторические показатели не переносятся на новый код. [Итоговая проверка документов и продукта](results/delivery-validation-1.2.json); исходный commit, ZIP и Git bundle фиксируются в [составе поставки](https://github.com/saslekawaiii/worldweaver-thesis/releases/download/v1.2.1/WorldWeaver-delivery-manifest.json).
 
 ## О проекте и лицензиях
 
