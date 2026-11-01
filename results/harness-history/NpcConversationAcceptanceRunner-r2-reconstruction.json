@@ -1,0 +1,16 @@
+{
+  "kind": "exact-historical-harness-reconstruction",
+  "utc": "2026-11-01T09:55:39.108194+00:00",
+  "reconstructedFrom": "scripts/NpcConversationAcceptanceRunner.cs",
+  "reconstructedFromSha256": "f5b338f2e779724db2aac029b0fad0e9011d654dbe57773a927b053a4b313f8b",
+  "output": "results/harness-history/NpcConversationAcceptanceRunner-r2.cs.txt",
+  "outputSha256": "71fbdc45a14ae75aa378b869a1f653190d4354352e13ca34bcc28c9273a98ccd",
+  "expectedHistoricalSha256": "71fbdc45a14ae75aa378b869a1f653190d4354352e13ca34bcc28c9273a98ccd",
+  "hashMatched": true,
+  "method": [
+    "Reverse the two identified reporting-only edits: remove the semantic-review warning comment and restore the old uniquePlayerCallsignRecalled check label.",
+    "Remove the later passScope reporting line.",
+    "Require exact SHA256 equality with the independently preserved R2 acceptance receipt and R2 harness declaration before writing."
+  ],
+  "scope": "Reconstructed bytes match the already recorded historical runner hash. No receipt, response, failure outcome or package source was changed."
+}

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="16" result="Passed" total="16" passed="16" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-01 09:36:27Z" end-time="2026-11-01 09:36:28Z" duration="0.8836276">
+  <test-suite type="TestSuite" id="1000" name="UnityProject" fullname="UnityProject" runstate="Runnable" testcasecount="504" result="Passed" start-time="2026-11-01 09:36:27Z" end-time="2026-11-01 09:36:28Z" duration="0.883628" total="16" passed="16" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1569" name="WorldWeaver.EditMode.dll" fullname="/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/integrated-test-snapshot/project-1.3/Library/ScriptAssemblies/WorldWeaver.EditMode.dll" runstate="Runnable" testcasecount="504" result="Passed" start-time="2026-11-01 09:36:27Z" end-time="2026-11-01 09:36:28Z" duration="0.867762" total="16" passed="16" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="31532" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1570" name="WorldWeaver" fullname="WorldWeaver" runstate="Runnable" testcasecount="504" result="Passed" start-time="2026-11-01 09:36:27Z" end-time="2026-11-01 09:36:28Z" duration="0.853756" total="16" passed="16" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1571" name="Tests" fullname="WorldWeaver.Tests" runstate="Runnable" testcasecount="504" result="Passed" start-time="2026-11-01 09:36:27Z" end-time="2026-11-01 09:36:28Z" duration="0.846858" total="16" passed="16" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestFixture" id="1381" name="MaterialHttpTransportTests" fullname="WorldWeaver.Tests.MaterialHttpTransportTests" classname="WorldWeaver.Tests.MaterialHttpTransportTests" runstate="Runnable" testcasecount="16" result="Passed" start-time="2026-11-01 09:36:27Z" end-time="2026-11-01 09:36:28Z" duration="0.835710" total="16" passed="16" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1393" name="ChangedFragmentEtagIsRejectedBeforeReassembly" fullname="WorldWeaver.Tests.MaterialHttpTransportTests.ChangedFragmentEtagIsRejectedBeforeReassembly" methodname="ChangedFragmentEtagIsRejectedBeforeReassembly" classname="WorldWeaver.Tests.MaterialHttpTransportTests" runstate="Runnable" seed="1800160845" result="Passed" start-time="2026-11-01 09:36:27Z" end-time="2026-11-01 09:36:27Z" duration="0.085066" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1391" name="ChangedFragmentStartIsRejectedBeforeReassembly" fullname="WorldWeaver.Tests.MaterialHttpTransportTests.ChangedFragmentStartIsRejectedBeforeReassembly" methodname="ChangedFragmentStartIsRejectedBeforeReassembly" classname="WorldWeaver.Tests.MaterialHttpTransportTests" runstate="Runnable" seed="1821628391" result="Passed" start-time="2026-11-01 09:36:27Z" end-time="2026-11-01 09:36:27Z" duration="0.003082" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1392" name="ChangedFragmentTotalIsRejectedBeforeReassembly" fullname="WorldWeaver.Tests.MaterialHttpTransportTests.ChangedFragmentTotalIsRejectedBeforeReassembly" methodname="ChangedFragmentTotalIsRejectedBeforeReassembly" classname="WorldWeaver.Tests.MaterialHttpTransportTests" runstate="Runnable" seed="636867314" result="Passed" start-time="2026-11-01 09:36:27Z" end-time="2026-11-01 09:36:27Z" duration="0.002566" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1389" name="Chunked206StillRequiresTheActualExactFragmentByteCount" fullname="WorldWeaver.Tests.MaterialHttpTransportTests.Chunked206StillRequiresTheActualExactFragmentByteCount" methodname="Chunked206StillRequiresTheActualExactFragmentByteCount" classname="WorldWeaver.Tests.MaterialHttpTransportTests" runstate="Runnable" seed="750973479" result="Passed" start-time="2026-11-01 09:36:27Z" end-time="2026-11-01 09:36:28Z" duration="0.008100" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1382" name="HealthyTextureUsesOneNormalRequestWithoutFragmenting" fullname="WorldWeaver.Tests.MaterialHttpTransportTests.HealthyTextureUsesOneNormalRequestWithoutFragmenting" methodname="HealthyTextureUsesOneNormalRequestWithoutFragmenting" classname="WorldWeaver.Tests.MaterialHttpTransportTests" runstate="Runnable" seed="536133795" result="Passed" start-time="2026-11-01 09:36:28Z" end-time="2026-11-01 09:36:28Z" duration="0.070385" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1390" name="IgnoredChunkedRangeStillCannotExceedTheActualBodyBudget" fullname="WorldWeaver.Tests.MaterialHttpTransportTests.IgnoredChunkedRangeStillCannotExceedTheActualBodyBudget" methodname="IgnoredChunkedRangeStillCannotExceedTheActualBodyBudget" classname="WorldWeaver.Tests.MaterialHttpTransportTests" runstate="Runnable" seed="102848097" result="Passed" start-time="2026-11-01 09:36:28Z" end-time="2026-11-01 09:36:28Z" duration="0.003333" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1384" name="IgnoredInitialRangeAcceptsOneBoundedWholeResponse" fullname="WorldWeaver.Tests.MaterialHttpTransportTests.IgnoredInitialRangeAcceptsOneBoundedWholeResponse" methodname="IgnoredInitialRangeAcceptsOneBoundedWholeResponse" classname="WorldWeaver.Tests.MaterialHttpTransportTests" runstate="Runnable" seed="1139187307" result="Passed" start-time="2026-11-01 09:36:28Z" end-time="2026-11-01 09:36:28Z" duration="0.040481" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1386" name="IgnoredInitialRangeCanReturnOneBoundedChunked200" fullname="WorldWeaver.Tests.MaterialHttpTransportTests.IgnoredInitialRangeCanReturnOneBoundedChunked200" methodname="IgnoredInitialRangeCanReturnOneBoundedChunked200" classname="WorldWeaver.Tests.MaterialHttpTransportTests" runstate="Runnable" seed="1448169049" result="Passed" start-time="2026-11-01 09:36:28Z" end-time="2026-11-01 09:36:28Z" duration="0.037029" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1394" name="IgnoredNonzeroRangeIsRejectedBeforeReassembly" fullname="WorldWeaver.Tests.MaterialHttpTransportTests.IgnoredNonzeroRangeIsRejectedBeforeReassembly" methodname="IgnoredNonzeroRangeIsRejectedBeforeReassembly" classname="WorldWeaver.Tests.MaterialHttpTransportTests" runstate="Runnable" seed="380068505" result="Passed" start-time="2026-11-01 09:36:28Z" end-time="2026-11-01 09:36:28Z" duration="0.003271" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1395" name="RedirectsAndOversizedNormalResponseDoNotTriggerFragmentRequests" fullname="WorldWeaver.Tests.MaterialHttpTransportTests.RedirectsAndOversizedNormalResponseDoNotTriggerFragmentRequests" methodname="RedirectsAndOversizedNormalResponseDoNotTriggerFragmentRequests" classname="WorldWeaver.Tests.MaterialHttpTransportTests" runstate="Runnable" seed="1408913554" result="Passed" start-time="2026-11-01 09:36:28Z" end-time="2026-11-01 09:36:28Z" duration="0.002116" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1397" name="RepeatedTransientFailuresCannotExceedTheFragmentRequestBudget" fullname="WorldWeaver.Tests.MaterialHttpTransportTests.RepeatedTransientFailuresCannotExceedTheFragmentRequestBudget" methodname="RepeatedTransientFailuresCannotExceedTheFragmentRequestBudget" classname="WorldWeaver.Tests.MaterialHttpTransportTests" runstate="Runnable" seed="970435495" result="Passed" start-time="2026-11-01 09:36:28Z" end-time="2026-11-01 09:36:28Z" duration="0.189439" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1383" name="StalledNormalTransferFallsBackToExactBoundedConcurrentFragments" fullname="WorldWeaver.Tests.MaterialHttpTransportTests.StalledNormalTransferFallsBackToExactBoundedConcurrentFragments" methodname="StalledNormalTransferFallsBackToExactBoundedConcurrentFragments" classname="WorldWeaver.Tests.MaterialHttpTransportTests" runstate="Runnable" seed="557783338" result="Passed" start-time="2026-11-01 09:36:28Z" end-time="2026-11-01 09:36:28Z" duration="0.162978" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1388" name="UnsolicitedComplete206CanBeReadAsOneVerifiedWholeBody" fullname="WorldWeaver.Tests.MaterialHttpTransportTests.UnsolicitedComplete206CanBeReadAsOneVerifiedWholeBody" methodname="UnsolicitedComplete206CanBeReadAsOneVerifiedWholeBody" classname="WorldWeaver.Tests.MaterialHttpTransportTests" runstate="Runnable" seed="132579044" result="Passed" start-time="2026-11-01 09:36:28Z" end-time="2026-11-01 09:36:28Z" duration="0.026158" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1387" name="UnsolicitedPartial206TriggersExplicitRangeRecovery" fullname="WorldWeaver.Tests.MaterialHttpTransportTests.UnsolicitedPartial206TriggersExplicitRangeRecovery" methodname="UnsolicitedPartial206TriggersExplicitRangeRecovery" classname="WorldWeaver.Tests.MaterialHttpTransportTests" runstate="Runnable" seed="343660657" result="Passed" start-time="2026-11-01 09:36:28Z" end-time="2026-11-01 09:36:28Z" duration="0.040820" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1396" name="UserCancellationStopsOutstandingFragmentsWithoutRetry" fullname="WorldWeaver.Tests.MaterialHttpTransportTests.UserCancellationStopsOutstandingFragmentsWithoutRetry" methodname="UserCancellationStopsOutstandingFragmentsWithoutRetry" classname="WorldWeaver.Tests.MaterialHttpTransportTests" runstate="Runnable" seed="627953576" result="Passed" start-time="2026-11-01 09:36:28Z" end-time="2026-11-01 09:36:28Z" duration="0.100817" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1385" name="ValidChunked206FragmentsNeedNoContentLengthHeader" fullname="WorldWeaver.Tests.MaterialHttpTransportTests.ValidChunked206FragmentsNeedNoContentLengthHeader" methodname="ValidChunked206FragmentsNeedNoContentLengthHeader" classname="WorldWeaver.Tests.MaterialHttpTransportTests" runstate="Runnable" seed="561368086" result="Passed" start-time="2026-11-01 09:36:28Z" end-time="2026-11-01 09:36:28Z" duration="0.041702" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Saving results to: /Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/integration-1.3-http-r4.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

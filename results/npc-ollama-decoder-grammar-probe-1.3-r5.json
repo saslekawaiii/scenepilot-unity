@@ -1,0 +1,1215 @@
+{
+  "kind": "native-ollama-decoder-schema-grammar-probe",
+  "startedUtc": "2026-11-01T09:54:47.154130+00:00",
+  "model": "qwen3.5:2b",
+  "endpoint": "http://127.0.0.1:11434/api/chat",
+  "numPredict": 1,
+  "conversationAcceptancePerformed": false,
+  "providerFactoryInjected": false,
+  "unityRunPerformed": false,
+  "purpose": "Verify actual Ollama grammar compilation only; one generated token is intentionally insufficient to form or validate a conversation reply.",
+  "schemaExport": "Actual C# NpcDecision.Schema and OllamaDecoderSchema.FromHost compiled together in standalone .NET6; no hand-built schema replacement.",
+  "sources": {
+    "Packages/com.worldweaver.toolkit/Runtime/Actions/NpcDecision.cs": "4432a53bfda6dc4160981f5bb4f59274467dc70e1ebf12b9abc029e9b240d011",
+    "Packages/com.worldweaver.toolkit/Runtime/Providers/OllamaDecoderSchema.cs": "d49098d2191b1dfc0326ada5270083b1e2d49860c5fe3677ac5d5df2c75e807b",
+    "Packages/com.worldweaver.toolkit/Runtime/Providers/LocalProvider.cs": "00851b2fd24fcb96ffba76cd2bb0507b17a3d216f0df7de315551849f9aff006"
+  },
+  "probes": [
+    {
+      "kind": "peer",
+      "hostSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "speech",
+          "actions"
+        ],
+        "properties": {
+          "speech": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "actions": {
+            "type": "array",
+            "maxItems": 4,
+            "items": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "type",
+                    "target",
+                    "item",
+                    "amount"
+                  ],
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "Talk"
+                      ]
+                    },
+                    "target": {
+                      "type": "string",
+                      "enum": [
+                        ""
+                      ]
+                    },
+                    "item": {
+                      "type": "string",
+                      "enum": [
+                        ""
+                      ]
+                    },
+                    "amount": {
+                      "type": "integer",
+                      "enum": [
+                        0
+                      ]
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "type",
+                    "target",
+                    "item",
+                    "amount"
+                  ],
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "Wait"
+                      ]
+                    },
+                    "target": {
+                      "type": "string",
+                      "enum": [
+                        ""
+                      ]
+                    },
+                    "item": {
+                      "type": "string",
+                      "enum": [
+                        ""
+                      ]
+                    },
+                    "amount": {
+                      "type": "integer",
+                      "enum": [
+                        0
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "decoderSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "speech",
+          "actions"
+        ],
+        "properties": {
+          "speech": {
+            "type": "string"
+          },
+          "actions": {
+            "type": "array",
+            "maxItems": 4,
+            "items": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "type",
+                    "target",
+                    "item",
+                    "amount"
+                  ],
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "Talk"
+                      ]
+                    },
+                    "target": {
+                      "type": "string",
+                      "enum": [
+                        ""
+                      ]
+                    },
+                    "item": {
+                      "type": "string",
+                      "enum": [
+                        ""
+                      ]
+                    },
+                    "amount": {
+                      "type": "integer",
+                      "enum": [
+                        0
+                      ]
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "type",
+                    "target",
+                    "item",
+                    "amount"
+                  ],
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "Wait"
+                      ]
+                    },
+                    "target": {
+                      "type": "string",
+                      "enum": [
+                        ""
+                      ]
+                    },
+                    "item": {
+                      "type": "string",
+                      "enum": [
+                        ""
+                      ]
+                    },
+                    "amount": {
+                      "type": "integer",
+                      "enum": [
+                        0
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "hostSchemaFileSha256": "055126689a3fd29756299ed4369fa42e356c16acdbe417ea9001d2b590174a71",
+      "decoderSchemaFileSha256": "7b142508040f57dd6ce1040803f54f451ec4bb74853d251e5216ea1f0f9e1b1b",
+      "requestBody": {
+        "model": "qwen3.5:2b",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Return one JSON NPC decision with speech and actions."
+          }
+        ],
+        "stream": false,
+        "think": false,
+        "format": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "speech",
+            "actions"
+          ],
+          "properties": {
+            "speech": {
+              "type": "string"
+            },
+            "actions": {
+              "type": "array",
+              "maxItems": 4,
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "type",
+                      "target",
+                      "item",
+                      "amount"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "Talk"
+                        ]
+                      },
+                      "target": {
+                        "type": "string",
+                        "enum": [
+                          ""
+                        ]
+                      },
+                      "item": {
+                        "type": "string",
+                        "enum": [
+                          ""
+                        ]
+                      },
+                      "amount": {
+                        "type": "integer",
+                        "enum": [
+                          0
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "type",
+                      "target",
+                      "item",
+                      "amount"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "Wait"
+                        ]
+                      },
+                      "target": {
+                        "type": "string",
+                        "enum": [
+                          ""
+                        ]
+                      },
+                      "item": {
+                        "type": "string",
+                        "enum": [
+                          ""
+                        ]
+                      },
+                      "amount": {
+                        "type": "integer",
+                        "enum": [
+                          0
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "keep_alive": "10m",
+        "options": {
+          "num_predict": 1,
+          "num_ctx": 4096,
+          "temperature": 0
+        }
+      },
+      "requestUtf8Sha256": "43596ee81a23effb4d5e9052429fd98c0d8c9cdeb6b419878dc4841c8337a394",
+      "httpStatus": 200,
+      "rawResponse": "{\"model\":\"qwen3.5:2b\",\"created_at\":\"2026-11-01T09:54:50.595854Z\",\"message\":{\"role\":\"assistant\",\"content\":\"{\"},\"done\":true,\"done_reason\":\"length\",\"total_duration\":3418283250,\"load_duration\":3261002750,\"prompt_eval_count\":22,\"prompt_eval_duration\":143373000,\"eval_count\":1,\"eval_duration\":1000}",
+      "elapsedSeconds": 3.4397437078878284,
+      "grammarCompilationAccepted": true
+    },
+    {
+      "kind": "all",
+      "hostSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "speech",
+          "actions"
+        ],
+        "properties": {
+          "speech": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "actions": {
+            "type": "array",
+            "maxItems": 4,
+            "items": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "type",
+                    "target",
+                    "item",
+                    "amount"
+                  ],
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "Talk"
+                      ]
+                    },
+                    "target": {
+                      "type": "string",
+                      "enum": [
+                        ""
+                      ]
+                    },
+                    "item": {
+                      "type": "string",
+                      "enum": [
+                        ""
+                      ]
+                    },
+                    "amount": {
+                      "type": "integer",
+                      "enum": [
+                        0
+                      ]
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "type",
+                    "target",
+                    "item",
+                    "amount"
+                  ],
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "Wait"
+                      ]
+                    },
+                    "target": {
+                      "type": "string",
+                      "enum": [
+                        ""
+                      ]
+                    },
+                    "item": {
+                      "type": "string",
+                      "enum": [
+                        ""
+                      ]
+                    },
+                    "amount": {
+                      "type": "integer",
+                      "enum": [
+                        0
+                      ]
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "type",
+                    "target",
+                    "item",
+                    "amount"
+                  ],
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "GiveItem"
+                      ]
+                    },
+                    "target": {
+                      "type": "string",
+                      "maxLength": 100
+                    },
+                    "item": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 100
+                    },
+                    "amount": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 10000
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "type",
+                    "target",
+                    "item",
+                    "amount"
+                  ],
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "TakeItem"
+                      ]
+                    },
+                    "target": {
+                      "type": "string",
+                      "maxLength": 100
+                    },
+                    "item": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 100
+                    },
+                    "amount": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 10000
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "type",
+                    "target",
+                    "item",
+                    "amount"
+                  ],
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "MoveTo"
+                      ]
+                    },
+                    "target": {
+                      "type": "string",
+                      "maxLength": 100
+                    },
+                    "item": {
+                      "type": "string",
+                      "enum": [
+                        ""
+                      ]
+                    },
+                    "amount": {
+                      "type": "integer",
+                      "enum": [
+                        0
+                      ]
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "type",
+                    "target",
+                    "item",
+                    "amount"
+                  ],
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "Follow"
+                      ]
+                    },
+                    "target": {
+                      "type": "string",
+                      "maxLength": 100
+                    },
+                    "item": {
+                      "type": "string",
+                      "enum": [
+                        ""
+                      ]
+                    },
+                    "amount": {
+                      "type": "integer",
+                      "enum": [
+                        0
+                      ]
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "type",
+                    "target",
+                    "item",
+                    "amount"
+                  ],
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "Flee"
+                      ]
+                    },
+                    "target": {
+                      "type": "string",
+                      "maxLength": 100
+                    },
+                    "item": {
+                      "type": "string",
+                      "enum": [
+                        ""
+                      ]
+                    },
+                    "amount": {
+                      "type": "integer",
+                      "enum": [
+                        0
+                      ]
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "type",
+                    "target",
+                    "item",
+                    "amount"
+                  ],
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "Interact"
+                      ]
+                    },
+                    "target": {
+                      "type": "string",
+                      "maxLength": 100
+                    },
+                    "item": {
+                      "type": "string",
+                      "enum": [
+                        ""
+                      ]
+                    },
+                    "amount": {
+                      "type": "integer",
+                      "enum": [
+                        0
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "decoderSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "speech",
+          "actions"
+        ],
+        "properties": {
+          "speech": {
+            "type": "string"
+          },
+          "actions": {
+            "type": "array",
+            "maxItems": 4,
+            "items": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "type",
+                    "target",
+                    "item",
+                    "amount"
+                  ],
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "Talk"
+                      ]
+                    },
+                    "target": {
+                      "type": "string",
+                      "enum": [
+                        ""
+                      ]
+                    },
+                    "item": {
+                      "type": "string",
+                      "enum": [
+                        ""
+                      ]
+                    },
+                    "amount": {
+                      "type": "integer",
+                      "enum": [
+                        0
+                      ]
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "type",
+                    "target",
+                    "item",
+                    "amount"
+                  ],
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "Wait"
+                      ]
+                    },
+                    "target": {
+                      "type": "string",
+                      "enum": [
+                        ""
+                      ]
+                    },
+                    "item": {
+                      "type": "string",
+                      "enum": [
+                        ""
+                      ]
+                    },
+                    "amount": {
+                      "type": "integer",
+                      "enum": [
+                        0
+                      ]
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "type",
+                    "target",
+                    "item",
+                    "amount"
+                  ],
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "GiveItem"
+                      ]
+                    },
+                    "target": {
+                      "type": "string"
+                    },
+                    "item": {
+                      "type": "string"
+                    },
+                    "amount": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 10000
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "type",
+                    "target",
+                    "item",
+                    "amount"
+                  ],
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "TakeItem"
+                      ]
+                    },
+                    "target": {
+                      "type": "string"
+                    },
+                    "item": {
+                      "type": "string"
+                    },
+                    "amount": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 10000
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "type",
+                    "target",
+                    "item",
+                    "amount"
+                  ],
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "MoveTo"
+                      ]
+                    },
+                    "target": {
+                      "type": "string"
+                    },
+                    "item": {
+                      "type": "string",
+                      "enum": [
+                        ""
+                      ]
+                    },
+                    "amount": {
+                      "type": "integer",
+                      "enum": [
+                        0
+                      ]
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "type",
+                    "target",
+                    "item",
+                    "amount"
+                  ],
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "Follow"
+                      ]
+                    },
+                    "target": {
+                      "type": "string"
+                    },
+                    "item": {
+                      "type": "string",
+                      "enum": [
+                        ""
+                      ]
+                    },
+                    "amount": {
+                      "type": "integer",
+                      "enum": [
+                        0
+                      ]
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "type",
+                    "target",
+                    "item",
+                    "amount"
+                  ],
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "Flee"
+                      ]
+                    },
+                    "target": {
+                      "type": "string"
+                    },
+                    "item": {
+                      "type": "string",
+                      "enum": [
+                        ""
+                      ]
+                    },
+                    "amount": {
+                      "type": "integer",
+                      "enum": [
+                        0
+                      ]
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "type",
+                    "target",
+                    "item",
+                    "amount"
+                  ],
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "Interact"
+                      ]
+                    },
+                    "target": {
+                      "type": "string"
+                    },
+                    "item": {
+                      "type": "string",
+                      "enum": [
+                        ""
+                      ]
+                    },
+                    "amount": {
+                      "type": "integer",
+                      "enum": [
+                        0
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "hostSchemaFileSha256": "a85cbca8785e622b86f7fa190c7944aacdb32ae4e94472b7ffa48929b1c35ffa",
+      "decoderSchemaFileSha256": "dee548cc9df72194515b4226a0dc5a802e7e365b82db9ddc6b4c26c99a782e95",
+      "requestBody": {
+        "model": "qwen3.5:2b",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Return one JSON NPC decision with speech and actions."
+          }
+        ],
+        "stream": false,
+        "think": false,
+        "format": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "speech",
+            "actions"
+          ],
+          "properties": {
+            "speech": {
+              "type": "string"
+            },
+            "actions": {
+              "type": "array",
+              "maxItems": 4,
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "type",
+                      "target",
+                      "item",
+                      "amount"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "Talk"
+                        ]
+                      },
+                      "target": {
+                        "type": "string",
+                        "enum": [
+                          ""
+                        ]
+                      },
+                      "item": {
+                        "type": "string",
+                        "enum": [
+                          ""
+                        ]
+                      },
+                      "amount": {
+                        "type": "integer",
+                        "enum": [
+                          0
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "type",
+                      "target",
+                      "item",
+                      "amount"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "Wait"
+                        ]
+                      },
+                      "target": {
+                        "type": "string",
+                        "enum": [
+                          ""
+                        ]
+                      },
+                      "item": {
+                        "type": "string",
+                        "enum": [
+                          ""
+                        ]
+                      },
+                      "amount": {
+                        "type": "integer",
+                        "enum": [
+                          0
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "type",
+                      "target",
+                      "item",
+                      "amount"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "GiveItem"
+                        ]
+                      },
+                      "target": {
+                        "type": "string"
+                      },
+                      "item": {
+                        "type": "string"
+                      },
+                      "amount": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 10000
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "type",
+                      "target",
+                      "item",
+                      "amount"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "TakeItem"
+                        ]
+                      },
+                      "target": {
+                        "type": "string"
+                      },
+                      "item": {
+                        "type": "string"
+                      },
+                      "amount": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 10000
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "type",
+                      "target",
+                      "item",
+                      "amount"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "MoveTo"
+                        ]
+                      },
+                      "target": {
+                        "type": "string"
+                      },
+                      "item": {
+                        "type": "string",
+                        "enum": [
+                          ""
+                        ]
+                      },
+                      "amount": {
+                        "type": "integer",
+                        "enum": [
+                          0
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "type",
+                      "target",
+                      "item",
+                      "amount"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "Follow"
+                        ]
+                      },
+                      "target": {
+                        "type": "string"
+                      },
+                      "item": {
+                        "type": "string",
+                        "enum": [
+                          ""
+                        ]
+                      },
+                      "amount": {
+                        "type": "integer",
+                        "enum": [
+                          0
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "type",
+                      "target",
+                      "item",
+                      "amount"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "Flee"
+                        ]
+                      },
+                      "target": {
+                        "type": "string"
+                      },
+                      "item": {
+                        "type": "string",
+                        "enum": [
+                          ""
+                        ]
+                      },
+                      "amount": {
+                        "type": "integer",
+                        "enum": [
+                          0
+                        ]
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "type",
+                      "target",
+                      "item",
+                      "amount"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "Interact"
+                        ]
+                      },
+                      "target": {
+                        "type": "string"
+                      },
+                      "item": {
+                        "type": "string",
+                        "enum": [
+                          ""
+                        ]
+                      },
+                      "amount": {
+                        "type": "integer",
+                        "enum": [
+                          0
+                        ]
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "keep_alive": "10m",
+        "options": {
+          "num_predict": 1,
+          "num_ctx": 4096,
+          "temperature": 0
+        }
+      },
+      "requestUtf8Sha256": "d3159f3271f0832cc665af8a53a91c988f3b701de1af65806f386d346ab0df60",
+      "httpStatus": 200,
+      "rawResponse": "{\"model\":\"qwen3.5:2b\",\"created_at\":\"2026-11-01T09:54:50.980467Z\",\"message\":{\"role\":\"assistant\",\"content\":\"{\"},\"done\":true,\"done_reason\":\"length\",\"total_duration\":375366458,\"load_duration\":278277750,\"prompt_eval_count\":22,\"prompt_eval_duration\":93302000,\"eval_count\":1,\"eval_duration\":1000}",
+      "elapsedSeconds": 0.37727466714568436,
+      "grammarCompilationAccepted": true
+    }
+  ],
+  "finishedUtc": "2026-11-01T09:54:50.982777+00:00",
+  "bothGrammarCompilationsAccepted": true
+}

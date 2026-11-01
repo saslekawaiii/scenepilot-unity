@@ -41,7 +41,7 @@ namespace WorldWeaver
                 messages.Add(item);
             }
             var body = new JObject { ["model"] = profile.Model, ["messages"] = messages, ["stream"] = request.Stream, ["think"] = false,
-                ["format"] = request.Schema != null ? (JToken)request.Schema : new JValue("json"), ["keep_alive"] = "10m",
+                ["format"] = request.Schema != null ? (JToken)OllamaDecoderSchema.FromHost(request.Schema) : new JValue("json"), ["keep_alive"] = "10m",
                 ["options"] = new JObject { ["temperature"] = profile.Temperature, ["num_predict"] = profile.MaxTokens, ["num_ctx"] = profile.ContextWindow } };
             var watch = Stopwatch.StartNew();
             JObject result; string content; long firstToken = 0;
