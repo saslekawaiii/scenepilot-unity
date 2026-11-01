@@ -218,8 +218,20 @@ namespace WorldWeaver.Editor.Assistant
                             // give the repair turn a fresh request and an error as data.
                             string codePhaseRepair = !readOnlyRequest && SelectTools(text, Settings.Mode).Contains("draft_script")
                                 ? AgentImplementationPolicy.CodePhaseRepair(plan) : "";
-                            if (codePhaseRepair.Length > 0) request.Messages.Add(new ChatMessage("system", codePhaseRepair));
-                            string proposal = error is JsonException || codePhaseRepair.Length > 0 ? "" : "\nОтклонённое предложение (данные): " + JsonConvert.SerializeObject(attempt.Response);
+                            var schemaTools = (request.Schema["properties"]?["actions"]?["items"]?["anyOf"] as JArray ?? new JArray()).OfType<JObject>().Select(EditorToolSchema.ToolName);
+                            string nextMaterialTool = "";
+                            string phaseRepair = codePhaseRepair.Length > 0 ? codePhaseRepair : AgentImplementationPolicy.MaterialPhaseRepair(plan, schemaTools, readOnlyRequest, out nextMaterialTool);
+                            if (nextMaterialTool.Length > 0)
+                            {
+                                // A fresh request may narrow an already permitted generation contract; never rewrite the rejected plan or host validators.
+                                request.Schema = (JObject)request.Schema.DeepClone();
+                                var actionSchema = (JObject)request.Schema["properties"]["actions"];
+                                actionSchema["items"]["anyOf"] = new JArray(((JArray)actionSchema["items"]["anyOf"]).OfType<JObject>().Where(branch => EditorToolSchema.ToolName(branch) == nextMaterialTool).Select(branch => branch.DeepClone()));
+                                actionSchema["minItems"] = 1; actionSchema["maxItems"] = 1;
+                                request.Schema["properties"]["complete"]["enum"] = new JArray(false);
+                            }
+                            if (phaseRepair.Length > 0) request.Messages.Add(new ChatMessage("system", phaseRepair));
+                            string proposal = error is JsonException || phaseRepair.Length > 0 ? "" : "\nОтклонённое предложение (данные): " + JsonConvert.SerializeObject(attempt.Response);
                             request.Messages.Add(new ChatMessage("user", "План отклонён, ничего из него не исполнено. Исправь контракт и параметры: " + attempt.Error + proposal +
                                 "\nВерни экземпляр EditorPlan, а не JSON Schema. Формат: {\"reply\":\"текст\",\"complete\":true,\"actions\":[]}. Если исходная задача ещё не выполнена, actions должны содержать нужные инструменты. Сверь актуальную сцену и уже выполненные шаги; не повторяй их." +
                                 (readOnlyRequest ? "\nПользователь просит только объяснение. Не изменяй сцену и не подготавливай новый код. Для готового объяснения используй actions:[] и complete:true." : "") +
@@ -258,7 +270,7 @@ namespace WorldWeaver.Editor.Assistant
                         operation.Token.ThrowIfCancellationRequested();
                         var batch = await ExecutePlanAsync(plan, session.Id, answer.Id, profile,reviewedRepair,operation.Token);
                         if (!batch.Success) unresolvedFailure = true;
-                        else if (batch.Results.Any(result => result.Success && !SceneToolExecutor.IsReadOnlyTool(result.Tool))) unresolvedFailure = false;
+                        else if (batch.Results.Any(result => result.Success && (!SceneToolExecutor.IsReadOnlyTool(result.Tool) || readOnlyRequest))) unresolvedFailure = false;
                         SanitizeResults(batch); answer.Steps.AddRange(batch.Results); answer.Text = ChatHistoryStore.Redact(plan.reply);
                         Save();
                         if(WaitingForEditor(answer))break;
@@ -277,7 +289,8 @@ namespace WorldWeaver.Editor.Assistant
                 bool timedOut = !userCancelled && !disposed;
                 answer.IsError = timedOut; answer.Status = timedOut ? "Лимит времени" : "Остановлено";
                 answer.Text = timedOut ? "Достигнут общий предел времени этого режима. Попробуйте меньшую задачу, другую модель или режим «Глубоко»." : "Запрос остановлен.";
-                answer.Text += answer.Steps.Any(s => s.Success) ? " Уже выполненные изменения доступны в сцене; их можно отменить." : " Сцена не изменена.";
+                answer.Text += answer.Steps.Any(s => s.Success && !SceneToolExecutor.IsReadOnlyTool(s.Tool)) ? " Уже выполненные изменения доступны в сцене; их можно отменить."
+                    : answer.Steps.Any(s => s.Success) ? " Полученные данные доступны в шагах; можно продолжить задачу следующим сообщением." : " Сцена не изменена.";
                 if (timedOut) Phase = answer.Text;
             }
             catch (Exception error)
@@ -287,7 +300,8 @@ namespace WorldWeaver.Editor.Assistant
                 answer.Text = FriendlyError(error);
                 var failedAttempt = answer.Attempts.LastOrDefault();
                 if (failedAttempt != null && string.IsNullOrEmpty(failedAttempt.Response)) failedAttempt.Error = answer.Text;
-                if (answer.Steps.Any(s => s.Success)) answer.Text += "\n\nЧасть задачи уже выполнена в сцене. Результаты перечислены в шагах; можно продолжить следующим сообщением.";
+                if (answer.Steps.Any(s => s.Success && !SceneToolExecutor.IsReadOnlyTool(s.Tool))) answer.Text += "\n\nЧасть задачи уже выполнена в сцене. Результаты перечислены в шагах; можно продолжить следующим сообщением.";
+                else if (answer.Steps.Any(s => s.Success)) answer.Text += "\n\nПолученные данные доступны в шагах; можно продолжить задачу следующим сообщением.";
                 Phase = answer.Text;
             }
             finally

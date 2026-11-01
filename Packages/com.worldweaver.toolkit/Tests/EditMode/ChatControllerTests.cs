@@ -65,6 +65,9 @@ namespace WorldWeaver.Tests
         private GameObject Find(string name)=>testScene.GetRootGameObjects().SelectMany(r=>r.GetComponentsInChildren<Transform>(true)).Select(t=>t.gameObject).FirstOrDefault(o=>o.name==name);
         private static string Reply(bool complete,params EditorCommand[] commands)=>JsonConvert.SerializeObject(new EditorPlan{reply="Проверяемый план",complete=complete,actions=commands.ToList()});
         private static EditorCommand Create(string name)=>new EditorCommand{tool="create_object",name=name,args=new JObject{["kind"]="cube",["on_terrain"]=false}};
+        private static EditorCommand MaterialSearch()=>new EditorCommand {tool="material_search",args=new JObject {["query"]="wood",["source"]="builtin",["limit"]=2}};
+        private static EditorCommand MaterialImport()=>new EditorCommand {tool="material_import",args=new JObject {["material_id"]="builtin:wood",["allow_online"]=false}};
+        private static EditorCommand MaterialApply(string target)=>new EditorCommand {tool="material_apply",target=target,args=new JObject {["material_id"]="builtin:wood"}};
         private static EditorCommand Draft(string name,string code=null)=>new EditorCommand{tool="draft_script",name=name,args=new JObject{["code"]=code??("using UnityEngine; public class "+name+" : MonoBehaviour { void Update() { transform.Rotate(Vector3.up,30f*Time.deltaTime,Space.Self); } }"),["description"]="Код для просмотра"}};
         private static IEnumerator Finish(Task task)
         {
@@ -129,6 +132,101 @@ namespace WorldWeaver.Tests
             Assert.IsNull(Find("RejectedMixedCube"));Assert.IsFalse(File.Exists("Assets/WorldWeaverGenerated/Scripts/"+className+".cs"));
             var saved=new ChatHistoryStore(folder).Load().Single(s=>s.Id==controller.Current.Id).Messages.Last();
             Assert.AreEqual(source,(string)saved.PendingPlan.actions[0].args["code"]);
+        }
+        [UnityTest] public IEnumerator MixedMaterialImportRepairsIntoExactStandalonePendingPlanWithoutMutation()
+        {
+            var beforeAssets=AssetDatabase.GetAllAssetPaths();string raw=Reply(false,MaterialImport(),MaterialApply("@RejectedMaterialDoorAnchor"));
+            var provider=new RecordingProvider();ChatController controller=null;JObject initialSchema=null;string initialSchemaJson=null;
+            provider.Respond=(round,request,token)=>
+            {
+                if(round==0) {initialSchema=request.Schema;initialSchemaJson=initialSchema.ToString(Formatting.None);return Task.FromResult(raw);}
+                Assert.AreEqual(1,round);Assert.AreEqual(0,testScene.rootCount);CollectionAssert.AreEquivalent(beforeAssets,AssetDatabase.GetAllAssetPaths());
+                Assert.AreNotSame(initialSchema,request.Schema);Assert.AreEqual(initialSchemaJson,initialSchema.ToString(Formatting.None));
+                var repairActions=request.Schema["properties"]["actions"];Assert.AreEqual(1,(int)repairActions["minItems"]);Assert.AreEqual(1,(int)repairActions["maxItems"]);
+                CollectionAssert.AreEqual(new[]{"material_import"},((JArray)repairActions["items"]["anyOf"]).OfType<JObject>().Select(EditorToolSchema.ToolName));
+                CollectionAssert.AreEqual(new[]{false},request.Schema["properties"]["complete"]["enum"].Values<bool>());
+                Assert.IsTrue(((JArray)initialSchema["properties"]["actions"]["items"]["anyOf"]).OfType<JObject>().Any(branch=>EditorToolSchema.ToolName(branch)=="material_apply"));
+                Assert.IsTrue(string.IsNullOrEmpty(controller.Current.Messages.Last().Task.CheckpointId));
+                Assert.IsTrue(request.Messages.Any(m=>m.Role=="system"&&m.Content.Contains("standalone material-import plan")&&m.Content.Contains("EXACTLY ONE material_import")&&m.Content.Contains("builtin:wood")));
+                Assert.IsFalse(request.Messages.Any(m=>m.Content.Contains("RejectedMaterialDoorAnchor")),"Rejected mixed actions must remain only in audit, not anchor the repair request.");
+                return Task.FromResult(Reply(false,MaterialImport()));
+            };
+            controller=Controller(provider);controller.Settings.Mode=AssistantMode.Plan;controller.Settings.Power=AssistantPower.Balanced;controller.Settings.AutoApply=true;
+            yield return Finish(controller.SendAsync("Найди текстуру дерева и подготовь её применение к двери."));
+            var answer=controller.Current.Messages.Last();Assert.IsFalse(answer.IsError,answer.Text);Assert.AreEqual(2,answer.Attempts.Count);Assert.IsFalse(answer.Attempts[0].Accepted);Assert.AreEqual(raw,answer.Attempts[0].RawResponse);Assert.IsTrue(answer.Attempts[1].Accepted);
+            Assert.IsNotNull(answer.PendingPlan);Assert.IsFalse(answer.PendingPlan.complete);Assert.AreEqual(1,answer.PendingPlan.actions.Count);Assert.AreEqual("material_import",answer.PendingPlan.actions[0].tool);Assert.IsTrue(JToken.DeepEquals(MaterialImport().args,answer.PendingPlan.actions[0].args));
+            Assert.IsEmpty(answer.Steps);Assert.IsTrue(string.IsNullOrEmpty(answer.Task.CheckpointId));Assert.AreEqual(0,testScene.rootCount);CollectionAssert.AreEquivalent(beforeAssets,AssetDatabase.GetAllAssetPaths());
+            var stored=new ChatHistoryStore(folder).Load().Single(s=>s.Id==controller.Current.Id).Messages.Last();Assert.AreEqual(raw,stored.Attempts[0].RawResponse);Assert.AreEqual("material_import",stored.PendingPlan.actions.Single().tool);
+        }
+        [UnityTest] public IEnumerator AskRejectsMixedImportAndRepairsWithOnlyPermittedOfflineSearch()
+        {
+            var beforeAssets=AssetDatabase.GetAllAssetPaths();var provider=new RecordingProvider();ChatController controller=null;JObject initialSchema=null;string initialSchemaJson=null;
+            provider.Respond=(round,request,token)=>
+            {
+                if(round==0) {initialSchema=request.Schema;initialSchemaJson=initialSchema.ToString(Formatting.None);return Task.FromResult(Reply(false,MaterialImport(),MaterialSearch(),MaterialApply("@RejectedAskMaterialAnchor")));}
+                var tools=((JArray)request.Schema["properties"]["actions"]["items"]["anyOf"]).OfType<JObject>().Select(EditorToolSchema.ToolName).ToArray();
+                Assert.IsTrue(tools.Contains("material_search"));Assert.IsTrue(tools.All(SceneToolExecutor.IsReadOnlyTool));Assert.IsFalse(tools.Contains("material_import"));
+                Assert.IsFalse(request.Messages.Any(m=>m.Role=="system"&&m.Content.Contains("EXACTLY ONE material_import")));
+                if(round==1)
+                {
+                    Assert.AreEqual(initialSchemaJson,initialSchema.ToString(Formatting.None));CollectionAssert.AreEqual(new[]{"material_search"},tools);
+                    Assert.AreEqual(1,(int)request.Schema["properties"]["actions"]["minItems"]);Assert.AreEqual(1,(int)request.Schema["properties"]["actions"]["maxItems"]);CollectionAssert.AreEqual(new[]{false},request.Schema["properties"]["complete"]["enum"].Values<bool>());
+                    Assert.IsTrue(request.Messages.Any(m=>m.Role=="system"&&m.Content.Contains("EXACTLY ONE material_search")&&m.Content.Contains("builtin")));
+                    Assert.IsFalse(request.Messages.Any(m=>m.Content.Contains("RejectedAskMaterialAnchor")));return Task.FromResult(Reply(false,MaterialSearch()));
+                }
+                Assert.AreEqual(2,round);Assert.AreEqual("material_search",controller.Current.Messages.Last().Steps.Single().Tool);
+                return Task.FromResult(Reply(true));
+            };
+            controller=Controller(provider);controller.Settings.Mode=AssistantMode.Ask;controller.Settings.Power=AssistantPower.Balanced;
+            yield return Finish(controller.SendAsync("Найди текстуру дерева и только объясни доступные варианты."));
+            var answer=controller.Current.Messages.Last();Assert.IsFalse(answer.IsError,answer.Text);Assert.AreEqual(3,answer.Attempts.Count);Assert.IsFalse(answer.Attempts[0].Accepted);Assert.IsTrue(answer.Attempts[1].Accepted);Assert.IsTrue(answer.Attempts[2].Accepted);
+            Assert.AreEqual(1,answer.Steps.Count);Assert.IsTrue(answer.Steps[0].Success);Assert.AreEqual("material_search",answer.Steps[0].Tool);Assert.IsNull(answer.PendingPlan);Assert.IsFalse(answer.Task.MutationAuthorized);Assert.IsTrue(string.IsNullOrEmpty(answer.Task.CheckpointId));
+            Assert.AreEqual(0,testScene.rootCount);CollectionAssert.AreEquivalent(beforeAssets,AssetDatabase.GetAllAssetPaths());
+        }
+        [UnityTest] public IEnumerator FailedMaterialPlanAfterReadOnlySearchNeverClaimsSceneChanges()
+        {
+            var beforeAssets=AssetDatabase.GetAllAssetPaths();var provider=new RecordingProvider();
+            provider.Respond=(round,request,token)=>Task.FromResult(round==0?Reply(false,MaterialSearch()):Reply(false,MaterialImport(),MaterialApply("@RejectedFailureDoor")));
+            var controller=Controller(provider);controller.Settings.Power=AssistantPower.Balanced;
+            yield return Finish(controller.SendAsync("Найди текстуру дерева и примени её к двери."));
+            var answer=controller.Current.Messages.Last();Assert.IsTrue(answer.IsError);Assert.AreEqual(3,answer.Attempts.Count);Assert.AreEqual(1,answer.Steps.Count);Assert.IsTrue(answer.Steps[0].Success);Assert.AreEqual("material_search",answer.Steps[0].Tool);
+            StringAssert.Contains("Полученные данные доступны в шагах",answer.Text);StringAssert.DoesNotContain("Часть задачи уже выполнена в сцене",answer.Text);StringAssert.DoesNotContain("изменения доступны в сцене",answer.Text);
+            Assert.IsNull(answer.PendingPlan);Assert.IsTrue(string.IsNullOrEmpty(answer.Task.CheckpointId));Assert.AreEqual(0,testScene.rootCount);CollectionAssert.AreEquivalent(beforeAssets,AssetDatabase.GetAllAssetPaths());
+        }
+        [UnityTest] public IEnumerator CancellationAfterReadOnlySearchNeverClaimsUndoableSceneChanges()
+        {
+            var beforeAssets=AssetDatabase.GetAllAssetPaths();var provider=new RecordingProvider();ChatController controller=null;
+            provider.Respond=(round,request,token)=>
+            {
+                if(round==0)return Task.FromResult(Reply(false,MaterialSearch()));
+                Assert.AreEqual(1,round);Assert.AreEqual("material_search",controller.Current.Messages.Last().Steps.Single().Tool);controller.Cancel();token.ThrowIfCancellationRequested();
+                throw new InvalidOperationException("The actual operation token must have been cancelled.");
+            };
+            controller=Controller(provider);controller.Settings.Power=AssistantPower.Balanced;
+            yield return Finish(controller.SendAsync("Найди текстуру дерева и примени её к двери."));
+            var answer=controller.Current.Messages.Last();Assert.AreEqual("Остановлено",answer.Status);Assert.IsFalse(answer.IsError);Assert.AreEqual(1,answer.Steps.Count);
+            StringAssert.Contains("Полученные данные доступны в шагах",answer.Text);StringAssert.DoesNotContain("изменения доступны в сцене",answer.Text);StringAssert.DoesNotContain("их можно отменить",answer.Text);
+            Assert.IsTrue(string.IsNullOrEmpty(answer.Task.CheckpointId));Assert.AreEqual(0,testScene.rootCount);CollectionAssert.AreEquivalent(beforeAssets,AssetDatabase.GetAllAssetPaths());
+        }
+        [UnityTest] public IEnumerator ReadOnlyInspectionCannotClearAnExecuteTasksFailedImport()
+        {
+            var beforeAssets=AssetDatabase.GetAllAssetPaths();string unavailable="polyhaven:phase_repair_uncached_"+Guid.NewGuid().ToString("N");
+            var provider=new RecordingProvider();ChatController controller=null;
+            provider.Respond=(round,request,token)=>
+            {
+                if(round==0)return Task.FromResult(Reply(false,new EditorCommand {tool="material_import",args=new JObject {["material_id"]=unavailable,["allow_online"]=false}}));
+                if(round==1)
+                {
+                    var failed=controller.Current.Messages.Last().Steps.Single();Assert.AreEqual("material_import",failed.Tool);Assert.IsFalse(failed.Success);StringAssert.Contains("not cached",failed.Error);
+                    return Task.FromResult(Reply(false,MaterialSearch()));
+                }
+                Assert.AreEqual(2,round);Assert.AreEqual(2,controller.Current.Messages.Last().Steps.Count);Assert.IsTrue(controller.Current.Messages.Last().Steps.Last().Success);return Task.FromResult(Reply(true));
+            };
+            controller=Controller(provider);controller.Settings.Mode=AssistantMode.Execute;controller.Settings.Power=AssistantPower.Balanced;
+            yield return Finish(controller.SendAsync("Найди и импортируй текстуру дерева для двери."));
+            var answer=controller.Current.Messages.Last();Assert.IsTrue(answer.IsError,"A successful lookup cannot repair the failed requested mutation.");Assert.IsTrue(answer.Task.MutationAuthorized);Assert.AreEqual("Проверки не пройдены",answer.Status);
+            Assert.AreEqual(2,answer.Steps.Count);Assert.IsFalse(answer.Steps[0].Success);Assert.AreEqual("material_search",answer.Steps[1].Tool);Assert.IsTrue(answer.Steps[1].Success);Assert.IsTrue(string.IsNullOrEmpty(answer.Task.CheckpointId));
+            Assert.AreEqual(0,testScene.rootCount);CollectionAssert.AreEquivalent(beforeAssets,AssetDatabase.GetAllAssetPaths());
         }
         [UnityTest] public IEnumerator CompleteFlagStillRequiresFreshReadbackAndGoalRepair()
         {

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using WorldWeaver.Editor.Assistant;
 
@@ -13,6 +15,44 @@ namespace WorldWeaver.Tests
         {
             var method = typeof(ChatController).GetMethod("SelectTools", BindingFlags.Static | BindingFlags.NonPublic);
             Assert.IsNotNull(method); return (HashSet<string>)method.Invoke(null, new object[] { input, mode });
+        }
+        static string MaterialHint(EditorPlan plan, IEnumerable<string> allowed, bool readOnly=false)
+        {
+            var type=typeof(ChatController).Assembly.GetType("WorldWeaver.Editor.Assistant.AgentImplementationPolicy");
+            var method=type.GetMethod("MaterialPhaseRepair",BindingFlags.Static|BindingFlags.NonPublic);
+            Assert.IsNotNull(method);var args=new object[]{plan,allowed,readOnly,null};string hint=(string)method.Invoke(null,args);
+            Assert.AreEqual(hint.Length>0,!string.IsNullOrEmpty((string)args[3]),"A phase hint must identify the one already-permitted next tool.");return hint;
+        }
+        static EditorCommand Material(string tool,JObject args,string target="")=>new EditorCommand {tool=tool,target=target,args=args};
+        [Test] public void MixedMaterialImportRepairPreservesExactParametersWithoutCopyingApplyPlan()
+        {
+            var import=Material("material_import",new JObject {["material_id"]="polyhaven:weathered_planks",["allow_online"]=true});
+            var plan=new EditorPlan {actions=new List<EditorCommand>{Material("material_search",new JObject {["query"]="wood",["source"]="polyhaven"}),import,Material("material_apply",new JObject {["material_id"]="polyhaven:weathered_planks"},"@RejectedDoorAnchor")}};
+            string before=JsonConvert.SerializeObject(plan);string hint=MaterialHint(plan,new[]{"material_search","material_import","material_apply"});
+            StringAssert.Contains("EXACTLY ONE material_import",hint);StringAssert.Contains("complete:false",hint);StringAssert.Contains(import.args.ToString(Formatting.None),hint);StringAssert.DoesNotContain("RejectedDoorAnchor",hint);
+            Assert.AreEqual(before,JsonConvert.SerializeObject(plan),"Repair guidance must not split, mutate or normalize the recorded plan.");
+        }
+        [Test] public void MixedMaterialSearchRepairPreservesQuerySourceAndLimit()
+        {
+            var search=Material("material_search",new JObject {["query"]="старое дерево / weathered wood",["source"]="builtin",["limit"]=3});
+            var plan=new EditorPlan {actions=new List<EditorCommand>{search,Material("material_apply",new JObject {["material_id"]="builtin:wood"},"RejectedApply")}};
+            string hint=MaterialHint(plan,new[]{"material_search","material_apply"});
+            StringAssert.Contains("EXACTLY ONE material_search",hint);StringAssert.Contains(search.args.ToString(Formatting.None),hint);StringAssert.DoesNotContain("RejectedApply",hint);
+        }
+        [Test] public void MaterialPhaseGuidanceCannotEnableAnUnexposedOrReadOnlyForbiddenImport()
+        {
+            var import=Material("material_import",new JObject {["material_id"]="polyhaven:weathered_planks",["allow_online"]=true});
+            var plan=new EditorPlan {actions=new List<EditorCommand>{import,Material("material_apply",new JObject {["material_id"]="polyhaven:weathered_planks"},"Door")}};
+            Assert.AreEqual("",MaterialHint(plan,new[]{"material_search"}));Assert.AreEqual("",MaterialHint(plan,new[]{"material_import"},true));Assert.AreEqual("",MaterialHint(plan,Array.Empty<string>()));
+            plan.actions.Add(Material("material_search",new JObject {["query"]="wood",["source"]="builtin"}));
+            string ask=MaterialHint(plan,new[]{"material_search","material_import"},true);
+            StringAssert.Contains("EXACTLY ONE material_search",ask);StringAssert.DoesNotContain("EXACTLY ONE material_import",ask);StringAssert.DoesNotContain("polyhaven:weathered_planks",ask);
+        }
+        [Test] public void MaterialPhaseGuidanceDoesNotAlterStandaloneOrUnrelatedPlans()
+        {
+            var import=Material("material_import",new JObject {["material_id"]="builtin:wood"});
+            Assert.AreEqual("",MaterialHint(null,new[]{"material_import"}));Assert.AreEqual("",MaterialHint(new EditorPlan {actions=new List<EditorCommand>{import}},new[]{"material_import"}));
+            Assert.AreEqual("",MaterialHint(new EditorPlan {actions=new List<EditorCommand>{Material("inspect_object",new JObject(),"Door"),Material("material_apply",new JObject {["material_id"]="builtin:wood"},"Door")}},new[]{"material_import","material_search"}));
         }
         [Test] public void RequestedMechanicOffersReviewedSourceToolsWithoutTheWordScript()
         {
