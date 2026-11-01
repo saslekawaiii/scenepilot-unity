@@ -44,7 +44,12 @@ namespace WorldWeaver
             if(request.Messages.Any(message=>message.Images!=null&&message.Images.Count>0))throw new ProviderException("This OpenAI-compatible adapter currently accepts text only. Use a supported local Ollama vision model for images.");
             var messages = new JArray();
             bool classicText = profile.Provider == ProviderKind.Pollinations && !profile.StrictSchema;
-            if (classicText)
+            if (request.UseToolCalls)
+            {
+                foreach (var message in request.Messages) messages.Add(new JObject { ["role"] = message.Role, ["content"] = message.Content });
+                messages.Add(new JObject { ["role"] = "system", ["content"] = AgentFunctionProtocol.Instructions });
+            }
+            else if (classicText)
             {
                 // Classic's JSON-object formatter can corrupt the first property of a
                 // valid model answer. Its native grammar also rejects propertyNames.
@@ -72,7 +77,13 @@ namespace WorldWeaver
             }
             var body = new JObject { ["model"] = profile.Model, ["messages"] = messages, ["temperature"] = profile.Temperature,
                 [profile.Provider == ProviderKind.Groq ? "max_completion_tokens" : "max_tokens"] = profile.Provider == ProviderKind.Pollinations ? Math.Min(profile.MaxTokens, 1500) : profile.MaxTokens };
-            if (!classicText && profile.ResponseMode != OpenAIResponseMode.Text)
+            if (request.UseToolCalls)
+            {
+                body["tools"] = AgentFunctionProtocol.Definitions(request.Schema);
+                body["tool_choice"] = "auto";
+                body["parallel_tool_calls"] = false;
+            }
+            else if (!classicText && profile.ResponseMode != OpenAIResponseMode.Text)
                 body["response_format"] = profile.StrictSchema && request.Schema != null
                     ? new JObject { ["type"] = "json_schema", ["json_schema"] = new JObject { ["name"] = "worldweaver", ["strict"] = true, ["schema"] = request.Schema } }
                     : new JObject { ["type"] = "json_object" };
@@ -80,11 +91,14 @@ namespace WorldWeaver
             var watch = Stopwatch.StartNew();
             var suffix = profile.Provider == ProviderKind.Pollinations ? "/openai" : "/chat/completions";
             var response = await transport.SendAsync(profile.Endpoint.TrimEnd('/') + suffix, body, profile.Provider == ProviderKind.Pollinations ? "" : Key, profile.TimeoutSeconds, profile.Retries, cancellationToken);
-            var content = (string)response["choices"]?[0]?["message"]?["content"];
+            var wireMessage = response["choices"]?[0]?["message"] as JObject;
+            var content = (string)wireMessage?["content"];
             string finishReason = (string)response["choices"]?[0]?["finish_reason"];
             bool truncated = CompletionResult.IsOutputLimit(finishReason);
+            if (request.UseToolCalls && !truncated) content = AgentFunctionProtocol.Normalize(wireMessage, request.Schema);
             if (string.IsNullOrWhiteSpace(content) && !truncated) throw new ProviderException("Provider returned no text.");
             return new CompletionResult { Text = content ?? "", Provider = profile.Provider.ToString(), Model = (string)response["model"] ?? profile.Model, ElapsedMs = watch.ElapsedMilliseconds,
+                WireResponse = request.UseToolCalls ? wireMessage?.ToString(Newtonsoft.Json.Formatting.None) : null,
                 FinishReason = finishReason, OutputTruncated = truncated,
                 InputTokens = (int?)response["usage"]?["prompt_tokens"] ?? 0, OutputTokens = (int?)response["usage"]?["completion_tokens"] ?? 0 };
         }

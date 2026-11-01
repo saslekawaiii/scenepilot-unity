@@ -20,10 +20,33 @@ namespace WorldWeaver.Editor.Assistant
             {
                 float x=(float)c.args["position"][0],z=(float)c.args["position"][1],width=(float?)c.args["width"]??7,length=(float?)c.args["length"]??24;
                 var start=terrain.transform.position;var size=terrain.terrainData.size;
-                if(size.x/(terrain.terrainData.heightmapResolution-1)>width/4||size.z/(terrain.terrainData.heightmapResolution-1)>width/4){int needed=Mathf.NextPowerOfTwo(Mathf.CeilToInt(Mathf.Max(size.x,size.z)/(width/4)))+1;throw new ArgumentException("Cave width needs four heightmap cells. Current resolution="+terrain.terrainData.heightmapResolution+"; required resolution="+needed+". Use shape_terrain operation refine, resolution "+needed+" BEFORE create_cave; refine preserves existing craters and holes. Maximum supported resolution is 513; use a smaller map or wider cave if more is required.");}
+                int needed=RequiredResolution(terrain,width);
+                if(needed>2049)throw new ArgumentException("Cave needs a finer terrain grid than the supported 2049 resolution; choose a wider entrance or a smaller world.");
                 if(x-width<start.x||x+width>start.x+size.x||z-2<start.z||z+length+2>start.z+size.z)throw new ArgumentException("Cave and approach must fit inside terrain.");
                 foreach(var cave in terrain.transform.parent.GetComponentsInChildren<WorldCave>())if(Mathf.Abs(cave.transform.position.x-x)<width+cave.Size.x&&Mathf.Abs(cave.transform.position.z-z)<length+cave.Size.z)throw new ArgumentException("Cave footprints overlap.");
             }
+        }
+        internal static int RequiredResolution(Terrain terrain,float width)=>Mathf.Max(terrain.terrainData.heightmapResolution,Mathf.NextPowerOfTwo(Mathf.CeilToInt(Mathf.Max(terrain.terrainData.size.x,terrain.terrainData.size.z)/(width/4)))+1);
+        internal static void ReanchorCaves(Terrain terrain)
+        {
+            var caves=terrain.transform.parent.GetComponentsInChildren<WorldCave>().Where(c=>c.Terrain==terrain).ToArray();
+            if(caves.Length==0)return;
+            int n=terrain.terrainData.holesResolution;var holes=new bool[n,n];for(int z=0;z<n;z++)for(int x=0;x<n;x++)holes[z,x]=true;
+            var origin=terrain.transform.position;var size=terrain.terrainData.size;
+            foreach(var cave in caves)
+            {
+                var p=cave.transform.position;
+                if(p.x-cave.Size.x/2<origin.x||p.x+cave.Size.x/2>origin.x+size.x||p.z<origin.z||p.z+cave.Size.z>origin.z+size.z)throw new ArgumentException("Resized terrain would exclude an existing cave. Choose larger extents or relocate the cave first.");
+                float delta=terrain.SampleHeight(p)+origin.y-p.y;
+                Undo.RecordObject(cave.transform,"Reanchor cave after terrain edit");cave.transform.position+=Vector3.up*delta;
+                Undo.RecordObject(cave,"Reanchor cave navigation points");cave.Entrance+=Vector3.up*delta;cave.Interior+=Vector3.up*delta;
+                for(int z=0;z<n;z++)for(int x=0;x<n;x++)
+                {
+                    float px=origin.x+(x+.5f)/n*size.x,pz=origin.z+(z+.5f)/n*size.z;
+                    if(px>p.x-cave.Size.x/2&&px<p.x+cave.Size.x/2&&pz>p.z&&pz<p.z+cave.Size.z)holes[z,x]=false;
+                }
+            }
+            terrain.terrainData.SetHoles(0,0,holes);
         }
         static TerrainData Clone(SceneBuildTransaction tx,Terrain terrain)
         {
@@ -73,7 +96,14 @@ namespace WorldWeaver.Editor.Assistant
         }
         internal static GameObject Cave(EditorCommand c,SceneBuildTransaction tx,GameObject target)
         {
-            var terrain=TerrainOf(target);var data=Clone(tx,terrain);float width=(float?)c.args["width"]??7,length=(float?)c.args["length"]??24;
+            var terrain=TerrainOf(target);float width=(float?)c.args["width"]??7,length=(float?)c.args["length"]??24;
+            int needed=RequiredResolution(terrain,width);
+            if(needed>terrain.terrainData.heightmapResolution)
+            {
+                var refine=new EditorCommand{tool="shape_terrain",target=c.target,args=new JObject{["operation"]="refine",["resolution"]=needed}};
+                Shape(refine,tx,target);
+            }
+            var data=Clone(tx,terrain);
             var at=new Vector3((float)c.args["position"][0],0,(float)c.args["position"][1]);at.y=terrain.SampleHeight(at)+terrain.transform.position.y;
             var go=tx.Empty(c.name,terrain.transform.parent,"cave");go.transform.position=at;
             // A rectangular physical cut removes Terrain from the ramp/tube, including the approach.

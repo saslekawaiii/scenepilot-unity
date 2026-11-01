@@ -24,6 +24,8 @@ namespace WorldWeaver
         public readonly List<ChatMessage> Messages = new List<ChatMessage>();
         public JObject Schema;
         public bool Stream;
+        /// <summary>Editor-agent function calls; ordinary runtime structured requests keep their existing protocol.</summary>
+        public bool UseToolCalls;
         public Action<string> OnContentDelta;
         public Action<string> OnActivity;
     }
@@ -31,6 +33,7 @@ namespace WorldWeaver
     public sealed class CompletionResult
     {
         public string Text, Provider, Model, FinishReason;
+        public string WireResponse;
         /// <summary>The provider explicitly reported an output-token limit; Text remains the exact partial response for audit.</summary>
         public bool OutputTruncated;
         public static bool IsOutputLimit(string reason) => string.Equals(reason, "length", StringComparison.OrdinalIgnoreCase) ||

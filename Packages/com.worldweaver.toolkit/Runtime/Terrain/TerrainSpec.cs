@@ -19,8 +19,8 @@ namespace WorldWeaver
 
         public void Validate()
         {
-            if (resolution != 33 && resolution != 65 && resolution != 129 && resolution != 257 && resolution != 513)
-                throw new ArgumentException("Resolution must be 33, 65, 129, 257 or 513.");
+            if (resolution != 33 && resolution != 65 && resolution != 129 && resolution != 257 && resolution != 513 && resolution != 1025 && resolution != 2049)
+                throw new ArgumentException("Resolution must be 33, 65, 129, 257, 513, 1025 or 2049.");
             Range(width, 32, 2048, "width"); Range(length, 32, 2048, "length"); Range(height, 4, 512, "height");
             Range(scale, .1f, 32, "scale"); Range(persistence, .1f, .9f, "persistence"); Range(lacunarity, 1, 4, "lacunarity");
             Range(mountainStrength, 0, 1, "mountainStrength"); Range(valleyDepth, 0, .8f, "valleyDepth");

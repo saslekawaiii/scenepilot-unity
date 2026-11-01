@@ -42,7 +42,7 @@ namespace WorldWeaver.Editor.Assistant
                     latest[key]=step;
                 }
             }
-            if(answer.Task.CompilationRequired&&!latest.Keys.Any(k=>k.StartsWith("compile:",StringComparison.Ordinal)))answer.Task.Checks.Add(new AgentCheckResult{RequirementId="required_compilation",Description="Запрошенный новый/изменённый код прошёл настоящую компиляцию",Passed=false,Actual="Нет результата компиляции текущей задачи",Evidence="Unity CompilationPipeline"});
+            if(answer.Task.CompilationRequired&&!latest.Keys.Any(k=>k.StartsWith("compile:",StringComparison.Ordinal))&&!answer.Steps.Any(s=>s.Tool=="execute_editor_code"&&s.Success))answer.Task.Checks.Add(new AgentCheckResult{RequirementId="required_compilation",Description="Запрошенный новый/изменённый код прошёл настоящую компиляцию",Passed=false,Actual="Нет результата компиляции текущей задачи",Evidence="Unity CompilationPipeline"});
             foreach(var pair in latest)answer.Task.Checks.Add(new AgentCheckResult{RequirementId=pair.Key,Description=pair.Key.StartsWith("compile:",StringComparison.Ordinal)?"Компиляция "+pair.Key.Substring(8):"Фактическая проверка Unity",Passed=pair.Value.Success,Actual=pair.Value.Success?"PASS":pair.Value.Error??"FAIL",Evidence=pair.Value.Summary});
             foreach(var requirement in answer.Task.Requirements.Where(r=>r.Kind=="rotation_speed"))
             {
@@ -201,7 +201,7 @@ namespace WorldWeaver.Editor.Assistant
             if(effectiveMode!=AssistantMode.Ask&&SimpleAnimatedPlayerRequest(input)&&
                 session.Messages.LastOrDefault(m=>m.Role=="user")?.Attachments?.Count==0)
                 return BuildAnimatedPlayerRequest(session,input,answer);
-            if((AgentCapabilities.NeedsExtendedWorkflow(input)||AgentImplementationPolicy.IsMechanicRequest(input)||Regex.IsMatch(input,@"(?i)C#|скрипт|\bкод\b|\bscript\b"))&&!AgentTaskSchema.GoalOnlyNpcUpdate(input)&&
+            if((Settings.UseNativeFunctions||AgentCapabilities.NeedsExtendedWorkflow(input)||AgentImplementationPolicy.IsMechanicRequest(input)||Regex.IsMatch(input,@"(?i)C#|скрипт|\bкод\b|\bscript\b"))&&!AgentTaskSchema.GoalOnlyNpcUpdate(input)&&
                 session.Messages.LastOrDefault(m=>m.Role=="user")?.Attachments?.Count==0)
                 return BuildConstructiveRequest(session,input,answer,effectiveMode);
             var tools=expandToolSelection&&effectiveMode!=AssistantMode.Ask?new HashSet<string>(((JArray)EditorToolSchema.CommandSchema()["anyOf"]).OfType<JObject>().Select(EditorToolSchema.ToolName)):SelectTools(input,effectiveMode);bool local=models.FirstOrDefault(m=>m.Key==Settings.ModelKey)?.Provider==ProviderKind.Ollama;

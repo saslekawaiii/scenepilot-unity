@@ -23,7 +23,8 @@ namespace WorldWeaver
             // Ground them in the exact contract, then keep the caller's unchanged
             // strict parser/validators. Never send the unsupported format object.
             bool cloud = profile.Model.EndsWith(":cloud", StringComparison.OrdinalIgnoreCase);
-            if (cloud && request.Schema != null)
+            if (request.UseToolCalls) messages.Add(new JObject { ["role"] = "system", ["content"] = AgentFunctionProtocol.Instructions });
+            if (!request.UseToolCalls && cloud && request.Schema != null)
                 messages.Add(new JObject { ["role"] = "system", ["content"] = "Return ONLY one JSON INSTANCE matching this exact output contract, never Markdown or a schema. Every required field must be present. Contract: " + request.Schema.ToString(Newtonsoft.Json.Formatting.None) });
             int imageCount = 0, imageBytes = 0;
             foreach (var message in request.Messages)
@@ -46,15 +47,18 @@ namespace WorldWeaver
                 }
                 messages.Add(item);
             }
+            if (request.UseToolCalls) messages.Add(new JObject { ["role"] = "system", ["content"] = AgentFunctionProtocol.Instructions });
             var body = new JObject { ["model"] = profile.Model, ["messages"] = messages, ["stream"] = request.Stream, ["think"] = false,
                 ["keep_alive"] = "10m",
                 ["options"] = new JObject { ["temperature"] = profile.Temperature, ["num_predict"] = profile.MaxTokens, ["num_ctx"] = profile.ContextWindow } };
-            if (!cloud) body["format"] = request.Schema != null ? (JToken)OllamaDecoderSchema.FromHost(request.Schema) : new JValue("json");
+            if (request.UseToolCalls) body["tools"] = AgentFunctionProtocol.Definitions(request.Schema);
+            else if (!cloud) body["format"] = request.Schema != null ? (JToken)OllamaDecoderSchema.FromHost(request.Schema) : new JValue("json");
             var watch = Stopwatch.StartNew();
             JObject result; string content; long firstToken = 0;
             if (request.Stream)
             {
                 var text = new StringBuilder();
+                var calls = new JArray();
                 request.OnActivity?.Invoke("Ожидаю ответ локальной модели…");
                 for (int attempt = 0; ; attempt++)
                 {
@@ -65,6 +69,7 @@ namespace WorldWeaver
                         {
                             receivedFrame = true;
                             token.ThrowIfCancellationRequested();
+                            if (frame["message"]?["tool_calls"] is JArray frameCalls) foreach (var call in frameCalls) calls.Add(call.DeepClone());
                             string delta = (string)frame["message"]?["content"] ?? "";
                             if (delta.Length > 0)
                             {
@@ -82,12 +87,18 @@ namespace WorldWeaver
                         await Task.Delay(500 * (1 << attempt), token);
                     }
                 }
-                content = text.ToString();
+                if (request.UseToolCalls)
+                {
+                    result["message"] = new JObject { ["role"] = "assistant", ["content"] = text.ToString(), ["tool_calls"] = calls };
+                    content = CompletionResult.IsOutputLimit((string)result["done_reason"]) ? text.ToString() : AgentFunctionProtocol.Normalize((JObject)result["message"], request.Schema);
+                }
+                else content = text.ToString();
             }
             else
             {
                 result = await transport.SendAsync(profile.Endpoint.TrimEnd('/') + "/api/chat", body, "", profile.TimeoutSeconds, profile.Retries, token);
-                content = (string)result["message"]?["content"];
+                content = request.UseToolCalls && !CompletionResult.IsOutputLimit((string)result["done_reason"])
+                    ? AgentFunctionProtocol.Normalize((JObject)result["message"], request.Schema) : (string)result["message"]?["content"];
             }
             token.ThrowIfCancellationRequested();
             string finishReason = (string)result["done_reason"];
@@ -96,6 +107,7 @@ namespace WorldWeaver
             int input = Counter(result, "prompt_eval_count"), output = Counter(result, "eval_count");
             double duration = Duration(result);
             return new CompletionResult { Text = content ?? "", Model = profile.Model, Provider = "Ollama", ElapsedMs = watch.ElapsedMilliseconds,
+                WireResponse = request.UseToolCalls ? result["message"]?.ToString(Newtonsoft.Json.Formatting.None) : null,
                 FinishReason = finishReason, OutputTruncated = truncated,
                 FirstTokenMs = firstToken, InputTokens = input, OutputTokens = output,
                 TokensPerSecond = duration > 0 ? output * 1e9 / duration : 0 };

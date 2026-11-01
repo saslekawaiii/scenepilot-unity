@@ -19,6 +19,8 @@ namespace WorldWeaver.Editor.Assistant
         public bool UseSkills = true;
         public bool AutoVerify = true;
         public bool PreferGeneratedScripts = true;
+        public bool UseNativeFunctions = true;
+        public bool AllowEditorCode;
         public int SkillContextBudget = 4000;
         public List<string> SkillFolders = new List<string>();
     }
@@ -121,7 +123,7 @@ namespace WorldWeaver.Editor.Assistant
         public int Round;
         // Response remains the raw provider text for compatibility with older traces.
         // NormalizedResponse is recorded only for an explicit, narrowly scoped adapter repair.
-        public string Response, RawResponse, NormalizedResponse, RepairKind, Error, SchemaHash, Model, FinishReason;
+        public string Response, RawResponse, WireResponse, NormalizedResponse, RepairKind, Error, SchemaHash, Model, FinishReason;
         public long ProviderElapsedMs;
         public List<ChatMessage> Messages = new List<ChatMessage>();
         public bool Accepted, OutputTruncated;

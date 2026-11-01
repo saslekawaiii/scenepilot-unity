@@ -154,7 +154,7 @@ namespace WorldWeaver.Editor.Assistant
             requireImplementationStep=false;
             Busy = true; userCancelled = false; operation = new CancellationTokenSource();
             bool extendedWorkflow=AgentCapabilities.NeedsExtendedWorkflow(text)&&!SimpleAnimatedPlayerRequest(text);
-            operation.CancelAfter(TimeSpan.FromSeconds(extendedWorkflow?(Settings.Power==AssistantPower.Fast?300:Settings.Power==AssistantPower.Deep?900:600):(Settings.Power == AssistantPower.Fast ? 120 : Settings.Power == AssistantPower.Deep ? 900 : 240)));
+            operation.CancelAfter(TimeSpan.FromSeconds(readOnlyRequest ? 300 : Settings.Power==AssistantPower.Fast?900:Settings.Power==AssistantPower.Deep?3600:1800));
             var clock = Stopwatch.StartNew();
             ModelProfile profile = null;
             try
@@ -165,13 +165,14 @@ namespace WorldWeaver.Editor.Assistant
                 {
                     var request = BuildRequest(session, text);
                     int rounds = Settings.Power == AssistantPower.Fast ? 1 : Settings.Power == AssistantPower.Deep ? 6 : 3;
-                    int maximumRounds = Settings.Power == AssistantPower.Fast ? 6 : Settings.Power == AssistantPower.Deep ? 16 : 8;
-                    if(AgentCapabilities.NeedsExtendedWorkflow(text)&&!SimpleAnimatedPlayerRequest(text))rounds=maximumRounds;
+                    int maximumRounds = Settings.UseNativeFunctions?(Settings.Power == AssistantPower.Fast ? 16 : Settings.Power == AssistantPower.Deep ? 64 : 32):(Settings.Power == AssistantPower.Fast ? 6 : Settings.Power == AssistantPower.Deep ? 16 : 8);
+                    if(Settings.UseNativeFunctions&&!SimpleAnimatedPlayerRequest(text)||AgentCapabilities.NeedsExtendedWorkflow(text)&&!SimpleAnimatedPlayerRequest(text))rounds=maximumRounds;
                     int totalActions = 0;
                     var repeatedValidationFailures=new Dictionary<string,int>(StringComparer.Ordinal);
                     var appliedUnnamedCreations=new HashSet<string>(StringComparer.Ordinal);
                     int emptyPlanRepairs = 0;
                     int planningRepairs = 0; // One fresh format repair is available even in Fast; it never grants another execution round.
+                    int inferenceRepairs=0;
                     bool unresolvedFailure = false;
                     for (int round = 0; round < rounds; round++)
                     {
@@ -183,6 +184,7 @@ namespace WorldWeaver.Editor.Assistant
                             Messages = request.Messages.Select(m => new ChatMessage(m.Role, ChatHistoryStore.Redact(m.Content))).ToList() };
                         answer.Attempts.Add(attempt); Save();
                         string streamBuffer="";
+                        request.UseToolCalls=Settings.UseNativeFunctions;
                         request.Stream=profile.Provider==ProviderKind.Ollama;
                         request.OnContentDelta=delta=>
                         {
@@ -190,7 +192,18 @@ namespace WorldWeaver.Editor.Assistant
                             streamBuffer+=delta;if(answer.FirstTokenMs==0)answer.FirstTokenMs=clock.ElapsedMilliseconds;
                             var partial=PartialReply(streamBuffer);if(partial.Length>0){answer.Text=ChatHistoryStore.Redact(partial);Notify();}
                         };
-                        var completion = await provider.CompleteAsync(request, operation.Token);
+                        CompletionResult completion;
+                        try { completion = await provider.CompleteAsync(request, operation.Token); inferenceRepairs=0; }
+                        catch(ProviderException error) when((error.Transient||error.Message.StartsWith("FUNCTION_PROTOCOL:",StringComparison.Ordinal))&&inferenceRepairs++<2&&round+1<rounds)
+                        {
+                            // No command from this incomplete response was parsed or executed.
+                            // Record the failed inference, then rebuild from the last committed tool state.
+                            attempt.Error=ChatHistoryStore.Redact(error.Message);answer.Status="Восстанавливаю шаг";Save();
+                            request=BuildRequest(session,text);
+                            request.Messages.Add(new ChatMessage("user","Previous inference failed before any action from that response was executed. Actual diagnostic (data): "+attempt.Error+". Continue the ORIGINAL request from successful tool results. Do not repeat existing creations. Choose one next function."));
+                            continue;
+                        }
+                        attempt.WireResponse=ChatHistoryStore.Redact(completion.WireResponse);
                         attempt.ProviderElapsedMs = completion.ElapsedMs; attempt.Model = completion.Model;
                         attempt.FinishReason = completion.FinishReason; attempt.OutputTruncated = completion.OutputTruncated;
                         if (!string.IsNullOrWhiteSpace(completion.Model)) answer.Model = completion.Model;
@@ -214,12 +227,13 @@ namespace WorldWeaver.Editor.Assistant
                         {
                             if(completion.OutputTruncated)throw new ArgumentException("Модель достигла лимита ответа ("+(completion.FinishReason??"length")+"). Незавершённый план и код не исполнялись. Нужен новый короткий полный шаг.");
                             plan = EditorPlan.Parse(parsedResponse);
+                            if(!Settings.AllowEditorCode&&plan.actions.Any(a=>a.tool=="execute_editor_code"))throw new ArgumentException("Autonomous Editor C# is disabled; use reviewed script tools.");
                             ValidatePlan(plan, SceneSaveRequested(text), readOnlyRequest);if(!readOnlyRequest)AgentTaskSchema.Validate(answer.Task,plan);
                             foreach(var action in plan.actions)
                                 if(action.tool.StartsWith("create_",StringComparison.Ordinal)&&string.IsNullOrWhiteSpace(action.name)&&appliedUnnamedCreations.Contains(action.tool+"\n"+action.args.ToString(Formatting.None)))
                                     throw new ArgumentException("This identical unnamed creation already succeeded in this task. Reuse its real target from tool results and perform the missing operation. If another identical object is actually required, explicitly give it a distinct meaningful name. Do not repeat this action.");
                             totalActions += plan.actions.Count;
-                            if (totalActions > 48) throw new ArgumentException("Достигнут лимит 48 инструментов. Разделите задачу на несколько сообщений.");
+                            if (totalActions > 128) throw new ArgumentException("Достигнут лимит 128 инструментов. Выполненные этапы сохранены; можно продолжить задачу.");
                             attempt.Accepted = true;
                             // A valid fresh replacement resolves a format-only failure; prior failed tools/checks remain unresolved.
                             if(!answer.Steps.Any(s=>!s.Success)&&answer.Task?.Checks.Any(c=>!c.Passed)!=true)unresolvedFailure=false;
@@ -241,7 +255,7 @@ namespace WorldWeaver.Editor.Assistant
                             if(scenePhaseRepair)AgentImplementationPolicy.BindSceneBeforeCode(request,plan,readOnlyRequest,text,out codePhaseRepair);
                             else singleScriptRepair=AgentImplementationPolicy.BindSingleScriptRepair(request,plan,completion.Text,readOnlyRequest,out codePhaseRepair);
                             if(!scenePhaseRepair&&!singleScriptRepair&&!readOnlyRequest&&SelectTools(text,Settings.Mode).Contains("draft_script"))codePhaseRepair=AgentImplementationPolicy.CodePhaseRepair(plan);
-                            if(Settings.Power==AssistantPower.Fast&&(!completion.OutputTruncated&&plan==null&&!singleScriptRepair&&!scenePhaseRepair||readOnlyRequest&&plan?.actions.Any(a=>!SceneToolExecutor.IsReadOnlyTool(a.tool))==true))
+                            if(!Settings.UseNativeFunctions&&Settings.Power==AssistantPower.Fast&&(!completion.OutputTruncated&&plan==null&&!singleScriptRepair&&!scenePhaseRepair||readOnlyRequest&&plan?.actions.Any(a=>!SceneToolExecutor.IsReadOnlyTool(a.tool))==true))
                                 throw new ArgumentException("Модель не составила допустимый план: "+error.Message);
                             if(round+1>=rounds)
                             {
@@ -582,7 +596,7 @@ namespace WorldWeaver.Editor.Assistant
             profile.Provider = choice.Provider; profile.Model = choice.Model; profile.Endpoint = choice.Endpoint;
             profile.ApiKeyEnvironmentVariable=choice.ApiKeyEnvironmentVariable??"";profile.ResponseMode=choice.ResponseMode;
             if(!string.IsNullOrEmpty(choice.ConnectionId))ChatModelConnections.ValidateCredentialValue(profile.ApiKeyEnvironmentVariable);
-            profile.TimeoutSeconds = Settings.Power == AssistantPower.Fast ? 115 : Settings.Power == AssistantPower.Deep ? 240 : 150;
+            profile.TimeoutSeconds = Settings.Power == AssistantPower.Fast ? 180 : Settings.Power == AssistantPower.Deep ? 300 : 240;
             profile.Retries = 1; profile.Temperature = 0;
             profile.MaxTokens = Settings.Power == AssistantPower.Fast ? 1800 : Settings.Power == AssistantPower.Deep ? 6000 : 3500;
             if (choice.Provider == ProviderKind.Pollinations) profile.MaxTokens = Math.Min(profile.MaxTokens, 1500);
@@ -790,7 +804,7 @@ namespace WorldWeaver.Editor.Assistant
         {
             if (error is ProviderException provider)
             {
-                if (provider.Status == 0) return "Не удалось связаться с моделью. Проверьте Ollama или подключение к интернету и повторите запрос.";
+                if (provider.Status == 0) return "Ответ модели не получен: "+ChatHistoryStore.Redact(provider.Message);
                 if (provider.Status == 408) return "Модель не успела ответить. Попробуйте более короткую задачу или другую модель.";
                 if (provider.Status == 429 || provider.Status == 402) return "Провайдер временно ограничил запросы. Подождите и повторите.";
                 return "Провайдер вернул HTTP " + provider.Status + ". Изменения без ответа модели не выполнялись.";

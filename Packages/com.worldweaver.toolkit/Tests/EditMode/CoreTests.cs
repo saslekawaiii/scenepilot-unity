@@ -24,7 +24,7 @@ namespace WorldWeaver.Tests
         }
         private static NpcDecision Decision(int amount, string type = "GiveItem", string target = "Player") => new NpcDecision { speech = "Вот кристалл.", actions = new[] { new ActionCommand { type = type, target = target, item = "Crystal", amount = amount } } };
         [Test] public void TerrainRoundtrip() { var spec = TerrainSpec.Parse(JsonConvert.SerializeObject(new TerrainSpec())); Assert.AreEqual(42, spec.seed); }
-        [TestCase(32)] [TestCase(128)] [TestCase(1025)] public void InvalidResolutionIsRejected(int n) { var s = new TerrainSpec { resolution = n }; Assert.Throws<ArgumentException>(() => s.Validate()); }
+        [TestCase(32)] [TestCase(128)] [TestCase(2050)] public void InvalidResolutionIsRejected(int n) { var s = new TerrainSpec { resolution = n }; Assert.Throws<ArgumentException>(() => s.Validate()); }
         [TestCase(float.NaN)] [TestCase(float.PositiveInfinity)] [TestCase(-1)] public void InvalidTerrainNumberIsRejected(float value) { var s = new TerrainSpec { width = value }; Assert.Throws<ArgumentException>(() => s.Validate()); }
         [Test] public void MissingTerrainFieldRejected() { Assert.Throws<ArgumentException>(() => TerrainSpec.Parse("{}")); }
         [Test] public void FractionalTerrainIntegerRejected() { var obj = JObject.FromObject(new TerrainSpec()); obj["resolution"] = 129.2; Assert.Throws<ArgumentException>(() => TerrainSpec.Parse(obj.ToString())); }

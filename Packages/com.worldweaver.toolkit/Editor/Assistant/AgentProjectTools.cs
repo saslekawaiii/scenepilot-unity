@@ -20,9 +20,9 @@ namespace WorldWeaver.Editor.Assistant
     /// <summary>Typed project operations: no shell, arbitrary reflection invocation or credential file reader.</summary>
     internal static class AgentProjectTools
     {
-        static readonly string[] Names={"plan_task","discover_tools","find_scene_objects","inspect_project","inspect_component","set_component","add_component","read_console","capture_scene","run_tests","run_play_check","poll_job","set_build_scenes","build_player","remember_design","list_skills","read_skill","open_scene"};
+        static readonly string[] Names={"execute_editor_code","reflect_api","plan_task","discover_tools","find_scene_objects","inspect_project","inspect_component","set_component","add_component","read_console","capture_scene","run_tests","run_play_check","poll_job","set_build_scenes","build_player","remember_design","list_skills","read_skill","open_scene"};
         internal static bool Handles(string tool)=>Names.Contains(tool);
-        internal static bool IsReadOnly(string tool)=>new[]{"plan_task","discover_tools","find_scene_objects","inspect_project","inspect_component","read_console","capture_scene","poll_job","list_skills","read_skill"}.Contains(tool);
+        internal static bool IsReadOnly(string tool)=>new[]{"reflect_api","plan_task","discover_tools","find_scene_objects","inspect_project","inspect_component","read_console","capture_scene","poll_job","list_skills","read_skill"}.Contains(tool);
         internal static bool IsDeferred(string tool)=>tool=="run_tests"||tool=="run_play_check"||tool=="build_player"||tool=="open_scene";
         internal static bool RequiresReview(EditorCommand c)=>c.tool=="open_scene"||c.tool=="set_build_scenes"||c.tool=="add_component"&&ResolveType((string)c.args["type"]).IsSubclassOf(typeof(MonoBehaviour));
         internal const string ToolInstructions=@"PROJECT TOOLS (exact typed args):
@@ -49,6 +49,8 @@ open_scene: target empty,args {path:Assets/...unity}. Standalone reviewed action
         internal static IEnumerable<JObject> CommandSchemas()
         {
             var schema=new Dictionary<string,JObject>{
+                ["reflect_api"]=Obj(new JObject{["type"]=Text(240),["member"]=Text(120)},"type"),
+                ["execute_editor_code"]=Obj(new JObject{["code"]=Text(20000)},"code"),
                 ["plan_task"]=Obj(new JObject{["steps"]=new JObject{["type"]="array",["minItems"]=1,["maxItems"]=12,["items"]=Text(300)}},"steps"),
                 ["discover_tools"]=Obj(new JObject{["query"]=Text(500),["names"]=new JObject{["type"]="array",["maxItems"]=16,["items"]=Text(64)}}),
                 ["find_scene_objects"]=Obj(new JObject{["query"]=Text(500),["limit"]=Integer(1,50)},"query"),
@@ -86,7 +88,8 @@ open_scene: target empty,args {path:Assets/...unity}. Standalone reviewed action
                 if(type=="number"&&((p.Value.Type!=JTokenType.Float&&p.Value.Type!=JTokenType.Integer)||double.IsNaN((double)p.Value)||double.IsInfinity((double)p.Value)||(double)p.Value<(double)definition["minimum"]||(double)p.Value>(double)definition["maximum"]))throw new ArgumentException("Number out of range: "+p.Name);
                 if(definition["enum"] is JArray choices&&!choices.Any(v=>JToken.DeepEquals(v,p.Value)))throw new ArgumentException("Invalid choice: "+p.Name);
             }
-            if(new[]{"inspect_component","set_component","add_component","run_play_check"}.Contains(c.tool))resolve(c.target);else if(!string.IsNullOrEmpty(c.target))throw new ArgumentException("Project query/job requires empty target.");
+            if(c.tool=="execute_editor_code"){if(!string.IsNullOrEmpty(c.target))resolve(c.target);}
+            else if(new[]{"inspect_component","set_component","add_component","run_play_check"}.Contains(c.tool))resolve(c.target);else if(!string.IsNullOrEmpty(c.target))throw new ArgumentException("Project query/job requires empty target.");
             if(c.tool=="inspect_component")Component(c,resolve);
             if(c.tool=="add_component")ResolveType((string)c.args["type"]);
             if(c.tool=="set_component")
@@ -174,6 +177,8 @@ open_scene: target empty,args {path:Assets/...unity}. Standalone reviewed action
             Validate(c,resolve);string summary;GameObject target=null;var a=c.args;
             switch(c.tool)
             {
+                case "execute_editor_code":return EditorCodeTools.Execute(c,resolve,context);
+                case "reflect_api":summary=EditorCodeTools.Reflect((string)a["type"],(string)a["member"]);break;
                 case "plan_task":if(context?.Message?.Task==null)throw new InvalidOperationException("A task context is required.");context.Message.Task.Approach=a["steps"].Values<string>().ToList();summary=new JObject{["stages"]=a["steps"].DeepClone(),["status"]="proposed, not completed",["changesApplied"]=false}.ToString(Formatting.None);break;
                 case "discover_tools":summary=AgentCapabilities.Discover(a).ToString(Formatting.None);break;
                 case "find_scene_objects":summary=ProjectContextIndex.Search((string)a["query"],(int?)a["limit"]??20).ToString(Formatting.None);break;

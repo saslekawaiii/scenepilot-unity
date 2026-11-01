@@ -73,7 +73,7 @@ namespace WorldWeaver.Tests
         private ChatController Controller(Provider provider, AssistantMode mode = AssistantMode.Ask)
         {
             var value = new ChatController(_ => provider, folder); controllers.Add(value);
-            value.Settings.Mode = mode; value.Settings.Power = AssistantPower.Fast; value.Settings.UseSkills = false;
+            value.Settings.UseNativeFunctions=false;value.Settings.Mode = mode; value.Settings.Power = AssistantPower.Fast; value.Settings.UseSkills = false;
             return value;
         }
         private static CompletionResult Result(params EditorCommand[] actions) => new CompletionResult

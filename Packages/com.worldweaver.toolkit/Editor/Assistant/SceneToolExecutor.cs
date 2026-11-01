@@ -314,7 +314,10 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
                     {result.Results.Add(WorldMaterialTools.Apply(command,resolve,tx));continue;}
                     if(AgentProjectTools.Handles(command.tool))
                     {
-                        result.Results.Add(AgentProjectTools.Execute(command,resolve,executionContext));continue;
+                        var projectResult=AgentProjectTools.Execute(command,resolve,executionContext);
+                        result.Results.Add(projectResult);
+                        if(!projectResult.Success)throw new InvalidOperationException(projectResult.Error??"Project command failed.");
+                        continue;
                     }
                     if(ConstructiveTools.Handles(command.tool))
                     {
@@ -528,9 +531,26 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
         {
             var generated=target.GetComponentInChildren<GeneratedTerrain>(true);var terrain=generated.GetComponent<Terrain>();if(!terrain||!terrain.terrainData)throw new InvalidOperationException("Terrain data missing.");
             var root=generated.transform.parent?generated.transform.parent:generated.transform;string style=(string)args["style"]??Style(root);var spec=WorldComposer.Specification(args,style,generated.Specification);
+            // Preserve constructed features when resizing/rebuilding the owned world.
+            var environment=root.GetComponent<WorldEnvironment>();
+            if(style=="moon"&&!environment){environment=Undo.AddComponent<WorldEnvironment>(root.gameObject);environment.Terrain=terrain;environment.Profile="moon";environment.Craters=spec.width<96||spec.length<96?new List<ImpactCrater>():ExplorationTerrain.Craters(spec.seed,Mathf.Min(8,Mathf.Max(1,(int)(spec.width*spec.length/12000))),spec.width,spec.length);}
+            if(environment)Undo.RecordObject(environment,"Preserve environment features");
+            var caves=root.GetComponentsInChildren<WorldCave>();
+            if(caves.Length>0)
+            {
+                int required=Mathf.NextPowerOfTwo(Mathf.CeilToInt(Mathf.Max(spec.width,spec.length)/(caves.Min(c=>c.Size.x)/4)))+1;
+                if(required>2049)throw new ArgumentException("Existing cave entrances need a finer grid than 2049 after this resize. Use smaller extents or wider caves.");
+                spec.resolution=Mathf.Max(spec.resolution,required);
+            }
             // Clone even owned data before editing, so imported/shared TerrainData is never modified.
             var data=tx.Asset(Object.Instantiate(terrain.terrainData),"UpdatedTerrain");Undo.RecordObject(terrain,"Assistant terrain data");var collider=terrain.GetComponent<TerrainCollider>();Undo.RecordObject(collider,"Assistant terrain collider");Undo.RecordObject(generated,"Assistant TerrainSpec");Undo.RecordObject(terrain.transform,"Assistant terrain extent");
-            terrain.terrainData=data;collider.terrainData=data;data.heightmapResolution=spec.resolution;data.size=new Vector3(spec.width,spec.height,spec.length);data.SetHeights(0,0,TerrainGenerator.Generate(spec));WorldComposer.Layers(tx,data,spec,style);generated.Specification=spec;terrain.transform.localPosition=new Vector3(-spec.width/2,0,-spec.length/2);
+            terrain.terrainData=data;collider.terrainData=data;data.heightmapResolution=spec.resolution;data.size=new Vector3(spec.width,spec.height,spec.length);data.SetHeights(0,0,environment&&environment.Profile=="moon"?ExplorationTerrain.Generate(spec,environment.Craters,true):TerrainGenerator.Generate(spec));WorldComposer.Layers(tx,data,spec,style);generated.Specification=spec;terrain.transform.localPosition=new Vector3(-spec.width/2,0,-spec.length/2);
+            TerrainConstruction.ReanchorCaves(terrain);
+            foreach(var survival in ProjectContextIndex.Objects().Select(g=>g.GetComponent<WorldSurvival>()).Where(s=>s&&s.Environment&&s.Environment.Terrain==terrain))
+            {
+                Undo.RecordObject(survival.transform,"Reanchor linked survival player");var p=survival.transform.position;p.y=terrain.SampleHeight(p)+terrain.transform.position.y+.1f;survival.transform.position=p;
+                if(survival.Habitat){Undo.RecordObject(survival.Habitat,"Reanchor survival habitat");var h=survival.Habitat.position;h.y=terrain.SampleHeight(h)+terrain.transform.position.y;survival.Habitat.position=h;Undo.RecordObject(survival,"Reanchor survival spawn");survival.Spawn=h+Vector3.up*.1f;}
+            }
             var rootMarker=root.GetComponent<GeneratedSceneObject>();if(rootMarker){Undo.RecordObject(rootMarker,"Assistant world style");rootMarker.Style=style;}
             var water=root.Find("Water");if(water&&water.GetComponent<GeneratedSceneObject>()){Undo.RecordObject(water,"Assistant water");water.localPosition=new Vector3(0,spec.waterLevel*spec.height,0);water.localScale=new Vector3(spec.width/10,1,spec.length/10);}
             foreach(var marker in root.GetComponentsInChildren<GeneratedSceneObject>(true).Where(m=>m.SurfaceAnchored))

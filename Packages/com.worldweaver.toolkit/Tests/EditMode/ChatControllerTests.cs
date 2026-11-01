@@ -61,7 +61,7 @@ namespace WorldWeaver.Tests
             assets.Clear();if(Directory.Exists(folder))Directory.Delete(folder,true);
         }
         private ChatController Controller(RecordingProvider provider)
-        {var controller=new ChatController(_=>provider,folder);controllers.Add(controller);return controller;}
+        {var controller=new ChatController(_=>provider,folder);controllers.Add(controller);controller.Settings.UseNativeFunctions=false;return controller;}
         private GameObject Find(string name)=>testScene.GetRootGameObjects().SelectMany(r=>r.GetComponentsInChildren<Transform>(true)).Select(t=>t.gameObject).FirstOrDefault(o=>o.name==name);
         private static string Reply(bool complete,params EditorCommand[] commands)=>JsonConvert.SerializeObject(new EditorPlan{reply="Проверяемый план",complete=complete,actions=commands.ToList()});
         private static EditorCommand Create(string name)=>new EditorCommand{tool="create_object",name=name,args=new JObject{["kind"]="cube",["on_terrain"]=false}};

@@ -455,6 +455,8 @@ namespace WorldWeaver.Editor.Assistant
             AddSettingToggle(advanced, "Использовать навыки", controller.Settings.UseSkills, value => controller.Settings.UseSkills = value);
             AddSettingToggle(advanced, "Проверять результат автоматически", controller.Settings.AutoVerify, value => controller.Settings.AutoVerify = value);
             AddSettingToggle(advanced, "Создавать C# для новых игровых механик", controller.Settings.PreferGeneratedScripts, value => controller.Settings.PreferGeneratedScripts = value);
+            AddSettingToggle(advanced, "Нативные вызовы функций модели", controller.Settings.UseNativeFunctions, value => controller.Settings.UseNativeFunctions = value);
+            AddSettingToggle(advanced, "Автономный C# с доступом Unity Editor", controller.Settings.AllowEditorCode, value => controller.Settings.AllowEditorCode = value);
             autoApply = AddSettingToggle(advanced, "Применять план в режиме «Выполнить»", controller.Settings.AutoApply, value => controller.Settings.AutoApply = value);
             autoApply.name = "auto-apply";
             var budget = new IntegerField("Объём знаний в запросе") { value = controller.Settings.SkillContextBudget, tooltip = "Лимит символов контекста, включая обрамление. Это не токены модели." };

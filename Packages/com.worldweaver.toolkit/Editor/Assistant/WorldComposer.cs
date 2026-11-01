@@ -115,12 +115,14 @@ namespace WorldWeaver.Editor.Assistant
             string style = (string)args["style"] ?? "forest"; var spec = Specification(args, style);
             var root = tx.Empty(name, group, "world"); root.GetComponent<GeneratedSceneObject>().Style = style;
             var data = tx.Asset(new TerrainData { heightmapResolution = spec.resolution, size = new Vector3(spec.width, spec.height, spec.length) }, "Terrain");
-            data.SetHeights(0, 0, TerrainGenerator.Generate(spec));
+            var craters=style=="moon"&&spec.width>=96&&spec.length>=96?ExplorationTerrain.Craters(spec.seed,Mathf.Min(8,Mathf.Max(1,(int)(spec.width*spec.length/12000))),spec.width,spec.length):new List<ImpactCrater>();
+            data.SetHeights(0, 0, style=="moon"?ExplorationTerrain.Generate(spec,craters,true):TerrainGenerator.Generate(spec));
             var go = Terrain.CreateTerrainGameObject(data); go.name = "Terrain"; Undo.RegisterCreatedObjectUndo(go, "WorldWeaver assistant"); go.transform.SetParent(root.transform, false);
             go.transform.localPosition = new Vector3(-spec.width / 2, 0, -spec.length / 2);
             var owned = Undo.AddComponent<GeneratedSceneObject>(go); owned.Kind = "terrain"; owned.BatchId = tx.BatchId; tx.Objects.Add(go);
             Undo.AddComponent<GeneratedTerrain>(go).Specification = spec;
             var terrain = go.GetComponent<Terrain>(); terrain.drawInstanced = true;
+            if(style=="moon"){var environment=Undo.AddComponent<WorldEnvironment>(root);environment.Terrain=terrain;environment.Profile="moon";environment.Craters=craters;}
             bool urp = GraphicsSettings.currentRenderPipeline && GraphicsSettings.currentRenderPipeline.GetType().Name.IndexOf("Universal",StringComparison.OrdinalIgnoreCase)>=0;
             Shader terrainShader = Shader.Find(urp ? "Universal Render Pipeline/Terrain/Lit" : "Nature/Terrain/Standard");
             if (terrainShader) terrain.materialTemplate = tx.Asset(new Material(terrainShader), "TerrainMaterial", ".mat");

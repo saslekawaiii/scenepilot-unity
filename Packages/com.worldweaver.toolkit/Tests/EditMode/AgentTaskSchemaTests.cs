@@ -112,7 +112,7 @@ namespace WorldWeaver.Tests
         ChatController Controller(Provider provider, AssistantMode mode = AssistantMode.Execute, bool cloud = false)
         {
             var controller = new ChatController(_ => provider, Path.Combine(folder, Guid.NewGuid().ToString("N"))); controllers.Add(controller);
-            controller.Settings.Mode = mode; controller.Settings.Power = AssistantPower.Fast; controller.Settings.UseSkills = false;
+            controller.Settings.UseNativeFunctions=false;controller.Settings.Mode = mode; controller.Settings.Power = AssistantPower.Fast; controller.Settings.UseSkills = false;
             if (cloud) controller.Settings.ModelKey = "pollinations:openai-fast";
             return controller;
         }

@@ -20,9 +20,9 @@ namespace WorldWeaver.Editor.Assistant
             ("physics","physics rigidbody collision gravity joint vehicle simulation физик гравитац коллиз тверд паден пада отскок машин",new[]{"configure_physics","inspect_component","add_component","set_component"}),
             ("ui","ui canvas interface menu button hud layout интерфейс меню кнопк экран панель текст",new[]{"create_ui_element","configure_ui","inspect_component","set_component","draft_script","attach_script"}),
             ("survival","survival oxygen resources sample shelter выжив кислород ресурс укрыт образц",new[]{"configure_survival","create_resource","create_cave","create_animated_player"}),
-            ("code","code script mechanic gameplay behavior custom скрипт код механик поведен систем",new[]{"create_node","read_script","draft_script","patch_script","attach_script","inspect_component","add_component","set_component","read_console"}),
+            ("code","code script mechanic gameplay behavior custom скрипт код механик поведен систем",new[]{"reflect_api","execute_editor_code","create_node","read_script","draft_script","patch_script","attach_script","inspect_component","add_component","set_component","read_console"}),
             ("navigation","navigation navmesh path route навигац маршрут проходим путь",new[]{"bake_navigation","set_navigation","validate_world","find_scene_objects"}),
-            ("presentation","lighting camera audio sound light screenshot освещ свет камер звук сним",new[]{"set_lighting","create_camera","configure_audio","capture_scene","search_project"}),
+            ("presentation","lighting camera audio sound light screenshot sky stars night освещ свет камер звук сним небо звезд ночн",new[]{"configure_environment","set_lighting","create_camera","configure_audio","capture_scene","search_project"}),
             ("project","project tests build verify compile save проект тест провер сборк сохран компиляц",new[]{"inspect_project","search_project","run_tests","poll_job","save_scene","set_build_scenes","build_player","read_console","verify_scene"})
         };
         internal static string Index => "AVAILABLE CAPABILITY CATEGORIES (not all are in this step's schema):\n"+string.Join("\n",Groups.Select(g=>g.Name+": "+string.Join(",",g.Tools)))+"\n"+Reference;
@@ -45,7 +45,7 @@ namespace WorldWeaver.Editor.Assistant
             var known=new HashSet<string>(all.Select(EditorToolSchema.ToolName));
             if(selected.Count==0)return new JObject{["index"]=Index,["enabledTools"]=new JArray(),["hint"]="Choose a category or exact tool names; this was discovery only, no changes were made."};
             var enabled=selected.Where(known.Contains).OrderBy(x=>Array.IndexOf(names,x)>=0?0:1).ThenBy(x=>x,StringComparer.Ordinal).Take(16).ToArray();
-            var instructions=string.Join("\n",new[]{SceneToolExecutor.ToolInstructions,WorldGameplayTools.ToolInstructions,AgentProjectTools.ToolInstructions,WorldMaterialTools.ToolInstructions,ConstructiveTools.Reference,AnimatedCharacterTools.ToolReference}.SelectMany(s=>s.Split('\n')).Where(line=>enabled.Any(t=>line.StartsWith(t+":",StringComparison.Ordinal))));
+            var instructions=string.Join("\n",new[]{SceneToolExecutor.ToolInstructions,WorldGameplayTools.ToolInstructions,AgentProjectTools.ToolInstructions,WorldMaterialTools.ToolInstructions,ConstructiveTools.Reference,EditorCodeTools.Reference,AnimatedCharacterTools.ToolReference}.SelectMany(s=>s.Split('\n')).Where(line=>enabled.Any(t=>line.StartsWith(t+":",StringComparison.Ordinal))));
             return new JObject{["enabledTools"]=new JArray(enabled),["definitions"]=new JArray(all.Where(c=>enabled.Contains(EditorToolSchema.ToolName(c))).Select(c=>c.DeepClone())),["instructions"]=instructions,
                 ["unknownNames"]=new JArray(names.Where(n=>!known.Contains(n))),["skills"]=JArray.FromObject(AgentSkillCatalog.CreateDefault().Search((string)args["query"]??string.Join(" ",names),6)),["appliedChanges"]=false};
         }

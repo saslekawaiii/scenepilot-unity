@@ -65,8 +65,8 @@ namespace WorldWeaver.Tests
         }
         void CreateController(Provider provider)
         {
-            controller = new ChatController(_ => provider, folder, Path.Combine(folder, "models"));
-            controller.Settings.Mode = AssistantMode.Execute; controller.Settings.Power = AssistantPower.Fast;
+            controller = new ChatController(_ => provider, folder, Path.Combine(folder, "models"));controller.Settings.UseNativeFunctions=false;
+            controller.Settings.UseNativeFunctions=false;controller.Settings.Mode = AssistantMode.Execute; controller.Settings.Power = AssistantPower.Fast;
             controller.Settings.ModelKey = "ollama:qwen3.5:9b"; controller.Settings.AutoApply = true; controller.Settings.UseSkills = false;
         }
         GameObject Find(string name) => scene.GetRootGameObjects().SelectMany(r => r.GetComponentsInChildren<Transform>(true)).Select(t => t.gameObject).FirstOrDefault(o => o.name == name);
@@ -124,7 +124,7 @@ namespace WorldWeaver.Tests
         [UnityTest] public IEnumerator ValidReadOnlyReplacementClearsOnlyThePreviousFormatFailure()
         {
             var provider=new Provider();provider.Reply=(round,request)=>Result(Plan(),round==0?"length":"stop");
-            CreateController(provider);controller.Settings.Mode=AssistantMode.Ask;
+            CreateController(provider);controller.Settings.UseNativeFunctions=false;controller.Settings.Mode=AssistantMode.Ask;
             yield return Finish(controller.SendAsync("Объясни назначение CharacterController."));
             var answer=controller.Current.Messages.Last();Assert.AreEqual(2,answer.Attempts.Count);
             Assert.IsFalse(answer.Attempts[0].Accepted);Assert.IsTrue(answer.Attempts[1].Accepted);

@@ -100,7 +100,14 @@ namespace WorldWeaver.Editor.Assistant
             }
             if(Regex.IsMatch(input,@"(?i)(играбельн|управляем\w*\s+(?:игрок|персонаж)|WASD|playable|player\s+controller)"))task.Requirements.Add(new AgentRequirement{Kind="player",Number=1,Description="В сцене есть управляемый игрок"});
             if(Regex.IsMatch(input,@"(?i)(квест|достав\w*\s+письм|delivery\s+quest)"))task.Requirements.Add(new AgentRequirement{Kind="quest",Number=1,Description="Квест доставки имеет двух участников и награду"});
-            if(Regex.IsMatch(input,@"(?i)(проходим|достижим|NavMesh|connected\s+village|pathfinding)"))task.Requirements.Add(new AgentRequirement{Kind="navigation",Number=1,Description="Связи именованных мест имеют полные пути NavMesh"});
+            if(Regex.IsMatch(input,@"(?i)(NavMesh|connected\s+village|pathfinding|(?:проходим|достижим)\p{L}*[^.!?\n]{0,70}(?:мест|маршрут|дорог|посел|деревн)|(?:мест|маршрут|дорог|посел|деревн)[^.!?\n]{0,70}(?:проходим|достижим))"))task.Requirements.Add(new AgentRequirement{Kind="navigation",Number=1,Description="Связи именованных мест имеют полные пути NavMesh"});
+            if(mutationAuthorized)
+            {
+                if(Regex.IsMatch(input,@"(?i)выжив|surviv"))task.Requirements.Add(new AgentRequirement{Kind="survival_loop",Number=1,Description="Игрок связан с миром, запасом кислорода и базой восстановления"});
+                if(Regex.IsMatch(input,@"(?i)пещер|\bcaves?\b"))task.Requirements.Add(new AgentRequirement{Kind="cave_collision",Number=1,Description="Пещера имеет физический проход и отверстие в Terrain"});
+                if(Regex.IsMatch(input,@"(?i)зв[её]зд\p{L}*\s+неб|star\p{L}*\s+sky|starfield"))task.Requirements.Add(new AgentRequirement{Kind="starfield",Number=1,Description="Звёздное небо содержит сохранённую геометрию и материал"});
+                if(Regex.IsMatch(input,@"(?i)(?:игрок|герой|player)[^.!?\n]{0,45}(?:ходить|walk)"))task.Requirements.Add(new AgentRequirement{Kind="grounded_player",Number=1,Description="Под управляемым игроком есть физическая поверхность"});
+            }
             if(AgentTaskSchema.GroundedPointLights(task))
             {
                 var count=task.Requirements.First(r=>r.Kind=="count"&&r.Expected=="point_light"&&r.Relative);
@@ -141,6 +148,27 @@ namespace WorldWeaver.Editor.Assistant
                 {
                     var ids=ProjectContextIndex.Objects().Where(go=>MatchesKind(go,requirement.Expected)).Select(ProjectContextIndex.StableTarget).ToArray();
                     actual=requirement.BaselineTargets!=null&&requirement.BaselineTargets.Count==(int)requirement.Number&&requirement.BaselineTargets.All(ids.Contains)?requirement.Number:double.NaN;evidence="Стабильные ID исходных объектов сохранены";
+                }
+                else if(requirement.Kind=="survival_loop")
+                {
+                    var terrains=objects.Select(g=>g.GetComponent<Terrain>()).Where(t=>t).ToArray();
+                    actual=ProjectContextIndex.Objects().Select(g=>g.GetComponent<WorldSurvival>()).Any(s=>s&&s.GetComponent<WorldPlayer>()&&s.Environment&&terrains.Contains(s.Environment.Terrain)&&s.Habitat&&s.OxygenSeconds>0)?1:0;
+                    evidence="WorldSurvival + WorldPlayer, ссылка на Terrain текущего мира, Habitat, OxygenSeconds; это проверка связей, не полного игрового прохождения";
+                }
+                else if(requirement.Kind=="cave_collision")
+                {
+                    actual=objects.Select(g=>g.GetComponent<WorldCave>()).Any(c=>c&&c.Terrain&&c.GetComponent<MeshCollider>()&&c.GetComponent<MeshCollider>().sharedMesh&&c.Terrain.terrainData.IsHole(Mathf.Clamp((int)((c.Interior.x-c.Terrain.transform.position.x)/c.Terrain.terrainData.size.x*c.Terrain.terrainData.holesResolution),0,c.Terrain.terrainData.holesResolution-1),Mathf.Clamp((int)((c.Interior.z-c.Terrain.transform.position.z)/c.Terrain.terrainData.size.z*c.Terrain.terrainData.holesResolution),0,c.Terrain.terrainData.holesResolution-1)))?1:0;
+                    evidence="WorldCave, MeshCollider и реальное TerrainData.IsHole в камере пещеры";
+                }
+                else if(requirement.Kind=="starfield")
+                {
+                    actual=objects.Select(g=>g.GetComponent<WorldStarfield>()).Any(s=>s&&s.StarCount>0&&s.GetComponent<MeshFilter>()&&s.GetComponent<MeshFilter>().sharedMesh&&s.GetComponent<MeshRenderer>()&&s.GetComponent<MeshRenderer>().sharedMaterial)?1:0;
+                    evidence="WorldStarfield + MeshFilter + MeshRenderer/material";
+                }
+                else if(requirement.Kind=="grounded_player")
+                {
+                    Physics.SyncTransforms();actual=ProjectContextIndex.Objects().Select(g=>g.GetComponent<WorldPlayer>()).Any(p=>p&&p.GetComponent<CharacterController>()&&Physics.Raycast(p.transform.position+Vector3.up*.4f,Vector3.down,3))?1:0;
+                    evidence="CharacterController и Physics.Raycast до поверхности в пределах 3 м; движение проверяется отдельно в Play Mode";
                 }
                 else if(requirement.Kind.StartsWith("terrain_",StringComparison.Ordinal))
                 {

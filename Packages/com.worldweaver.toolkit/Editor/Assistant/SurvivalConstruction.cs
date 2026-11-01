@@ -26,7 +26,8 @@ namespace WorldWeaver.Editor.Assistant
                 tx.Primitive("Airlock lintel",PrimitiveType.Cube,habitat.transform,shell,new Vector3(0,3.6f,-4),new Vector3(3.2f,.8f,.25f));
                 var lamp=tx.Empty("Recovery light",habitat.transform,"light");lamp.transform.localPosition=new Vector3(0,3.5f,0);var light=Undo.AddComponent<Light>(lamp);light.type=LightType.Point;light.color=new Color(.36f,1,.79f);light.range=10;light.intensity=2;
             }
-            survival.Spawn=survival.Habitat.position+Vector3.up*.1f;EditorUtility.SetDirty(survival);EditorUtility.SetDirty(control);
+            survival.Spawn=survival.Habitat.position+Vector3.up*.1f;
+            Undo.RecordObject(player.transform,"Ground player in survival world");player.transform.position=survival.Spawn;EditorUtility.SetDirty(survival);EditorUtility.SetDirty(control);
         }
         internal static GameObject Resource(EditorCommand c,SceneBuildTransaction tx,GameObject world)
         {

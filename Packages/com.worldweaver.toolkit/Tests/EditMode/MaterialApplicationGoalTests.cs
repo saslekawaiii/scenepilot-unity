@@ -262,7 +262,7 @@ namespace WorldWeaver.Tests
             {
                 using (var controller = new ChatController(_ => provider, history + "/history", history + "/models"))
                 {
-                    controller.Settings.Mode = AssistantMode.Execute; controller.Settings.Power = repair ? AssistantPower.Balanced : AssistantPower.Fast;
+                    controller.Settings.UseNativeFunctions=false;controller.Settings.Mode = AssistantMode.Execute; controller.Settings.Power = repair ? AssistantPower.Balanced : AssistantPower.Fast;
                     controller.Settings.AutoApply = controller.Settings.AutoVerify = true; controller.Settings.UseSkills = false;
                     await controller.SendAsync("Примени материал дерева к выделенной двери."); var answer = controller.Current.Messages.Last(); checkpoint = answer.Task.CheckpointId;
                     Assert.IsTrue(provider.InitialPin); Assert.IsFalse(answer.Attempts[0].Accepted); Assert.AreEqual(provider.InvalidRaw, answer.Attempts[0].RawResponse);
@@ -313,7 +313,7 @@ namespace WorldWeaver.Tests
             {
                 using (var controller = new ChatController(_ => provider, history + "/history", history + "/models"))
                 {
-                    controller.Settings.Mode = AssistantMode.Execute; controller.Settings.Power = AssistantPower.Deep;
+                    controller.Settings.UseNativeFunctions=false;controller.Settings.Mode = AssistantMode.Execute; controller.Settings.Power = AssistantPower.Deep;
                     controller.Settings.AutoApply = true; controller.Settings.AutoVerify = true; controller.Settings.UseSkills = false;
                     await controller.SendAsync(Request); var answer = controller.Current.Messages.Last(); checkpoint = answer.Task.CheckpointId;
                     Assert.AreEqual(6, provider.Calls); Assert.IsTrue(provider.SawRemainingApplicationRequirement);

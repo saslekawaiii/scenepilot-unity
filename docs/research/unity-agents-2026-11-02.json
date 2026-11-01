@@ -1,0 +1,62 @@
+{
+  "reviewedUtc": "2026-11-01T22:30:00.292974+00:00",
+  "sources": [
+    {
+      "repository": "https://github.com/CoplayDev/unity-mcp",
+      "commit": "e2fd09c71644d1d9fa1ae134526ce913cbf97536",
+      "license": "MIT",
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha256": "6efe650c965012ac418238dcd6b9116e4130a5220717ef0dfb539dd159c4245c"
+        },
+        {
+          "path": "MCPForUnity/Editor/Tools/ExecuteCode.cs",
+          "sha256": "904df839949337d625fec7958cbb762a7bae8edf41898ed30653660bfc55d6aa"
+        },
+        {
+          "path": "MCPForUnity/Editor/Tools/UnityReflect.cs",
+          "sha256": "b42f5b8de353eec2e6ce26bbfa72a4e235ecedcf7fabffbda548244f10f838ef"
+        },
+        {
+          "path": "MCPForUnity/Editor/Tools/BatchExecute.cs",
+          "sha256": "98e0e2c04a8be9dd7506e9ff6f8f791ad860964d9d48081ae47abea6a062ed74"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/IvanMurzak/Unity-MCP",
+      "commit": "475d025746755d130bfdb5274bc6e75ba9c83f24",
+      "license": "Apache-2.0",
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha256": "89f7ebcbc3191847e416977446359ddc5b25f7233ab7e85cac4826a6905bdec8"
+        },
+        {
+          "path": "Unity-MCP-Plugin/Packages/com.ivanmurzak.unity.mcp/Editor/Scripts/API/Tool/Script.Execute.cs",
+          "sha256": "246592e18a1c0d47cffe140828e16ecc5c64c8fbe04e7eecfffd47a3d02442e6"
+        },
+        {
+          "path": "Unity-MCP-Plugin/Packages/com.ivanmurzak.unity.mcp/Editor/Scripts/CodeExec/Core/ExecutionGuard.cs",
+          "sha256": "3b8e8987b221d3f635948d8193fbe8c60631ea0653157ca11ef9080bd0073d04"
+        }
+      ]
+    }
+  ],
+  "incorporatedCode": {
+    "source": "Coplay ExecuteCode.cs: RoslynCompiler",
+    "destination": "Packages/com.worldweaver.toolkit/Editor/Assistant/EditorSnippetCompiler.cs",
+    "license": "Packages/com.worldweaver.toolkit/ThirdPartyNotices/CoplayDev-MIT.txt",
+    "modifications": [
+      "Unity bundled Roslyn discovery",
+      "unique assembly names",
+      "local namespace and loader",
+      "wrapper diagnostic offset"
+    ]
+  },
+  "notIncorporated": [
+    "IvanMurzak sources were reviewed for architecture; no Apache-2.0 code copied",
+    "No upstream agent benchmark claims are reused as WorldWeaver results"
+  ]
+}
