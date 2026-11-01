@@ -29,6 +29,8 @@ namespace WorldWeaver.Tests
             var go=new GameObject(id);go.transform.SetParent(world.transform);go.transform.position=position;var npc=go.AddComponent<IntelligentNPC>();npc.CharacterId=id;npc.NpcName=id;npc.UseRag=false;
             npc.ConfigureInference(router??new ReplyRouter(),new NoEmbedding());go.AddComponent<WorldPlace>();return npc;
         }
+        static bool FiniteGeometry(Rect rect)=>new[]{rect.x,rect.y,rect.width,rect.height}.All(v=>!float.IsNaN(v)&&!float.IsInfinity(v))&&rect.width>0&&rect.height>0;
+        static bool FiniteRange(float value)=>!float.IsNaN(value)&&!float.IsInfinity(value);
         static void InvokeQuest(WorldConversationUI ui)=>typeof(WorldConversationUI).GetMethod("PerformQuestAction",BindingFlags.NonPublic|BindingFlags.Instance).Invoke(ui,null);
         [UnityTest] public IEnumerator OpeningNearestConversationFreezesActualPlayerUpdateAndDoesNotAcceptQuest()
         {
@@ -71,6 +73,40 @@ namespace WorldWeaver.Tests
             var text=player.Conversation.View.Query<Label>(className:"speech-text").ToList();Assert.AreEqual(2,text.Count);
             Assert.IsTrue(text.All(label=>!label.enableRichText));StringAssert.Contains("<b>облако</b>",text[0].text);StringAssert.Contains("Поговорим",text[1].text);
             Assert.IsTrue(player.Conversation.View.Q<TextField>("conversation-input").enabledInHierarchy);Assert.IsNull(player.Conversation.LastError);
+        }
+        [UnityTest] public IEnumerator NewNpcReplyBecomesVisibleAfterWideAndCompactLayoutWithoutHoldingReaderAtBottom()
+        {
+            var player=Player(out var world);var npc=Actor(world,"guard",new Vector3(1,3,0));var ui=player.Conversation;
+            foreach(var size in new[]{new Vector2(1280,900),new Vector2(800,450)})
+            {
+                ui.Close();npc.RestoreConversation(Array.Empty<NpcUtterance>());
+                for(int i=0;i<12;i++)npc.ObserveUtterance(new NpcUtterance {Id=Guid.NewGuid().ToString("N"),SpeakerId=i%2==0?"Player":npc.CharacterId,SpeakerName=i%2==0?"Вы":npc.NpcName,
+                    TargetId=i%2==0?npc.CharacterId:"Player",Text="Предыдущая реплика номер "+i+". "+string.Join(" ",Enumerable.Repeat("Мы обсуждаем дорогу, деревню и старый мост.",3)),
+                    Timestamp=DateTime.UtcNow.ToString("o"),IsPlayer=i%2==0,IsAi=i%2!=0});
+                var root=ui.View;root.style.right=StyleKeyword.Auto;root.style.bottom=StyleKeyword.Auto;root.style.width=size.x;root.style.height=size.y;
+                ui.Open(npc);var scroll=root.Q<ScrollView>("conversation-history");float deadline=Time.realtimeSinceStartup+3;
+                while((scroll.panel==null||!FiniteGeometry(root.worldBound)||!FiniteGeometry(scroll.contentViewport.worldBound)||!FiniteGeometry(scroll.contentContainer.worldBound)||!FiniteRange(scroll.verticalScroller.highValue)||Mathf.Abs(root.worldBound.width-size.x)>.5f||root.ClassListContains("compact")!=(size.x<900)||scroll.verticalScroller.highValue<=20)&&Time.realtimeSinceStartup<deadline)yield return null;
+                Assert.IsTrue(FiniteGeometry(root.worldBound)&&FiniteGeometry(scroll.contentViewport.worldBound)&&FiniteGeometry(scroll.contentContainer.worldBound)&&FiniteRange(scroll.verticalScroller.highValue),"Wait for finite actual UI geometry and scroller range; NaN is not a ready layout.");
+                Assert.That(root.worldBound.width,Is.EqualTo(size.x).Within(.5f));Assert.AreEqual(size.x<900,root.ClassListContains("compact"));
+                Assert.Greater(scroll.verticalScroller.highValue,20,"The real UI layout must overflow before appending, otherwise latest-reply clipping is not exercised.");
+                // This is authored UI geometry, not desktop screenshot/native keyboard evidence.
+                yield return new WaitForSecondsRealtime(.2f);scroll.scrollOffset=Vector2.zero;
+                var pending=ui.SendAsync("Ответь на новую реплику, не меняя мир.");while(!pending.IsCompleted)yield return null;
+                Assert.IsTrue(pending.GetAwaiter().GetResult().Validation.Accepted);
+                var latest=root.Query<Label>(className:"speech-text").ToList().Last();deadline=Time.realtimeSinceStartup+3;
+                while((!FiniteGeometry(latest.worldBound)||!FiniteGeometry(scroll.contentViewport.worldBound)||latest.worldBound.yMin<scroll.contentViewport.worldBound.yMin-.75f||latest.worldBound.yMax>scroll.contentViewport.worldBound.yMax+.75f)&&Time.realtimeSinceStartup<deadline)yield return null;
+                var viewport=scroll.contentViewport.worldBound;Assert.IsTrue(FiniteGeometry(latest.worldBound)&&FiniteGeometry(viewport),"The NPC reply and clip viewport must have finite actual bounds.");Assert.Greater(latest.worldBound.height,0);
+                Assert.GreaterOrEqual(latest.worldBound.yMin,viewport.yMin-.75f,"The actual latest NPC text must be visible above the composer in both layouts.");
+                Assert.LessOrEqual(latest.worldBound.yMax,viewport.yMax+.75f,"A stale old scroll range must not leave the new NPC text clipped below the viewport.");
+                yield return new WaitForSecondsRealtime(.25f);scroll.scrollOffset=Vector2.zero;
+                yield return new WaitForSecondsRealtime(.3f);
+                Assert.That(scroll.scrollOffset.y,Is.EqualTo(0).Within(.75f),"Automatic reveal must finish; it must not continually drag a reader away from older messages.");
+                TestContext.WriteLine("Actual conversation layout "+size+": viewport="+viewport+", latest="+latest.worldBound+", range="+scroll.verticalScroller.highValue);
+            }
+            // A scheduled reveal for this transcript must not operate on a newly opened conversation.
+            npc.ObserveUtterance(new NpcUtterance {Id=Guid.NewGuid().ToString("N"),SpeakerId=npc.CharacterId,SpeakerName=npc.NpcName,TargetId="Player",Text="Старая отложенная реплика",Timestamp=DateTime.UtcNow.ToString("o"),IsAi=true});
+            ui.Close();var other=Actor(world,"merchant",new Vector3(2,3,0));ui.Open(other);yield return new WaitForSecondsRealtime(.2f);
+            Assert.AreSame(other,ui.ActiveNpc);Assert.AreEqual(0,ui.View.Query<Label>(className:"speech-text").ToList().Count);ui.Close();
         }
         [UnityTest] public IEnumerator ClosingPendingRequestCancelsAndNextNpcCannotReceiveStaleReply()
         {

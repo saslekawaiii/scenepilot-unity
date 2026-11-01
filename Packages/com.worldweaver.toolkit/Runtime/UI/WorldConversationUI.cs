@@ -32,7 +32,8 @@ namespace WorldWeaver
         RenderTexture portraitTexture;
         double nextHud, nextPortrait;
         string historySignature;
-        int conversationVersion;
+        int conversationVersion, historyScrollGeneration;
+        IVisualElementScheduledItem pendingHistoryScroll;
         bool sending, opened;
 
         void OnEnable() { EnsureView(); }
@@ -46,6 +47,7 @@ namespace WorldWeaver
 
         public void EnsureView()
         {
+            CancelHistoryScroll();
             document = GetComponent<UIDocument>() ?? gameObject.AddComponent<UIDocument>();
             if (!settings)
             {
@@ -104,6 +106,8 @@ namespace WorldWeaver
             history = new ScrollView(ScrollViewMode.Vertical) { name = "conversation-history", horizontalScrollerVisibility = ScrollerVisibility.Hidden };
             history.AddToClassList("conversation-history"); conversation.Add(history);
             timeline = history.contentContainer;
+            history.RegisterCallback<WheelEvent>(_ => CancelHistoryScroll(), TrickleDown.TrickleDown);
+            history.RegisterCallback<PointerDownEvent>(_ => CancelHistoryScroll(), TrickleDown.TrickleDown);
             emptyHistory = Label(timeline, "", "conversation-intro");
             var contextActions = Box(conversation, "context-actions");
             questAction = Button(contextActions, "", PerformQuestAction, "quest-action");
@@ -173,6 +177,7 @@ namespace WorldWeaver
         public void Close()
         {
             conversationVersion++;
+            CancelHistoryScroll();
             CancelRequest();
             if (ActiveNpc)
             {
@@ -210,8 +215,47 @@ namespace WorldWeaver
                 Label(row, entry.IsPlayer ? "ВЫ" : entry.IsAi ? (entry.SpeakerName ?? ActiveNpc.NpcName).ToUpperInvariant() : "СИСТЕМА", "speaker-name");
                 Label(row, entry.Text ?? "", "speech-text");
             }
-            history.schedule.Execute(() => { if (history.panel != null) history.scrollOffset = new Vector2(0, history.verticalScroller.highValue); });
+            RevealLatestHistoryAfterLayout();
         }
+
+        void CancelHistoryScroll()
+        {
+            historyScrollGeneration++;
+            pendingHistoryScroll?.Pause(); pendingHistoryScroll = null;
+        }
+
+        void RevealLatestHistoryAfterLayout()
+        {
+            CancelHistoryScroll();
+            if (!IsOpen || history == null || timeline == null || timeline.childCount == 0) return;
+            var scroll = history; var content = timeline; var latest = timeline[timeline.childCount - 1];
+            int version = conversationVersion, generation = historyScrollGeneration, attempts = 0, stableLayouts = 0;
+            float deadline = Time.realtimeSinceStartup + 1f, previousHeight = -1, previousRange = -1, previousViewport = -1;
+            // UI Toolkit can update the scroller range after the first scheduled callback.
+            // Observe the new row's real layout, then stop after it remains visible across two stable layouts.
+            IVisualElementScheduledItem reveal = null;
+            Action finish = () => { reveal?.Pause(); if (pendingHistoryScroll == reveal) pendingHistoryScroll = null; };
+            reveal = scroll.schedule.Execute(() =>
+            {
+                if (!this || !IsOpen || version != conversationVersion || generation != historyScrollGeneration ||
+                    history != scroll || timeline != content || !content.Contains(latest) || ++attempts > 12 || Time.realtimeSinceStartup > deadline)
+                { finish(); return; }
+                if (scroll.panel == null || latest.panel == null || !ReadyLayout(latest.layout) || !ReadyLayout(content.layout) ||
+                    !ReadyLayout(scroll.contentViewport.layout) || !ReadyLayout(latest.worldBound) || !ReadyLayout(scroll.contentViewport.worldBound) || !Finite(scroll.verticalScroller.highValue)) return;
+                float range = Mathf.Max(0, scroll.verticalScroller.highValue), height = content.layout.height, viewportHeight = scroll.contentViewport.layout.height;
+                scroll.scrollOffset = new Vector2(0, range);
+                Rect row = latest.worldBound, viewport = scroll.contentViewport.worldBound;
+                bool visible = ReadyLayout(row) && ReadyLayout(viewport) && row.yMax <= viewport.yMax + .75f && (row.height > viewport.height || row.yMin >= viewport.yMin - .75f);
+                bool stable = Mathf.Abs(height - previousHeight) < .1f && Mathf.Abs(range - previousRange) < .1f && Mathf.Abs(viewportHeight - previousViewport) < .1f;
+                stableLayouts = visible && stable ? stableLayouts + 1 : 0;
+                previousHeight = height; previousRange = range; previousViewport = viewportHeight;
+                if (stableLayouts >= 2) finish();
+            }).Every(16);
+            pendingHistoryScroll = reveal;
+        }
+
+        static bool Finite(float value) => !float.IsNaN(value) && !float.IsInfinity(value);
+        static bool ReadyLayout(Rect rect) => Finite(rect.x) && Finite(rect.y) && Finite(rect.width) && Finite(rect.height) && rect.width > 0 && rect.height > 0;
 
         void RefreshControls()
         {

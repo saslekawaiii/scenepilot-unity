@@ -212,7 +212,7 @@ validate_world: target owned world; args {}. Read-only semantic graph/NavMesh/qu
             Undo.AddComponent<Inventory>(go);var npc=Undo.AddComponent<IntelligentNPC>(go);npc.CharacterId=place.PersistentId;npc.NpcName=name;npc.Role=key=="guard"?"страж":"житель";npc.Personality="Спокойный, доброжелательный, говорит кратко.";npc.Goals=goal;npc.Autonomous=false;
             if(!routes)
             {
-                var model=tx.Asset(ScriptableObject.CreateInstance<ModelProfile>(),"NpcLocalModel");model.Model="qwen3.5:9b";model.MaxTokens=1024;model.ContextWindow=8192;
+                var model=tx.Asset(ScriptableObject.CreateInstance<ModelProfile>(),"NpcLocalModel");model.Model="qwen3.5:9b";model.MaxTokens=512;model.TimeoutSeconds=150;model.Retries=0;model.Temperature=.25f;model.ContextWindow=8192;
                 routes=tx.Asset(ScriptableObject.CreateInstance<OrchestratorProfile>(),"NpcRoutes");routes.Dialogue=routes.Planning=routes.Terrain=model;
             }
             Undo.AddComponent<NpcRelationships>(go);
