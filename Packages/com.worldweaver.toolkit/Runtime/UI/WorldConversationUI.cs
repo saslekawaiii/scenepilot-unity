@@ -304,7 +304,7 @@ namespace WorldWeaver
             if (worldTime != null) worldTime.text = clock ? "День " + clock.Day + "   /   " + Mathf.FloorToInt(clock.Hour).ToString("00") + ":" + Mathf.FloorToInt(clock.Hour % 1 * 60).ToString("00") : "";
             if (location != null && save) location.text = save.gameObject.name.ToUpperInvariant();
             var quests = save ? save.GetComponentsInChildren<DeliveryQuest>() : Array.Empty<DeliveryQuest>();
-            if (questText != null) questText.text = string.Join("\n\n", quests.Select(q => q.Title + "\n" + (q.Stage == DeliveryQuestStage.Completed ? "Выполнено. Письмо у стража." : q.Stage == DeliveryQuestStage.CarryingLetter ? "Передайте письмо стражу у северных ворот." : "Поговорите с жителем на площади.")));
+            if (questText != null) questText.text = string.Join("\n\n", quests.Select(q => q.Title + "\n" + q.ObjectiveText));
             if (inventoryText != null && PlayerInventory) inventoryText.text = "В сумке: " + (PlayerInventory.Snapshot().Any(p => p.Value > 0) ? string.Join(", ", PlayerInventory.Snapshot().Where(p => p.Value > 0).Select(p => p.Key + " ×" + p.Value)) : "пусто");
             if (hudNotice != null) { hudNotice.text = Player ? Player.LastMessage : ""; hudNotice.style.display = !IsOpen && Player && !(Player.LastMessage ?? "").StartsWith("WASD", StringComparison.Ordinal) ? DisplayStyle.Flex : DisplayStyle.None; }
             if (questCard != null) questCard.style.display = save ? DisplayStyle.Flex : DisplayStyle.None;

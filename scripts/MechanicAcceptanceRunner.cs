@@ -31,11 +31,7 @@ public static class MechanicAcceptanceRunner
             throw new InvalidOperationException("Disposable batch mode, WW_MECHANIC_ACCEPTANCE=1 and WW_MECHANIC_OUTPUT are required.");
         if (running) throw new InvalidOperationException("Mechanic acceptance already runs.");
         running = true;
-        string output = Path.GetFullPath(requestedOutput), project = Directory.GetParent(Application.dataPath).FullName;
-        string assets = Path.GetFullPath(Application.dataPath) + Path.DirectorySeparatorChar;
-        if (output.StartsWith(assets, StringComparison.Ordinal) || output.StartsWith(Path.Combine(project, "Packages") + Path.DirectorySeparatorChar, StringComparison.Ordinal))
-            throw new InvalidOperationException("Receipt/draft output must remain outside Assets and Packages to avoid imports.");
-        Directory.CreateDirectory(Path.GetDirectoryName(output));
+        string output = requestedOutput, project = null, packageRoot = null;bool outputApproved=false;
         var checks = new JObject(); var failures = new JArray(); var captured = new JObject(); var drafts = new JArray();
         var report = new JObject {
             ["schemaVersion"] = 1, ["kind"] = "actual-main-chat-proactive-mechanic-draft", ["runner"] = typeof(MechanicAcceptanceRunner).FullName,
@@ -52,7 +48,12 @@ public static class MechanicAcceptanceRunner
         var watch = Stopwatch.StartNew(); Dictionary<string, string> packageBefore = null, scriptsBefore = null;
         try
         {
-            File.WriteAllText(output, report.ToString());
+            output=Path.GetFullPath(requestedOutput);project=Directory.GetParent(Application.dataPath).FullName;
+            if(IsWithin(output,Application.dataPath)||IsWithin(output,Path.Combine(project,"Packages")))throw new InvalidOperationException("Receipt/draft output must remain outside Assets and Packages to avoid imports.");
+            outputApproved=true;
+            packageRoot=ResolvePackageRoot();
+            if(IsWithin(output,packageRoot)){outputApproved=false;throw new InvalidOperationException("Acceptance outputs must remain outside the resolved package source.");}
+            Directory.CreateDirectory(Path.GetDirectoryName(output));File.WriteAllText(output,report.ToString());
             if (EditorApplication.isPlayingOrWillChangePlaymode || EditorApplication.isCompiling || EditorApplication.isUpdating || ScriptDrafts.Pending)
                 throw new InvalidOperationException("Wait for Edit Mode/import/compilation and previous reviewed code operations.");
             if (Path.GetFullPath("Assets").TrimEnd(Path.DirectorySeparatorChar) != Application.dataPath.TrimEnd(Path.DirectorySeparatorChar))
@@ -64,10 +65,11 @@ public static class MechanicAcceptanceRunner
             string requestedPower = Environment.GetEnvironmentVariable("WW_MECHANIC_POWER");
             if (!string.IsNullOrEmpty(requestedPower) && (!Enum.TryParse(requestedPower, true, out power) || !Enum.IsDefined(typeof(AssistantPower), power))) throw new ArgumentException("WW_MECHANIC_POWER must be Fast, Balanced or Deep.");
             report["modelKey"] = "ollama:" + model; report["power"] = power.ToString();
-            packageBefore = Files("Packages/com.worldweaver.toolkit", false); scriptsBefore = Files("Assets", true);
+            packageBefore = Files(packageRoot, false); scriptsBefore = Files("Assets", true);
             report["source"] = new JObject { ["packageFiles"] = JObject.FromObject(packageBefore), ["fileCount"] = packageBefore.Count,
+                ["packageRoot"] = packageRoot,["harnessSha256"]=Environment.GetEnvironmentVariable("WW_MECHANIC_HARNESS_SHA256")??"not supplied",
                 ["treeSha256"] = TreeHash(packageBefore), ["treeFormat"] = "Ordinal relative path + NUL + lowercase file SHA256 + LF, UTF-8; all package files except .DS_Store.",
-                ["packageVersion"] = (string)JObject.Parse(File.ReadAllText("Packages/com.worldweaver.toolkit/package.json"))["version"] };
+                ["packageVersion"] = (string)JObject.Parse(File.ReadAllText(Path.Combine(packageRoot,"package.json")))["version"] };
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single); Selection.objects = Array.Empty<Object>();
             Application.runInBackground = true;
             string history = Path.Combine(project, "UserSettings", "WorldWeaverChatAcceptance", Guid.NewGuid().ToString("N"));
@@ -114,28 +116,46 @@ public static class MechanicAcceptanceRunner
             checks["draftRetainedByteExactlyInHistory"] = answer?.PendingPlan != null && new ChatHistoryStore(history).Load().Any(s => s.Id == controller.Current.Id && s.Messages.Any(m => m.Id == answer.Id && m.PendingPlan != null && JToken.DeepEquals(JToken.FromObject(m.PendingPlan), captured[answer.Id])));
             checks["noGeneratedSourceImported"] = Same(scriptsBefore, Files("Assets", true));
             checks["noCompilationOrScriptImportPending"] = !EditorApplication.isCompiling && !ScriptDrafts.Pending;
-            checks["packageSourceUnchanged"] = Same(packageBefore, Files("Packages/com.worldweaver.toolkit", false));
+            checks["packageSourceUnchanged"] = Same(packageBefore, Files(packageRoot, false));
             report["singleScriptCodeAcceptanceCompatible"] = answer?.PendingPlan?.actions?.Count == 1 && answer.PendingPlan.actions[0].tool == "draft_script";
             success = checks.Properties().All(p => p.Value.Type == JTokenType.Boolean && (bool)p.Value);
         }
         catch (Exception error) { report["error"] = ChatHistoryStore.Redact(error.ToString()); }
         finally
         {
-            controller?.Dispose(); Application.runInBackground = previousBackground; watch.Stop();
-            if (packageBefore != null) checks["packageSourceUnchangedAtExit"] = Same(packageBefore, Files("Packages/com.worldweaver.toolkit", false));
-            if (scriptsBefore != null) checks["sourceAssetsUnchangedAtExit"] = Same(scriptsBefore, Files("Assets", true));
+            try
+            {
+                controller?.Dispose();Application.runInBackground=previousBackground;
+                if(packageBefore!=null)checks["packageSourceUnchangedAtExit"]=Same(packageBefore,Files(packageRoot,false));
+                if(scriptsBefore!=null)checks["sourceAssetsUnchangedAtExit"]=Same(scriptsBefore,Files("Assets",true));
+            }
+            catch(Exception error){report["cleanupError"]=ChatHistoryStore.Redact(error.ToString());success=false;}
+            watch.Stop();report["sourceAssetsComparisonScope"]="Assets/**/*.cs only. Authorized scene/material generation is not counted as a source-code import.";
             foreach (var check in checks.Properties().Where(p => p.Value.Type != JTokenType.Boolean || !(bool)p.Value)) failures.Add(check.Name);
             success = success && failures.Count == 0; report["success"] = success; report["passed"] = success; report["ms"] = watch.ElapsedMilliseconds; report["finishedUtc"] = DateTime.UtcNow.ToString("o");
-            File.WriteAllText(output, ChatHistoryStore.Redact(report.ToString())); running = false;
-            EditorApplication.Exit(success ? 0 : 1);
+            try
+            {
+                if(!outputApproved)output=Path.Combine(Directory.GetParent(Application.dataPath).FullName,"UserSettings","WorldWeaverAcceptanceFailures","mechanic-"+Guid.NewGuid().ToString("N")+".json");
+                Directory.CreateDirectory(Path.GetDirectoryName(output));File.WriteAllText(output,ChatHistoryStore.Redact(report.ToString()));
+            }
+            catch(Exception error){UnityEngine.Debug.LogError("Cannot write mechanic acceptance failure receipt: "+ChatHistoryStore.Redact(error.ToString()));success=false;}
+            finally{running=false;EditorApplication.Exit(success?0:1);}
         }
     }
     static Dictionary<string, string> Files(string root, bool scriptsOnly)
     {
-        if (!Directory.Exists(root)) return new Dictionary<string, string>(StringComparer.Ordinal);
-        return Directory.GetFiles(root, scriptsOnly ? "*.cs" : "*", SearchOption.AllDirectories).Where(p => Path.GetFileName(p) != ".DS_Store").OrderBy(p => p, StringComparer.Ordinal)
-            .ToDictionary(p => p.Replace('\\', '/'), p => Hash(File.ReadAllBytes(p)), StringComparer.Ordinal);
+        string physical=Path.GetFullPath(root).TrimEnd(Path.DirectorySeparatorChar);
+        if(!Directory.Exists(physical))throw new DirectoryNotFoundException("Acceptance source directory is absent: "+physical);
+        return Directory.GetFiles(physical, scriptsOnly ? "*.cs" : "*", SearchOption.AllDirectories).Where(p => Path.GetFileName(p) != ".DS_Store").OrderBy(p => p, StringComparer.Ordinal)
+            .ToDictionary(p => p.Substring(physical.Length).TrimStart(Path.DirectorySeparatorChar).Replace('\\', '/'), p => Hash(File.ReadAllBytes(p)), StringComparer.Ordinal);
     }
+    static string ResolvePackageRoot()
+    {
+        var info=UnityEditor.PackageManager.PackageInfo.FindForAssembly(typeof(SceneToolExecutor).Assembly);string path=info?.resolvedPath;
+        if(string.IsNullOrWhiteSpace(path)||!Directory.Exists(path)||!File.Exists(Path.Combine(path,"package.json")))throw new DirectoryNotFoundException("Cannot resolve the physical WorldWeaver package source via PackageInfo.");
+        return Path.GetFullPath(path);
+    }
+    static bool IsWithin(string path,string folder)=>Path.GetFullPath(path).StartsWith(Path.GetFullPath(folder).TrimEnd(Path.DirectorySeparatorChar)+Path.DirectorySeparatorChar,StringComparison.Ordinal);
     static bool Same(Dictionary<string, string> first, Dictionary<string, string> second) => first.Count == second.Count && first.All(p => second.TryGetValue(p.Key, out string hash) && hash == p.Value);
     static string TreeHash(Dictionary<string, string> files) => Hash(Encoding.UTF8.GetBytes(string.Concat(files.OrderBy(p => p.Key, StringComparer.Ordinal).Select(p => p.Key + "\0" + p.Value + "\n"))));
     static string Hash(byte[] bytes) { using (var hash = SHA256.Create()) return BitConverter.ToString(hash.ComputeHash(bytes)).Replace("-", "").ToLowerInvariant(); }

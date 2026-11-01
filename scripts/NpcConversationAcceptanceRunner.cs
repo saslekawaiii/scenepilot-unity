@@ -27,11 +27,17 @@ public static class NpcConversationAcceptanceRunner
         string model=Environment.GetEnvironmentVariable("WW_NPC_MODEL")??"qwen3.5:2b";
         var report=new JObject { ["kind"]="actual-local-freeform-and-social-npc-acceptance",["startedUtc"]=DateTime.UtcNow.ToString("O"),["unity"]=Application.unityVersion,["model"]=model,["providerFactoryInjected"]=false,["paidApiUsed"]=false,["manualSemanticReviewRequired"]=true,
             ["limitations"]=new JArray("One authored world and one dependent conversation on one local model; not a general dialogue benchmark.","Keyword-based recall and nonempty-response criteria require independent semantic review of the exact raw turns.","Editor inference run does not demonstrate PlayMode navigation or the visual dialogue UI.","Cancellation is recorded separately; a cancelled request is not counted as a successful inference response.") };
-        var checks=new JObject();var turns=new JArray();bool passed=false;var timer=Stopwatch.StartNew();
+        var checks=new JObject();var turns=new JArray();bool passed=false;var timer=Stopwatch.StartNew();bool outputApproved=false;
         try
         {
+            output=Path.GetFullPath(output);string project=Directory.GetParent(Application.dataPath).FullName;
+            if(IsWithin(output,Application.dataPath)||IsWithin(output,Path.Combine(project,"Packages")))throw new InvalidOperationException("Acceptance outputs must remain outside Assets and Packages.");
+            outputApproved=true;
+            string package=ResolvePackageRoot();
+            if(IsWithin(output,package)){outputApproved=false;throw new InvalidOperationException("Acceptance outputs must remain outside the resolved package source.");}
+            Directory.CreateDirectory(Path.GetDirectoryName(output));
+            File.WriteAllText(output,report.ToString(Formatting.Indented));
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);TraceLog.Clear();
-            string package=Path.GetFullPath("Packages/com.worldweaver.toolkit");
             report["source"]=Source(package);
             var profile=Keep(ScriptableObject.CreateInstance<ModelProfile>());profile.Provider=ProviderKind.Ollama;profile.Endpoint="http://127.0.0.1:11434";profile.Model=model;
             profile.Temperature=.25f;profile.MaxTokens=512;profile.ContextWindow=8192;profile.TimeoutSeconds=150;profile.Retries=0;profile.StrictSchema=true;
@@ -62,7 +68,9 @@ public static class NpcConversationAcceptanceRunner
                 checks["playerTurn"+(i+1)+"DecisionAccepted"]=trace.Validation!=null&&trace.Validation.Accepted;
             }
             string normalized=recall.ToLowerInvariant().Replace('ё','е');
-            checks["uniquePlayerCallsignRecalled"]=normalized.Contains("ласточка")&&normalized.Contains("73");
+            // A keyword can appear inside an incorrect invented explanation. The
+            // separate semantic review must judge actual recall, not this check.
+            checks["uniqueCallsignMentionedRequiresSemanticReview"]=normalized.Contains("ласточка")&&normalized.Contains("73");
             checks["freeformInputNotConstrainedToPresetChoices"]=turns.Count==4&&((string)turns[1]["Input"]).Contains("облака")&&!string.IsNullOrWhiteSpace((string)turns[1]["Speech"]);
             checks["rewardRequestDidNotCompleteQuestOrGrantCoins"]=quest.Stage==DeliveryQuestStage.NotStarted&&playerInventory.Count("Монета")==0&&playerInventory.Count("Coin")==0;
             checks["verifiedQuestStateInPrompt"]=((string)turns[3]["Context"]).Contains("NotStarted");
@@ -94,9 +102,19 @@ public static class NpcConversationAcceptanceRunner
         catch(Exception error) { report["errorType"]=error.GetType().FullName;report["error"]=error.Message; }
         finally
         {
+            var cleanupErrors=new JArray();
+            foreach(var obj in owned.AsEnumerable().Reverse())
+                try{if(obj)Object.DestroyImmediate(obj);}catch(Exception error){cleanupErrors.Add(error.ToString());}
+            owned.Clear();if(cleanupErrors.Count>0){report["cleanupErrors"]=cleanupErrors;passed=false;}
             report["checks"]=checks;report["allTraces"]=JArray.FromObject(TraceLog.Entries);report["elapsedMs"]=timer.ElapsedMilliseconds;report["finishedUtc"]=DateTime.UtcNow.ToString("O");report["passed"]=passed;
-            foreach(var obj in owned.AsEnumerable().Reverse())if(obj)Object.DestroyImmediate(obj);owned.Clear();
-            Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(output)));File.WriteAllText(output,report.ToString(Formatting.Indented));EditorApplication.Exit(passed?0:1);
+            report["passScope"]="Automatic protocol, state and transcript checks only. Dialogue quality and recall require a separate review of these exact raw responses.";
+            try
+            {
+                if(!outputApproved)output=Path.Combine(Directory.GetParent(Application.dataPath).FullName,"UserSettings","WorldWeaverAcceptanceFailures","npc-"+Guid.NewGuid().ToString("N")+".json");
+                Directory.CreateDirectory(Path.GetDirectoryName(output));File.WriteAllText(output,report.ToString(Formatting.Indented));
+            }
+            catch(Exception error){UnityEngine.Debug.LogError("Cannot write NPC acceptance failure receipt: "+error);passed=false;}
+            finally{EditorApplication.Exit(passed?0:1);}
         }
     }
     static IntelligentNPC Actor(Transform root,string id,string name,string role,string persona,string goal,OrchestratorProfile routes)
@@ -107,10 +125,17 @@ public static class NpcConversationAcceptanceRunner
     }
     static JObject Persona(IntelligentNPC npc)=>new JObject {["id"]=npc.CharacterId,["name"]=npc.NpcName,["role"]=npc.Role,["personality"]=npc.Personality,["goals"]=npc.Goals,["constraints"]=npc.Constraints};
     static string Sha(byte[] bytes) {using(var hash=SHA256.Create())return BitConverter.ToString(hash.ComputeHash(bytes)).Replace("-","").ToLowerInvariant();}
+    static string ResolvePackageRoot()
+    {
+        var info=UnityEditor.PackageManager.PackageInfo.FindForAssembly(typeof(IntelligentNPC).Assembly);string path=info?.resolvedPath;
+        if(string.IsNullOrWhiteSpace(path)||!Directory.Exists(path)||!File.Exists(Path.Combine(path,"package.json")))throw new DirectoryNotFoundException("Cannot resolve the physical WorldWeaver package source via PackageInfo.");
+        return Path.GetFullPath(path);
+    }
+    static bool IsWithin(string path,string folder)=>Path.GetFullPath(path).StartsWith(Path.GetFullPath(folder).TrimEnd(Path.DirectorySeparatorChar)+Path.DirectorySeparatorChar,StringComparison.Ordinal);
     static JObject Source(string root)
     {
         var files=new JArray();var tree=new StringBuilder();
-        foreach(string path in Directory.GetFiles(root,"*",SearchOption.AllDirectories).OrderBy(path=>path,StringComparer.Ordinal))
+        foreach(string path in Directory.GetFiles(root,"*",SearchOption.AllDirectories).Where(path=>Path.GetFileName(path)!=".DS_Store").OrderBy(path=>path,StringComparer.Ordinal))
         {
             string relative=path.Substring(root.Length).TrimStart(Path.DirectorySeparatorChar).Replace('\\','/');string hash=Sha(File.ReadAllBytes(path));
             files.Add(new JObject {["path"]=relative,["sha256"]=hash,["bytes"]=new FileInfo(path).Length});tree.Append(relative).Append('\t').Append(hash).Append('\n');

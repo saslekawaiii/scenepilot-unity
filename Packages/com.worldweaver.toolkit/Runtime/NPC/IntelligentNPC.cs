@@ -178,7 +178,7 @@ namespace WorldWeaver
                         if(dialogue!=null&&dialogue.IsPlayer)RecordUtterance(dialogue.SpeakerId,dialogue.SpeakerName,CharacterId,input,true,false);
                         SetStatus("Обдумывает ответ…");
                         // Ambient turns use bounded lexical knowledge and recent memory, avoiding a second embedding model swap on small machines.
-                        var trace=await Services.RunAsync(this,input,task,UseRag&&!ambient,lease.Token,true,dialogue);
+                        var trace=await Services.RunAsync(this,input,task,UseRag&&!ambient,lease.Token,true,dialogue,()=>lease.TryReserveRepair());
                         // Validation may already have committed before cancellable memory indexing. Retain that evidence,
                         // but a closed/disabled conversation must never publish a new utterance or a fresh ready status.
                         if(lease.Token.IsCancellationRequested||!this||!isActiveAndEnabled||!AiEnabled)

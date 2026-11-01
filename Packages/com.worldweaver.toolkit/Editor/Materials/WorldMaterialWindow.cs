@@ -12,11 +12,16 @@ namespace WorldWeaver.Editor.Assistant
     {
         private string query="дерево",status="13 встроенных поверхностей доступны без интернета.";
         private int source;private Vector2 scroll;private MaterialDescriptor[] materials=Array.Empty<MaterialDescriptor>();
-        private CancellationTokenSource operation;private bool children=true;private float tiling=1;
+        private CancellationTokenSource operation;private bool children=true,importing;private float tiling=1;
         [MenuItem("Tools/WorldWeaver/Материалы и текстуры",priority=4)]
         public static void Open(){var window=GetWindow<WorldMaterialWindow>();window.titleContent=new GUIContent("Материалы");window.minSize=new Vector2(490,420);window.Show();}
-        private void OnEnable(){materials=WorldMaterialLibrary.BuiltIns;}
-        private void OnDisable(){operation?.Cancel();}
+        private void OnEnable(){materials=WorldMaterialLibrary.BuiltIns;WorldMaterialLibrary.TransferProgress+=ShowTransfer;}
+        private void OnDisable(){operation?.Cancel();WorldMaterialLibrary.TransferProgress-=ShowTransfer;}
+        private void ShowTransfer(MaterialTransferProgress progress)
+        {
+            if(!importing||!this)return;
+            status="Загружаю "+progress.File+": "+progress.Bytes/1024+" / "+progress.TotalBytes/1024+" КиБ"+(progress.RangeFallback?" · восстановление соединения":"");Repaint();
+        }
         private void OnGUI()
         {
             EditorGUILayout.Space(12);GUILayout.Label("Материалы для вашего мира",EditorStyles.boldLabel);
@@ -79,7 +84,7 @@ namespace WorldWeaver.Editor.Assistant
         private async Task Import(MaterialDescriptor item,bool apply)
         {
             var target=Selection.activeGameObject;bool include=children;float repeat=tiling;
-            operation=new CancellationTokenSource();status="Импортирую "+item.Name+"…";Repaint();
+            operation=new CancellationTokenSource();importing=true;status="Импортирую "+item.Name+"…";Repaint();
             try
             {
                 var imported=await WorldMaterialLibrary.ImportAsync(item.Id,true,operation.Token);
@@ -94,7 +99,7 @@ namespace WorldWeaver.Editor.Assistant
             }
             catch(OperationCanceledException){if(this)status="Загрузка отменена. Сцена не изменена.";}
             catch(Exception error){if(this)status=error.Message;}
-            finally{operation.Dispose();operation=null;if(this)Repaint();}
+            finally{operation.Dispose();operation=null;importing=false;if(this)Repaint();}
         }
     }
 }

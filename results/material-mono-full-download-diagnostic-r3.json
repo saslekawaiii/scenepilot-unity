@@ -1,0 +1,47 @@
+{
+  "kind": "actual-Unity-bundled-Mono-CLI-material-transport-diagnostic",
+  "unityEditorRun": false,
+  "startedUtc": "2026-11-01T09:17:52.6275680Z",
+  "materialId": "polyhaven:wooden_garage_door",
+  "maps": [
+    {
+      "role": "albedo",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/wooden_garage_door/wooden_garage_door_diff_1k.jpg",
+      "bytes": 880352,
+      "md5": "64682a3d56d94d5f6162ed7ac07be820",
+      "sha256": "818c0b6fcd0b2166cb2482388c5a469ee9c1650ce5d39598a553b3afac917874"
+    },
+    {
+      "role": "normal",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/wooden_garage_door/wooden_garage_door_nor_gl_1k.jpg",
+      "bytes": 613094,
+      "md5": "e7ae96c05592b5bcefdbd010652a56bb",
+      "sha256": "447987b3656b8f5895b465a91c99f43603ef0fc0f2d10293a00ea199cdff2532"
+    },
+    {
+      "role": "roughness",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/wooden_garage_door/wooden_garage_door_rough_1k.jpg",
+      "bytes": 375981,
+      "md5": "a5a008f6d4f445a8870bd084b64e7f22",
+      "sha256": "18f94943c243c00f17ee735a9424d26176a611e75c8daeca81edeb856095e4b4"
+    },
+    {
+      "role": "occlusion",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/wooden_garage_door/wooden_garage_door_ao_1k.jpg",
+      "bytes": 554138,
+      "md5": "17441678ba80f79ff17274eadcd6b2e0",
+      "sha256": "0d7c2ed84ca9404ef5770afd2d3af7e0aec2d4acc3ef03fe28b0c09c253bc389"
+    }
+  ],
+  "ms": 54384,
+  "passed": true,
+  "finishedUtc": "2026-11-01T09:18:46.9909960Z",
+  "sourceBinding": {
+    "recordedUtc": "2026-11-01T09:21:20.528394+00:00",
+    "clientSha256": "7ac3ac89c49c18f3c9be88a24af928da330409e758b0353b509ba1b32d901857",
+    "harnessSha256": "8c6970b5f5fb511b58633f202ec101491f90e7e31781809ee20f8aadfc9a3638",
+    "binarySha256": "d96827978a0076fa8194fd6d7332617353cc757d36f53ed80cb5ae90ce40f145",
+    "clientFileUnchangedSinceProbeCompile": true,
+    "scope": "Actual standalone Unity-bundled Mono CLI download; no Unity Editor asset import/render claim."
+  }
+}

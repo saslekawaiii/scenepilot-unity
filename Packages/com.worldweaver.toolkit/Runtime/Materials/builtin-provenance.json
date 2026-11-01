@@ -10,18 +10,18 @@
   "files": [
     {
       "path": "grass_albedo.png",
-      "sha256": "ae5f2005a18e1e88b4c2acfab818c3c8c4f14fce1aa53d246b7b9e36209e1c90",
-      "bytes": 34950
+      "sha256": "eb4284ec0808cadbbd22987c9e8023b02236f2e2c8c2301fa39f1776653a3783",
+      "bytes": 58460
     },
     {
       "path": "grass_normal.png",
-      "sha256": "fb1588710c1a315d254d10dfeef61dac10d398c85ac1c839385d0ff5c2c7980d",
-      "bytes": 51080
+      "sha256": "3933f5408b6fb4389a100c59c99d90c9baaa84152e14d733e240378276832b50",
+      "bytes": 49642
     },
     {
       "path": "grass_metallic_smoothness.png",
-      "sha256": "82e3bc4370af301265be2ffd24a6d212491e49c0abb93a2e810ad461d7abe604",
-      "bytes": 7258
+      "sha256": "f861ff4b76c5ad03b548a6c7e787079a0ddf5a76951547f48b58cf1ea5139c93",
+      "bytes": 6236
     },
     {
       "path": "stone_albedo.png",
@@ -100,18 +100,18 @@
     },
     {
       "path": "sand_albedo.png",
-      "sha256": "886265609a74cdb92e1e3bff8797b649c465b658c3ebf46f9beac24651eba3e1",
-      "bytes": 43462
+      "sha256": "d5aedafb2fee8d5012b36a27d64265e82a931a9c7f8f2a36bca9ef5c9992e5c6",
+      "bytes": 58767
     },
     {
       "path": "sand_normal.png",
-      "sha256": "dce1403f9ab34449fc036bd351697c4d7c6dfadf5a89f4fb9108c78aa22de325",
-      "bytes": 35918
+      "sha256": "5c3f84a32ee63b07e1747ca31f5b374d851fb9e18d5eb16d21006ed43192e196",
+      "bytes": 38890
     },
     {
       "path": "sand_metallic_smoothness.png",
-      "sha256": "2f4c073e268e41b6e58f4b534d8870d478ac9679dca096ab738414d9593100df",
-      "bytes": 7929
+      "sha256": "238f5aecb4360993c329762ba8cd66f4bedfb2ea6b487d34076382452648cc4e",
+      "bytes": 6257
     },
     {
       "path": "snow_albedo.png",

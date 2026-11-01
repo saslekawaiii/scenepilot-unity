@@ -22,6 +22,16 @@ namespace WorldWeaver
             bool disposed;
             internal Lease(bool ambient, CancellationToken token) { Ambient=ambient; Source=CancellationTokenSource.CreateLinkedTokenSource(token); }
             public CancellationToken Token => Source.Token;
+            internal bool TryReserveRepair()
+            {
+                lock(sync)
+                {
+                    if(disposed||active!=this||Source.IsCancellationRequested)return false;
+                    if(!Ambient)return true;
+                    TrimBudget();if(ambientStarts.Count>=MaxAmbientRequestsPerMinute)return false;
+                    ambientStarts.Enqueue(Seconds);return true;
+                }
+            }
             public void Dispose()
             {
                 lock(sync)
@@ -36,7 +46,7 @@ namespace WorldWeaver
         static readonly List<Pending> waiting = new List<Pending>();
         static readonly Queue<double> ambientStarts = new Queue<double>();
         static Lease active;
-        /// <summary>Ambient completions, not frames or generated dialogue lines, consume this global rolling budget.</summary>
+        /// <summary>Ambient router invocation slots, including decision repair, consume this budget. Provider transport retries are separate.</summary>
         public const int MaxAmbientRequestsPerMinute = 4;
         public static bool AmbientBudgetAvailable
         {
@@ -72,7 +82,7 @@ namespace WorldWeaver
             {
                 TrimBudget();
                 if(ambientStarts.Count>=MaxAmbientRequestsPerMinute)
-                { item.Completion.TrySetException(new InvalidOperationException("Фоновые разговоры приостановлены: лимит 4 запросов в минуту.")); Dispatch(); return; }
+                { item.Completion.TrySetException(new InvalidOperationException("Фоновые разговоры приостановлены: лимит 4 фоновых операций ИИ в минуту.")); Dispatch(); return; }
                 ambientStarts.Enqueue(Seconds);
             }
             active=new Lease(item.Ambient,item.Token); item.Completion.TrySetResult(active);

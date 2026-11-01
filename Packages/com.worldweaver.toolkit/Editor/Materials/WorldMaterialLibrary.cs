@@ -30,7 +30,15 @@ namespace WorldWeaver.Editor.Assistant
     {
         public const string Root = "Assets/WorldWeaverGenerated/Materials";
         public const string PackageTextures = "Packages/com.worldweaver.toolkit/Runtime/Materials/Textures/";
-        private static readonly PolyHavenMaterialClient online = new PolyHavenMaterialClient();
+        public static MaterialTransferProgress LastTransfer {get;private set;}
+        public static event Action<MaterialTransferProgress> TransferProgress;
+        private static readonly PolyHavenMaterialClient online = new PolyHavenMaterialClient(new MaterialHttpTransport(progress:new Progress<MaterialTransferProgress>(OnTransfer)));
+        private static void OnTransfer(MaterialTransferProgress value)
+        {
+            if(value.Bytes<=MaterialHttpTransport.RangeChunkBytes)LastTransfer=null;
+            if(LastTransfer!=null&&LastTransfer.File==value.File&&LastTransfer.Bytes>value.Bytes)return;
+            LastTransfer=value;TransferProgress?.Invoke(value);
+        }
         private sealed class BuiltIn
         {
             public string Id, Name, Tags; public Color Color; public float Tile;
@@ -124,10 +132,10 @@ namespace WorldWeaver.Editor.Assistant
             MaterialDownload downloaded;
             try { downloaded=await online.DownloadAsync(materialId.Substring("polyhaven:".Length),token); }
             catch(OperationCanceledException)when(token.IsCancellationRequested){throw;}
-            catch(Exception error)when(error is HttpRequestException || error is OperationCanceledException)
+            catch(Exception error)when(error is HttpRequestException || error is OperationCanceledException || error is IOException&&!(error is InvalidDataException))
             {
                 var fallback=ImportBuiltIn(FallbackId(materialId),beforeMutation);fallback.RequestedMaterialId=materialId;
-                fallback.Warning="Poly Haven недоступен; применим встроенный материал "+fallback.MaterialId+". "+error.GetType().Name;return fallback;
+                fallback.Warning="Poly Haven недоступен; применим встроенный материал "+fallback.MaterialId+". "+error.GetType().Name+": "+new string((error.Message??"").Take(240).ToArray());return fallback;
             }
             token.ThrowIfCancellationRequested();
             beforeMutation?.Invoke();

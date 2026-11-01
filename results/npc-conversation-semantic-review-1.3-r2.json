@@ -1,0 +1,43 @@
+{
+  "kind": "independent-qualitative-review-of-exact-local-npc-responses",
+  "reviewUtc": "2026-11-01T09:16:09.394595+00:00",
+  "sourceReceipt": "npc-conversation-acceptance-1.3-r2.json",
+  "sourceReceiptSha256": "aba3d45d818fe072ff3ae44bc6144c3187770bb41f216c244c1f77a23ce869e5",
+  "model": "qwen3.5:2b",
+  "method": "A separate review agent read all exact raw inputs, contexts, speech and validation outcomes; no provider substitution or scripted answer was used.",
+  "accepted": false,
+  "actualCompletions": 6,
+  "findings": [
+    {
+      "area": "role",
+      "result": "partial",
+      "evidence": "First player reply fits the bridge guard persona; later social merchant reply adopts the guard duty instead of the authored trade interest."
+    },
+    {
+      "area": "hypothetical",
+      "result": "fail",
+      "evidence": "The cloud/court hypothetical leads to invented actual fog, rain and wind with no verified weather source."
+    },
+    {
+      "area": "recall",
+      "result": "fail",
+      "evidence": "The exact callsign is mentioned but called a legend. A keyword match alone does not prove faithful recall of the player statement."
+    },
+    {
+      "area": "quest",
+      "result": "host-state-pass-speech-fail",
+      "evidence": "No coins or completion were granted. The reply incorrectly explains letter delivery in terms of bridge closure and threats."
+    },
+    {
+      "area": "social",
+      "result": "fail",
+      "evidence": "First social line invents prior agreement about weather. Second completion is rejected because Talk target is nonempty."
+    }
+  ],
+  "notReached": [
+    "Third social reply",
+    "Save/restore acceptance",
+    "Actual-provider cancel/close acceptance"
+  ],
+  "scope": "One dependent authored conversation; not a benchmark or an estimate of general model quality."
+}

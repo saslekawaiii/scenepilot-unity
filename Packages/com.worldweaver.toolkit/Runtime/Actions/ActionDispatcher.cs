@@ -47,7 +47,10 @@ namespace WorldWeaver
         }
         public void Register(IGameAction action)
         { if (action == null || string.IsNullOrWhiteSpace(action.Identifier)) throw new ArgumentException("Action ID required."); registry[action.Identifier] = action; }
-        public ActionReport Execute(IntelligentNPC npc, NpcDecision decision, IEnumerable<string> allowedOverride = null)
+        /// <summary>Checks the whole batch without executing actions or committing projected inventory.</summary>
+        public ActionReport Validate(IntelligentNPC npc,NpcDecision decision,IEnumerable<string> allowedOverride=null)=>Process(npc,decision,allowedOverride,false);
+        public ActionReport Execute(IntelligentNPC npc,NpcDecision decision,IEnumerable<string> allowedOverride=null)=>Process(npc,decision,allowedOverride,true);
+        private ActionReport Process(IntelligentNPC npc,NpcDecision decision,IEnumerable<string> allowedOverride,bool execute)
         {
             if (decision?.actions == null || decision.actions.Length > 4) return new ActionReport { Reason = "Invalid action batch." };
             var entities = new Dictionary<string, WorldEntity>(StringComparer.Ordinal);
@@ -71,6 +74,7 @@ namespace WorldWeaver
                 if (error != null) return new ActionReport { Reason = error };
             }
             var report = new ActionReport { Accepted = true, Reason = "All preconditions satisfied." };
+            if(!execute)return report;
             foreach (var command in decision.actions)
             { registry[command.type].Execute(context, command); report.Executed.Add(command.type + "(" + command.target + "," + command.item + "," + command.amount + ")"); }
             return report;

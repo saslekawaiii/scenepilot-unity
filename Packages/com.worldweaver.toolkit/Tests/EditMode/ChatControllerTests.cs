@@ -107,6 +107,29 @@ namespace WorldWeaver.Tests
             var controller=Controller(provider);controller.Settings.Power=AssistantPower.Balanced;yield return Finish(controller.SendAsync("Создай объект."));
             var answer=controller.Current.Messages.Last();Assert.That(answer.IsError,Is.False,answer.Text);Assert.That(answer.Status,Is.EqualTo("Изменения применены"));Assert.That(provider.Requests.Count,Is.EqualTo(3));Assert.That(Find("MustNotExist"),Is.Null);Assert.That(Find("RepairedCube"),Is.Not.Null);Assert.That(answer.Steps.Count(s=>s.Success),Is.EqualTo(1));
         }
+        [UnityTest] public IEnumerator MixedCodePlanRepairsIntoReviewOnlyWithoutExecutingOrReanchoringRejectedActions()
+        {
+            const string className="MixedReviewOnly";
+            string source="using UnityEngine; public class "+className+" : MonoBehaviour { void Update() { if(Input.GetKeyDown(KeyCode.F)) enabled=false; } }";
+            var provider=new RecordingProvider();provider.Respond=(round,request,token)=>
+            {
+                if(round==0)return Task.FromResult(Reply(false,Create("RejectedMixedCube"),Draft(className,source),new EditorCommand {tool="attach_script",name=className,target="@RejectedMixedCube",args=new JObject()}));
+                Assert.AreEqual(1,round,"Only one actual repair completion is needed for this contract correction.");
+                Assert.IsNull(Find("RejectedMixedCube"));Assert.IsFalse(File.Exists("Assets/WorldWeaverGenerated/Scripts/"+className+".cs"));
+                Assert.IsTrue(request.Messages.Any(m=>m.Role=="system"&&m.Content.Contains("standalone review plan")));
+                Assert.IsFalse(request.Messages.Any(m=>m.Content.Contains("RejectedMixedCube")),"The rejected mixed proposal remains in the audit trail, but must not anchor the repair prompt.");
+                return Task.FromResult(Reply(false,Draft(className,source)));
+            };
+            var controller=Controller(provider);controller.Settings.Power=AssistantPower.Balanced;controller.Settings.AutoApply=true;
+            yield return Finish(controller.SendAsync("Создай куб, который реагирует на нажатие клавиши F."));
+            var answer=controller.Current.Messages.Last();Assert.IsFalse(answer.IsError,answer.Text);Assert.AreEqual(2,answer.Attempts.Count);
+            Assert.IsFalse(answer.Attempts[0].Accepted);StringAssert.Contains("RejectedMixedCube",answer.Attempts[0].RawResponse);
+            Assert.IsTrue(answer.Attempts[1].Accepted);Assert.AreEqual(1,answer.PendingPlan.actions.Count);Assert.AreEqual("draft_script",answer.PendingPlan.actions[0].tool);
+            Assert.AreEqual(source,(string)answer.PendingPlan.actions[0].args["code"]);Assert.AreEqual(0,answer.Steps.Count);
+            Assert.IsNull(Find("RejectedMixedCube"));Assert.IsFalse(File.Exists("Assets/WorldWeaverGenerated/Scripts/"+className+".cs"));
+            var saved=new ChatHistoryStore(folder).Load().Single(s=>s.Id==controller.Current.Id).Messages.Last();
+            Assert.AreEqual(source,(string)saved.PendingPlan.actions[0].args["code"]);
+        }
         [UnityTest] public IEnumerator CompleteFlagStillRequiresFreshReadbackAndGoalRepair()
         {
             const string goal="Создай ровно один куб VerifiedCube в точке (6, 1, -3).";

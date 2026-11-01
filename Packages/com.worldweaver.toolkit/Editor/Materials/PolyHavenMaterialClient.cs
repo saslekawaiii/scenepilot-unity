@@ -4,7 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Security.Cryptography;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -27,36 +29,138 @@ namespace WorldWeaver.Editor.Assistant
     {
         Task<byte[]> GetAsync(Uri uri, int maxBytes, CancellationToken token);
     }
+    public sealed class MaterialTransferProgress
+    {
+        public string File;public int Bytes,TotalBytes,Requests;public bool RangeFallback;
+    }
     /// <summary>No caller-supplied URLs, redirects, credentials, executable content or archives.</summary>
     public sealed class MaterialHttpTransport : IMaterialHttpTransport
     {
+        public const int RangeChunkBytes=16384,MaxRangeRequests=600,RangeParallelism=3;
+        private readonly Func<HttpMessageHandler> handlerFactory;
+        private readonly IProgress<MaterialTransferProgress> progress;
+        private sealed class Payload {public byte[] Bytes;public long Total;public string ETag;public bool Whole;}
+        public MaterialHttpTransport(Func<HttpMessageHandler> handlerFactory=null,IProgress<MaterialTransferProgress> progress=null)
+        {
+            this.handlerFactory=handlerFactory??(()=>new HttpClientHandler{AllowAutoRedirect=false,UseCookies=false,Credentials=null,AutomaticDecompression=DecompressionMethods.None});
+            this.progress=progress;
+        }
         public async Task<byte[]> GetAsync(Uri uri, int maxBytes, CancellationToken token)
         {
             PolyHavenMaterialClient.ValidateEndpoint(uri);
+            if(uri.Host.Equals("dl.polyhaven.org",StringComparison.OrdinalIgnoreCase))
+            {
+                try {return (await Request(uri,maxBytes,token,12,null,null,null,null).ConfigureAwait(false)).Bytes;}
+                catch(OperationCanceledException)when(token.IsCancellationRequested){throw;}
+                catch(Exception error)when(error is OperationCanceledException||error is HttpRequestException||error is IOException&&!(error is InvalidDataException))
+                {return await Ranges(uri,maxBytes,token).ConfigureAwait(false);}
+            }
+            return (await Request(uri,maxBytes,token,35,null,null,null,null).ConfigureAwait(false)).Bytes;
+        }
+        private async Task<Payload> Request(Uri uri,int maxBytes,CancellationToken token,int seconds,long? from,long? to,long? total,string etag)
+        {
             using (var timeout = CancellationTokenSource.CreateLinkedTokenSource(token))
-            using (var handler = new HttpClientHandler { AllowAutoRedirect = false, UseCookies = false, Credentials = null, AutomaticDecompression = DecompressionMethods.None })
+            using (var handler = handlerFactory())
             using (var client = new HttpClient(handler))
             using (var request = new HttpRequestMessage(HttpMethod.Get, uri))
             {
-                timeout.CancelAfter(TimeSpan.FromSeconds(35));
+                timeout.CancelAfter(TimeSpan.FromSeconds(seconds));
                 request.Headers.TryAddWithoutValidation("User-Agent", "WorldWeaver-Unity/1.3 (PolyHaven-Material-Library)");
-                using (var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, timeout.Token))
+                if(from.HasValue)
                 {
-                    if ((int)response.StatusCode >= 300 && (int)response.StatusCode < 400) throw new IOException("Poly Haven redirects are not followed.");
+                    request.Headers.Range=new RangeHeaderValue(from,to);
+                    // A fresh, closed connection per fragment avoids stalled reused Mono TLS streams.
+                    request.Headers.ConnectionClose=true;
+                    if(!string.IsNullOrEmpty(etag))request.Headers.IfRange=new RangeConditionHeaderValue(new EntityTagHeaderValue(etag));
+                }
+                using (var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, timeout.Token).ConfigureAwait(false))
+                {
+                    if ((int)response.StatusCode >= 300 && (int)response.StatusCode < 400) throw new InvalidDataException("Poly Haven redirects are not followed.");
                     response.EnsureSuccessStatusCode();
-                    if (response.Content.Headers.ContentLength > maxBytes) throw new IOException("Material response exceeds the download budget.");
-                    using (var input = await response.Content.ReadAsStreamAsync())
+                    long expected=-1,length=response.Content.Headers.ContentLength??-1;bool whole=!from.HasValue;
+                    string actualEtag=response.Headers.ETag?.IsWeak==false?response.Headers.ETag.Tag:null;
+                    if(from.HasValue)
+                    {
+                        if(response.StatusCode==HttpStatusCode.OK&&from.Value==0)
+                        {
+                            // A provider may ignore Range; accept one bounded complete object, never append it.
+                            whole=true;expected=length;
+                        }
+                        else
+                        {
+                            var range=response.Content.Headers.ContentRange;
+                            if(response.StatusCode!=HttpStatusCode.PartialContent||range==null||range.Unit!="bytes"||!range.HasLength||!range.HasRange)
+                                throw new InvalidDataException("Texture server did not return a valid 206 Content-Range.");
+                            long size=range.Length.Value,end=Math.Min(to.Value,size-1);
+                            if(size<1||size>maxBytes||range.From!=from||range.To!=end||total.HasValue&&size!=total.Value||!string.IsNullOrEmpty(etag)&&actualEtag!=etag)
+                                throw new InvalidDataException("Texture Content-Range/total/ETag changed or is outside the download budget.");
+                            expected=end-from.Value+1;
+                            if(expected<1||length!=expected)throw new InvalidDataException("Texture fragment length does not match Content-Range.");
+                            total=size;
+                        }
+                    }
+                    if(length>maxBytes||whole&&from.HasValue&&length<1)throw new InvalidDataException("Material response exceeds or omits the download budget.");
+                    int responseLimit=whole?maxBytes:(int)expected;
+                    using (var input = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
                     using (var output = new MemoryStream())
                     {
                         byte[] buffer = new byte[16384]; int count;
-                        while ((count = await input.ReadAsync(buffer, 0, buffer.Length, timeout.Token)) != 0)
+                        while(true)
                         {
-                            if (output.Length + count > maxBytes) throw new IOException("Material response exceeds the download budget.");
+                            using(var stall=CancellationTokenSource.CreateLinkedTokenSource(timeout.Token))
+                            {
+                                stall.CancelAfter(TimeSpan.FromSeconds(5));
+                                count=await input.ReadAsync(buffer,0,buffer.Length,stall.Token).ConfigureAwait(false);
+                            }
+                            if(count==0)break;
+                            if (output.Length + count > responseLimit) throw new InvalidDataException("Material response exceeds the download budget.");
                             output.Write(buffer, 0, count);
                         }
-                        return output.ToArray();
+                        if(length>=0&&output.Length!=length||expected>=0&&output.Length!=expected)throw new IOException("Texture response was truncated.");
+                        return new Payload{Bytes=output.ToArray(),Total=whole?output.Length:total.Value,ETag=actualEtag,Whole=whole};
                     }
                 }
+            }
+        }
+        private async Task<byte[]> Ranges(Uri uri,int maxBytes,CancellationToken token)
+        {
+            int requests=0,completed=0;
+            using(var operation=CancellationTokenSource.CreateLinkedTokenSource(token))
+            {
+                Func<long,long,long?,string,Task<Payload>> fetch=async(start,end,total,etag)=>
+                {
+                    for(int attempt=0;;attempt++)
+                    {
+                        if(Interlocked.Increment(ref requests)>MaxRangeRequests)throw new InvalidDataException("The bounded texture fragment request budget was exhausted.");
+                        try{return await Request(uri,maxBytes,operation.Token,12,start,end,total,etag).ConfigureAwait(false);}
+                        catch(OperationCanceledException)when(operation.IsCancellationRequested){throw;}
+                        catch(Exception error)when(attempt==0&&(error is OperationCanceledException||error is HttpRequestException||error is IOException&&!(error is InvalidDataException))){}
+                    }
+                };
+                var first=await fetch(0,RangeChunkBytes-1,null,null).ConfigureAwait(false);
+                if(first.Whole)return first.Bytes;
+                var result=new byte[(int)first.Total];Buffer.BlockCopy(first.Bytes,0,result,0,first.Bytes.Length);completed=first.Bytes.Length;
+                progress?.Report(new MaterialTransferProgress{File=Path.GetFileName(uri.AbsolutePath),Bytes=completed,TotalBytes=result.Length,Requests=requests,RangeFallback=true});
+                int next=RangeChunkBytes;Exception failure=null;
+                Func<Task> worker=async()=>
+                {
+                    try
+                    {
+                        while(true)
+                        {
+                            int start=Interlocked.Add(ref next,RangeChunkBytes)-RangeChunkBytes;if(start>=result.Length)return;
+                            int end=Math.Min(start+RangeChunkBytes,result.Length)-1;
+                            var part=await fetch(start,end,result.Length,first.ETag).ConfigureAwait(false);
+                            if(part.Whole||part.Bytes.Length!=end-start+1)throw new InvalidDataException("Texture server ignored a nonzero Range; no whole response was appended.");
+                            Buffer.BlockCopy(part.Bytes,0,result,start,part.Bytes.Length);int bytes=Interlocked.Add(ref completed,part.Bytes.Length);
+                            progress?.Report(new MaterialTransferProgress{File=Path.GetFileName(uri.AbsolutePath),Bytes=bytes,TotalBytes=result.Length,Requests=requests,RangeFallback=true});
+                        }
+                    }
+                    catch(Exception error){Interlocked.CompareExchange(ref failure,error,null);operation.Cancel();throw;}
+                };
+                try{await Task.WhenAll(Enumerable.Range(0,RangeParallelism).Select(_=>worker())).ConfigureAwait(false);}
+                catch{if(failure!=null)ExceptionDispatchInfo.Capture(failure).Throw();throw;}
+                return result;
             }
         }
     }

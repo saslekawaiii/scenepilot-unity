@@ -186,7 +186,13 @@ namespace WorldWeaver.Editor
             traceIndex = EditorGUILayout.Popup("Trace", Mathf.Clamp(traceIndex, 0, entries.Count - 1), entries.Select(e => e.Route + " / " + e.Character + " / " + e.TotalMs + " ms").ToArray());
             var trace = entries[traceIndex];
             Field("Input", trace.Input); Field("Route", trace.Route + " / " + trace.Completion?.Provider + " / " + trace.Completion?.Model);
-            GUILayout.Label("Total " + trace.TotalMs + " ms · Retrieval " + trace.RetrievalMs + " ms · Tokens " + trace.Completion?.InputTokens + "/" + trace.Completion?.OutputTokens, EditorStyles.wordWrappedLabel);
+            if(trace.Attempts.Count>0)
+            {
+                GUILayout.Label("Total "+trace.TotalMs+" ms · Retrieval "+trace.RetrievalMs+" ms · Router starts "+trace.ModelRequestStarts+" · Completed "+trace.CompletedModelRequests+" · Reported completed tokens "+trace.CompletedInputTokens+"/"+trace.CompletedOutputTokens,EditorStyles.wordWrappedLabel);
+                GUILayout.Label("Provider attempts reported for completed responses: "+(trace.CompletedReportedProviderAttempts.HasValue?trace.CompletedReportedProviderAttempts.Value.ToString():"not reported")+". Transport retries are separate from router starts.",EditorStyles.wordWrappedMiniLabel);
+                foreach(var attempt in trace.Attempts)GUILayout.Label("#"+attempt.Number+(attempt.IsRepair?" repair":"")+" · "+attempt.Status+" · "+attempt.ElapsedMs+" ms"+(string.IsNullOrEmpty(attempt.Error)?"":" · "+attempt.Error),EditorStyles.wordWrappedMiniLabel);
+            }
+            else GUILayout.Label("Total "+trace.TotalMs+" ms · Retrieval "+trace.RetrievalMs+" ms · Last response tokens "+trace.Completion?.InputTokens+"/"+trace.Completion?.OutputTokens+" · Router start count not recorded for this legacy trace.",EditorStyles.wordWrappedLabel);
             foreach (var chunk in trace.Retrieved) Field(chunk.Kind + " / " + chunk.Title + " / " + chunk.Score.ToString("F3"), chunk.Text);
             Field("Context", trace.Context); Field("Raw structured output", trace.Raw);
             Field("Validation", trace.Validation == null ? "—" : trace.Validation.Accepted + " / " + trace.Validation.Reason + "\n" + string.Join(", ", trace.Validation.Executed));

@@ -181,6 +181,95 @@ namespace WorldWeaver.Tests
             var invalid=npc.ExportConversation();invalid[0].IsPlayer=true;Assert.Throws<ArgumentException>(()=>npc.RestoreConversation(invalid));
             Assert.AreEqual(32,npc.ConversationHistory.Count);
         }
+        IntelligentNPC TransferActor(out Inventory player)
+        {
+            var npc=Actor("guard");npc.GetComponent<Inventory>().Add("Coin",5);
+            var go=Keep(new GameObject("Player"));player=go.AddComponent<Inventory>();var entity=go.AddComponent<WorldEntity>();entity.Id="Player";npc.KnownEntities.Add(entity);return npc;
+        }
+        static string Batch(string speech,string talkTarget="",bool transfer=false)=>new JObject { ["speech"]=speech,["actions"]=transfer?new JArray(new JObject { ["type"]="GiveItem",["target"]="Player",["item"]="Coin",["amount"]=1 },new JObject { ["type"]="Talk",["target"]=talkTarget,["item"]="",["amount"]=0 }):new JArray(new JObject { ["type"]="Talk",["target"]=talkTarget,["item"]="",["amount"]=0 }) }.ToString();
+        [UnityTest] public IEnumerator RejectedWholeBatchRepairsOnceBeforeAnyMutationAndCommitsTransferExactlyOnce()=>Await(RepairAtomicTransfer());
+        async Task RepairAtomicTransfer()
+        {
+            var npc=TransferActor(out var player);string rejected=Batch("Unexecuted proposal must not become memory","guard",true),corrected=Batch("Вот одна монета.","",true);
+            var router=new ScriptedRouter((call,request,token)=>
+            {
+                if(call==2) { Assert.AreEqual(0,player.Count("Coin"));Assert.AreEqual(5,npc.GetComponent<Inventory>().Count("Coin"));StringAssert.Contains("Wait/Talk have no target",request.Messages.Last().Content); }
+                return Task.FromResult(Completion(call,call==1?rejected:corrected));
+            });npc.ConfigureInference(router,new RejectEmbedding());
+            var trace=await npc.SpeakToPlayerAsync("Передай одну монету и поговори со мной.");
+            Assert.AreEqual(2,router.Calls);Assert.AreEqual(2,trace.Attempts.Count);Assert.IsFalse(trace.Attempts[0].Validation.Accepted);Assert.IsEmpty(trace.Attempts[0].Validation.Executed);Assert.AreEqual(rejected,trace.Attempts[0].Raw);Assert.IsTrue(trace.Attempts[1].IsRepair);
+            Assert.IsTrue(trace.Validation.Accepted);Assert.AreEqual(2,trace.Validation.Executed.Count);Assert.AreEqual(1,player.Count("Coin"));Assert.AreEqual(4,npc.GetComponent<Inventory>().Count("Coin"));Assert.AreEqual(corrected,trace.Raw);Assert.AreEqual(1,trace.Completion.Attempts);Assert.AreEqual(2,trace.ModelRequestStarts);Assert.AreEqual(2,trace.CompletedModelRequests);Assert.AreEqual(30,trace.CompletedInputTokens);Assert.AreEqual(60,trace.CompletedOutputTokens);Assert.AreEqual(2,trace.CompletedReportedProviderAttempts);Assert.IsTrue(trace.Attempts.All(attempt=>attempt.Completion.Attempts==1));
+            Assert.AreEqual(1,npc.ConversationHistory.Count(line=>line.IsAi));Assert.IsFalse(npc.ExportMemory().Any(doc=>doc.Text.Contains("Unexecuted proposal")));
+            Assert.IsTrue(JToken.DeepEquals(router.Requests[0].Schema,router.Requests[1].Schema));Assert.AreEqual(router.Requests[0].Messages[1].Content,router.Requests[1].Messages[1].Content);
+        }
+        [UnityTest] public IEnumerator ParseFailureRepairsWithStrictSchemaAndKeepsOriginalRawAudit()=>Await(RepairParse());
+        async Task RepairParse()
+        {
+            var npc=Actor("guard");var router=new ScriptedRouter((call,request,token)=>Task.FromResult(Completion(call,call==1?"{":Batch("Теперь корректная реплика."))));npc.ConfigureInference(router,new RejectEmbedding());
+            var trace=await npc.SpeakToPlayerAsync("Продолжим разговор.");Assert.IsTrue(trace.Validation.Accepted);Assert.AreEqual(2,router.Calls);Assert.AreEqual("{",trace.Attempts[0].Raw);StringAssert.Contains("Decision parsing failed",trace.Attempts[0].Validation.Reason);Assert.IsNotEmpty(trace.Attempts[0].Error);StringAssert.Contains("validation_reason",router.Requests[1].Messages.Last().Content);
+            var talk=((JArray)router.Requests[1].Schema["properties"]["actions"]["items"]["anyOf"]).OfType<JObject>().Single(branch=>(string)branch["properties"]["type"]["enum"][0]=="Talk");
+            Assert.AreEqual("",(string)talk["properties"]["target"]["enum"][0]);Assert.AreEqual("",(string)talk["properties"]["item"]["enum"][0]);Assert.AreEqual(0,(int)talk["properties"]["amount"]["enum"][0]);Assert.AreEqual(4,(int)router.Requests[1].Schema["properties"]["actions"]["maxItems"]);
+        }
+        [UnityTest] public IEnumerator TwoRejectedDecisionsStopWithoutMutationOrTeachingInvalidReplyToMemory()=>Await(RepairFails());
+        async Task RepairFails()
+        {
+            var npc=TransferActor(out var player);var router=new ScriptedRouter((call,request,token)=>Task.FromResult(Completion(call,Batch("Unexecuted proposal "+call,"guard",true))));npc.ConfigureInference(router,new RejectEmbedding());
+            var trace=await npc.SpeakToPlayerAsync("Дай монету.");Assert.AreEqual(2,router.Calls);Assert.AreEqual(2,trace.Attempts.Count);Assert.IsFalse(trace.Validation.Accepted);Assert.IsEmpty(trace.Validation.Executed);Assert.AreEqual(0,player.Count("Coin"));Assert.AreEqual(5,npc.GetComponent<Inventory>().Count("Coin"));StringAssert.Contains("2 attempt(s)",trace.Error);StringAssert.Contains("Wait/Talk have no target",trace.Error);Assert.AreEqual(0,npc.ConversationHistory.Count(line=>line.IsAi));Assert.IsEmpty(npc.ExportMemory());
+        }
+        [UnityTest] public IEnumerator ProviderFailureNeverTriggersDecisionRepair()=>Await(NoProviderRepair());
+        async Task NoProviderRepair()
+        {
+            var npc=Actor("guard");var router=new ScriptedRouter((call,request,token)=>throw new ProviderException("Explicit offline fixture"));npc.ConfigureInference(router,new RejectEmbedding());
+            bool failed=false;try {await npc.SpeakToPlayerAsync("Привет");}catch(ProviderException){failed=true;}
+            Assert.IsTrue(failed);Assert.AreEqual(1,router.Calls);Assert.AreEqual(1,TraceLog.Entries.Last().ModelRequestStarts);Assert.AreEqual(0,TraceLog.Entries.Last().CompletedModelRequests);Assert.AreEqual("failed",TraceLog.Entries.Last().Attempts[0].Status);Assert.IsNull(TraceLog.Entries.Last().CompletedReportedProviderAttempts);Assert.AreEqual(0,npc.ConversationHistory.Count(line=>line.IsAi));
+        }
+        [UnityTest] public IEnumerator CancellationDuringRepairCannotDispatchOriginalOrCorrectedTransfer()=>Await(CancelRepair());
+        async Task CancelRepair()
+        {
+            var npc=TransferActor(out var player);var router=new ScriptedRouter(async(call,request,token)=>
+            {
+                if(call==1)return Completion(call,Batch("Unexecuted proposal","guard",true));
+                await Task.Delay(30000,token);return Completion(call,Batch("Эта реплика отменена.","",true));
+            });npc.ConfigureInference(router,new RejectEmbedding());
+            using(var cancellation=new CancellationTokenSource())
+            {
+                var pending=npc.SpeakToPlayerAsync("Дай монету",cancellation.Token);Assert.AreEqual(2,router.Calls);Assert.IsTrue(npc.Busy);Assert.AreEqual(0,player.Count("Coin"));cancellation.Cancel();
+                bool cancelled=false;try{await pending;}catch(OperationCanceledException){cancelled=true;}
+                Assert.IsTrue(cancelled);Assert.AreEqual(0,player.Count("Coin"));Assert.AreEqual(5,npc.GetComponent<Inventory>().Count("Coin"));Assert.AreEqual(2,TraceLog.Entries.Last().Attempts.Count);Assert.AreEqual(2,TraceLog.Entries.Last().ModelRequestStarts);Assert.AreEqual(1,TraceLog.Entries.Last().CompletedModelRequests);Assert.AreEqual("cancelled",TraceLog.Entries.Last().Attempts[1].Status);Assert.IsNull(TraceLog.Entries.Last().Attempts[1].Completion);Assert.IsNotEmpty(TraceLog.Entries.Last().Attempts[1].Error);Assert.IsFalse(TraceLog.Entries.Last().Attempts[0].Validation.Accepted);Assert.AreEqual(0,npc.ConversationHistory.Count(line=>line.IsAi));Assert.IsFalse(npc.Busy);
+            }
+        }
+        [UnityTest] public IEnumerator AmbientRepairConsumesAdditionalRequestBudgetAndCannotExceedFourStarts()=>Await(RepairBudget());
+        async Task RepairBudget()
+        {
+            for(int i=0;i<3;i++)(await NpcInferenceScheduler.AcquireAsync(true,CancellationToken.None)).Dispose();
+            var npc=Actor("guard");var peer=Actor("merchant");var router=new ScriptedRouter((call,request,token)=>Task.FromResult(Completion(call,Batch("Некорректный адресат.","merchant"))));npc.ConfigureInference(router,new RejectEmbedding());
+            var trace=await npc.SpeakToNpcAsync(peer,"Обсудим мост.");Assert.AreEqual(1,router.Calls);Assert.IsFalse(trace.Validation.Accepted);StringAssert.Contains("repair request budget unavailable",trace.Error);Assert.IsFalse(NpcInferenceScheduler.AmbientBudgetAvailable);Assert.IsEmpty(npc.ExportMemory());
+        }
+        [UnityTest] public IEnumerator PeerContextExcludesUnrelatedPlayerConversationWhileKeepingOwnVerifiedEpisodes()=>Await(PeerMemoryScope());
+        async Task PeerMemoryScope()
+        {
+            var npc=Actor("guard");var peer=Actor("merchant");var router=new ScriptedRouter((call,request,token)=>Task.FromResult(Completion(call,Batch("Обсудим торговлю."))));npc.ConfigureInference(router,new RejectEmbedding());
+            npc.RestoreMemory(new[]{new KnowledgeDocument {Id="past-player",Scope="guard",Kind=MemoryKind.Conversation,Text="Игрок говорил о FANTASY_WEATHER_SUNDOG. Ответ NPC не доказывает реальную погоду."},new KnowledgeDocument {Id="public-event",Scope="guard",Kind=MemoryKind.Episodic,Text="VERIFIED_GATE_EVENT: ворота действительно открыты."}});
+            npc.ObserveUtterance(new NpcUtterance {Id="player-line",SpeakerId="Player",SpeakerName="Вы",TargetId="guard",Text="FANTASY_WEATHER_SUNDOG",IsPlayer=true,Timestamp=DateTime.UtcNow.ToString("O")});
+            await npc.SpeakToNpcAsync(peer,"Обсудим торговлю.");
+            string context=(string)JObject.Parse(router.Requests[0].Messages[1].Content)["context"].ToString();StringAssert.DoesNotContain("FANTASY_WEATHER_SUNDOG",context);StringAssert.Contains("VERIFIED_GATE_EVENT",context);StringAssert.Contains("не присваивай роль",router.Requests[0].Messages[0].Content);
+        }
+        [UnityTest] public IEnumerator RepairCannotEscalateNpcPeerPermissionsToInventoryTransfer()=>Await(RepairScope());
+        async Task RepairScope()
+        {
+            var npc=TransferActor(out var player);var peer=Actor("merchant");var router=new ScriptedRouter((call,request,token)=>Task.FromResult(Completion(call,call==1?Batch("Спорю.","merchant"):Batch("Дам монету.","",true))));npc.ConfigureInference(router,new RejectEmbedding());
+            var trace=await npc.SpeakToNpcAsync(peer,"Давай обсудим мост.");Assert.AreEqual(2,router.Calls);Assert.IsFalse(trace.Validation.Accepted);Assert.AreEqual(0,player.Count("Coin"));Assert.AreEqual(5,npc.GetComponent<Inventory>().Count("Coin"));Assert.IsTrue(JToken.DeepEquals(router.Requests[0].Schema,router.Requests[1].Schema));
+            Assert.AreEqual(2,((JArray)router.Requests[1].Schema["properties"]["actions"]["items"]["anyOf"]).Count);Assert.IsFalse(trace.Validation.Accepted);
+        }
+        static CompletionResult Completion(int number,string raw)=>new CompletionResult {Text=raw,Provider="explicit-repair-test-fixture",Model="test-only",Attempts=1,InputTokens=number*10,OutputTokens=number*20};
+        sealed class ScriptedRouter:IModelRouter
+        {
+            readonly Func<int,CompletionRequest,CancellationToken,Task<CompletionResult>> complete;
+            public readonly List<CompletionRequest> Requests=new List<CompletionRequest>();public int Calls;
+            public ScriptedRouter(Func<int,CompletionRequest,CancellationToken,Task<CompletionResult>> complete)=>this.complete=complete;
+            public Task<CompletionResult> CompleteAsync(ModelTask task,CompletionRequest request,CancellationToken token) {Calls++;Requests.Add(request);return complete(Calls,request,token);}
+            public void Dispose(){}
+        }
         sealed class QueueRouter:IModelRouter
         {
             readonly Queue<string> replies;readonly string action;public readonly List<CompletionRequest> Requests=new List<CompletionRequest>();

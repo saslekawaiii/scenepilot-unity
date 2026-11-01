@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.IO;
+using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.AI;
@@ -42,6 +43,28 @@ namespace WorldWeaver.Tests
             var npc=new GameObject("npc");npc.transform.SetParent(root.transform);npc.transform.position=new Vector3(-6,0,0);npc.AddComponent<NavMeshAgent>();var behavior=npc.AddComponent<SceneBehavior>();behavior.Mode=SceneBehaviorKind.Patrol;behavior.Waypoints=new[]{new Vector3(6,0,0),new Vector3(-6,0,0)};
             yield return new WaitForSeconds(.7f);Assert.That(Vector3.Distance(npc.transform.position,new Vector3(-6,0,0)),Is.LessThan(.2f));Assert.AreEqual("Destination is unreachable.",behavior.LastNavigationError);
             Object.Destroy(root);yield return null;
+        }
+        [Test] public void CustomDeliveryParticipantsAndItemDriveObjectivesMessagesMemoryAndSingleReward()
+        {
+            var root=new GameObject("Custom delivery world");
+            try
+            {
+                root.AddComponent<WorldEventJournal>();
+                var giver=new GameObject("Giver object");giver.transform.SetParent(root.transform);var gp=giver.AddComponent<WorldPlace>();var gn=giver.AddComponent<IntelligentNPC>();gn.CharacterId="custom-giver";gn.NpcName="Алина";
+                var recipient=new GameObject("Архив маяка");recipient.transform.SetParent(root.transform);recipient.transform.position=Vector3.right*2;var rp=recipient.AddComponent<WorldPlace>();var rn=recipient.AddComponent<IntelligentNPC>();rn.CharacterId="custom-recipient";rn.NpcName="Эрвин";
+                var player=new GameObject("Player");player.transform.SetParent(root.transform);var inventory=player.AddComponent<Inventory>();
+                var quest=root.AddComponent<DeliveryQuest>();quest.Title="Карта для архивариуса";quest.Giver=gp;quest.Recipient=rp;quest.LetterItem="Карта затонувшего маяка";quest.RewardItem="Жетон";quest.RewardAmount=7;
+                Assert.AreEqual("Алина",quest.GiverName);Assert.AreEqual("Эрвин",quest.RecipientName);StringAssert.Contains("Алина",quest.ObjectiveText);StringAssert.Contains(quest.LetterItem,quest.ObjectiveText);
+                Assert.IsFalse(quest.Interact(rp,inventory));StringAssert.Contains("Алина",quest.LastMessage);Assert.AreEqual(DeliveryQuestStage.NotStarted,quest.Stage);
+                Assert.IsTrue(quest.Interact(gp,inventory));Assert.AreEqual(1,inventory.Count(quest.LetterItem));StringAssert.Contains("Эрвин",quest.ObjectiveText);StringAssert.Contains("Эрвин",quest.LastMessage);
+                Assert.IsFalse(quest.Interact(gp,inventory));StringAssert.Contains("Эрвин",quest.LastMessage);Assert.AreEqual(1,inventory.Count(quest.LetterItem));
+                Assert.IsTrue(quest.Interact(rp,inventory));Assert.AreEqual(DeliveryQuestStage.Completed,quest.Stage);Assert.AreEqual(0,inventory.Count(quest.LetterItem));Assert.AreEqual(7,inventory.Count(quest.RewardItem));StringAssert.Contains("Эрвин",quest.ObjectiveText);
+                Assert.IsFalse(quest.Interact(rp,inventory));Assert.AreEqual(7,inventory.Count(quest.RewardItem));
+                string memories=string.Join("\n",gn.ExportMemory().Concat(rn.ExportMemory()).Select(memory=>memory.Text));
+                StringAssert.Contains("Алина",memories);StringAssert.Contains("Эрвин",memories);StringAssert.Contains(quest.LetterItem,memories);StringAssert.DoesNotContain("страж",memories);StringAssert.DoesNotContain("северн",memories);
+                rn.NpcName="";Assert.AreEqual("Архив маяка",quest.RecipientName);quest.Recipient=null;Assert.AreEqual("получатель",quest.RecipientName);quest.Giver=null;Assert.AreEqual("отправитель",quest.GiverName);
+            }
+            finally {Object.DestroyImmediate(root);}
         }
         [UnityTest]
         public IEnumerator DeliveryInventoryRewardAndScopedMemorySurviveDiskReload()

@@ -40,16 +40,24 @@ namespace WorldWeaver
         }
         public static JObject Schema(IEnumerable<string> allowedActions = null)
         {
-            var schema = JObject.Parse(@"{
-              'type':'object','additionalProperties':false,'required':['speech','actions'],
-              'properties':{'speech':{'type':'string'},'actions':{'type':'array','items':{
-                'type':'object','additionalProperties':false,'required':['type','target','item','amount'],
-                'properties':{'type':{'type':'string'},'target':{'type':'string'},'item':{'type':'string'},'amount':{'type':'integer'}}
-              }}}
-            }");
-            var allowed = (allowedActions ?? new[] { "Talk", "Wait", "GiveItem", "TakeItem", "MoveTo", "Follow", "Flee", "Interact" }).Distinct().ToArray();
-            schema["properties"]["actions"]["items"]["properties"]["type"]["enum"] = JArray.FromObject(allowed);
-            return schema;
+            var allowed=(allowedActions??new[]{"Talk","Wait","GiveItem","TakeItem","MoveTo","Follow","Flee","Interact"}).Distinct().ToArray();
+            var branches=new JArray();
+            foreach(string type in allowed)
+            {
+                bool noTarget=type=="Talk"||type=="Wait",transfer=type=="GiveItem"||type=="TakeItem",known=transfer||new[]{"Talk","Wait","MoveTo","Follow","Flee","Interact"}.Contains(type);
+                var properties=new JObject {
+                    ["type"]=new JObject { ["type"]="string",["enum"]=new JArray(type) },
+                    ["target"]=noTarget?new JObject { ["type"]="string",["enum"]=new JArray("") }:new JObject { ["type"]="string",["maxLength"]=100 },
+                    ["item"]=!known?new JObject { ["type"]="string",["maxLength"]=100 }:transfer?new JObject { ["type"]="string",["minLength"]=1,["maxLength"]=100 }:new JObject { ["type"]="string",["enum"]=new JArray("") },
+                    ["amount"]=!known?new JObject { ["type"]="integer",["minimum"]=0,["maximum"]=10000 }:transfer?new JObject { ["type"]="integer",["minimum"]=1,["maximum"]=10000 }:new JObject { ["type"]="integer",["enum"]=new JArray(0) }
+                };
+                branches.Add(new JObject { ["type"]="object",["additionalProperties"]=false,["required"]=new JArray("type","target","item","amount"),["properties"]=properties });
+            }
+            var items=branches.Count>0?new JObject { ["anyOf"]=branches }:new JObject { ["type"]="object",["additionalProperties"]=false,["properties"]=new JObject() };
+            return new JObject { ["type"]="object",["additionalProperties"]=false,["required"]=new JArray("speech","actions"),["properties"]=new JObject {
+                ["speech"]=new JObject { ["type"]="string",["maxLength"]=2000 },
+                ["actions"]=new JObject { ["type"]="array",["maxItems"]=allowed.Length==0?0:4,["items"]=items }
+            } };
         }
     }
 }

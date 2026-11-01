@@ -1,0 +1,8 @@
+{
+  "sourceSnapshot": "integration-1.3-snapshot-r2.json",
+  "harnesses": {
+    "MaterialAcceptanceRunner.cs": "a59b8b006287baaf623ddb19ddf2248491a85eba018c10cc4ab71d3ba5f02c25",
+    "NpcConversationAcceptanceRunner.cs": "71fbdc45a14ae75aa378b869a1f653190d4354352e13ca34bcc28c9273a98ccd",
+    "MechanicAcceptanceRunner.cs": "ac48bb92f566511ac629d1c8880ad87a1cb53cbf6a777a7262a02ef05d593365"
+  }
+}

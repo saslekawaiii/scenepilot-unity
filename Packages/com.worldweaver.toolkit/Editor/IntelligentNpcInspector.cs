@@ -71,7 +71,7 @@ namespace WorldWeaver.Editor
             var state=new SerializedObject(social);state.Update();
             foreach(string name in new[]{"Topic","CooldownSeconds","MaxTurns","InteractionRadius","ApproachNearbyCharacters","SearchRadius"})EditorGUILayout.PropertyField(state.FindProperty(name),true);
             state.ApplyModifiedProperties();
-            EditorGUILayout.HelpBox("До 3 реплик по умолчанию и не более 4 фоновых запросов в минуту на весь запуск. Игрок получает приоритет. Для ходьбы необходимы NavMesh и NavMeshAgent; участники должны принадлежать одному миру или общей корневой группе.",MessageType.None);
+            EditorGUILayout.HelpBox("До 3 реплик по умолчанию и не более 4 фоновых операций ИИ в минуту на весь запуск; сетевые повторы профиля учитываются отдельно. Игрок получает приоритет. Для ходьбы необходимы NavMesh и NavMeshAgent; участники должны принадлежать одному миру или общей корневой группе.",MessageType.None);
         }
         void DrawIdentity(IntelligentNPC npc)
         {

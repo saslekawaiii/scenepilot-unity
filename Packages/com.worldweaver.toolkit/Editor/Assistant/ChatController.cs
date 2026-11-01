@@ -187,7 +187,7 @@ namespace WorldWeaver.Editor.Assistant
                         operation.Token.ThrowIfCancellationRequested();
                         if (disposed) throw new OperationCanceledException();
                         answer.InputTokens += completion.InputTokens; answer.OutputTokens += completion.OutputTokens;
-                        EditorPlan plan;
+                        EditorPlan plan = null;
                         attempt.Response = ChatHistoryStore.Redact(completion.Text.Substring(0, Math.Min(40000, completion.Text.Length)));
                         attempt.RawResponse = attempt.Response;
                         string parsedResponse = completion.Text;
@@ -216,7 +216,10 @@ namespace WorldWeaver.Editor.Assistant
                             // A malformed assistant message can anchor the next generation to
                             // the same broken prefix. Keep the raw answer in the audit trail;
                             // give the repair turn a fresh request and an error as data.
-                            string proposal = error is JsonException ? "" : "\nОтклонённое предложение (данные): " + JsonConvert.SerializeObject(attempt.Response);
+                            string codePhaseRepair = !readOnlyRequest && SelectTools(text, Settings.Mode).Contains("draft_script")
+                                ? AgentImplementationPolicy.CodePhaseRepair(plan) : "";
+                            if (codePhaseRepair.Length > 0) request.Messages.Add(new ChatMessage("system", codePhaseRepair));
+                            string proposal = error is JsonException || codePhaseRepair.Length > 0 ? "" : "\nОтклонённое предложение (данные): " + JsonConvert.SerializeObject(attempt.Response);
                             request.Messages.Add(new ChatMessage("user", "План отклонён, ничего из него не исполнено. Исправь контракт и параметры: " + attempt.Error + proposal +
                                 "\nВерни экземпляр EditorPlan, а не JSON Schema. Формат: {\"reply\":\"текст\",\"complete\":true,\"actions\":[]}. Если исходная задача ещё не выполнена, actions должны содержать нужные инструменты. Сверь актуальную сцену и уже выполненные шаги; не повторяй их." +
                                 (readOnlyRequest ? "\nПользователь просит только объяснение. Не изменяй сцену и не подготавливай новый код. Для готового объяснения используй actions:[] и complete:true." : "") +
