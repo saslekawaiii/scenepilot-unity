@@ -19,6 +19,12 @@ namespace WorldWeaver
             if (request == null) throw new ArgumentNullException(nameof(request));
             token.ThrowIfCancellationRequested();
             var messages = new JArray();
+            // Ollama's :cloud models do not support schema-constrained decoding.
+            // Ground them in the exact contract, then keep the caller's unchanged
+            // strict parser/validators. Never send the unsupported format object.
+            bool cloud = profile.Model.EndsWith(":cloud", StringComparison.OrdinalIgnoreCase);
+            if (cloud && request.Schema != null)
+                messages.Add(new JObject { ["role"] = "system", ["content"] = "Return ONLY one JSON INSTANCE matching this exact output contract, never Markdown or a schema. Every required field must be present. Contract: " + request.Schema.ToString(Newtonsoft.Json.Formatting.None) });
             int imageCount = 0, imageBytes = 0;
             foreach (var message in request.Messages)
             {
@@ -41,8 +47,9 @@ namespace WorldWeaver
                 messages.Add(item);
             }
             var body = new JObject { ["model"] = profile.Model, ["messages"] = messages, ["stream"] = request.Stream, ["think"] = false,
-                ["format"] = request.Schema != null ? (JToken)OllamaDecoderSchema.FromHost(request.Schema) : new JValue("json"), ["keep_alive"] = "10m",
+                ["keep_alive"] = "10m",
                 ["options"] = new JObject { ["temperature"] = profile.Temperature, ["num_predict"] = profile.MaxTokens, ["num_ctx"] = profile.ContextWindow } };
+            if (!cloud) body["format"] = request.Schema != null ? (JToken)OllamaDecoderSchema.FromHost(request.Schema) : new JValue("json");
             var watch = Stopwatch.StartNew();
             JObject result; string content; long firstToken = 0;
             if (request.Stream)

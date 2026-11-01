@@ -56,7 +56,31 @@ public static class GeneralAgentAcceptanceRunner
                 if(selectedModel.StartsWith("ollama:",StringComparison.Ordinal))await controller.RefreshLocalModelsAsync();
                 controller.Settings.ModelKey=selectedModel;controller.Settings.Power=AssistantPower.Deep;controller.Settings.Mode=key=="discovery"?AssistantMode.Ask:AssistantMode.Execute;controller.Settings.UseSkills=true;controller.Settings.AutoApply=true;controller.Settings.AutoVerify=true;
                 var row=new JObject{["case"]=key,["prompt"]=Prompts[key],["history"]=history,["passed"]=false};((JArray)report["cases"]).Add(row);
-                controller.Changed+=()=>{row["messages"]=JArray.FromObject(controller.Current.Messages);Write(output,report);};
+                float? craterBaseline=null;int observedRound=0,observedSteps=0;
+                controller.Changed+=()=>
+                {
+                    var live=controller.Current.Messages.LastOrDefault(m=>m.Role=="assistant");
+                    if(key=="terrain"&&live!=null)
+                    {
+                        // Measure the real surface before carving. A lunar rebuild
+                        // changes its base profile: the original noise is no longer
+                        // a valid reference. This observer never edits the scene.
+                        foreach(var step in live.Steps.Skip(observedSteps))
+                            if(step.Success&&(step.Tool=="create_world"||step.Tool=="shape_terrain"&&JObject.Parse(step.Summary)["operation"]?.ToString()=="lunar"))craterBaseline=null;
+                        observedSteps=live.Steps.Count;
+                        var attempt=live.Attempts.LastOrDefault();
+                        if(attempt?.Accepted==true&&attempt.Round!=observedRound)
+                        {
+                            observedRound=attempt.Round;var pending=EditorPlan.Parse(attempt.NormalizedResponse??attempt.Response);
+                            if(pending.actions.Any(a=>a.tool=="shape_terrain"&&(string)a.args["operation"]=="crater")&&!craterBaseline.HasValue)
+                            {
+                                var surfaces=UnityEngine.Object.FindObjectsByType<Terrain>(FindObjectsSortMode.None);
+                                if(surfaces.Length==1){craterBaseline=surfaces[0].terrainData.GetInterpolatedHeight(.5f,.5f);row["measuredCenterBeforeCrater"]=craterBaseline.Value;}
+                            }
+                        }
+                    }
+                    row["messages"]=JArray.FromObject(controller.Current.Messages);Write(output,report);
+                };
                 await controller.SendAsync(Prompts[key]);var answer=controller.Current.Messages.Last(m=>m.Role=="assistant");
                 row["elapsedMs"]=answer.ElapsedMs;row["status"]=answer.Status;row["messages"]=JArray.FromObject(controller.Current.Messages);
                 var objects=UnityEngine.Object.FindObjectsByType<Transform>(FindObjectsInactive.Include,FindObjectsSortMode.None).Where(t=>t.gameObject.scene==UnityEngine.SceneManagement.SceneManager.GetActiveScene()).Select(t=>t.gameObject).ToArray();
@@ -73,8 +97,8 @@ public static class GeneralAgentAcceptanceRunner
                     checks["panelVisibleAroundButton"]=panelRect&&buttonRect&&panelRect.rect.width*panelRect.rect.height>2*buttonRect.rect.width*buttonRect.rect.height;
                 }
                 if(key=="terrain")
-                {checks["actualTerrain"]=objects.Any(g=>g.GetComponent<Terrain>());checks["craterRecord"]=objects.Select(g=>g.GetComponent<WorldEnvironment>()).Any(e=>e&&e.Craters.Any(c=>Math.Abs(c.Radius-10)<.1f&&Math.Abs(c.Depth-3)<.1f));checks["physicalCave"]=objects.Any(g=>g.GetComponent<WorldCave>()&&g.GetComponent<MeshCollider>());var terrain=objects.Select(g=>g.GetComponent<Terrain>()).FirstOrDefault(t=>t);var generated=terrain?terrain.GetComponent<GeneratedTerrain>():null;if(generated){var spec=generated.Specification;var baseline=TerrainGenerator.Generate(spec);int center=(spec.resolution-1)/2;float original=baseline[center,center]*spec.height;checks["actualCraterDepth"]=Math.Abs(original-terrain.terrainData.GetHeight(center,center)-3)<.15f;}else checks["actualCraterDepth"]=false;}
-                if(key=="code"){checks["actualEmptyNode"]=objects.Any(g=>g.GetComponent<GeneratedSceneObject>()&&g.GetComponent<GeneratedSceneObject>().Kind=="node");checks["completeReviewedTimerDraft"]=answer.PendingPlan?.actions.Any(a=>a.tool=="draft_script"&&((string)a.args["code"]).Contains("15")&&((string)a.args["code"]).Contains("Time."))==true;}
+                {checks["actualTerrain"]=objects.Any(g=>g.GetComponent<Terrain>());checks["craterRecord"]=objects.Select(g=>g.GetComponent<WorldEnvironment>()).Any(e=>e&&e.Craters.Any(c=>Math.Abs(c.Radius-10)<.1f&&Math.Abs(c.Depth-3)<.1f));checks["physicalCave"]=objects.Any(g=>g.GetComponent<WorldCave>()&&g.GetComponent<MeshCollider>());var terrain=objects.Select(g=>g.GetComponent<Terrain>()).FirstOrDefault(t=>t);float finalHeight=terrain?terrain.terrainData.GetInterpolatedHeight(.5f,.5f):float.NaN;row["measuredCenterAfterCrater"]=finalHeight;checks["actualCraterDepth"]=craterBaseline.HasValue&&Math.Abs(craterBaseline.Value-finalHeight-3)<.15f;}
+                if(key=="code"){checks["actualEmptyNode"]=objects.Any(g=>g.GetComponent<GeneratedSceneObject>()&&g.GetComponent<GeneratedSceneObject>().Kind=="node");checks["completeTimerDraftForReview"]=answer.PendingPlan?.actions.Any(a=>a.tool=="draft_script"&&((string)a.args["code"]).Contains("15")&&new[]{"Time.","WaitForSeconds","Invoke(","Task.Delay"}.Any(timer=>((string)a.args["code"]).Contains(timer)))==true;}
                 if(key=="discovery"){checks["discoveryUsed"]=answer.Steps.Any(s=>s.Success&&s.Tool=="discover_tools");checks["skillLoaded"]=answer.Steps.Any(s=>s.Success&&s.Tool=="read_skill")||answer.Skills.Any(id=>answer.Attempts.Any(t=>t.Messages.Any(m=>(m.Content??"").Contains("id=\""+id+"\"")))) ;row["skillLoadedBy"]=answer.Steps.Any(s=>s.Success&&s.Tool=="read_skill")?"read_skill":(bool)checks["skillLoaded"]?"automatic_verified_markdown_context":"none";checks["sceneUntouched"]=objects.Length==0;}
                 row["checks"]=checks;row["passed"]=checks.Properties().All(p=>(bool)p.Value);
                 if(objects.Length>0){Directory.CreateDirectory("Assets/GeneralAgentAcceptance");AssetDatabase.Refresh();string scene="Assets/GeneralAgentAcceptance/"+Path.GetFileNameWithoutExtension(output)+"-"+key+".unity";EditorSceneManager.SaveScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene(),scene);row["scene"]=scene;}

@@ -14,6 +14,25 @@ namespace WorldWeaver.Tests
 {
     public sealed class TransportTests
     {
+        [UnityTest] public IEnumerator OllamaCloudReceivesExactContractWithoutUnsupportedFormat() => Await(CheckCloudContract());
+        static async Task CheckCloudContract()
+        {
+            using(var server=new LocalServer(_=>200,"{\"message\":{\"content\":\"{\\\"reply\\\":\\\"ok\\\",\\\"complete\\\":true,\\\"actions\\\":[]}\"},\"done\":true}"))
+            {
+                var profile=ScriptableObject.CreateInstance<ModelProfile>();
+                try
+                {
+                    profile.Endpoint=server.Url.TrimEnd('/');profile.Model="example:cloud";profile.Retries=0;
+                    var schema=EditorPlan.Schema(true,new[]{"create_mesh"});var original=schema.DeepClone();
+                    using(var provider=new LocalProvider(profile))await provider.CompleteAsync(new CompletionRequest{Schema=schema},CancellationToken.None);
+                    var body=JObject.Parse(server.LastRequest.Substring(server.LastRequest.IndexOf("\r\n\r\n",StringComparison.Ordinal)+4));
+                    Assert.That(body["format"],Is.Null);Assert.That((bool)body["think"],Is.False);
+                    StringAssert.Contains(schema.ToString(Newtonsoft.Json.Formatting.None),(string)body["messages"][0]["content"]);
+                    Assert.That(JToken.DeepEquals(schema,original),Is.True,"Cloud compatibility must not weaken host bounds or mutate the source schema.");
+                }
+                finally{UnityEngine.Object.DestroyImmediate(profile);}
+            }
+        }
         [UnityTest] public IEnumerator ClassicChatUsesTextInstanceAndOneSystemMessage() => Await(CheckClassicEnvelope());
         private static async Task CheckClassicEnvelope()
         {
