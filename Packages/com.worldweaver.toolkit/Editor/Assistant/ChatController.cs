@@ -26,6 +26,7 @@ namespace WorldWeaver.Editor.Assistant
         private readonly Dictionary<string,bool> checkpointAvailability = new Dictionary<string,bool>();
         private AssistantMessage executingMessage;
         private bool expandToolSelection;
+        private bool requireImplementationStep;
         public ChatSession Current { get; private set; }
         public IReadOnlyList<ChatSession> Sessions => sessions;
         public IReadOnlyList<AvailableModel> Models => models;
@@ -150,6 +151,7 @@ namespace WorldWeaver.Editor.Assistant
             bool readOnlyRequest=Settings.Mode==AssistantMode.Ask||ExplicitReadOnlyRequest(text)||answer.Task?.MutationAuthorized==false&&Settings.Mode!=AssistantMode.Plan;
             executingMessage=answer;
             expandToolSelection=false;
+            requireImplementationStep=false;
             Busy = true; userCancelled = false; operation = new CancellationTokenSource();
             bool extendedWorkflow=AgentCapabilities.NeedsExtendedWorkflow(text)&&!SimpleAnimatedPlayerRequest(text);
             operation.CancelAfter(TimeSpan.FromSeconds(extendedWorkflow?(Settings.Power==AssistantPower.Fast?300:Settings.Power==AssistantPower.Deep?900:600):(Settings.Power == AssistantPower.Fast ? 120 : Settings.Power == AssistantPower.Deep ? 900 : 240)));
@@ -268,8 +270,9 @@ namespace WorldWeaver.Editor.Assistant
                             bool missingRequestedChanges=!readOnlyRequest&&answer.Task?.MutationAuthorized==true&&AgentCapabilities.IsChangeRequest(text)&&!answer.Steps.Any(s=>s.Success&&!SceneToolExecutor.IsReadOnlyTool(s.Tool)&&s.Tool!="remember_design");
                             if(missingRequestedChanges&&!answer.Steps.Any(s=>!s.Success)&&emptyPlanRepairs++<1&&round+1<rounds)
                             {
+                                requireImplementationStep=answer.Steps.Any(s=>s.Success&&(s.Tool=="discover_tools"||s.Tool=="plan_task"||s.Tool=="read_skill"));
                                 expandToolSelection=true;request=BuildRequest(session,text);
-                                request.Messages.Add(new ChatMessage("user","В исходном запросе требуются изменения, но ни один инструмент их не применил. Предложенное complete:true не принято как выполнение. Проверь каталог возможностей через discover_tools или подготовь поддерживаемую часть и новый код через draft_script. Не утверждай, что инструмента нет, только потому что он отсутствовал в предыдущем сокращённом наборе. Не повторяй прежний отказ как доказательство."));continue;
+                                request.Messages.Add(new ChatMessage("user","В исходном запросе требуются изменения, но ни один инструмент их не применил. Предложенное complete:true не принято как выполнение. Доступные определения уже прочитаны; выполни подходящий шаг реализации. Не повторяй ту же справку вместо действия. Если новой механике нужен код, подготовь полный reviewed draft_script. ИСХОДНАЯ ЗАДАЧА: "+text));continue;
                             }
                             if(!plan.complete&&!readOnlyRequest&&round+1<rounds){request=BuildRequest(session,text);request.Messages.Add(new ChatMessage("user","Задача ещё не выполнена. Используй discover_tools/read_skill для недостающих возможностей и продолжи разрешённые шаги."));continue;}
                             answer.Text = ChatHistoryStore.Redact(plan.reply);
@@ -300,6 +303,7 @@ namespace WorldWeaver.Editor.Assistant
                         operation.Token.ThrowIfCancellationRequested();
                         var batch = await ExecutePlanAsync(plan, session.Id, answer.Id, profile,reviewedRepair,operation.Token);
                         if(batch.Success)repeatedValidationFailures.Clear();
+                        if(batch.Success&&batch.Results.Any(s=>s.Success&&!SceneToolExecutor.IsReadOnlyTool(s.Tool)&&s.Tool!="remember_design"&&s.Tool!="save_scene"))requireImplementationStep=false;
                         if (!batch.Success) unresolvedFailure = true;
                         else if (batch.Results.Any(result => result.Success && (!SceneToolExecutor.IsReadOnlyTool(result.Tool) || readOnlyRequest && !answer.Steps.Any(step => !step.Success)))) unresolvedFailure = false;
                         SanitizeResults(batch); answer.Steps.AddRange(batch.Results); answer.Text = ChatHistoryStore.Redact(plan.reply);

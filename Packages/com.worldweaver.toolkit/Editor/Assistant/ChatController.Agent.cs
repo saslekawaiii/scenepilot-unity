@@ -11,6 +11,16 @@ namespace WorldWeaver.Editor.Assistant
 {
     public sealed partial class ChatController
     {
+        CompletionRequest RequireImplementation(CompletionRequest request)
+        {
+            if(!requireImplementationStep||Settings.Mode!=AssistantMode.Execute)return request;
+            var actions=request.Schema?["properties"]?["actions"] as JObject;var branches=actions?["items"]?["anyOf"] as JArray;if(branches==null)return request;
+            var implementation=branches.OfType<JObject>().Where(b=>{string name=EditorToolSchema.ToolName(b);return !SceneToolExecutor.IsReadOnlyTool(name)&&!new[]{"remember_design","save_scene","set_build_scenes","build_player","open_scene","run_tests"}.Contains(name);}).ToArray();
+            if(implementation.Length==0)return request;
+            request.Schema=(JObject)request.Schema.DeepClone();actions=(JObject)request.Schema["properties"]["actions"];actions["items"]["anyOf"]=new JArray(implementation.Select(b=>b.DeepClone()));actions["minItems"]=1;request.Schema["properties"]["complete"]["enum"]=new JArray(false);
+            request.Messages.Add(new ChatMessage("system","Your previous complete:true had no requested change. Discovery and planning have already succeeded; the next step must implement part of the ORIGINAL user request using an available scene action or a reviewed code draft. This generation schema excludes further metadata-only actions for this step. Choose the tool and all parameters yourself from the original task and actual scene. No unrequested objects, invented IDs or claims of completion."));
+            return request;
+        }
         internal static IReadOnlyList<AgentCheckResult> VerifyTask(AssistantMessage answer)
         {
             if(answer.Task==null)return Array.Empty<AgentCheckResult>();
@@ -236,7 +246,7 @@ User interaction mode: "+effectiveMode+". Ask never mutates or drafts code. Plan
             }
             string current="ACTIVE MODEL: "+Settings.ModelKey+"; POWER: "+Settings.Power+"\nCURRENT USER TASK: "+input+"\nLIVE SCENE SUMMARY:\n"+BoundedSceneContext()+"\nTASK TOOL EVIDENCE (already executed; do not duplicate):\n"+JsonConvert.SerializeObject(evidence)+"\nCOMPILATION EVIDENCE:\n"+ScriptDrafts.CompilationContext()+"\n"+AgentSourcePatches.CompilationContext();
             request.Messages.Add(new ChatMessage("user",ChatHistoryStore.Redact(current),images.Take(3).Select(AgentViewCapture.ReadBase64)));
-            return request;
+            return RequireImplementation(request);
         }
         CompletionRequest BuildAnimatedPlayerRequest(ChatSession session,string input,AssistantMessage answer)
         {
@@ -252,7 +262,7 @@ User interaction mode: "+effectiveMode+". Ask never mutates or drafts code. Plan
             request.Messages.Add(new ChatMessage("user",ChatHistoryStore.Redact("CURRENT USER TASK: "+input+"\nEXISTING WORLD/PLAYER TARGETS: "+JsonConvert.SerializeObject(candidates)+
                 "\nALREADY EXECUTED THIS TASK: "+JsonConvert.SerializeObject(evidence)+"\nDESIGN CONSTRAINTS (data): "+AgentDesignMemory.Recall(session,input,1200)+
                 "\nRequired outcome: an actual imported skinned character, connected Idle/Walk/Sprint/Jump/Fall, WorldPlayer, CharacterController and camera. A pending plan or empty reply does not fulfill it.")));
-            return request;
+            return RequireImplementation(request);
         }
     }
 }

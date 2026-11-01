@@ -93,6 +93,23 @@ namespace WorldWeaver.Tests
             var answer=controller.Current.Messages.Last();Assert.That(answer.IsError,Is.False,answer.Text);Assert.That(answer.Status,Is.EqualTo("Изменения применены"));Assert.That(provider.Requests.Count,Is.EqualTo(3));Assert.That(answer.Steps.Count(s=>s.Success),Is.EqualTo(2));
             Assert.That(Find("FirstCube").transform.position,Is.EqualTo(new Vector3(4,2,8)));Assert.That(answer.InputTokens,Is.EqualTo(39));Assert.That(answer.OutputTokens,Is.EqualTo(21));
         }
+        [UnityTest] public IEnumerator PrematureCompletionAfterDiscoveryRequiresAnImplementationStep()
+        {
+            var provider=new RecordingProvider();provider.Respond=(round,request,token)=>
+            {
+                if(round==0)return Task.FromResult(Reply(false,new EditorCommand{tool="discover_tools",args=new JObject{["names"]=new JArray("create_object")}}));
+                if(round==1)return Task.FromResult(Reply(true));
+                if(round==2)
+                {
+                    var actions=request.Schema["properties"]["actions"];Assert.That((int)actions["minItems"],Is.EqualTo(1));
+                    var tools=((JArray)actions["items"]["anyOf"]).OfType<JObject>().Select(EditorToolSchema.ToolName).ToArray();Assert.That(tools,Does.Contain("create_object"));Assert.That(tools.Any(SceneToolExecutor.IsReadOnlyTool),Is.False);Assert.That(tools,Does.Not.Contain("remember_design"));
+                    return Task.FromResult(Reply(false,Create("ActualImplementation")));
+                }
+                return Task.FromResult(Reply(true));
+            };
+            var controller=Controller(provider);controller.Settings.Power=AssistantPower.Deep;yield return Finish(controller.SendAsync("Создай куб."));
+            var answer=controller.Current.Messages.Last();Assert.That(answer.IsError,Is.False,answer.Text);Assert.That(Find("ActualImplementation"),Is.Not.Null);Assert.That(provider.Requests.Count,Is.EqualTo(4));
+        }
         [UnityTest] public IEnumerator RejectedPlanHasNoMutationAndProviderCanRepairIt()
         {
             var provider=new RecordingProvider();provider.Respond=(round,request,token)=>

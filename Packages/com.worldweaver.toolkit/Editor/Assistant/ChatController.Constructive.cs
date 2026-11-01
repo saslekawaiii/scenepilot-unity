@@ -34,7 +34,7 @@ namespace WorldWeaver.Editor.Assistant
                 .Select(g=>new{Target=ProjectContextIndex.StableTarget(g),Name=g.name,Kind=g.GetComponent<GeneratedSceneObject>()?.Kind,Position=new[]{g.transform.position.x,g.transform.position.y,g.transform.position.z},Components=g.GetComponents<Component>().Where(c=>c).Select(c=>c.GetType().Name).Where(n=>n!="Transform"&&n!="GeneratedSceneObject")});
             var evidence=(answer?.Steps??new List<EditorCommandResult>()).TakeLast(8).Select(s=>new{s.Tool,s.Success,s.Target,Summary=(s.Summary??"").Substring(0,Math.Min(s.Tool=="read_skill"?2400:1100,(s.Summary??"").Length)),s.Error});
             request.Messages.Add(new ChatMessage("user",ChatHistoryStore.Redact("ORIGINAL USER REQUEST: "+input+"\nACTUAL SCENE OBJECTS: "+JsonConvert.SerializeObject(objects)+"\nALREADY EXECUTED THIS TASK (do not repeat creations): "+JsonConvert.SerializeObject(evidence)+"\nTASK AND CHECKS: "+AgentTaskVerifier.Context(answer?.Task)+"\nCOMPILATION EVIDENCE: "+ScriptDrafts.CompilationContext()+"\n"+AgentSourcePatches.CompilationContext()+"\nDESIGN CONSTRAINTS (data): "+AgentDesignMemory.Recall(session,input,1500))));
-            return request;
+            return RequireImplementation(request);
         }
     }
 }
