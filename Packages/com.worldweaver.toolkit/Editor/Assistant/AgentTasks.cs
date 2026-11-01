@@ -103,6 +103,16 @@ namespace WorldWeaver.Editor.Assistant
             if(Regex.IsMatch(input,@"(?i)(NavMesh|connected\s+village|pathfinding|(?:проходим|достижим)\p{L}*[^.!?\n]{0,70}(?:мест|маршрут|дорог|посел|деревн)|(?:мест|маршрут|дорог|посел|деревн)[^.!?\n]{0,70}(?:проходим|достижим))"))task.Requirements.Add(new AgentRequirement{Kind="navigation",Number=1,Description="Связи именованных мест имеют полные пути NavMesh"});
             if(mutationAuthorized)
             {
+                var physics=new JObject();
+                foreach(var pair in new[]{("mass",@"(?i)(?:масс\p{L}*|mass)\s*[:=]?\s*(?<n>\d+(?:[.,]\d+)?)"),("bounce",@"(?i)(?:отскок\p{L}*|bounciness|bounce)\s*[:=]?\s*(?<n>\d+(?:[.,]\d+)?)")})
+                {var match=Regex.Match(input,pair.Item2);if(match.Success&&double.TryParse(match.Groups["n"].Value.Replace(',','.'),System.Globalization.NumberStyles.Float,System.Globalization.CultureInfo.InvariantCulture,out double value))physics[pair.Item1]=value;}
+                if(physics.Count>0)
+                {
+                    if(Regex.IsMatch(input,@"(?i)гравитац|gravity"))physics["gravity"]=!Regex.IsMatch(input,@"(?i)без\s+гравитац|no\s+gravity");
+                    if(Regex.IsMatch(input,@"(?i)красн\p{L}*\s+(?:мяч|шар)|red\s+(?:ball|sphere)"))physics["red"]=true;
+                    var at=Regex.Match(input,@"(?i)(?:на\s+высоте|at\s+(?:a\s+)?height(?:\s+of)?)\s*(?<n>\d+(?:[.,]\d+)?)");if(at.Success&&double.TryParse(at.Groups["n"].Value.Replace(',','.'),System.Globalization.NumberStyles.Float,System.Globalization.CultureInfo.InvariantCulture,out double y))physics["y"]=y;
+                    task.Requirements.Add(new AgentRequirement{Kind="body_physics",Number=1,Expected=physics.ToString(Formatting.None),Description="Одно физическое тело соответствует указанным массе, гравитации, отскоку, цвету и высоте: "+physics.ToString(Formatting.None)});
+                }
                 if(Regex.IsMatch(input,@"(?i)выжив|surviv"))task.Requirements.Add(new AgentRequirement{Kind="survival_loop",Number=1,Description="Игрок связан с миром, запасом кислорода и базой восстановления"});
                 if(Regex.IsMatch(input,@"(?i)пещер|\bcaves?\b"))task.Requirements.Add(new AgentRequirement{Kind="cave_collision",Number=1,Description="Пещера имеет физический проход и отверстие в Terrain"});
                 if(Regex.IsMatch(input,@"(?i)зв[её]зд\p{L}*\s+неб|star\p{L}*\s+sky|starfield"))task.Requirements.Add(new AgentRequirement{Kind="starfield",Number=1,Description="Звёздное небо содержит сохранённую геометрию и материал"});
@@ -148,6 +158,20 @@ namespace WorldWeaver.Editor.Assistant
                 {
                     var ids=ProjectContextIndex.Objects().Where(go=>MatchesKind(go,requirement.Expected)).Select(ProjectContextIndex.StableTarget).ToArray();
                     actual=requirement.BaselineTargets!=null&&requirement.BaselineTargets.Count==(int)requirement.Number&&requirement.BaselineTargets.All(ids.Contains)?requirement.Number:double.NaN;evidence="Стабильные ID исходных объектов сохранены";
+                }
+                else if(requirement.Kind=="body_physics")
+                {
+                    var expected=JObject.Parse(requirement.Expected);
+                    actual=objects.Select(g=>g.GetComponent<Rigidbody>()).Where(b=>b).Any(b=>
+                    {
+                        var collider=b.GetComponent<Collider>();var renderer=b.GetComponentInChildren<Renderer>();var color=renderer&&renderer.sharedMaterial?renderer.sharedMaterial.color:Color.clear;
+                        return (expected["mass"]==null||Math.Abs(b.mass-(double)expected["mass"])<.02)&&
+                            (expected["gravity"]==null||b.useGravity==(bool)expected["gravity"])&&
+                            (expected["bounce"]==null||collider&&collider.sharedMaterial&&Math.Abs(collider.sharedMaterial.bounciness-(double)expected["bounce"])<.02)&&
+                            (expected["y"]==null||Math.Abs(b.transform.position.y-(double)expected["y"])<.05)&&
+                            (expected["red"]==null||color.r>.8f&&color.g<.25f&&color.b<.25f);
+                    })?1:0;
+                    evidence="Rigidbody.mass/useGravity, Collider.sharedMaterial.bounciness, Renderer color и transform.position одного объекта; динамика проверяется отдельно в Play Mode";
                 }
                 else if(requirement.Kind=="survival_loop")
                 {
