@@ -77,8 +77,11 @@ namespace WorldWeaver
             var suffix = profile.Provider == ProviderKind.Pollinations ? "/openai" : "/chat/completions";
             var response = await transport.SendAsync(profile.Endpoint.TrimEnd('/') + suffix, body, profile.Provider == ProviderKind.Pollinations ? "" : Key, profile.TimeoutSeconds, profile.Retries, cancellationToken);
             var content = (string)response["choices"]?[0]?["message"]?["content"];
-            if (string.IsNullOrWhiteSpace(content)) throw new ProviderException("Provider returned no text.");
-            return new CompletionResult { Text = content, Provider = profile.Provider.ToString(), Model = (string)response["model"] ?? profile.Model, ElapsedMs = watch.ElapsedMilliseconds,
+            string finishReason = (string)response["choices"]?[0]?["finish_reason"];
+            bool truncated = CompletionResult.IsOutputLimit(finishReason);
+            if (string.IsNullOrWhiteSpace(content) && !truncated) throw new ProviderException("Provider returned no text.");
+            return new CompletionResult { Text = content ?? "", Provider = profile.Provider.ToString(), Model = (string)response["model"] ?? profile.Model, ElapsedMs = watch.ElapsedMilliseconds,
+                FinishReason = finishReason, OutputTruncated = truncated,
                 InputTokens = (int?)response["usage"]?["prompt_tokens"] ?? 0, OutputTokens = (int?)response["usage"]?["completion_tokens"] ?? 0 };
         }
         public async Task<bool> HealthAsync(CancellationToken token)

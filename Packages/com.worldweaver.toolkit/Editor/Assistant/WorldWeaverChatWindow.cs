@@ -1148,8 +1148,10 @@ namespace WorldWeaver.Editor.Assistant
                 restore.style.display = hasRestore ? DisplayStyle.Flex : DisplayStyle.None;
                 // CanRestore may inspect/save a scene copy: never call it from this rendering loop.
                 restore.SetEnabled(hasRestore && !owner.controller.HasPendingWork && !owner.backgroundBlocked && !EditorApplication.isCompiling && !EditorApplication.isPlayingOrWillChangePlaymode && string.IsNullOrEmpty(value.Task.PendingJobId));
-                string taskState = value.Task == null ? "" : JsonConvert.SerializeObject(value.Task);
-                if (taskState != taskSignature) { taskSignature = taskState; RenderTask(value.Task); changed = true; }
+                bool taskActive = owner.controller.HasPendingWork && owner.controller.Current.Messages.LastOrDefault(item => item.Role == "assistant") == value;
+                var taskPresentation = ChatTaskPresentation.From(value, taskActive);
+                string taskState = taskPresentation.Signature(value.Task);
+                if (taskState != taskSignature) { taskSignature = taskState; RenderTask(value.Task, taskPresentation); changed = true; }
                 string skillState = string.Join("\n", value.Skills ?? new List<string>());
                 if (skillState != skillsSignature) { skillsSignature = skillState; RenderSkills(value.Skills); changed = true; }
                 string imageState = string.Join("\n", (value.Attachments ?? new List<ChatAttachment>()).Select(item => item.Sha256 + ":" + item.Name));
@@ -1187,17 +1189,17 @@ namespace WorldWeaver.Editor.Assistant
                 foreach (string value in values.Take(5)) { string id = value; var chip = Button(SkillTitle(id), () => owner.OpenSkills(id), "skill-chip"); chip.tooltip = "Прочитать использованный навык"; skillChips.Add(chip); }
             }
 
-            void RenderTask(AgentTaskState value)
+            void RenderTask(AgentTaskState value, ChatTaskPresentation presentation)
             {
-                bool show = value != null && (value.MutationAuthorized || value.Requirements?.Count > 0 || value.Checks?.Count > 0 || !string.IsNullOrEmpty(value.PendingJobId));
-                task.Clear(); task.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
-                if (!show) return;
+                task.Clear(); task.style.display = presentation.Visible ? DisplayStyle.Flex : DisplayStyle.None;
+                foreach (string cssClass in new[] { "task-card-neutral", "task-card-pending", "task-card-error", "task-card-success" })
+                    task.EnableInClassList(cssClass, cssClass == presentation.CssClass);
+                if (!presentation.Visible) return;
                 var checks = value.Checks ?? new List<AgentCheckResult>();
                 var requirements = value.Requirements ?? new List<AgentRequirement>();
-                int passed = checks.Count(check => check.Passed);
-                string title = checks.Count > 0 ? "Проверено " + passed + " из " + checks.Count : value.PendingJobId != null && value.PendingJobId.Length > 0 ? "Проверка ещё выполняется" : "Готовность задачи";
-                task.Add(Text(title, "task-title"));
-                task.Add(Text(HumanStatus(value.Status), "task-state"));
+                task.Add(Text(presentation.Title, "task-title"));
+                task.Add(Text(presentation.Status, "task-state"));
+                if (!string.IsNullOrEmpty(presentation.Detail)) task.Add(Text(presentation.Detail, "task-check-pending"));
                 if (checks.Count > 0)
                 {
                     foreach (var check in checks.Take(20))
@@ -1208,9 +1210,8 @@ namespace WorldWeaver.Editor.Assistant
                         task.Add(Text((check.Passed ? "✓ " : "! ") + HumanCriterion(check.Description) + expected + actual, check.Passed ? "task-check-pass" : "task-check-fail"));
                     }
                 }
-                else if (requirements.Count > 0)
-                    foreach (var requirement in requirements.Take(20)) task.Add(Text("○ " + HumanCriterion(requirement.Description) + " · ещё не проверено", "task-check-pending"));
-                else task.Add(Text(message.PendingPlan != null ? "Изменения ещё не выполнены. После применения появятся результаты проверок." : "Отдельные критерии не определены. Результаты выполненных действий доступны ниже.", "task-check-pending"));
+                foreach (var requirement in requirements.Where(item => !checks.Any(check => check.RequirementId == item.Id)).Take(20))
+                    task.Add(Text("○ " + HumanCriterion(requirement.Description) + " · ещё не проверено", "task-check-pending"));
                 foreach (string question in (value.OpenQuestions ?? new List<string>()).Take(6)) task.Add(Text("Уточнение: " + question, "task-check-pending"));
                 var proof = new Foldout { text = "Как проверено", value = false };
                 foreach (var check in checks.Where(item => !string.IsNullOrWhiteSpace(item.Evidence)).Take(20)) proof.Add(Text(HumanCriterion(check.Description) + ": " + check.Evidence, "task-evidence"));

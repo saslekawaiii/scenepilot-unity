@@ -46,6 +46,78 @@ namespace WorldWeaver.Tests
                 finally { UnityEngine.Object.DestroyImmediate(profile); }
             }
         }
+        [UnityTest] public IEnumerator OpenAiFinishReasonRetainsPartialEmptyAndBalancedTokenLimitedOutput() => Await(CheckOpenAiFinishReason());
+        static async Task CheckOpenAiFinishReason()
+        {
+            const string partial="{\"reply\":\"\",\"complete\":false,\"actions\":[{\"tool\":\"draft_script\",\"args\":{\"code\":\"using UnityEngine;";
+            const string balanced="{\"reply\":\"looks complete but provider hit a limit\",\"complete\":true,\"actions\":[]}";
+            foreach(var sample in new[]{Tuple.Create("length",partial,true),Tuple.Create("length","",true),Tuple.Create("length",balanced,true),Tuple.Create("stop",balanced,false),Tuple.Create((string)null,balanced,false)})
+            {
+                var choice=new JObject {["message"]=new JObject {["content"]=sample.Item2}};if(sample.Item1!=null)choice["finish_reason"]=sample.Item1;
+                string envelope=new JObject {["model"]="fixture",["choices"]=new JArray(choice),["usage"]=new JObject {["prompt_tokens"]=13,["completion_tokens"]=1500}}.ToString();
+                using(var server=new LocalServer(_=>200,envelope))
+                {
+                    var profile=ScriptableObject.CreateInstance<ModelProfile>();
+                    try
+                    {
+                        profile.Provider=ProviderKind.OpenAICompatible;profile.Endpoint=server.Url.TrimEnd('/');profile.Model="fixture";profile.Retries=0;
+                        using(var provider=new OpenAICompatibleProvider(profile))
+                        {
+                            var result=await provider.CompleteAsync(new CompletionRequest(),CancellationToken.None);
+                            Assert.AreEqual(sample.Item2,result.Text,"Never append delimiters or silently repair partial model source.");Assert.AreEqual(sample.Item1,result.FinishReason);Assert.AreEqual(sample.Item3,result.OutputTruncated);
+                            Assert.AreEqual(13,result.InputTokens);Assert.AreEqual(1500,result.OutputTokens);Assert.AreEqual(1,server.Count,"A token limit is metadata, not a hidden transport retry.");
+                            if(sample.Item2==partial)Assert.Throws<Newtonsoft.Json.JsonReaderException>(()=>EditorPlan.Parse(result.Text));
+                        }
+                    }
+                    finally {UnityEngine.Object.DestroyImmediate(profile);}
+                }
+            }
+        }
+        [UnityTest] public IEnumerator OllamaNonStreamingDoneReasonRetainsExactLimitedOutput() => Await(CheckOllamaFinishReason());
+        static async Task CheckOllamaFinishReason()
+        {
+            foreach(var sample in new[]{Tuple.Create("length","{\"reply\":\"cut",true),Tuple.Create("length","",true),Tuple.Create("stop","{\"reply\":\"ok\",\"complete\":true,\"actions\":[]}",false),Tuple.Create((string)null,"legacy response",false)})
+            {
+                var envelope=new JObject {["message"]=new JObject {["content"]=sample.Item2},["done"]=true,["prompt_eval_count"]=11,["eval_count"]=42};if(sample.Item1!=null)envelope["done_reason"]=sample.Item1;
+                using(var server=new LocalServer(_=>200,envelope.ToString()))
+                {
+                    var profile=ScriptableObject.CreateInstance<ModelProfile>();
+                    try
+                    {
+                        profile.Endpoint=server.Url.TrimEnd('/');profile.Model="fixture";profile.Retries=0;
+                        using(var provider=new LocalProvider(profile))
+                        {
+                            var result=await provider.CompleteAsync(new CompletionRequest(),CancellationToken.None);
+                            Assert.AreEqual(sample.Item2,result.Text);Assert.AreEqual(sample.Item1,result.FinishReason);Assert.AreEqual(sample.Item3,result.OutputTruncated);
+                            Assert.AreEqual(11,result.InputTokens);Assert.AreEqual(42,result.OutputTokens);Assert.AreEqual(1,server.Count);
+                        }
+                    }
+                    finally {UnityEngine.Object.DestroyImmediate(profile);}
+                }
+            }
+        }
+        [UnityTest] public IEnumerator OllamaStreamingTerminalLimitKeepsExactlyTheAlreadyEmittedPartial() => Await(CheckOllamaStreamLimit());
+        static async Task CheckOllamaStreamLimit()
+        {
+            const string partial="{\"reply\":\"draft\",\"actions\":[{\"tool\":\"draft_script\",\"args\":{\"code\":\"void Update() {";
+            string body=new JObject {["done"]=false,["message"]=new JObject {["role"]="assistant",["content"]=partial}}.ToString(Newtonsoft.Json.Formatting.None)+"\n"+
+                new JObject {["done"]=true,["done_reason"]="length",["prompt_eval_count"]=11,["eval_count"]=42,["eval_duration"]=1000000000}.ToString(Newtonsoft.Json.Formatting.None)+"\n";
+            using(var server=new LocalServer(_=>200,body))
+            {
+                var profile=ScriptableObject.CreateInstance<ModelProfile>();
+                try
+                {
+                    profile.Endpoint=server.Url.TrimEnd('/');profile.Model="fixture";profile.Retries=0;string emitted="";
+                    using(var provider=new LocalProvider(profile))
+                    {
+                        var result=await provider.CompleteAsync(new CompletionRequest {Stream=true,OnContentDelta=chunk=>emitted+=chunk},CancellationToken.None);
+                        Assert.AreEqual(partial,emitted);Assert.AreEqual(partial,result.Text);Assert.AreEqual("length",result.FinishReason);Assert.IsTrue(result.OutputTruncated);
+                        Assert.AreEqual(42,result.OutputTokens);Assert.AreEqual(1,server.Count,"A partially emitted stream must never be replayed by this metadata handling.");
+                    }
+                }
+                finally {UnityEngine.Object.DestroyImmediate(profile);}
+            }
+        }
         [UnityTest] public IEnumerator RetryRateLimit() => Await(CheckRetry());
         private static async Task CheckRetry()
         {

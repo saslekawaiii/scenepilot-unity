@@ -220,9 +220,14 @@
 .skill-chip-caption { color: #89958f; font-size: 10px; margin-right: 6px; margin-bottom: 4px; }
 .ww-chat .skill-chip { color: #b4c5ba; background-color: #2a3530; font-size: 10px; padding: 4px 7px; margin: 0 5px 4px 0; border-radius: 6px; }
 .ww-chat .skill-chip:hover { background-color: #35483d; }
-.task-card { border-width: 1px; border-color: #3e4a45; border-radius: 9px; background-color: #252c29; padding: 12px 14px; margin-top: 13px; }
-.task-title { color: #dce5df; font-size: 12px; -unity-font-style: bold; }
-.task-state { color: #a7b4ab; font-size: 11px; margin: 5px 0 7px 0; }
+.task-card { border-width: 1px; border-color: #444a54; border-radius: 9px; background-color: #282c33; padding: 12px 14px; margin-top: 13px; }
+.task-card.task-card-success { border-color: #3e4a45; background-color: #252c29; }
+.task-card.task-card-pending { border-color: #66583e; background-color: #302c24; }
+.task-card.task-card-error { border-color: #76504d; background-color: #342727; }
+.task-title { color: #e0e3e8; font-size: 12px; -unity-font-style: bold; }
+.task-state { color: #b4bac4; font-size: 11px; margin: 5px 0 7px 0; }
+.task-card-error .task-title, .task-card-error .task-state { color: #e3b2ad; }
+.task-card-pending .task-state { color: #d4c19d; }
 .task-check-pass, .task-check-fail, .task-check-pending { font-size: 11px; margin: 4px 0; }
 .task-check-pass { color: #b3cbb8; }
 .task-check-fail { color: #e0b691; }

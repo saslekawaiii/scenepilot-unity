@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "sourceArchiveSha256": "a95a02b556735246570549d0c4a1fcd13ea46ede18187c63d463575a56fd6e1d",
+  "license": "CC0-1.0",
+  "checks": [
+    {
+      "file": "adventurer.fbx",
+      "sha256Matches": true,
+      "sourceUnmodified": true
+    },
+    {
+      "file": "explorer.fbx",
+      "sha256Matches": true,
+      "sourceUnmodified": true
+    },
+    {
+      "file": "colormap.png",
+      "sha256Matches": true,
+      "sourceUnmodified": true
+    },
+    {
+      "file": "License.txt",
+      "sha256Matches": true,
+      "sourceUnmodified": true
+    }
+  ],
+  "success": true,
+  "scope": "Static source integrity only. Actual Unity import, Animator playback and physical movement are verified separately by the root agent."
+}

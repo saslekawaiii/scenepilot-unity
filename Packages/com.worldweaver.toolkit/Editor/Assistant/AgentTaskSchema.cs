@@ -92,6 +92,7 @@ namespace WorldWeaver.Editor.Assistant
         internal static void Bind(JObject planSchema,AgentTaskState task)
         {
             AgentMaterialApplicationGoal.BindTarget(planSchema,task);
+            AgentAnimatedPlayerGoal.Bind(planSchema,task);
             if(task!=null&&GoalOnlyNpcUpdate(task.OriginalRequest))
                 foreach(var branch in (planSchema["properties"]?["actions"]?["items"]?["anyOf"] as JArray??new JArray()).OfType<JObject>().Where(b=>EditorToolSchema.ToolName(b)=="update_npc"))
                 {
@@ -139,6 +140,7 @@ namespace WorldWeaver.Editor.Assistant
         internal static void Validate(AgentTaskState task,EditorPlan plan)
         {
             AgentMaterialApplicationGoal.ValidateTarget(task,plan);
+            AgentAnimatedPlayerGoal.Validate(task,plan);
             if(task!=null&&GoalOnlyNpcUpdate(task.OriginalRequest)&&plan.actions.Any(a=>a.tool=="update_npc"&&(a.args.Properties().Any(p=>p.Name!="goals")||a.args["goals"]?.Type!=JTokenType.String||string.IsNullOrWhiteSpace((string)a.args["goals"]))))
                 throw new ArgumentException("Запрошено изменение только цели NPC: update_npc должен содержать только непустое поле goals. Остальные сведения персонажа сохраняются.");
             if(GroundedPointLights(task)&&plan.actions.Any(a=>a.tool=="set_lighting"&&string.IsNullOrEmpty(a.target)&&(string)a.args["type"]=="point"&&a.args["on_terrain"]!=null&&(a.args["on_terrain"].Type!=JTokenType.Boolean||!(bool)a.args["on_terrain"])))

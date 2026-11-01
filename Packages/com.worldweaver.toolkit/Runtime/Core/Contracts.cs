@@ -30,7 +30,11 @@ namespace WorldWeaver
 
     public sealed class CompletionResult
     {
-        public string Text, Provider, Model;
+        public string Text, Provider, Model, FinishReason;
+        /// <summary>The provider explicitly reported an output-token limit; Text remains the exact partial response for audit.</summary>
+        public bool OutputTruncated;
+        public static bool IsOutputLimit(string reason) => string.Equals(reason, "length", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(reason, "max_tokens", StringComparison.OrdinalIgnoreCase) || string.Equals(reason, "max_output_tokens", StringComparison.OrdinalIgnoreCase);
         public long ElapsedMs;
         public long FirstTokenMs;
         public int InputTokens, OutputTokens, Attempts;

@@ -69,10 +69,13 @@ namespace WorldWeaver
                 content = (string)result["message"]?["content"];
             }
             token.ThrowIfCancellationRequested();
-            if (string.IsNullOrWhiteSpace(content)) throw new ProviderException("Ollama returned no text.");
+            string finishReason = (string)result["done_reason"];
+            bool truncated = CompletionResult.IsOutputLimit(finishReason);
+            if (string.IsNullOrWhiteSpace(content) && !truncated) throw new ProviderException("Ollama returned no text.");
             int input = Counter(result, "prompt_eval_count"), output = Counter(result, "eval_count");
             double duration = Duration(result);
-            return new CompletionResult { Text = content, Model = profile.Model, Provider = "Ollama", ElapsedMs = watch.ElapsedMilliseconds,
+            return new CompletionResult { Text = content ?? "", Model = profile.Model, Provider = "Ollama", ElapsedMs = watch.ElapsedMilliseconds,
+                FinishReason = finishReason, OutputTruncated = truncated,
                 FirstTokenMs = firstToken, InputTokens = input, OutputTokens = output,
                 TokensPerSecond = duration > 0 ? output * 1e9 / duration : 0 };
         }

@@ -23,6 +23,43 @@ namespace WorldWeaver.Tests
             Assert.IsNotNull(method);var args=new object[]{plan,allowed,readOnly,null};string hint=(string)method.Invoke(null,args);
             Assert.AreEqual(hint.Length>0,!string.IsNullOrEmpty((string)args[3]),"A phase hint must identify the one already-permitted next tool.");return hint;
         }
+        static bool SingleScriptRepair(CompletionRequest request, EditorPlan rejected, string raw, bool readOnly, out string hint)
+        {
+            var type=typeof(ChatController).Assembly.GetType("WorldWeaver.Editor.Assistant.AgentImplementationPolicy");
+            var args=new object[]{request,rejected,raw,readOnly,null};bool bound=(bool)type.GetMethod("BindSingleScriptRepair",BindingFlags.Static|BindingFlags.NonPublic).Invoke(null,args);hint=(string)args[4];return bound;
+        }
+        [Test] public void InterruptedCodeProposalGetsOneAlreadyAllowedDraftWithoutRepairingRawOrOriginalSchema()
+        {
+            var schema=EditorPlan.Schema(true,new[]{"inspect_object","draft_script","attach_script","create_object"});string before=schema.ToString();
+            const string raw="{\"reply\":\"Готовлю героя\",\"complete\":false,\"actions\":[{\"tool\":\"create_object\",\"name\":\"RejectedHero\",\"target\":\"\",\"args\":{}},{\"tool\":\"draft_script\",\"name\":\"HeroController\",\"target\":\"\",\"args\":{\"code\":\"using UnityEngine; public class";
+            var request=new CompletionRequest {Schema=schema};Assert.IsTrue(SingleScriptRepair(request,null,raw,false,out string hint));
+            Assert.AreEqual(before,schema.ToString(),"A previous request keeps its exact schema for the audit trail.");Assert.AreNotSame(schema,request.Schema);
+            var actions=request.Schema["properties"]["actions"];Assert.AreEqual(1,(int)actions["minItems"]);Assert.AreEqual(1,(int)actions["maxItems"]);
+            var branches=((JArray)actions["items"]["anyOf"]).OfType<JObject>().ToArray();Assert.AreEqual(1,branches.Length);Assert.AreEqual("draft_script",EditorToolSchema.ToolName(branches[0]));
+            Assert.AreEqual(false,(bool)request.Schema["properties"]["complete"]["enum"][0]);StringAssert.Contains("EXACTLY ONE draft_script",hint);StringAssert.DoesNotContain("RejectedHero",hint);StringAssert.DoesNotContain("using UnityEngine",hint);
+            Assert.Throws<JsonReaderException>(()=>EditorPlan.Parse(raw),"The partial raw output must stay broken, not be auto-completed into an executable plan.");
+        }
+        [Test] public void SingleScriptRepairCannotEnableCodeForAskAbsentToolsOrUnrelatedMalformedReplies()
+        {
+            const string code="{\"reply\":\"\",\"complete\":false,\"actions\":[{\"tool\":\"draft_script\",\"args\":{\"code\":\"cut";
+            foreach(bool ask in new[]{false,true})
+            {
+                var request=new CompletionRequest {Schema=EditorPlan.Schema(true,ask?new[]{"draft_script","inspect_object"}:new[]{"inspect_object"})};var schema=request.Schema;string before=schema.ToString();
+                Assert.IsFalse(SingleScriptRepair(request,null,code,ask,out string hint));Assert.AreSame(schema,request.Schema);Assert.AreEqual(before,schema.ToString());Assert.AreEqual("",hint);
+            }
+            foreach(string raw in new[]{"{\"reply\":\"draft_script is only a word", "{\"reply\":\"\",\"complete\":false,\"actions\":[{\"tool\":\"material_search\",\"args\":{\"query\":\"draft_script"})
+            {
+                var request=new CompletionRequest {Schema=EditorPlan.Schema(true,new[]{"draft_script","material_search"})};var schema=request.Schema;
+                Assert.IsFalse(SingleScriptRepair(request,null,raw,false,out _));Assert.AreSame(schema,request.Schema);
+            }
+        }
+        [Test] public void ParsedMixedCodeRepairDoesNotMutateRejectedActionsOrAddPreviouslyMissingTools()
+        {
+            var plan=new EditorPlan {actions=new List<EditorCommand>{new EditorCommand {tool="create_object",name="RawRejectedCube",args=new JObject()},new EditorCommand {tool="draft_script",name="Draft",args=new JObject { ["code"]="complete source remains exact"}}}};
+            string before=JsonConvert.SerializeObject(plan);var request=new CompletionRequest {Schema=EditorPlan.Schema(false,new[]{"draft_script","create_object"})};
+            Assert.IsTrue(SingleScriptRepair(request,plan,null,false,out _));Assert.AreEqual(before,JsonConvert.SerializeObject(plan));
+            var denied=new CompletionRequest {Schema=EditorPlan.Schema(false,new[]{"create_object"})};Assert.IsFalse(SingleScriptRepair(denied,plan,null,false,out _));
+        }
         static EditorCommand Material(string tool,JObject args,string target="")=>new EditorCommand {tool=tool,target=target,args=args};
         [Test] public void MixedMaterialImportRepairPreservesExactParametersWithoutCopyingApplyPlan()
         {

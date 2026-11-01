@@ -9,11 +9,15 @@ namespace WorldWeaver
     {
         public Camera View;
         public float Speed = 5, LookSpeed = 120, InteractDistance = 3;
+        [Min(1)] public float SprintMultiplier = 1.6f;
+        [Min(0)] public float JumpHeight = 1.1f;
         private CharacterController motor;
         private float yaw, vertical;
         private WorldConversationUI conversation;
         public WorldConversationUI Conversation => conversation;
-        public string LastMessage = "WASD — движение · правая кнопка мыши — камера · E — действие";
+        public string LastMessage = "WASD — движение · Shift — бег · Space — прыжок · правая кнопка мыши — поворот · E — разговор";
+        public bool IsGrounded => motor && motor.isGrounded;
+        public float PlanarSpeed => motor ? new Vector2(motor.velocity.x,motor.velocity.z).magnitude : 0;
         private void OnEnable()
         {
             motor = GetComponent<CharacterController>(); yaw = transform.eulerAngles.y; if (View) View.enabled = true;
@@ -32,9 +36,21 @@ namespace WorldWeaver
             float x = Input.GetAxisRaw("Horizontal"), z = Input.GetAxisRaw("Vertical");
             if (Input.GetMouseButton(1)) yaw += Input.GetAxis("Mouse X") * LookSpeed * Time.deltaTime;
             transform.rotation = Quaternion.Euler(0,yaw,0);
-            vertical = motor.isGrounded && vertical < 0 ? -2 : vertical + Physics.gravity.y * Time.deltaTime;
-            motor.Move((transform.TransformDirection(Vector3.ClampMagnitude(new Vector3(x,0,z),1)) * Speed + Vector3.up * vertical) * Time.deltaTime);
+            MoveFrame(new Vector2(x,z), Input.GetKey(KeyCode.LeftShift)||Input.GetKey(KeyCode.RightShift), Input.GetKeyDown(KeyCode.Space), Time.deltaTime);
             if (Input.GetKeyDown(KeyCode.E)) OpenNearestConversation();
+        }
+        /// <summary>The same movement path is used by keyboard input and deterministic Play Mode checks.</summary>
+        public void MoveFrame(Vector2 input, bool sprint, bool jump, float deltaTime)
+        {
+            if (!motor || !motor.enabled || (conversation && conversation.IsOpen) || deltaTime <= 0 || float.IsNaN(deltaTime) || float.IsInfinity(deltaTime)) return;
+            deltaTime = Mathf.Min(deltaTime,.1f);
+            bool grounded = motor.isGrounded;
+            if (grounded && vertical < 0) vertical = -2;
+            if (grounded && jump && JumpHeight > 0) vertical = Mathf.Sqrt(2 * Mathf.Abs(Physics.gravity.y) * JumpHeight);
+            vertical += Physics.gravity.y * deltaTime;
+            var direction = Vector3.ClampMagnitude(new Vector3(input.x,0,input.y),1);
+            float speed = Mathf.Max(0,Speed) * (sprint ? Mathf.Max(1,SprintMultiplier) : 1);
+            motor.Move((transform.TransformDirection(direction)*speed + Vector3.up*vertical)*deltaTime);
         }
         public bool OpenNearestConversation()
         {

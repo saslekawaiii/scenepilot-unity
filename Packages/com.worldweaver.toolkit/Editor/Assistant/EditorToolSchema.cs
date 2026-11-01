@@ -56,6 +56,7 @@ namespace WorldWeaver.Editor.Assistant
                 Command("attach_script", Object(new JObject()), ClassName(), ExplicitTarget())
             };
             foreach (var schema in WorldGameplayTools.CommandSchemas()) commands.Add(schema);
+            foreach (var schema in AnimatedCharacterTools.CommandSchemas()) commands.Add(schema);
             foreach (var schema in WorldMaterialTools.CommandSchemas()) commands.Add(schema);
             foreach (var schema in AgentProjectTools.CommandSchemas()) commands.Add(schema);
             commands.Add(AgentSourcePatches.CommandSchema());

@@ -175,6 +175,16 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
                     if(AgentProjectTools.IsDeferred(command.tool)&&plan.actions.Count!=1)throw new ArgumentException("Test/build/open-scene operations require a standalone plan.");
                     continue;
                 }
+                if(AnimatedCharacterTools.Handles(command.tool))
+                {
+                    AnimatedCharacterTools.Validate(command,s=>Resolve(s,aliases).Object??throw new ArgumentException("Character target must already exist; create the world in a prior step."));
+                    string characterName=string.IsNullOrWhiteSpace(command.name)?"Главный герой":command.name;
+                    if(characterName.Any(c=>char.IsControl(c)||c=='/'||c=='\\')||!names.Add(characterName))throw new ArgumentException("Character name must contain no path separators and be unique in this plan.");
+                    created+=AnimatedCharacterTools.EstimateCost(command);
+                    if(created>BatchLimit||owned+created>SceneLimit)throw new ArgumentException("Animated character object budget exceeded.");
+                    var future=new VirtualTarget{Owned=true,Renderer=true};aliases["@"+characterName]=future;aliases[characterName]=future;
+                    continue;
+                }
                 if(WorldGameplayTools.Handles(command.tool))
                 {
                     WorldGameplayTools.Validate(command,s=>Resolve(s,aliases).Object??throw new ArgumentException("Gameplay target must already exist; use a subsequent step after creating the world."));
@@ -296,6 +306,13 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
                     if(AgentProjectTools.Handles(command.tool))
                     {
                         result.Results.Add(AgentProjectTools.Execute(command,resolve,executionContext));continue;
+                    }
+                    if(AnimatedCharacterTools.Handles(command.tool))
+                    {
+                        var characterParent=string.IsNullOrEmpty(command.target)?getGroup().transform:resolve(command.target).transform;
+                        var outcome=AnimatedCharacterTools.Execute(command,tx,characterParent,resolve,routes);go=outcome.Target;
+                        if(go){string characterName=string.IsNullOrWhiteSpace(command.name)?go.name:command.name;aliases["@"+characterName]=go;aliases[characterName]=go;}
+                        result.Results.Add(new EditorCommandResult{Success=true,Tool=command.tool,Target=go?Id(go):command.target,Summary=outcome.Summary,CreatedAssets=tx.Assets.Skip(assetStart).ToList()});continue;
                     }
                     if(WorldGameplayTools.Handles(command.tool))
                     {

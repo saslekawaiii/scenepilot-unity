@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Linq;
+using System.IO;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 
 namespace WorldWeaver.Editor.Assistant
@@ -25,6 +27,46 @@ namespace WorldWeaver.Editor.Assistant
                 "Your NEXT response must be a standalone review plan: actions contains ONLY 1-4 draft_script actions, each with its exact complete C# source; complete:false. " +
                 "Do not include create_object, attach_script, patch_script or any other action in that response. " +
                 "The original scene task remains pending and can continue after the code is reviewed and Unity confirms compilation. Never claim that a draft has already been imported, attached or tested.";
+        }
+
+        /// <summary>Narrow an already exposed code draft after a mixed or interrupted proposal; never reconstruct partial source.</summary>
+        internal static bool BindSingleScriptRepair(CompletionRequest request, EditorPlan rejected, string rawResponse, bool readOnlyRequest, out string guidance)
+        {
+            guidance = "";
+            if (readOnlyRequest || request?.Schema == null ||
+                !(rejected?.actions?.Any(action => action?.tool == "draft_script") == true || PartialDraftTool(rawResponse))) return false;
+            var branches = request.Schema["properties"]?["actions"]?["items"]?["anyOf"] as JArray;
+            var drafts = branches?.OfType<JObject>().Where(branch => EditorToolSchema.ToolName(branch) == "draft_script").ToArray();
+            if (drafts == null || drafts.Length == 0) return false;
+            var schema = (JObject)request.Schema.DeepClone();
+            var actions = (JObject)schema["properties"]["actions"];
+            actions["items"]["anyOf"] = new JArray(drafts.Select(branch => branch.DeepClone()));
+            actions["minItems"] = 1; actions["maxItems"] = 1;
+            schema["properties"]["complete"]["enum"] = new JArray(false);
+            request.Schema = schema;
+            guidance = "The prior code proposal was rejected or cut off; NOTHING from it was executed. " +
+                "Return a new standalone review plan: complete:false and EXACTLY ONE draft_script action with one complete cohesive C# source file. " +
+                "Do not continue, concatenate, quote or repair the broken JSON prefix. Do not include scene creation, attach_script, patch_script or any other action. " +
+                "Keep the reply short. Other requested files and scene work remain pending for subsequent reviewed steps. " +
+                "Do not claim that code was imported, compiled, attached or tested before the actual results.";
+            return true;
+        }
+        static bool PartialDraftTool(string raw)
+        {
+            if (string.IsNullOrEmpty(raw)) return false;
+            // Read only actual JSON tool-value tokens. A word inside reply/code is not an action.
+            // Failure later in args.code leaves the exact partial response untouched in the audit.
+            using (var reader = new JsonTextReader(new StringReader(raw.Substring(0, Math.Min(40000, raw.Length)))) { MaxDepth = 16 })
+            {
+                try
+                {
+                    while (reader.Read())
+                        if (reader.TokenType == JsonToken.String && (string)reader.Value == "draft_script" &&
+                            Regex.IsMatch(reader.Path, @"^actions\[\d+\]\.tool$", RegexOptions.CultureInvariant)) return true;
+                }
+                catch (JsonException) { }
+            }
+            return false;
         }
 
         internal static string MaterialPhaseRepair(EditorPlan rejected, IEnumerable<string> allowedTools, bool readOnlyRequest, out string nextTool)

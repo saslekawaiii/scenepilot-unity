@@ -118,10 +118,10 @@ namespace WorldWeaver.Editor.Assistant
         public int Round;
         // Response remains the raw provider text for compatibility with older traces.
         // NormalizedResponse is recorded only for an explicit, narrowly scoped adapter repair.
-        public string Response, RawResponse, NormalizedResponse, RepairKind, Error, SchemaHash, Model;
+        public string Response, RawResponse, NormalizedResponse, RepairKind, Error, SchemaHash, Model, FinishReason;
         public long ProviderElapsedMs;
         public List<ChatMessage> Messages = new List<ChatMessage>();
-        public bool Accepted;
+        public bool Accepted, OutputTruncated;
     }
 
     [Serializable]

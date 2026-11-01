@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "author": "Kenney",
+  "pack": "Mini Characters 1 (1.0)",
+  "assetPage": "https://kenney.nl/assets/mini-characters",
+  "authorUploadPage": "https://opengameart.org/node/165679",
+  "downloadUrl": "https://opengameart.org/sites/default/files/kenney_mini-characters.zip",
+  "archiveSha256": "a95a02b556735246570549d0c4a1fcd13ea46ede18187c63d463575a56fd6e1d",
+  "archiveBytes": 2403165,
+  "license": "CC0-1.0",
+  "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "modifications": "Selected files renamed only. Geometry, weights, skeleton, animations and texture pixels are unchanged. Unity import settings use the original generic 7-bone skeleton, without Humanoid retargeting.",
+  "visualStyle": "Stylized low-poly humanoids; no claim of photorealism or generated mesh.",
+  "selectedFiles": [
+    {
+      "path": "adventurer.fbx",
+      "archivePath": "Models/FBX format/character-male-a.fbx",
+      "bytes": 719360,
+      "sha256": "5c99dc0ede89c720e2e38b0fdaaa80fafb1d06ad5a2b95f95c7b9946a01b5591"
+    },
+    {
+      "path": "explorer.fbx",
+      "archivePath": "Models/FBX format/character-female-b.fbx",
+      "bytes": 723552,
+      "sha256": "084a1529740a9f0649b3602cd0277fd39c7327380e434af46dff1a81d93b9c06"
+    },
+    {
+      "path": "colormap.png",
+      "archivePath": "Models/FBX format/Textures/colormap.png",
+      "bytes": 8706,
+      "sha256": "0d4947d34ff32acf4a359c7f22ca784e057e7e72f622170a9a77b6fc88fdb70e"
+    },
+    {
+      "path": "License.txt",
+      "archivePath": "License.txt",
+      "bytes": 720,
+      "sha256": "2846262ed15fc51403dc199866a7dadda488c2cefdbbd99c22af946045be98f6"
+    }
+  ],
+  "authoredClipNames": [
+    "static",
+    "idle",
+    "walk",
+    "sprint",
+    "jump",
+    "fall",
+    "crouch",
+    "sit",
+    "drive",
+    "die",
+    "pick-up",
+    "emote-yes",
+    "emote-no",
+    "holding-right",
+    "holding-left",
+    "holding-both",
+    "holding-right-shoot",
+    "holding-left-shoot",
+    "holding-both-shoot",
+    "attack-melee-right",
+    "attack-melee-left",
+    "attack-kick-right",
+    "attack-kick-left",
+    "interact-right",
+    "interact-left",
+    "wheelchair-sit",
+    "wheelchair-look-left",
+    "wheelchair-look-right",
+    "wheelchair-move-forward",
+    "wheelchair-move-back",
+    "wheelchair-move-left",
+    "wheelchair-move-right"
+  ]
+}

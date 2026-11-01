@@ -107,6 +107,8 @@ namespace WorldWeaver.Editor.Assistant
             }
             var materialApplication=AgentMaterialApplicationGoal.Capture(input,mutationAuthorized);
             if(materialApplication!=null)task.Requirements.Add(materialApplication);
+            var animatedPlayer=AgentAnimatedPlayerGoal.Capture(input,mutationAuthorized);
+            if(animatedPlayer!=null)task.Requirements.Add(animatedPlayer);
             return task;
         }
         static bool MatchesKind(GameObject go,string expected)=>expected=="light"?go.GetComponent<Light>()!=null:Kind(go)==expected;
@@ -120,7 +122,7 @@ namespace WorldWeaver.Editor.Assistant
             task.Checks.Clear();
             foreach(var requirement in task.Requirements)
             {
-                if(requirement.Kind=="rotation_speed"||requirement.Kind==AgentMaterialApplicationGoal.Kind)continue; // Controller combines tool evidence with actual read-back.
+                if(requirement.Kind=="rotation_speed"||requirement.Kind==AgentMaterialApplicationGoal.Kind||requirement.Kind==AgentAnimatedPlayerGoal.Kind)continue; // Controller combines tool evidence with actual read-back.
                 double actual=double.NaN;string evidence="live Unity scene";
                 if(missingScope){task.Checks.Add(new AgentCheckResult{RequirementId=requirement.Id,Description=requirement.Description,Actual="Мир задания отсутствует",Evidence="Не разрешён ScopeTarget; чужие объекты не учитываются",Passed=false});continue;}
                 if(requirement.Kind=="count")
