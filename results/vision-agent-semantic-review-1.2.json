@@ -1,0 +1,30 @@
+{
+  "kind": "independent-semantic-review-of-image-only-inference",
+  "utc": "2026-10-31T23:55:49.341767+00:00",
+  "productSourceCommit": "ee8d9329a53b416b53ec8f0546cd906263abb331",
+  "productTreeSha256": "f6756356eb56ea7f73ecf693f2826c588b7ee97abe1ca45589de028cfdf593aa",
+  "report": "results/vision-agent-acceptance-1.2.json",
+  "reportSha256": "89d4b3eb2a65bfb0254aeebf4bb6d9cca0b3aa98681326f5b1a3c458d37cae2b",
+  "image": "results/vision-agent-acceptance-1.2.png",
+  "imageSha256": "610802f24de09fc1673d347db5ece45aaaad16c77b24f4df3378435dd5476df0",
+  "runner": "scripts/VisualAcceptanceRunner.cs",
+  "runnerSha256": "28cc41993b9bf3450bad067f11423807d559946f7e07e7c5f6a855cdd1a779f0",
+  "unityExitCode": 1,
+  "personallyViewedOriginalImage": true,
+  "actualResponse": "Слева изображён красный параллелепипед, справа — синий шар.",
+  "strictAutomatedPass": false,
+  "checks": {
+    "redObjectAtImageLeftCorrect": true,
+    "blueSphereAtImageRightCorrect": true,
+    "leftObjectBoxLikeShapeCorrect": true,
+    "leftObjectSpecificallyNamedCube": false,
+    "liveSceneEmptyAndUnchanged": true,
+    "noProviderFactoryInjected": true
+  },
+  "judgment": "Image-only local vision route supplied a content-bearing answer with correct side/color association and right-hand sphere. The cube was called the broader parallelepiped category, so the predefined exact cube-word criterion failed. Do not report this as a full visual acceptance pass.",
+  "limitations": [
+    "One authored rendered image and one model response, not a general vision benchmark.",
+    "Shape specificity remains limited.",
+    "Independent review does not alter the original automated outcome."
+  ]
+}

@@ -5,6 +5,7 @@ import json
 import re
 import zipfile
 import os
+import argparse
 from pathlib import Path
 from docx import Document
 from docx.enum.section import WD_SECTION_START
@@ -21,6 +22,8 @@ BUILD = ROOT/'.private/build'
 REFERENCE = ROOT/'thesis/templates/official-title.docx'
 if not REFERENCE.exists():REFERENCE=ROOT/'.private/reference/official-title.docx'
 TOPIC = 'Разработка интеллектуального инструментария для автоматизированного создания динамических игровых миров'
+ASSIGNMENT = ROOT/'thesis/templates/official-assignment.docx'
+TEXT_FILES = ['00-introduction.md','01-analysis.md','02-design.md','03-implementation.md','04-evaluation.md','05-conclusion.md']
 
 
 def font(style, size, bold=False):
@@ -29,24 +32,28 @@ def font(style, size, bold=False):
 
 
 def styles(doc):
-    for name,size,bold in [('WWBody',14,False),('WWHeading1',14,True),('WWHeading2',14,True),('WWCaption',12,False),('WWTable',11,False),('WWTOC',12,False),('WWCode',10,False)]:
+    compat=doc.settings.element.find(qn('w:compat'))
+    if compat is None:compat=OxmlElement('w:compat');doc.settings.element.append(compat)
+    if compat.find(qn('w:doNotExpandShiftReturn')) is None:
+        compat.append(OxmlElement('w:doNotExpandShiftReturn'))
+    for name,size,bold in [('WWBody',14,False),('WWHeading1',14,True),('WWHeading2',14,True),('WWHeading3',14,True),('WWCaption',14,False),('WWTable',14,False),('WWTOC',14,False),('WWCode',14,False)]:
         if name not in doc.styles:doc.styles.add_style(name,WD_STYLE_TYPE.PARAGRAPH)
         s=doc.styles[name];font(s,size,bold);f=s.paragraph_format;f.space_after=Pt(0);f.space_before=Pt(0);f.line_spacing=1.5;f.widow_control=True
-        if name=='WWBody':f.first_line_indent=Cm(1.25);s.paragraph_format.alignment=WD_ALIGN_PARAGRAPH.JUSTIFY
+        if name=='WWBody':f.first_line_indent=Cm(1.5);s.paragraph_format.alignment=WD_ALIGN_PARAGRAPH.JUSTIFY
         if name.startswith('WWHeading'):
-            f.keep_with_next=True;f.space_before=Pt(12);f.space_after=Pt(8);f.line_spacing=1.15
-            outline=OxmlElement('w:outlineLvl');outline.set(qn('w:val'),'0' if name.endswith('1') else '1');s.element.get_or_add_pPr().append(outline)
-        if name in ['WWTable','WWCaption','WWCode','WWTOC']:f.line_spacing=1.0
+            f.keep_with_next=True;f.space_before=Pt(12);f.space_after=Pt(8);f.line_spacing=1.5;f.first_line_indent=Cm(1.5)
+            outline=OxmlElement('w:outlineLvl');outline.set(qn('w:val'),str(int(name[-1])-1));s.element.get_or_add_pPr().append(outline)
+        if name in ['WWTable','WWCaption','WWCode','WWTOC']:f.line_spacing=1.5;f.first_line_indent=Cm(0)
     doc.styles['WWCaption'].paragraph_format.alignment=WD_ALIGN_PARAGRAPH.CENTER
     doc.styles['WWCaption'].paragraph_format.space_after=Pt(8)
     doc.styles['WWCaption'].paragraph_format.keep_with_next=False
     doc.styles['WWTable'].paragraph_format.space_after=Pt(3)
-    for name in ['WWBody','WWHeading1','WWHeading2','WWCaption','WWTable','WWTOC']:
+    for name in ['WWBody','WWHeading1','WWHeading2','WWHeading3','WWCaption','WWTable','WWTOC']:
         lang=OxmlElement('w:lang');lang.set(qn('w:val'),'ru-RU');doc.styles[name].element.get_or_add_rPr().append(lang)
 
 
 def body_section(doc):
-    s=doc.add_section(WD_SECTION_START.NEW_PAGE);s.page_width=Cm(21);s.page_height=Cm(29.7);s.left_margin=Cm(3);s.right_margin=Cm(1.5);s.top_margin=Cm(2);s.bottom_margin=Cm(2)
+    s=doc.add_section(WD_SECTION_START.NEW_PAGE);s.page_width=Cm(21);s.page_height=Cm(29.7);s.left_margin=Cm(3);s.right_margin=Cm(1);s.top_margin=Cm(1.5);s.bottom_margin=Cm(2)
     s.header_distance=Cm(.8);s.footer_distance=Cm(1);s.footer.is_linked_to_previous=False
     p=s.footer.paragraphs[0];p.alignment=WD_ALIGN_PARAGRAPH.CENTER;p.style=doc.styles['WWCaption']
     field=OxmlElement('w:fldSimple');field.set(qn('w:instr'),'PAGE');p._p.append(field)
@@ -69,8 +76,58 @@ def cover():
     return d
 
 
+def append_assignment(doc):
+    """Append the retained official form; only explicitly documented slots are filled."""
+    manifest=json.loads((ROOT/'thesis/templates/manifest.json').read_text())['assignment']
+    assert hashlib.sha256(ASSIGNMENT.read_bytes()).hexdigest()==manifest['normalized_sha256']
+    source=Document(ASSIGNMENT)
+    data=json.loads((ROOT/'thesis/assignment-content.json').read_text())
+    p=source.paragraphs
+    slots={4:'Кафедра '+data['department'],8:'Задание на выпускную квалификационную работу бакалавра',10:'Студент '+data['student'],12:'Код кафедры _____________________                Группа '+data['group'],13:'Тема Разработка интеллектуального инструментария для',14:'автоматизированного создания динамических игровых миров',15:'',22:data['input']}
+    for i,title in zip(range(25,29),data['sections']):slots[i]=title
+    for i,title in zip(range(43,67,2),data['graphics']):slots[i]=str((i-43)//2+1)+') '+title
+    for i,text in slots.items():replace(p[i],text)
+    # Namespace source styles so Word never resolves an assignment style to the cover's Normal.
+    mapping={s.style_id:'WWAssignment_'+s.style_id for s in source.styles}
+    for style in source.styles:
+        node=copy.deepcopy(style.element);node.set(qn('w:styleId'),mapping[style.style_id])
+        node.attrib.pop(qn('w:default'),None)
+        for tag in ['basedOn','next','link']:
+            for item in node.findall(qn('w:'+tag)):
+                old=item.get(qn('w:val'))
+                if old in mapping:item.set(qn('w:val'),mapping[old])
+        name=node.find(qn('w:name'))
+        if name is not None:name.set(qn('w:val'),'WWAssignment '+style.name)
+        doc.styles.element.append(node)
+    section=doc.add_section(WD_SECTION_START.NEW_PAGE)
+    for field in ['page_width','page_height','left_margin','right_margin','top_margin','bottom_margin','header_distance','footer_distance']:
+        setattr(section,field,getattr(source.sections[0],field))
+    section.header.is_linked_to_previous=False;section.footer.is_linked_to_previous=False
+    section.different_first_page_header_footer=False
+    for element in source.element.body:
+        if element.tag==qn('w:sectPr'):continue
+        node=copy.deepcopy(element)
+        for item in node.iter(qn('w:p')):
+            props=item.find(qn('w:pPr'))
+            if props is None:props=OxmlElement('w:pPr');item.insert(0,props)
+            if props.find(qn('w:pStyle')) is None:
+                default=OxmlElement('w:pStyle');default.set(qn('w:val'),'Normal');props.insert(0,default)
+        for tag in ['pStyle','rStyle','tblStyle']:
+            for item in node.iter(qn('w:'+tag)):
+                old=item.get(qn('w:val'))
+                if old in mapping:item.set(qn('w:val'),mapping[old])
+        doc.element.body.insert(len(doc.element.body)-1,node)
+
+
 def paragraph(doc,text,style='WWBody'):
     text=re.sub(r'`([^`]+)`',r'\1',text);text=re.sub(r'\*\*([^*]+)\*\*',r'\1',text)
+    if style=='WWBody' and re.match(r'^\d+\. ',text) and ' — URL: ' in text:
+        description,address=text.split(' — URL: ',1)
+        p=doc.add_paragraph(style=style);p.paragraph_format.keep_together=True
+        p.add_run(description.replace('[б. г.]','[б.\u00a0г.]'))
+        p.add_run().add_break(WD_BREAK.LINE)
+        p.add_run('—\u00a0URL:\u00a0'+address)
+        return p
     p=doc.add_paragraph(text,style);return p
 
 def anchor_name(title):
@@ -128,7 +185,10 @@ def table(doc,lines,title,number):
     p=paragraph(doc,f'Таблица {number} — {title}','WWCaption');p.alignment=WD_ALIGN_PARAGRAPH.LEFT;p.paragraph_format.keep_with_next=True
     t=doc.add_table(rows=1,cols=len(cells[0]));t.alignment=WD_TABLE_ALIGNMENT.CENTER;t.autofit=False
     total=16.5
-    if cells[0][:2]==['ID','Вопрос']:widths=[1.8,8,6.7]
+    if cells[0][:2]==['Код','Требование']:widths=[2,14.5]
+    elif len(cells[0])==3 and cells[0][0]=='Код':widths=[2,4.7,9.8]
+    elif len(cells[0])==3 and cells[0][0]=='№':widths=[1,6,9.5]
+    elif cells[0][:2]==['ID','Вопрос']:widths=[1.8,8,6.7]
     elif len(cells[0])==3 and cells[0][0]=='ID':widths=[1.8,5.2,9.5]
     elif len(cells[0])==4 and cells[0][0]=='№':widths=[.9,4.4,8.8,2.4]
     elif len(cells[0])==4 and cells[0][0]=='Код':widths=[1.7,4.9,4.8,5.1]
@@ -164,12 +224,16 @@ def table(doc,lines,title,number):
 
 
 def render_markdown(doc,text,counters,headings,break_chapters=True):
-    lines=text.splitlines();i=0;section='Сведения';code=False
+    lines=text.splitlines();i=0;section='Сведения';code=False;pending_caption=None
     while i<len(lines):
         line=lines[i].strip()
         if not line:i+=1;continue
         if line.startswith('```'):code=not code;i+=1;continue
         if code:paragraph(doc,line,'WWCode');i+=1;continue
+        caption=re.fullmatch(r'Таблица[ \u00a0](\d+) — (.+)',line)
+        if caption:
+            if pending_caption is not None:raise ValueError('Table caption without table')
+            pending_caption=(int(caption.group(1)),caption.group(2));i+=1;continue
         if line in ['[[MATH_COSINE]]','[[MATH_FBM]]','[[MATH_SMOOTH]]']:
             equation(doc,{'[[MATH_COSINE]]':'cosine','[[MATH_FBM]]':'fbm','[[MATH_SMOOTH]]':'smooth'}[line]);i+=1;continue
         if line.startswith('# '):
@@ -178,10 +242,15 @@ def render_markdown(doc,text,counters,headings,break_chapters=True):
             headings.append((title,1));section=title;i+=1;continue
         if line.startswith('## '):
             title=line[3:];p=paragraph(doc,title,'WWHeading2');bookmark(p,title,len(headings)+1000);headings.append((title,2));section=title;i+=1;continue
+        if line.startswith('### '):
+            paragraph(doc,line[4:],'WWHeading3');i+=1;continue
         if line.startswith('|'):
             rows=[]
             while i<len(lines) and lines[i].strip().startswith('|'):rows.append(lines[i]);i+=1
-            counters['tables']+=1;title=re.sub(r'^\d+(?:\.\d+)*\s+','',section)
+            counters['tables']+=1
+            if pending_caption is None:raise ValueError('Rendered table without explicit caption')
+            number,title=pending_caption;pending_caption=None
+            if number!=counters['tables']:raise ValueError('Table caption numbering differs from table order')
             table(doc,rows,title,counters['tables']);continue
         image=re.fullmatch(r'!\[(.*?)\]\((.*?)\)',line)
         if image:
@@ -189,13 +258,16 @@ def render_markdown(doc,text,counters,headings,break_chapters=True):
             if not p.exists():raise FileNotFoundError(p)
             from PIL import Image
             with Image.open(p) as im:w,h=im.size
-            # Crop the real dialogue pane natively in DrawingML; preserve the source PNG.
+            # Native Word cropping shows genuine UI details; source image bytes remain unchanged.
             crops={'play-dialogue.png':(.174,.145,.435,.14),'toolkit-world.png':(0,.06,.40,.02),
                    'chat-npc-play-reply.png':(.504,.149,.192,.143),
-                   'chat-scene-result.png':(.1653,.1269,.1810,.1269)}
+                   'chat-scene-result.png':(.1653,.1269,.1810,.1269),
+                   'chat-420.jpg':(0,110/1400,0,60/1400),
+                   'village-letter-received.jpg':(500/2900,230/1676,1180/2900,396/1676),
+                   'village-quest-completed.jpg':(500/2900,230/1676,1180/2900,396/1676)}
             crop=crops.get(p.name)
             ratio=(w*(1-crop[0]-crop[2]))/(h*(1-crop[1]-crop[3])) if crop else w/h
-            width=min(16.2,19.5*ratio);pr=doc.add_paragraph();pr.alignment=WD_ALIGN_PARAGRAPH.CENTER;pr.paragraph_format.keep_with_next=True
+            width=min(17.0,19.5*ratio);pr=doc.add_paragraph();pr.alignment=WD_ALIGN_PARAGRAPH.CENTER;pr.paragraph_format.keep_with_next=True
             shape=pr.add_run().add_picture(str(p),width=Cm(width),height=Cm(width/ratio))
             if crop:
                 rect=OxmlElement('a:srcRect')
@@ -207,64 +279,182 @@ def render_markdown(doc,text,counters,headings,break_chapters=True):
         parts=[line];i+=1
         while i<len(lines) and lines[i].strip() and not lines[i].strip().startswith(('#','|','![','```')):parts.append(lines[i].strip());i+=1
         paragraph(doc,' '.join(parts))
+    if pending_caption is not None:raise ValueError('Table caption without table')
 
 
-def bibliography():
-    data=json.loads((ROOT/'docs/research/sources.json').read_text());text='# СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ\n\n'
-    for r in data:
+def catalog():
+    data=json.loads((ROOT/'docs/research/sources.json').read_text())
+    extra=ROOT/'thesis/supplemental-sources.json'
+    if extra.exists():data+=json.loads(extra.read_text())
+    result={str(r['id']):r for r in data}
+    if len(result)!=len(data):raise ValueError('Duplicate source identifier')
+    overrides=ROOT/'thesis/source-overrides.json'
+    if overrides.exists():
+        for key,fields in json.loads(overrides.read_text()).items():
+            if key not in result:raise ValueError('Override without source '+key)
+            result[key]={**result[key],**fields}
+    return result
+
+
+def citation_ids(content):
+    """Read stable catalog IDs and an optional page locator from a square citation."""
+    parts=re.split(r',\s*с\.\s*',content,maxsplit=1)
+    tokens=[p.strip() for p in parts[0].split(',')]
+    ids=[]
+    for token in tokens:
+        if re.fullmatch(r'\d+',token) or re.fullmatch(r'@[a-z0-9-]+',token):ids.append(token)
+        elif re.fullmatch(r'\d+\s*[–-]\s*\d+',token):
+            first,last=map(int,re.split(r'\s*[–-]\s*',token))
+            if last<first or last-first>100:raise ValueError('Invalid source range')
+            ids.extend(str(i) for i in range(first,last+1))
+        else:return None
+    return ids,parts[1] if len(parts)>1 else None
+
+
+def renumber_citations(texts):
+    known=catalog();order=[]
+    def convert(match):
+        parsed=citation_ids(match.group(1))
+        if parsed is None:return match.group(0)
+        ids,page=parsed
+        for key in ids:
+            if key not in known:raise ValueError('Unknown source ID '+key)
+            if key not in order:order.append(key)
+        return '['+', '.join(str(order.index(key)+1) for key in ids)+((', с. '+page) if page else '')+']'
+    updated=[re.sub(r'\[([^\[\]\n]+)\]',convert,text) for text in texts]
+    return updated,order
+
+
+def bibliography(order):
+    data=catalog();text='# СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ\n\n'
+    for number,key in enumerate(order,1):
+        r=data[key]
         accessed=r.get('accessed','2026-10-30');parts=accessed.split('-');accessed='.'.join(reversed(parts)) if len(parts)==3 else accessed
         author=r['author'].rstrip('.')
-        text+=f"{r['id']}. {author}. {r['title']}. — {r['year']}. — URL: {r['url']} (дата обращения: {accessed}). — Текст: электронный.\n\n"
+        description=r.get('description',f"{author}. {r['title']}. — {r['year']}.")
+        text+=f"{number}. {description} — URL: {r['url']} (дата обращения: {accessed}). — Текст : электронный.\n\n"
     return text
 
 
-def main():
-    OUT.mkdir(exist_ok=True);BUILD.mkdir(parents=True,exist_ok=True)
-    doc=cover();styles(doc);body_section(doc)
-    texts=[(ROOT/'thesis'/n).read_text() for n in ['00-introduction.md','01-analysis.md','02-design.md','03-implementation.md','04-evaluation.md','05-conclusion.md']]
-    if any('{{' in t for t in texts):raise ValueError('Unresolved document placeholder')
-    annotation,after_annotation=texts[0].split('# ПЕРЕЧЕНЬ СОКРАЩЕНИЙ',1)
-    texts[0]='# ПЕРЕЧЕНЬ СОКРАЩЕНИЙ'+after_annotation
-    # A static, verified TOC avoids blank cached Word fields in the delivered file.
-    titles=[]
+def expanded_appendices():
+    text=(ROOT/'thesis/06-appendices.md').read_text()
+    tz=(ROOT/'thesis/technical-specification.md').read_text()
+    def heading(match):
+        depth,title=match.groups()
+        return ('## ' if len(depth)==1 else '### ')+'А.'+title
+    tz=re.sub(r'^(#{1,2}) (\d[^\n]*)$',heading,tz,flags=re.M)
+    return text.replace('[[TECHNICAL_SPECIFICATION]]',tz)
+
+
+def resolve_layout_references(texts):
+    figures={};tables={};captions={}
     for text in texts:
-        for l in text.splitlines():
-            if l.startswith('# ') or l.startswith('## '):
-                title=l.lstrip('#').strip()
-                if title not in ['АННОТАЦИЯ','ПЕРЕЧЕНЬ СОКРАЩЕНИЙ']:titles.append((title,2 if l.startswith('##') else 1))
-    titles += [('СПИСОК ИСПОЛЬЗОВАННЫХ ИСТОЧНИКОВ',1)]
-    appendices=(ROOT/'thesis/06-appendices.md').read_text()
-    titles += [(line[2:],1) for line in appendices.splitlines() if line.startswith('# ')]
+        for path in re.findall(r'^!\[.*?\]\((.*?)\)$',text,flags=re.M):
+            key=Path(path).stem
+            if key in figures:raise ValueError('Duplicate figure reference key '+key)
+            figures[key]=len(figures)+1
+        pending=None;in_table=False
+        for line in text.splitlines():
+            tag=re.fullmatch(r'\[\[TABLE:([a-z0-9-]+)\|([^\]\n]+)\]\]',line.strip())
+            if tag:
+                if pending is not None:raise ValueError('Table key without table '+pending)
+                captions[tag.group(1)]=tag.group(2).strip()
+                pending=tag.group(1);in_table=False;continue
+            if line.strip().startswith('|'):
+                if not in_table:
+                    if pending is None:raise ValueError('Table without a stable reference key')
+                    if pending in tables:raise ValueError('Duplicate table key '+pending)
+                    tables[pending]=len(tables)+1;pending=None
+                in_table=True
+            else:
+                in_table=False
+                if pending and line.strip():raise ValueError('Table key not immediately followed by table '+pending)
+        if pending is not None:raise ValueError('Table key without table '+pending)
+    def figure_reference(match):
+        key=match.group(1)
+        if key not in figures:raise ValueError('Unknown figure reference '+key)
+        return 'рисунке\u00a0'+str(figures[key])
+    def table_reference(match):
+        key=match.group(1)
+        if key not in tables:raise ValueError('Unknown table reference '+key)
+        return 'таблице\u00a0'+str(tables[key])
+    def table_caption(match):
+        key=match.group(1)
+        return 'Таблица\u00a0'+str(tables[key])+' — '+captions[key]+'\n'
+    updated=[]
+    for text in texts:
+        text=re.sub(r'\[\[FIG:([a-z0-9-]+)\]\]',figure_reference,text)
+        text=re.sub(r'\[\[TAB:([a-z0-9-]+)\]\]',table_reference,text)
+        text=re.sub(r'^\[\[TABLE:([a-z0-9-]+)\|[^\]\n]+\]\]\s*\n',table_caption,text,flags=re.M)
+        updated.append(text)
+    return updated
+
+
+def document_sources():
+    raw=[(ROOT/'thesis'/name).read_text() for name in TEXT_FILES]
+    raw.append(expanded_appendices())
+    raw=resolve_layout_references(raw)
+    if any('{{' in text for text in raw):raise ValueError('Unresolved content placeholder')
+    texts,order=renumber_citations(raw)
+    return texts[:-1],texts[-1],order
+
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--draft',action='store_true',help='Create review DOCX only; do not replace final deliverables')
+    parser.add_argument('--sources-only',action='store_true',help='Refresh combined Markdown and source manifest without DOCX or PDF')
+    parser.add_argument('--output-dir',type=Path,help='Explicit DOCX output directory')
+    args=parser.parse_args()
+    state=json.loads((ROOT/'thesis/build-status.json').read_text())
+    if not args.draft and not args.sources_only and not (state.get('content_final') and state.get('metrics_final')):
+        raise SystemExit('Final build blocked: content and actual 1.2 metrics are not confirmed. Use --sources-only or --draft for internal review.')
+    output=args.output_dir or (ROOT/'.private/draft-vkr2026' if args.draft else OUT)
+    BUILD.mkdir(parents=True,exist_ok=True)
+    texts,appendices,order=document_sources()
+    references=bibliography(order)
+    complete='\n\n'.join(texts+[references,appendices])
+    for marker,expression in {'[[MATH_COSINE]]':r'$$c(q,d)=\frac{\sum_{i=1}^{D}q_i d_i}{\sqrt{\sum_{i=1}^{D}q_i^2}\sqrt{\sum_{i=1}^{D}d_i^2}}$$','[[MATH_FBM]]':r'$$F(u,v)=\frac{\sum_{o=0}^{O-1}a_oN(f_ou,f_ov,s_o)}{\sum_{o=0}^{O-1}a_o}$$','[[MATH_SMOOTH]]':r'$$h^{p+1}=0.65h^p+0.35\operatorname{avg}_4(h^p)$$'}.items():
+        complete=complete.replace(marker,expression)
+    (ROOT/'thesis/ВКР_полный_текст.md').write_text(complete)
+    source_manifest={'edition':state['edition'],'content_final':state['content_final'],'metrics_final':state['metrics_final'],'sources':[{'printed_number':i+1,'catalog_id':key,'title':catalog()[key]['title']} for i,key in enumerate(order)],'combined_markdown_sha256':hashlib.sha256(complete.encode()).hexdigest()}
+    (BUILD/'source-manifest.json').write_text(json.dumps(source_manifest,ensure_ascii=False,indent=2))
+    if args.sources_only:
+        print('SOURCES_UPDATED',len(order),'cited references');return
+    output.mkdir(parents=True,exist_ok=True)
+    doc=cover();styles(doc);append_assignment(doc);body_section(doc)
+    front,after=texts[0].split('# ПЕРЕЧЕНЬ СОКРАЩЕНИЙ',1)
+    texts[0]='# ПЕРЕЧЕНЬ СОКРАЩЕНИЙ'+after
+    titles=[]
+    for text in texts+[references,appendices]:
+        for line in text.splitlines():
+            if line.startswith('# ') or line.startswith('## '):
+                title=line.lstrip('#').strip()
+                if title not in ['АННОТАЦИЯ','ABSTRACT','ПЕРЕЧЕНЬ СОКРАЩЕНИЙ']:
+                    titles.append((title,2 if line.startswith('##') else 1))
+    if len({title for title,_ in titles})!=len(titles):raise ValueError('Duplicate heading text')
     counters={'figures':0,'tables':0};headings=[]
-    render_markdown(doc,annotation,counters,headings)
-    first=next(p for p in doc.paragraphs if p.text.startswith('Выпускная квалификационная работа посвящена'))
-    stat=first.insert_paragraph_before(style='WWBody');stat.add_run('Объём пояснительной записки — ')
-    count=OxmlElement('w:fldSimple');count.set(qn('w:instr'),'NUMPAGES');run=OxmlElement('w:r');value=OxmlElement('w:t')
-    stats_path=ROOT/'thesis/document-statistics.json'
-    value.text=str(json.loads(stats_path.read_text()).get('pages',74)) if stats_path.exists() else '74'
-    run.append(value);count.append(run);stat._p.append(count)
-    statistics_run=stat.add_run(' с.')
-    paragraph(doc,'СОДЕРЖАНИЕ','WWHeading1')
-    doc.paragraphs[-1].paragraph_format.page_break_before=True
-    map_path=BUILD/'page-map.json' if (BUILD/'page-map.json').exists() else ROOT/'thesis/document-page-map.json'
+    # Both short language versions share a page; the official program recommends half a page each.
+    render_markdown(doc,front,counters,headings,break_chapters=False)
+    paragraph(doc,'СОДЕРЖАНИЕ','WWHeading1').paragraph_format.page_break_before=True
+    map_path=ROOT/'thesis/document-page-map.json'
+    private_map=BUILD/'page-map.json'
+    if private_map.exists():map_path=private_map
     pages=json.loads(map_path.read_text()) if map_path.exists() else {}
+    missing=[title for title,_ in titles if title not in pages]
+    if missing and not args.draft:raise ValueError('Final TOC page map is incomplete. Render draft and run map_document_pages.py first: '+str(missing))
     for title,level in titles:
-        p=paragraph(doc,title+'\t'+str(pages.get(title,'00')),'WWTOC');p.paragraph_format.left_indent=Cm(.4 if level==2 else 0);p.paragraph_format.tab_stops.add_tab_stop(Cm(16.5),WD_TAB_ALIGNMENT.RIGHT,WD_TAB_LEADER.DOTS);p.paragraph_format.space_after=Pt(1)
+        p=paragraph(doc,title+'\t'+str(pages.get(title,'—')),'WWTOC')
+        p.paragraph_format.left_indent=Cm(.75 if level==2 else 0)
+        p.paragraph_format.tab_stops.add_tab_stop(Cm(17),WD_TAB_ALIGNMENT.RIGHT,WD_TAB_LEADER.DOTS)
         link=OxmlElement('w:hyperlink');link.set(qn('w:anchor'),anchor_name(title))
         for run in list(p._p):
             if run.tag==qn('w:r'):p._p.remove(run);link.append(run)
         p._p.append(link)
     for text in texts:render_markdown(doc,text,counters,headings)
-    render_markdown(doc,bibliography(),counters,headings)
+    render_markdown(doc,references,counters,headings)
     render_markdown(doc,appendices,counters,headings)
-    source_count=len(json.loads((ROOT/'docs/research/sources.json').read_text()))
-    source_word='источник' if source_count%10==1 and source_count%100!=11 else 'источника' if source_count%10 in (2,3,4) and source_count%100 not in (12,13,14) else 'источников'
-    statistics_run.text=f" с., {counters['figures']} рис., {counters['tables']} табл., {source_count} {source_word}, 4 приложения."
-    # Preserve the template's opaque source parts; new body styles and footer are intentional.
-    settings=doc.settings.element
-    update=OxmlElement('w:updateFields');update.set(qn('w:val'),'true');settings.append(update)
-    thesis_path=OUT/'ВКР_WorldWeaver.docx'
-    doc.save(thesis_path)
+    update=OxmlElement('w:updateFields');update.set(qn('w:val'),'true');doc.settings.element.append(update)
+    thesis_path=output/'ВКР_WorldWeaver.docx';doc.save(thesis_path)
     preserve_parts=['docProps/app.xml','_rels/.rels','word/theme/theme1.xml','word/fontTable.xml','word/numbering.xml']
     with zipfile.ZipFile(REFERENCE) as ref,zipfile.ZipFile(thesis_path) as current:
         contents={name:current.read(name) for name in current.namelist()}
@@ -273,30 +463,27 @@ def main():
     with zipfile.ZipFile(temporary,'w',zipfile.ZIP_DEFLATED) as final:
         for name,data in contents.items():final.writestr(name,data)
     os.replace(temporary,thesis_path)
-    tz=Document();styles(tz);s=tz.sections[0];s.page_width=Cm(21);s.page_height=Cm(29.7);s.left_margin=Cm(3);s.right_margin=Cm(1.5);s.top_margin=Cm(2);s.bottom_margin=Cm(2)
+    tz=Document();styles(tz);s=tz.sections[0]
+    s.page_width=Cm(21);s.page_height=Cm(29.7);s.left_margin=Cm(3);s.right_margin=Cm(1);s.top_margin=Cm(1.5);s.bottom_margin=Cm(2)
     for target in [tz.styles['Title'].element.get_or_add_pPr(),tz.styles['Normal'].element.get_or_add_pPr()]:
         for child in list(target):
             if child.tag==qn('w:pBdr'):target.remove(child)
     p=tz.add_paragraph('ТЕХНИЧЕСКОЕ ЗАДАНИЕ','Title');p.alignment=WD_ALIGN_PARAGRAPH.CENTER
-    border=p._p.get_or_add_pPr().find(qn('w:pBdr'))
-    if border is not None:border.getparent().remove(border)
-    for r in p.runs:r.font.name='Times New Roman';r.font.size=Pt(20);r.font.color.rgb=RGBColor(0,0,0)
-    paragraph(tz,'на разработку программного инструментария WorldWeaver')
-    paragraph(tz,TOPIC);paragraph(tz,'Исполнитель Коваленко Кирилл Дмитриевич, ИВТ-465');paragraph(tz,'ВолгГТУ, ФЭВТ, кафедра САПР и ПК');paragraph(tz,'Редакция от 31 октября 2026 года')
-    paragraph(tz,'Согласование руководителя ВКР ____________________');paragraph(tz,'Обозначение и реквизиты утверждения ____________________')
-    for p in tz.paragraphs[1:]:p.alignment=WD_ALIGN_PARAGRAPH.LEFT;p.paragraph_format.first_line_indent=Cm(0)
+    for run in p.runs:run.font.name='Times New Roman';run.font.size=Pt(14);run.font.color.rgb=RGBColor(0,0,0)
+    for text in ['на разработку программного инструментария WorldWeaver',TOPIC,'Исполнитель Коваленко Кирилл Дмитриевич, ИВТ-465','ВолгГТУ, ФЭВТ, кафедра САПР и ПК','Согласование руководителя ВКР ____________________','Обозначение и реквизиты утверждения ____________________']:
+        p=paragraph(tz,text);p.paragraph_format.first_line_indent=Cm(0);p.alignment=WD_ALIGN_PARAGRAPH.CENTER
     s.different_first_page_header_footer=True
     footer=s.footer.paragraphs[0];footer.alignment=WD_ALIGN_PARAGRAPH.CENTER;footer.style=tz.styles['WWCaption']
     page=OxmlElement('w:fldSimple');page.set(qn('w:instr'),'PAGE');footer._p.append(page)
     tz.add_page_break()
-    render_markdown(tz,(ROOT/'thesis/technical-specification.md').read_text(),{'figures':0,'tables':0},[],break_chapters=False)
-    tz.core_properties.author='Коваленко Кирилл Дмитриевич';tz.save(OUT/'Техническое_задание_WorldWeaver.docx')
-    complete=annotation+'\n'+'\n'.join(texts)+'\n'+bibliography()+'\n'+appendices
-    math_markdown={'[[MATH_COSINE]]':r'$$c(q,d)=\frac{\sum_{i=1}^{D}q_i d_i}{\sqrt{\sum_{i=1}^{D}q_i^2}\sqrt{\sum_{i=1}^{D}d_i^2}}$$','[[MATH_FBM]]':r'$$F(u,v)=\frac{\sum_{o=0}^{O-1}a_oN(f_ou,f_ov,s_o)}{\sum_{o=0}^{O-1}a_o}$$','[[MATH_SMOOTH]]':r'$$h^{p+1}=0.65h^p+0.35\operatorname{avg}_4(h^p)$$'}
-    for marker,expression in math_markdown.items():complete=complete.replace(marker,expression)
-    (ROOT/'thesis/ВКР_полный_текст.md').write_text(complete)
-    (BUILD/'document-manifest.json').write_text(json.dumps({'headings':titles,'figures':counters['figures'],'tables':counters['tables']},ensure_ascii=False,indent=2))
-    print('DOCX_CREATED',counters)
+    (tz_text,),tz_order=renumber_citations(resolve_layout_references([(ROOT/'thesis/technical-specification.md').read_text()]))
+    render_markdown(tz,tz_text,{'figures':0,'tables':0},[],break_chapters=False)
+    # The standalone document has its own references; the appendix uses the thesis numbering.
+    render_markdown(tz,bibliography(tz_order),{'figures':0,'tables':0},[],break_chapters=False)
+    tz.core_properties.author='Коваленко Кирилл Дмитриевич';tz.save(output/'Техническое_задание_WorldWeaver.docx')
+    manifest={'headings':titles,'figures':counters['figures'],'tables':counters['tables'],'sources':len(order),'edition':state['edition'],'draft':args.draft,'body_layout':{'margins_mm':{'left':30,'right':10,'top':15,'bottom':20},'indent_mm':15,'font':'Times New Roman','size_pt':14,'line_spacing':1.5},'official_assignment_pages':2,'source_manifest':source_manifest,'output_dir':str(output)}
+    (BUILD/'document-manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
+    print('DOCX_CREATED',json.dumps({'output_dir':str(output),**counters},ensure_ascii=False))
 
 
 if __name__=='__main__':main()

@@ -1,7 +1,16 @@
 {
-  "pages": 117,
-  "figures": 18,
-  "tables": 16,
-  "references": 41,
-  "appendices": 4
+  "pages": 101,
+  "total_pages": 101,
+  "pages_before_appendices": 80,
+  "introduction_pages": 3,
+  "conclusion_pages": 2,
+  "checks": {
+    "main_50_to_80": true,
+    "intro_2_to_3": true,
+    "conclusion_1_to_2": true
+  },
+  "figures": 12,
+  "tables": 12,
+  "sources": 41,
+  "pdf_sha256": "7f41d202c1f7d261c9f3fbeb3e8e4cf5fba25ed56332f1779758ccef37ec1f7c"
 }

@@ -1,11 +1,21 @@
 {
-  "utc": "2026-10-31T22:46:18.977620+00:00",
-  "purpose": "actual serial Deep7turn1.2 acceptance; source copied byte-identically",
-  "integrationSnapshot": "results/integration-1.2-snapshot-sixth.json",
+  "utc": "2026-10-31T23:22:52.982631+00:00",
+  "purpose": "Actual serial Deep seven-task acceptance on immutable SEVENTH-r2 source; known debugging scenarios, not held-out quality benchmark.",
+  "sourceCommit": "74ceb3f2312966c88ac9a74d2210788290565226",
+  "integrationSnapshot": "results/integration-1.2-snapshot-seventh-r2.json",
+  "frozenPackage": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/integrated-test-snapshot/package-seventh-r2",
   "files": [
     {
       "path": "Documentation~/index.md",
       "sha256": "90bce04c0c02fb4866279ce2b3750e5decd14f3ff02447bcc6e6390e50cbd6bb"
+    },
+    {
+      "path": "Editor.meta",
+      "sha256": "abb3039a7ec91d135dcce0203b06dd4410e4f420a87ca76a02b073fc4c793b18"
+    },
+    {
+      "path": "Editor/Assistant.meta",
+      "sha256": "ac0ca9be99c031d58055289047a41a243218104f1cf61f3a3430a4ed690a4b88"
     },
     {
       "path": "Editor/Assistant/AgentCheckpoints.cs",
@@ -65,7 +75,7 @@
     },
     {
       "path": "Editor/Assistant/AgentTaskSchema.cs",
-      "sha256": "285428f54f5c47504e0e3988bec9cc6b889ed34d662a0f396b02139a17026b3a"
+      "sha256": "6d71a70a6b2e710e06ff9ccbdc721583cb12f94c328d5ff63c66933142dcd288"
     },
     {
       "path": "Editor/Assistant/AgentTaskSchema.cs.meta",
@@ -73,7 +83,7 @@
     },
     {
       "path": "Editor/Assistant/AgentTasks.cs",
-      "sha256": "3d5b6d8936d4deb8f6fe81dede505d2a4bc0fd075dee112304aa9f17895a2f20"
+      "sha256": "f0ec69b763327277a9d9f34ceac9cae0e5ddb10761cc67de2e1502bd021f9d90"
     },
     {
       "path": "Editor/Assistant/AgentTasks.cs.meta",
@@ -129,7 +139,7 @@
     },
     {
       "path": "Editor/Assistant/ChatController.Agent.cs",
-      "sha256": "3b667abb85f9a998fb2344eba61e2afb8c80152ad3e09891294f6c7a00c4fffe"
+      "sha256": "70889c5d35c5bcac345b41557283979f650a6e27feafe773a52087f04d66f5f3"
     },
     {
       "path": "Editor/Assistant/ChatController.Agent.cs.meta",
@@ -185,7 +195,7 @@
     },
     {
       "path": "Editor/Assistant/SceneToolExecutor.cs",
-      "sha256": "0549446f2a3189e7ac014f341af02b48fb2839626aa8a3c0ce25e4dd4a7d02f6"
+      "sha256": "e962063205cb30ff814254f3fa510989a2e3598a1d073da16dbec87f93983ab6"
     },
     {
       "path": "Editor/Assistant/SceneToolExecutor.cs.meta",
@@ -232,10 +242,6 @@
       "sha256": "b93a2d3a6ab830b8b4ea89b29bf0018833d6448b2683c28c07eb49e67e7d4c43"
     },
     {
-      "path": "Editor/Assistant.meta",
-      "sha256": "ac0ca9be99c031d58055289047a41a243218104f1cf61f3a3430a4ed690a4b88"
-    },
-    {
       "path": "Editor/DemoBuilder.cs",
       "sha256": "1d75cbef824d03972eaafb65b71d6d72c9439d38b0df9c0fe40f0a6c0094fe2e"
     },
@@ -260,6 +266,14 @@
       "sha256": "9504bda0a0cc28ee233adbfc209eb65df5a32ff5f9246360259bd0dce6f06bad"
     },
     {
+      "path": "Editor/Skills.meta",
+      "sha256": "90d6abc3970896bd8b9e7ef3687b358987993ba6323607ff6dc52ee95c85d402"
+    },
+    {
+      "path": "Editor/Skills/LICENSES.meta",
+      "sha256": "8c0a30073cb68065ab88c4392f086bd8241eda87199bbd8531e47fbf87d464de"
+    },
+    {
       "path": "Editor/Skills/LICENSES/Besty0728-MIT.txt",
       "sha256": "ddf7990f8b3edee6160687f1b365e12e6ed0254da898aef069c41e0264a1e4bf"
     },
@@ -274,10 +288,6 @@
     {
       "path": "Editor/Skills/LICENSES/Nice-Wolf-Studio-MIT.txt.meta",
       "sha256": "25e179c3329cca78d9475938927a48a081d8858fc64f9e2ca4d52388b27bbb16"
-    },
-    {
-      "path": "Editor/Skills/LICENSES.meta",
-      "sha256": "8c0a30073cb68065ab88c4392f086bd8241eda87199bbd8531e47fbf87d464de"
     },
     {
       "path": "Editor/Skills/THIRD-PARTY-NOTICES.md",
@@ -296,6 +306,10 @@
       "sha256": "600fc2a5693f6278ec43750d759d87c0af3e916b54ae75bd64441d7a15218f63"
     },
     {
+      "path": "Editor/Skills/ww-addressables-design.meta",
+      "sha256": "ee841e918f3d30f9bbaa9cd6c14071accc5db8b021c497b90618313766c80812"
+    },
+    {
       "path": "Editor/Skills/ww-addressables-design/SKILL.md",
       "sha256": "9bd8a637ea7e96b5524bf09dfd69d7d64e9536015f85eff54170c5201a671df4"
     },
@@ -304,8 +318,8 @@
       "sha256": "2dadf1b8879f1b5d1a049cf9281e6b2fbbe5cc0f77add9fe9128679ec6b285bd"
     },
     {
-      "path": "Editor/Skills/ww-addressables-design.meta",
-      "sha256": "ee841e918f3d30f9bbaa9cd6c14071accc5db8b021c497b90618313766c80812"
+      "path": "Editor/Skills/ww-animator-states.meta",
+      "sha256": "860a6ddf543c8d25b60ff3c8d95b595b7b9ec7e1c7aaefba4c71e0dc06e3e98f"
     },
     {
       "path": "Editor/Skills/ww-animator-states/SKILL.md",
@@ -316,16 +330,8 @@
       "sha256": "90b7b7dc1fc29319341ba9ad4dd0cc6d1f1d069ac96cb5d90dd729252ed35f6d"
     },
     {
-      "path": "Editor/Skills/ww-animator-states.meta",
-      "sha256": "860a6ddf543c8d25b60ff3c8d95b595b7b9ec7e1c7aaefba4c71e0dc06e3e98f"
-    },
-    {
-      "path": "Editor/Skills/ww-architecture/SKILL.md",
-      "sha256": "64edff86093d0d9a83f6eae875577612ea5a16d1e51f652d5ab4764762098c4f"
-    },
-    {
-      "path": "Editor/Skills/ww-architecture/SKILL.md.meta",
-      "sha256": "134ccf90bdbf0c3e1dd25e1d88f4338ec1b3d63c9997d2aaad167237811b1a28"
+      "path": "Editor/Skills/ww-architecture-decisions.meta",
+      "sha256": "d4441e7f9d2954c09ea46dcb16b3d0d37be4336089e071672daf0cc80c1e869b"
     },
     {
       "path": "Editor/Skills/ww-architecture-decisions/SKILL.md",
@@ -336,12 +342,20 @@
       "sha256": "f120d9a462b0e4d3bb800e242480aec47755d2afe9079a61c1bdff234e712f76"
     },
     {
-      "path": "Editor/Skills/ww-architecture-decisions.meta",
-      "sha256": "d4441e7f9d2954c09ea46dcb16b3d0d37be4336089e071672daf0cc80c1e869b"
-    },
-    {
       "path": "Editor/Skills/ww-architecture.meta",
       "sha256": "5491f755974c1ae0375c36a77e7e27fb454ca286fa54ab92351c5cd778f41ef3"
+    },
+    {
+      "path": "Editor/Skills/ww-architecture/SKILL.md",
+      "sha256": "64edff86093d0d9a83f6eae875577612ea5a16d1e51f652d5ab4764762098c4f"
+    },
+    {
+      "path": "Editor/Skills/ww-architecture/SKILL.md.meta",
+      "sha256": "134ccf90bdbf0c3e1dd25e1d88f4338ec1b3d63c9997d2aaad167237811b1a28"
+    },
+    {
+      "path": "Editor/Skills/ww-assembly-boundaries.meta",
+      "sha256": "3b87c4f7ac7fe1add2e2794eda938a4130a20e993cc4e99d05962ebd0b0e430d"
     },
     {
       "path": "Editor/Skills/ww-assembly-boundaries/SKILL.md",
@@ -352,8 +366,8 @@
       "sha256": "e3f036e4157ac5094b0c0bc04761a4e282e303bb6c358240d0f9f4a5332d85af"
     },
     {
-      "path": "Editor/Skills/ww-assembly-boundaries.meta",
-      "sha256": "3b87c4f7ac7fe1add2e2794eda938a4130a20e993cc4e99d05962ebd0b0e430d"
+      "path": "Editor/Skills/ww-asset-lifecycle.meta",
+      "sha256": "a134ebbbd7b581dcd62ed0e1754368b7cee8b17b0d82aee2f9f6ae9bc63a482f"
     },
     {
       "path": "Editor/Skills/ww-asset-lifecycle/SKILL.md",
@@ -364,8 +378,8 @@
       "sha256": "cb6b5e4ad02638c7728c878061763b381b4e03159e52444e97c7a323d44e45b3"
     },
     {
-      "path": "Editor/Skills/ww-asset-lifecycle.meta",
-      "sha256": "a134ebbbd7b581dcd62ed0e1754368b7cee8b17b0d82aee2f9f6ae9bc63a482f"
+      "path": "Editor/Skills/ww-asset-optimization.meta",
+      "sha256": "3a692b33c6ae4e9573b73a7441c8c3f200d54b8ba39bb09e721e9c689c0521bd"
     },
     {
       "path": "Editor/Skills/ww-asset-optimization/SKILL.md",
@@ -376,8 +390,8 @@
       "sha256": "a11bddb773365cfba1b78d350e25b9568c7276fcd7c56650d994965f049b158c"
     },
     {
-      "path": "Editor/Skills/ww-asset-optimization.meta",
-      "sha256": "3a692b33c6ae4e9573b73a7441c8c3f200d54b8ba39bb09e721e9c689c0521bd"
+      "path": "Editor/Skills/ww-async-lifetime.meta",
+      "sha256": "5a78adb3652bbda7c0dc3473f5700173fbfb15a09b61aed391d33792cd489ebc"
     },
     {
       "path": "Editor/Skills/ww-async-lifetime/SKILL.md",
@@ -388,8 +402,8 @@
       "sha256": "12d87a54daae41650e0b77c74667709cb74169f88d7c05901afd2df676a8a61b"
     },
     {
-      "path": "Editor/Skills/ww-async-lifetime.meta",
-      "sha256": "5a78adb3652bbda7c0dc3473f5700173fbfb15a09b61aed391d33792cd489ebc"
+      "path": "Editor/Skills/ww-audio-spatial.meta",
+      "sha256": "4222de1b450a92ea2f6a35430add74b21de69088cbbcbcce788d0995b6477beb"
     },
     {
       "path": "Editor/Skills/ww-audio-spatial/SKILL.md",
@@ -400,8 +414,8 @@
       "sha256": "cb859c568c842928e43116f1035d1a53349e163638eec3644f63093573d41cf6"
     },
     {
-      "path": "Editor/Skills/ww-audio-spatial.meta",
-      "sha256": "4222de1b450a92ea2f6a35430add74b21de69088cbbcbcce788d0995b6477beb"
+      "path": "Editor/Skills/ww-build-platforms.meta",
+      "sha256": "6822c59fd3ba599809018cce4b22e82fe9b1834928e7a24a6426a610b44b93b3"
     },
     {
       "path": "Editor/Skills/ww-build-platforms/SKILL.md",
@@ -412,8 +426,8 @@
       "sha256": "33a04e169a522e6ce8750ba18fd0762aab690b78b0ba75c28762038f7c98b30a"
     },
     {
-      "path": "Editor/Skills/ww-build-platforms.meta",
-      "sha256": "6822c59fd3ba599809018cce4b22e82fe9b1834928e7a24a6426a610b44b93b3"
+      "path": "Editor/Skills/ww-camera-framing.meta",
+      "sha256": "5425542368e15184a79f9788ecef4d60914e8f9a282c46dc3642f5d3fc91d42b"
     },
     {
       "path": "Editor/Skills/ww-camera-framing/SKILL.md",
@@ -424,8 +438,8 @@
       "sha256": "ac5dcf8f7f2f9dda7027aede8b410b32a20f5d9cef7cb4742ab0179736f7216c"
     },
     {
-      "path": "Editor/Skills/ww-camera-framing.meta",
-      "sha256": "5425542368e15184a79f9788ecef4d60914e8f9a282c46dc3642f5d3fc91d42b"
+      "path": "Editor/Skills/ww-cinemachine.meta",
+      "sha256": "a027489b5fefa51e732869cf6d37b94ab47d124ff6b3087c0ace19cb4afe1b37"
     },
     {
       "path": "Editor/Skills/ww-cinemachine/SKILL.md",
@@ -436,8 +450,8 @@
       "sha256": "f1ebab15a840cf218150be3826b708ace2ac7fbc6af97fcd4ddbe8d455531cb2"
     },
     {
-      "path": "Editor/Skills/ww-cinemachine.meta",
-      "sha256": "a027489b5fefa51e732869cf6d37b94ab47d124ff6b3087c0ace19cb4afe1b37"
+      "path": "Editor/Skills/ww-components.meta",
+      "sha256": "8a30dfd52aa95b02904b8f3c7e41f9b1112f46d4f07ffc722751a7579932062d"
     },
     {
       "path": "Editor/Skills/ww-components/SKILL.md",
@@ -448,8 +462,8 @@
       "sha256": "ef9ad560d0d5bac82bfda296eaa08a2ab1cbbd43dc1c6bc998b69182bdda31fd"
     },
     {
-      "path": "Editor/Skills/ww-components.meta",
-      "sha256": "8a30dfd52aa95b02904b8f3c7e41f9b1112f46d4f07ffc722751a7579932062d"
+      "path": "Editor/Skills/ww-console-triage.meta",
+      "sha256": "8d9d19c3239fe3340772e40def89425e4adff24b895e167333c21c42b03d70bd"
     },
     {
       "path": "Editor/Skills/ww-console-triage/SKILL.md",
@@ -460,8 +474,8 @@
       "sha256": "c15563cf69a7dea7edb09fb8deb7fca07663586e04a5cb2a3852b3541f9ee702"
     },
     {
-      "path": "Editor/Skills/ww-console-triage.meta",
-      "sha256": "8d9d19c3239fe3340772e40def89425e4adff24b895e167333c21c42b03d70bd"
+      "path": "Editor/Skills/ww-data-versioning.meta",
+      "sha256": "bcc774bb3747299280adc53fd30430d87e693e1ba6e5417c43604947696eced4"
     },
     {
       "path": "Editor/Skills/ww-data-versioning/SKILL.md",
@@ -472,8 +486,8 @@
       "sha256": "1896ba58cc766840ac3567bebc6bc2fd02afeaee98f57ee20299d2dc5e1275b6"
     },
     {
-      "path": "Editor/Skills/ww-data-versioning.meta",
-      "sha256": "bcc774bb3747299280adc53fd30430d87e693e1ba6e5417c43604947696eced4"
+      "path": "Editor/Skills/ww-debug-reproduction.meta",
+      "sha256": "8b096ececd79e84f11a52a8577b3c07d0303ab4905072682d9d05a3a45bd7b94"
     },
     {
       "path": "Editor/Skills/ww-debug-reproduction/SKILL.md",
@@ -484,8 +498,8 @@
       "sha256": "e8538f6e5df3dd0e592a89b7257a677a31be409fad147540d3bbf332bffbc849"
     },
     {
-      "path": "Editor/Skills/ww-debug-reproduction.meta",
-      "sha256": "8b096ececd79e84f11a52a8577b3c07d0303ab4905072682d9d05a3a45bd7b94"
+      "path": "Editor/Skills/ww-editor-tools.meta",
+      "sha256": "0554d3ced5f174b43b94f560a9da848a71fd6862c5565a3bcd100f6d83a37826"
     },
     {
       "path": "Editor/Skills/ww-editor-tools/SKILL.md",
@@ -496,8 +510,8 @@
       "sha256": "a1796b89748245ca7c7757a954e7bdd0cb9ed9dfabcc91db6d0b03a760a20536"
     },
     {
-      "path": "Editor/Skills/ww-editor-tools.meta",
-      "sha256": "0554d3ced5f174b43b94f560a9da848a71fd6862c5565a3bcd100f6d83a37826"
+      "path": "Editor/Skills/ww-game-loop.meta",
+      "sha256": "404055d036ca233859a7878750c202a78d4b504e0cfff8345207a6caa71d7088"
     },
     {
       "path": "Editor/Skills/ww-game-loop/SKILL.md",
@@ -508,8 +522,8 @@
       "sha256": "6880323599b59294fc53ce9daa26350ca216fb5f5537714df2d1443173b8ace0"
     },
     {
-      "path": "Editor/Skills/ww-game-loop.meta",
-      "sha256": "404055d036ca233859a7878750c202a78d4b504e0cfff8345207a6caa71d7088"
+      "path": "Editor/Skills/ww-graphics-settings.meta",
+      "sha256": "31c36e86ba104c75984b39f9dab2a7f49f65c5454aa9c8b0e3395dcf805d8452"
     },
     {
       "path": "Editor/Skills/ww-graphics-settings/SKILL.md",
@@ -520,8 +534,8 @@
       "sha256": "03c9ad966067652aa2c9ff32c363efdf5242180f3ba88f067acf90e8cf9b78a8"
     },
     {
-      "path": "Editor/Skills/ww-graphics-settings.meta",
-      "sha256": "31c36e86ba104c75984b39f9dab2a7f49f65c5454aa9c8b0e3395dcf805d8452"
+      "path": "Editor/Skills/ww-import-settings.meta",
+      "sha256": "189fb9b57e4bc2115a9f9551c52ce909c46772d4f74577c2bcddd29352591c12"
     },
     {
       "path": "Editor/Skills/ww-import-settings/SKILL.md",
@@ -532,8 +546,8 @@
       "sha256": "a230d33b3edb8bd423dfa26e78be16cd80dba17be9be650bf9441e4577d46518"
     },
     {
-      "path": "Editor/Skills/ww-import-settings.meta",
-      "sha256": "189fb9b57e4bc2115a9f9551c52ce909c46772d4f74577c2bcddd29352591c12"
+      "path": "Editor/Skills/ww-input-correctness.meta",
+      "sha256": "533b80ac17a257328351f34c87cf0a043c301f117db2206ee2ad15fd1bfb44f5"
     },
     {
       "path": "Editor/Skills/ww-input-correctness/SKILL.md",
@@ -544,8 +558,8 @@
       "sha256": "4173d45727f5e26736d9087da9e8bd6be0daba7cbbc9136c008cfe678b163e06"
     },
     {
-      "path": "Editor/Skills/ww-input-correctness.meta",
-      "sha256": "533b80ac17a257328351f34c87cf0a043c301f117db2206ee2ad15fd1bfb44f5"
+      "path": "Editor/Skills/ww-inspector-authoring.meta",
+      "sha256": "fb4d0f69847147f374333219eee717150dbf1baa1c60252773e43f04849db562"
     },
     {
       "path": "Editor/Skills/ww-inspector-authoring/SKILL.md",
@@ -556,8 +570,8 @@
       "sha256": "08eabc001e6dab7480dd855dbdd55a20650622fef7cdc3b9481b82658e427d47"
     },
     {
-      "path": "Editor/Skills/ww-inspector-authoring.meta",
-      "sha256": "fb4d0f69847147f374333219eee717150dbf1baa1c60252773e43f04849db562"
+      "path": "Editor/Skills/ww-lifecycle-correctness.meta",
+      "sha256": "8cfd0966a262a8d1c4a4f7fe43e5483cf5513cee59bb71220b0bfc9b7dc0162f"
     },
     {
       "path": "Editor/Skills/ww-lifecycle-correctness/SKILL.md",
@@ -568,8 +582,8 @@
       "sha256": "fe82c5fbffc6b5d0208e19b80f0f99d0dd3738f718e890231994bd10c6366c85"
     },
     {
-      "path": "Editor/Skills/ww-lifecycle-correctness.meta",
-      "sha256": "8cfd0966a262a8d1c4a4f7fe43e5483cf5513cee59bb71220b0bfc9b7dc0162f"
+      "path": "Editor/Skills/ww-lighting.meta",
+      "sha256": "04e2f1f2839252b373f9351ca40f44c7c10ec34c3ef9b35e79d4ba164292444e"
     },
     {
       "path": "Editor/Skills/ww-lighting/SKILL.md",
@@ -580,8 +594,8 @@
       "sha256": "b23940e907ab2a8b3413e12a48bcdabdbb3bb5cb1289b9d190d886c97cf8551d"
     },
     {
-      "path": "Editor/Skills/ww-lighting.meta",
-      "sha256": "04e2f1f2839252b373f9351ca40f44c7c10ec34c3ef9b35e79d4ba164292444e"
+      "path": "Editor/Skills/ww-materials.meta",
+      "sha256": "2db2f9a8e32106e26b01f43dae4a888ec2def08baa9374e9c30b8fa5656b3eb5"
     },
     {
       "path": "Editor/Skills/ww-materials/SKILL.md",
@@ -592,8 +606,8 @@
       "sha256": "55ae7b2e48eac52c92dcdcd123748372e9ab9ca71d7ac4bd9c9d1109fb02b172"
     },
     {
-      "path": "Editor/Skills/ww-materials.meta",
-      "sha256": "2db2f9a8e32106e26b01f43dae4a888ec2def08baa9374e9c30b8fa5656b3eb5"
+      "path": "Editor/Skills/ww-navigation-behavior.meta",
+      "sha256": "994684bc8617426d459c6e6bd02f736a14b3b941d469882c029435690b1b5c8f"
     },
     {
       "path": "Editor/Skills/ww-navigation-behavior/SKILL.md",
@@ -604,8 +618,8 @@
       "sha256": "2244ce90b9b8e3cfd6f6ee27a01a564ddd79eac865fce0de77699b73d7b7e6e2"
     },
     {
-      "path": "Editor/Skills/ww-navigation-behavior.meta",
-      "sha256": "994684bc8617426d459c6e6bd02f736a14b3b941d469882c029435690b1b5c8f"
+      "path": "Editor/Skills/ww-navmesh-baking.meta",
+      "sha256": "2ed87d1f6eea51ead5a89dbf91a98f165d3e7c59e8972a6f556286302589ad68"
     },
     {
       "path": "Editor/Skills/ww-navmesh-baking/SKILL.md",
@@ -616,8 +630,8 @@
       "sha256": "f83ce83f6baac7f85aad14c254e1945352501d81354a865fe48155e4cff0d90b"
     },
     {
-      "path": "Editor/Skills/ww-navmesh-baking.meta",
-      "sha256": "2ed87d1f6eea51ead5a89dbf91a98f165d3e7c59e8972a6f556286302589ad68"
+      "path": "Editor/Skills/ww-npc-behavior.meta",
+      "sha256": "0b1298c68cba6eff241419990c99859444ed7f3fc0a25e6c8e43461c420a0058"
     },
     {
       "path": "Editor/Skills/ww-npc-behavior/SKILL.md",
@@ -628,8 +642,8 @@
       "sha256": "a6dce76d3f8b769d96929be8461877857cb98bf0adc05aa93b4961f25652cc16"
     },
     {
-      "path": "Editor/Skills/ww-npc-behavior.meta",
-      "sha256": "0b1298c68cba6eff241419990c99859444ed7f3fc0a25e6c8e43461c420a0058"
+      "path": "Editor/Skills/ww-package-compatibility.meta",
+      "sha256": "1f85966e0383d009f73fc5fbe66abc1cd230ef3a1e39ddd21b586eca3c1382d2"
     },
     {
       "path": "Editor/Skills/ww-package-compatibility/SKILL.md",
@@ -640,8 +654,8 @@
       "sha256": "cd0b583e287c16d5b57166fd3ea528742a3867723a079d22bdb772c2a24e902e"
     },
     {
-      "path": "Editor/Skills/ww-package-compatibility.meta",
-      "sha256": "1f85966e0383d009f73fc5fbe66abc1cd230ef3a1e39ddd21b586eca3c1382d2"
+      "path": "Editor/Skills/ww-patterns.meta",
+      "sha256": "2a143224a6ded297b1e8e64a71ad9c1c8337e455d71985ec22e07b59a906f3f7"
     },
     {
       "path": "Editor/Skills/ww-patterns/SKILL.md",
@@ -652,8 +666,8 @@
       "sha256": "80bc7e9c83943dafad37a4e6037185df328331569922f924851cc8a2492287c6"
     },
     {
-      "path": "Editor/Skills/ww-patterns.meta",
-      "sha256": "2a143224a6ded297b1e8e64a71ad9c1c8337e455d71985ec22e07b59a906f3f7"
+      "path": "Editor/Skills/ww-physics-behavior.meta",
+      "sha256": "c6708238468d5a3e974071a5693d8288e9de7ce8c903de31af1823500618568d"
     },
     {
       "path": "Editor/Skills/ww-physics-behavior/SKILL.md",
@@ -664,8 +678,8 @@
       "sha256": "a4dec83bf63cb45e7c5501517b5dc3ab389f081d5b315868165d5fe0775900d4"
     },
     {
-      "path": "Editor/Skills/ww-physics-behavior.meta",
-      "sha256": "c6708238468d5a3e974071a5693d8288e9de7ce8c903de31af1823500618568d"
+      "path": "Editor/Skills/ww-physics-queries.meta",
+      "sha256": "6a526fcf85214d766a66bef8416dd1bdc549defb412a7c8cd10f456a02ee39f8"
     },
     {
       "path": "Editor/Skills/ww-physics-queries/SKILL.md",
@@ -676,8 +690,8 @@
       "sha256": "eab9fa4c0d33d47835ddcbe3c4b7f528b79c3b05368cc49d9de2d25f9dfa9869"
     },
     {
-      "path": "Editor/Skills/ww-physics-queries.meta",
-      "sha256": "6a526fcf85214d766a66bef8416dd1bdc549defb412a7c8cd10f456a02ee39f8"
+      "path": "Editor/Skills/ww-post-processing.meta",
+      "sha256": "1654c49a812339b665ea5bf073356bb9e81fecf856883dc42a4bafe16c43dd5c"
     },
     {
       "path": "Editor/Skills/ww-post-processing/SKILL.md",
@@ -688,8 +702,8 @@
       "sha256": "fb65acfae1c6e132e243b2d19253c1f50c6656601d2998b0fecb770058cdf26f"
     },
     {
-      "path": "Editor/Skills/ww-post-processing.meta",
-      "sha256": "1654c49a812339b665ea5bf073356bb9e81fecf856883dc42a4bafe16c43dd5c"
+      "path": "Editor/Skills/ww-prefab-editing.meta",
+      "sha256": "cb6867ed46c995f8c4d7960dc2f8ad466659da53ddf6f2945bb7c584fa4d65d1"
     },
     {
       "path": "Editor/Skills/ww-prefab-editing/SKILL.md",
@@ -700,8 +714,8 @@
       "sha256": "6f75a3114c0f2c8358861c821c966fd9ebf3d221de6e0f80a00915d2fe9df2de"
     },
     {
-      "path": "Editor/Skills/ww-prefab-editing.meta",
-      "sha256": "cb6867ed46c995f8c4d7960dc2f8ad466659da53ddf6f2945bb7c584fa4d65d1"
+      "path": "Editor/Skills/ww-procedural-generation.meta",
+      "sha256": "9ef77cdba5513676535e94b62431e7a30d4d149cc8beaaf3fb2df5411cd418c9"
     },
     {
       "path": "Editor/Skills/ww-procedural-generation/SKILL.md",
@@ -712,8 +726,8 @@
       "sha256": "ed02f12d22178fde740b8005aa08d154561e11fde80fa9bf1a03d726220fa909"
     },
     {
-      "path": "Editor/Skills/ww-procedural-generation.meta",
-      "sha256": "9ef77cdba5513676535e94b62431e7a30d4d149cc8beaaf3fb2df5411cd418c9"
+      "path": "Editor/Skills/ww-profiler-evidence.meta",
+      "sha256": "3ac6fb6f2ae4350789cc6c853d7996b0bafdb9361a9931ab3ac23ef6e50cf3ac"
     },
     {
       "path": "Editor/Skills/ww-profiler-evidence/SKILL.md",
@@ -724,8 +738,8 @@
       "sha256": "c8bcd03a626b9e32bf100693392bcf7113508e212c555089fe27b544cc8886d1"
     },
     {
-      "path": "Editor/Skills/ww-profiler-evidence.meta",
-      "sha256": "3ac6fb6f2ae4350789cc6c853d7996b0bafdb9361a9931ab3ac23ef6e50cf3ac"
+      "path": "Editor/Skills/ww-project-scout.meta",
+      "sha256": "7a1856655c5da7d94ea938b36adb7064d1ee6ef39c2a2ed2a0d1c4b71c6c4137"
     },
     {
       "path": "Editor/Skills/ww-project-scout/SKILL.md",
@@ -736,8 +750,8 @@
       "sha256": "9b6a094955f4375270366d166a130fa80b5a22648b9e7738c40c849dd8dc6c54"
     },
     {
-      "path": "Editor/Skills/ww-project-scout.meta",
-      "sha256": "7a1856655c5da7d94ea938b36adb7064d1ee6ef39c2a2ed2a0d1c4b71c6c4137"
+      "path": "Editor/Skills/ww-quests-level-events.meta",
+      "sha256": "c530a8abd967bcf2154ead9681590164243c0fb4033690ce19d34b88751cabcc"
     },
     {
       "path": "Editor/Skills/ww-quests-level-events/SKILL.md",
@@ -748,8 +762,8 @@
       "sha256": "27d02e12b3f21f5871cbaefd02e231affab36ec4de2a9869c03d76f3be5eb1d1"
     },
     {
-      "path": "Editor/Skills/ww-quests-level-events.meta",
-      "sha256": "c530a8abd967bcf2154ead9681590164243c0fb4033690ce19d34b88751cabcc"
+      "path": "Editor/Skills/ww-runtime-performance.meta",
+      "sha256": "1638ace803df74b01fa7853807373da21947140c8cd245bb2d0a18949ed0f380"
     },
     {
       "path": "Editor/Skills/ww-runtime-performance/SKILL.md",
@@ -760,8 +774,8 @@
       "sha256": "003c92d386caac4c4bc5d22bd590d9e07f2308519b27d1faa91640f4985f8a8e"
     },
     {
-      "path": "Editor/Skills/ww-runtime-performance.meta",
-      "sha256": "1638ace803df74b01fa7853807373da21947140c8cd245bb2d0a18949ed0f380"
+      "path": "Editor/Skills/ww-save-load.meta",
+      "sha256": "7e237e15e7bb52249b9135b07a96b37771b20b465bf7f203e4add3ca8a4482f4"
     },
     {
       "path": "Editor/Skills/ww-save-load/SKILL.md",
@@ -772,8 +786,8 @@
       "sha256": "3afc088f2b5fa6f7dabf15aebaeb33c5f3894d718818f7cfc84042b09c3acb6f"
     },
     {
-      "path": "Editor/Skills/ww-save-load.meta",
-      "sha256": "7e237e15e7bb52249b9135b07a96b37771b20b465bf7f203e4add3ca8a4482f4"
+      "path": "Editor/Skills/ww-scene-contracts.meta",
+      "sha256": "bcc1141b6464e495ec86429c162d8bd6c0a3d80fa6249e92eb89ce42e8315202"
     },
     {
       "path": "Editor/Skills/ww-scene-contracts/SKILL.md",
@@ -784,8 +798,8 @@
       "sha256": "57827dc19e1e9e5d2afcb5612db90dc2c900d63d521fcb3fb664d9d8931e275b"
     },
     {
-      "path": "Editor/Skills/ww-scene-contracts.meta",
-      "sha256": "bcc1141b6464e495ec86429c162d8bd6c0a3d80fa6249e92eb89ce42e8315202"
+      "path": "Editor/Skills/ww-scene-objects.meta",
+      "sha256": "cbfd61d1c313025cf34c6feb6e5995194dfb482d8bdb3fd75ef6044f3ab53eed"
     },
     {
       "path": "Editor/Skills/ww-scene-objects/SKILL.md",
@@ -796,8 +810,8 @@
       "sha256": "180ee1f4eece865d89ef3adea199eb1ed149c8c7ec10e62301069e15bda3785c"
     },
     {
-      "path": "Editor/Skills/ww-scene-objects.meta",
-      "sha256": "cbfd61d1c313025cf34c6feb6e5995194dfb482d8bdb3fd75ef6044f3ab53eed"
+      "path": "Editor/Skills/ww-scene-validation.meta",
+      "sha256": "923b10e5ce714066e2f4378765671e0716cd0da98ac277a4683fe9e35cbf03ef"
     },
     {
       "path": "Editor/Skills/ww-scene-validation/SKILL.md",
@@ -808,8 +822,8 @@
       "sha256": "03b3aa34afde75e926c2949c20b55c0fdc52336e7eb06ff051d8099a01b33d8b"
     },
     {
-      "path": "Editor/Skills/ww-scene-validation.meta",
-      "sha256": "923b10e5ce714066e2f4378765671e0716cd0da98ac277a4683fe9e35cbf03ef"
+      "path": "Editor/Skills/ww-script-review.meta",
+      "sha256": "e6bc24a820368b4a5db46a9a3a481073a7a135bf1757267e47a8f598a89889a0"
     },
     {
       "path": "Editor/Skills/ww-script-review/SKILL.md",
@@ -820,8 +834,8 @@
       "sha256": "8593d4a7d3163ae2e78b4620951f55e3979a2c7dddcb9306d40987ae53460177"
     },
     {
-      "path": "Editor/Skills/ww-script-review.meta",
-      "sha256": "e6bc24a820368b4a5db46a9a3a481073a7a135bf1757267e47a8f598a89889a0"
+      "path": "Editor/Skills/ww-script-roles.meta",
+      "sha256": "dd9da27c072e89c620b78a595cfe8c899a9bd43a8e63438f4783f199773feabf"
     },
     {
       "path": "Editor/Skills/ww-script-roles/SKILL.md",
@@ -832,8 +846,8 @@
       "sha256": "769bf4d9f5a87baaef4f6b16e6c0d2cfdab9e665a2ce8c195f755e3c602c1b82"
     },
     {
-      "path": "Editor/Skills/ww-script-roles.meta",
-      "sha256": "dd9da27c072e89c620b78a595cfe8c899a9bd43a8e63438f4783f199773feabf"
+      "path": "Editor/Skills/ww-scriptable-config.meta",
+      "sha256": "eb98de59b18d0f0cd58738521770464f8b4e2c6993a17e01474544247c63c316"
     },
     {
       "path": "Editor/Skills/ww-scriptable-config/SKILL.md",
@@ -844,8 +858,8 @@
       "sha256": "1faa58b927d7bdc3dddd2d0e6866016f015de614fb0346ef3ad7a9bf2b4f5cf2"
     },
     {
-      "path": "Editor/Skills/ww-scriptable-config.meta",
-      "sha256": "eb98de59b18d0f0cd58738521770464f8b4e2c6993a17e01474544247c63c316"
+      "path": "Editor/Skills/ww-shader-code.meta",
+      "sha256": "466fe617567482ba9a4ef79fc79728e07a2038a34a077827f979a94c74d2a236"
     },
     {
       "path": "Editor/Skills/ww-shader-code/SKILL.md",
@@ -856,8 +870,8 @@
       "sha256": "8b2e6646e243de600af6a27622b78da371fa9113fd928e05f683f29690635246"
     },
     {
-      "path": "Editor/Skills/ww-shader-code.meta",
-      "sha256": "466fe617567482ba9a4ef79fc79728e07a2038a34a077827f979a94c74d2a236"
+      "path": "Editor/Skills/ww-shadergraph-design.meta",
+      "sha256": "6fee95a8bec0c0f2e6e941ab826c88e5137ea9d499382b15bdd3ea27c3be669e"
     },
     {
       "path": "Editor/Skills/ww-shadergraph-design/SKILL.md",
@@ -868,8 +882,8 @@
       "sha256": "a002a1c7e8816bc4043b8913274251e442e4f5e8a328e6d68db53481bc3363e2"
     },
     {
-      "path": "Editor/Skills/ww-shadergraph-design.meta",
-      "sha256": "6fee95a8bec0c0f2e6e941ab826c88e5137ea9d499382b15bdd3ea27c3be669e"
+      "path": "Editor/Skills/ww-state-machines.meta",
+      "sha256": "6d9629db7cc3e5a249beadcd713fefb1ff3477a7b575481f3b769bf92ceb5f54"
     },
     {
       "path": "Editor/Skills/ww-state-machines/SKILL.md",
@@ -880,8 +894,8 @@
       "sha256": "f5ab69033b9976a841d22823b8462eee7e84ebcde73eed9b2c47861d174d4e13"
     },
     {
-      "path": "Editor/Skills/ww-state-machines.meta",
-      "sha256": "6d9629db7cc3e5a249beadcd713fefb1ff3477a7b575481f3b769bf92ceb5f54"
+      "path": "Editor/Skills/ww-task-workflow.meta",
+      "sha256": "df45bacfc92c12808ac750cd38940ad9850b4911e11850b389707ae2d6cf04cf"
     },
     {
       "path": "Editor/Skills/ww-task-workflow/SKILL.md",
@@ -892,8 +906,8 @@
       "sha256": "8b9ce8869c99a4605c54214d9f2358f07b74695ee9e650d2be9092e555ea343d"
     },
     {
-      "path": "Editor/Skills/ww-task-workflow.meta",
-      "sha256": "df45bacfc92c12808ac750cd38940ad9850b4911e11850b389707ae2d6cf04cf"
+      "path": "Editor/Skills/ww-terrain-shaping.meta",
+      "sha256": "4150e289f5a3784b1ae02f85b9ba89abe5bcfdc455cf73aab6f2ed963f9897c3"
     },
     {
       "path": "Editor/Skills/ww-terrain-shaping/SKILL.md",
@@ -904,8 +918,8 @@
       "sha256": "6f402064b90c130e77cae709423bada88ee6d3fcb3b5763859a6bdc9500d55c6"
     },
     {
-      "path": "Editor/Skills/ww-terrain-shaping.meta",
-      "sha256": "4150e289f5a3784b1ae02f85b9ba89abe5bcfdc455cf73aab6f2ed963f9897c3"
+      "path": "Editor/Skills/ww-test-runner.meta",
+      "sha256": "f0128ba89f6d26d55c54fd572efb29fe97cb83d7ad9867abe23408e9d97ab933"
     },
     {
       "path": "Editor/Skills/ww-test-runner/SKILL.md",
@@ -916,8 +930,8 @@
       "sha256": "1489fe394bd09673348ce86f976cf3c3b6ea92c997db3e3ea895e2fdba6c06ff"
     },
     {
-      "path": "Editor/Skills/ww-test-runner.meta",
-      "sha256": "f0128ba89f6d26d55c54fd572efb29fe97cb83d7ad9867abe23408e9d97ab933"
+      "path": "Editor/Skills/ww-testability.meta",
+      "sha256": "bc7b5ef1de056745f7b2090086fe5d79a66ec3a1c5e4058c5883cf01c3e4ea1f"
     },
     {
       "path": "Editor/Skills/ww-testability/SKILL.md",
@@ -928,8 +942,8 @@
       "sha256": "5a19a5932206b7fc7e7922b501f99888687a5c250338c28d22644024edf73509"
     },
     {
-      "path": "Editor/Skills/ww-testability.meta",
-      "sha256": "bc7b5ef1de056745f7b2090086fe5d79a66ec3a1c5e4058c5883cf01c3e4ea1f"
+      "path": "Editor/Skills/ww-timeline.meta",
+      "sha256": "93691cf4e75dbc10f42ea792f06fc4680ed28d313c594cd12a06d2543e2dadac"
     },
     {
       "path": "Editor/Skills/ww-timeline/SKILL.md",
@@ -940,8 +954,8 @@
       "sha256": "3957b6cdbcff477952a1dd041610b33f3c30e2bd23c51fc605ab26a7eca354e1"
     },
     {
-      "path": "Editor/Skills/ww-timeline.meta",
-      "sha256": "93691cf4e75dbc10f42ea792f06fc4680ed28d313c594cd12a06d2543e2dadac"
+      "path": "Editor/Skills/ww-ugui-layout.meta",
+      "sha256": "612bc530286bfbcc4393a0314f7faa470c025a41b5ea17c57578d227703c944a"
     },
     {
       "path": "Editor/Skills/ww-ugui-layout/SKILL.md",
@@ -952,8 +966,8 @@
       "sha256": "2f706c33cf33de9d9668516718d49cd01bd99ffa84790a410725fbeed3f3d942"
     },
     {
-      "path": "Editor/Skills/ww-ugui-layout.meta",
-      "sha256": "612bc530286bfbcc4393a0314f7faa470c025a41b5ea17c57578d227703c944a"
+      "path": "Editor/Skills/ww-ui-screen-flow.meta",
+      "sha256": "9d2ac54249f36c9bc26fec1fea6dcc0e591ed3873d97c4adc64a80c0847d5e82"
     },
     {
       "path": "Editor/Skills/ww-ui-screen-flow/SKILL.md",
@@ -964,8 +978,8 @@
       "sha256": "048f338eb2870fc2df4690417ab6ef7915074bad552a7bc7f303ea5763cef1f0"
     },
     {
-      "path": "Editor/Skills/ww-ui-screen-flow.meta",
-      "sha256": "9d2ac54249f36c9bc26fec1fea6dcc0e591ed3873d97c4adc64a80c0847d5e82"
+      "path": "Editor/Skills/ww-ui-toolkit.meta",
+      "sha256": "b2f3ce2693d9bda9fdc321be62c689fce28f8e80d6f51b24c108b78398a54532"
     },
     {
       "path": "Editor/Skills/ww-ui-toolkit/SKILL.md",
@@ -976,8 +990,8 @@
       "sha256": "8b3093c88b8e4c38744739f4a35487539d13a38be41b70efa69113667b879777"
     },
     {
-      "path": "Editor/Skills/ww-ui-toolkit.meta",
-      "sha256": "b2f3ce2693d9bda9fdc321be62c689fce28f8e80d6f51b24c108b78398a54532"
+      "path": "Editor/Skills/ww-undo-journal.meta",
+      "sha256": "c0f5b1d83320371240d7b124fe0171a0cc58552ef5f050a5063085a17ab3a71e"
     },
     {
       "path": "Editor/Skills/ww-undo-journal/SKILL.md",
@@ -988,8 +1002,8 @@
       "sha256": "1db49aeab50eae0364719246b04cc9041dab39c467939142ef276d70a2acd3fb"
     },
     {
-      "path": "Editor/Skills/ww-undo-journal.meta",
-      "sha256": "c0f5b1d83320371240d7b124fe0171a0cc58552ef5f050a5063085a17ab3a71e"
+      "path": "Editor/Skills/ww-unity-foundations.meta",
+      "sha256": "9920ac24f56dd74b2e2352020e86424b6f85233579070f67993cc971a4b495d6"
     },
     {
       "path": "Editor/Skills/ww-unity-foundations/SKILL.md",
@@ -1000,8 +1014,8 @@
       "sha256": "4fa5fb7d7d1e1b5f1fa0a225ba6cf8283aa500716629da8d57e389063975da66"
     },
     {
-      "path": "Editor/Skills/ww-unity-foundations.meta",
-      "sha256": "9920ac24f56dd74b2e2352020e86424b6f85233579070f67993cc971a4b495d6"
+      "path": "Editor/Skills/ww-urp-versioning.meta",
+      "sha256": "e9962cba105f0608e4624d142b8112d7bd317d092646bba9d502c6fd8787356a"
     },
     {
       "path": "Editor/Skills/ww-urp-versioning/SKILL.md",
@@ -1010,14 +1024,6 @@
     {
       "path": "Editor/Skills/ww-urp-versioning/SKILL.md.meta",
       "sha256": "4e89a651431a9134709668d9b740e70ebef8d32a345cfe1636038d5b94619518"
-    },
-    {
-      "path": "Editor/Skills/ww-urp-versioning.meta",
-      "sha256": "e9962cba105f0608e4624d142b8112d7bd317d092646bba9d502c6fd8787356a"
-    },
-    {
-      "path": "Editor/Skills.meta",
-      "sha256": "90d6abc3970896bd8b9e7ef3687b358987993ba6323607ff6dc52ee95c85d402"
     },
     {
       "path": "Editor/TerrainAuthoring.cs",
@@ -1044,8 +1050,12 @@
       "sha256": "e5b637004b90f780fd3a15357180fa4016ab19cdcee3b5fdbc2f3d134a17ab79"
     },
     {
-      "path": "Editor.meta",
-      "sha256": "abb3039a7ec91d135dcce0203b06dd4410e4f420a87ca76a02b073fc4c793b18"
+      "path": "Runtime.meta",
+      "sha256": "cf6acc3b3198945621300693adbe51f139b1d3964332f663ac4247421a9d479a"
+    },
+    {
+      "path": "Runtime/Actions.meta",
+      "sha256": "bc3266dbaf97e0648bed4f1cc2e8122741648d6cbac61bf0c87062c82a7952d7"
     },
     {
       "path": "Runtime/Actions/ActionDispatcher.cs",
@@ -1080,8 +1090,8 @@
       "sha256": "6be41ccde558abf5a62eea736bc43f1fc88f5255490864109225874ac851162d"
     },
     {
-      "path": "Runtime/Actions.meta",
-      "sha256": "bc3266dbaf97e0648bed4f1cc2e8122741648d6cbac61bf0c87062c82a7952d7"
+      "path": "Runtime/Assistant.meta",
+      "sha256": "3bb41041d9367c3f4814eea16f861d4d2d0f88151b2652fa775a62236ae26db8"
     },
     {
       "path": "Runtime/Assistant/GeneratedSceneObject.cs",
@@ -1108,8 +1118,8 @@
       "sha256": "cd15dbcdb8cfc60cae13a42dfbd94294b9eae2d388d48300a4d55d2c522e1dc4"
     },
     {
-      "path": "Runtime/Assistant.meta",
-      "sha256": "3bb41041d9367c3f4814eea16f861d4d2d0f88151b2652fa775a62236ae26db8"
+      "path": "Runtime/Core.meta",
+      "sha256": "cadca59a64f6db8301aa449fd292233a46aa7700cf5a72a0909a8056f9eb344a"
     },
     {
       "path": "Runtime/Core/Contracts.cs",
@@ -1120,8 +1130,8 @@
       "sha256": "63cc8aa52c2427647277b164c34d08df456a0220bd55b20b2bdfd6acfe231038"
     },
     {
-      "path": "Runtime/Core.meta",
-      "sha256": "cadca59a64f6db8301aa449fd292233a46aa7700cf5a72a0909a8056f9eb344a"
+      "path": "Runtime/Dialogue.meta",
+      "sha256": "b1d781932ddb5c41e97dd331ea61c6e45a4aeb7d47a3fbb2531171f718c829b2"
     },
     {
       "path": "Runtime/Dialogue/DemoDialogue.cs",
@@ -1140,8 +1150,8 @@
       "sha256": "cbfa076e4bd66f04a65fb98ff7b6eaec237f7bf447849fa2d76ae72167e93f8d"
     },
     {
-      "path": "Runtime/Dialogue.meta",
-      "sha256": "b1d781932ddb5c41e97dd331ea61c6e45a4aeb7d47a3fbb2531171f718c829b2"
+      "path": "Runtime/NPC.meta",
+      "sha256": "2be1937e0637ff0a454533b73740dd9a322f30b3e19fed3447e6c45eb2197943"
     },
     {
       "path": "Runtime/NPC/DemoNavigation.cs",
@@ -1160,8 +1170,8 @@
       "sha256": "52be6449ea4c7ad3c0cc999f291ffb3add9843ba73c0c86b199c8a5ba3dca90a"
     },
     {
-      "path": "Runtime/NPC.meta",
-      "sha256": "2be1937e0637ff0a454533b73740dd9a322f30b3e19fed3447e6c45eb2197943"
+      "path": "Runtime/Orchestration.meta",
+      "sha256": "0e28c6bd549f493b7cc690e7cc52e747edc281e4c6fae3db3819928b6313cc4c"
     },
     {
       "path": "Runtime/Orchestration/ModelRouter.cs",
@@ -1180,8 +1190,8 @@
       "sha256": "6140765aae1b77dca0911b9d11dae07e01847874cbd058e94e9c4c1d6b566ba6"
     },
     {
-      "path": "Runtime/Orchestration.meta",
-      "sha256": "0e28c6bd549f493b7cc690e7cc52e747edc281e4c6fae3db3819928b6313cc4c"
+      "path": "Runtime/Providers.meta",
+      "sha256": "6294b61c92b39d0b2a3f8e2e23478f942add69561c6c6b557e0d62cdb0e8fc14"
     },
     {
       "path": "Runtime/Providers/JsonTransport.cs",
@@ -1224,8 +1234,8 @@
       "sha256": "35bbf60242f3f1d9703e41520e2beb0d2ee92d20efad2950cd70f6732d31ead3"
     },
     {
-      "path": "Runtime/Providers.meta",
-      "sha256": "6294b61c92b39d0b2a3f8e2e23478f942add69561c6c6b557e0d62cdb0e8fc14"
+      "path": "Runtime/Quests.meta",
+      "sha256": "87132463187a019f9f4e150bbb06538faf796854cfdad0ce85010eeddc40d708"
     },
     {
       "path": "Runtime/Quests/DeliveryQuest.cs",
@@ -1236,8 +1246,8 @@
       "sha256": "cbc14244a5cf0c481a1606dd7b86b74eff7ea6dae62c75371a170e84933cdf35"
     },
     {
-      "path": "Runtime/Quests.meta",
-      "sha256": "87132463187a019f9f4e150bbb06538faf796854cfdad0ce85010eeddc40d708"
+      "path": "Runtime/RAG.meta",
+      "sha256": "a92fd109c864496d4e3d62040d9a5a5aca03312c0620ef370559db7530a9acd2"
     },
     {
       "path": "Runtime/RAG/KnowledgeBase.cs",
@@ -1256,8 +1266,8 @@
       "sha256": "a9cde07e01324b8a2a0e1cbda7f47011f8a7acdc2395fc2cdddd44024982a766"
     },
     {
-      "path": "Runtime/RAG.meta",
-      "sha256": "a92fd109c864496d4e3d62040d9a5a5aca03312c0620ef370559db7530a9acd2"
+      "path": "Runtime/Terrain.meta",
+      "sha256": "91d95bd1bcf85ce04b8838e4715fcd3d6ecc9a6eef8c54d75fc4f44a0be6dd95"
     },
     {
       "path": "Runtime/Terrain/GeneratedTerrain.cs",
@@ -1284,8 +1294,8 @@
       "sha256": "255c28214d048d642ff8fbda1a856bacc6ea10a656f387d6c0fc3db602bc8219"
     },
     {
-      "path": "Runtime/Terrain.meta",
-      "sha256": "91d95bd1bcf85ce04b8838e4715fcd3d6ecc9a6eef8c54d75fc4f44a0be6dd95"
+      "path": "Runtime/World.meta",
+      "sha256": "3c59274c5c1e7cdca4453dee546090ecdf29de6be7410b5985a15c8450717c6d"
     },
     {
       "path": "Runtime/World/NpcDailyRoutine.cs",
@@ -1368,10 +1378,6 @@
       "sha256": "80db55fe04fc29f5ff5f03ab05812f3abab62f456953b2ea74416e2a2a9b0c7a"
     },
     {
-      "path": "Runtime/World.meta",
-      "sha256": "3c59274c5c1e7cdca4453dee546090ecdf29de6be7410b5985a15c8450717c6d"
-    },
-    {
       "path": "Runtime/WorldWeaver.Runtime.asmdef",
       "sha256": "a1ce128a2827499a16412efdd0f34716c2f7234095313aacd7a8a89ccec11ced"
     },
@@ -1380,16 +1386,20 @@
       "sha256": "7388b3c0f6a2049caa641b6ed2ad3cbb38ebac3238f258a696a5085159440bcf"
     },
     {
-      "path": "Runtime.meta",
-      "sha256": "cf6acc3b3198945621300693adbe51f139b1d3964332f663ac4247421a9d479a"
-    },
-    {
       "path": "Samples~/Village/README.md",
       "sha256": "7ff396b5e640b9dff71d350c37f952057fbc1bc4f2487516049fbcc7b39f99bf"
     },
     {
       "path": "Samples~/Village/village-lore.json",
       "sha256": "c0afbe58cccf685428b1b67ddd2ac0fe4acbc358d4c9bd6bc180482ac5ccd318"
+    },
+    {
+      "path": "Tests.meta",
+      "sha256": "32dc9e69414b3b6e625dd4c7b02b853e82bd92a8b209d81ef7717fd71c60e793"
+    },
+    {
+      "path": "Tests/EditMode.meta",
+      "sha256": "42f7bdcc45d0eee69986e4a3ca853f4a30dcd57009a28f50ecaca8b4af75facc"
     },
     {
       "path": "Tests/EditMode/AgentCheckpointTests.cs",
@@ -1425,7 +1435,7 @@
     },
     {
       "path": "Tests/EditMode/AgentTaskSchemaTests.cs",
-      "sha256": "bb9e41895e041f4b94080df14bd8eda4251926f3c0231bf72f8491a3fc64940d"
+      "sha256": "16bb1bd90dbf8fc29087a80d0381ff237b44af5645cd0682b1d0c90e326eb45e"
     },
     {
       "path": "Tests/EditMode/AgentTaskSchemaTests.cs.meta",
@@ -1505,7 +1515,7 @@
     },
     {
       "path": "Tests/EditMode/WorldGameplayEditorTests.cs",
-      "sha256": "ee49c28c77b199e9f21491274b8141e6bc9ffafdd79930bf65d9f490b47db962"
+      "sha256": "591eabf080ba17e97ca289a0034286a6bbedd336327d8d4d47a68bb8ac8f96a0"
     },
     {
       "path": "Tests/EditMode/WorldGameplayEditorTests.cs.meta",
@@ -1520,8 +1530,8 @@
       "sha256": "7d7cc7d3faf3471215afc6f8c150e90dc25800c56378b3bd3515f7d4db6909c4"
     },
     {
-      "path": "Tests/EditMode.meta",
-      "sha256": "42f7bdcc45d0eee69986e4a3ca853f4a30dcd57009a28f50ecaca8b4af75facc"
+      "path": "Tests/PlayMode.meta",
+      "sha256": "92205b99cd01f6e6c42a0978a5ee67e2ce04354619d2d75202d1d1d2e59a2ab0"
     },
     {
       "path": "Tests/PlayMode/AssistantBehaviorTests.cs",
@@ -1572,14 +1582,6 @@
       "sha256": "6b36f5358f8bf0a6eb89d5b7e174a370423d0cbdf88079fbbf980456beca3041"
     },
     {
-      "path": "Tests/PlayMode.meta",
-      "sha256": "92205b99cd01f6e6c42a0978a5ee67e2ce04354619d2d75202d1d1d2e59a2ab0"
-    },
-    {
-      "path": "Tests.meta",
-      "sha256": "32dc9e69414b3b6e625dd4c7b02b853e82bd92a8b209d81ef7717fd71c60e793"
-    },
-    {
       "path": "package.json",
       "sha256": "e2ce9b3ce41dcf7d0bc675c96679b454a6204e50ecf42826a03547421ccaf16f"
     },
@@ -1588,7 +1590,7 @@
       "sha256": "030e7a2399ad58ad3166e28d941625899ea602435456e815e3e44a0c563ad5f4"
     }
   ],
-  "treeSha256": "276fc666ecf1563dba91e0705d4ec9ac1b9c241d003dad608c131bc81910ed21",
+  "treeSha256": "ecc4767f45b32fec139232e4e788bbf047c18eb00fc2dbb035ccb2f480e7fff1",
   "conditions": {
     "cpu": "Apple M4",
     "ramGiB": 16,

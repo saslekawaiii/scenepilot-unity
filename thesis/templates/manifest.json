@@ -17,15 +17,53 @@
     38
   ],
   "body_layout": {
+    "authority": "ВолгГТУ, программа ГИА профиля Разработка игровых и XR приложений, план2025,с.16–17",
     "paper": "A4",
     "font": "Times New Roman",
     "size_pt": 14,
     "line_spacing": 1.5,
-    "margins_mm": [
-      20,
+    "margins_mm": {
+      "left": 30,
+      "right": 10,
+      "top": 15,
+      "bottom": 20
+    },
+    "first_line_indent_mm": 15
+  },
+  "assignment": {
+    "source": "https://www.vstu.ru/obrazovanie/umu/blanki/zadanie_na_vrb_i_md_2019.doc",
+    "original_file": "official-assignment.doc",
+    "original_sha256": "d23a12944372c7cd7de4d9cefa47a4424dd7639fe1a7d68b03fe832eb5c863e6",
+    "normalized_file": "official-assignment.docx",
+    "normalized_sha256": "b2d70bf6872f772d0c9aedf37a4786a25b577edb648de7becff3a173cea60642",
+    "pages": 2,
+    "normalization": "Bundled LibreOfficeDev26.8.0.0.alpha0, DOC→DOCX; original retained unchanged",
+    "editable_paragraph_slots": [
+      4,
+      8,
+      10,
+      12,
+      13,
+      14,
       15,
-      20,
-      30
-    ]
+      22,
+      25,
+      26,
+      27,
+      28,
+      43,
+      45,
+      47,
+      49,
+      51,
+      53,
+      55,
+      57,
+      59,
+      61,
+      63,
+      65
+    ],
+    "unknown_fields": "Department code, approval order/date, delivery date, supervisor, consultants, signatures remain blank"
   }
 }

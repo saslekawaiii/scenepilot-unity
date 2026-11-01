@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "runner": "WorldWeaver.Editor.Assistant.ChatCodeAcceptanceRunner",
+  "startedUtc": "2026-10-31T23:50:37.260994Z",
+  "unityVersion": "6000.3.27f1",
+  "inputPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/chat-agent-acceptance-local-1.2-final.json",
+  "outputPath": "/Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/chat-code-acceptance-local-1.2.json",
+  "sessionId": "ca4f5937466e441b8fed88783b5d7c2b",
+  "messageId": "729eaeedb8ed4041935c632057e66063",
+  "reviewHashMatched": true,
+  "reviewedCodeSha256": "2468b871f20cddd64ad5431d897226352a35b6df8992d8cd374b2393bf7e4918",
+  "className": "SmoothYRotationMonoBehaviour",
+  "assetPath": "Assets/WorldWeaverGenerated/Scripts/SmoothYRotationMonoBehaviour.cs",
+  "sourceExistedBefore": false,
+  "sourceBeforeSha256": null,
+  "testScenePath": "Assets/WorldWeaverGenerated/CodeAcceptance/ba286515fb0d49e6841c2bd38b7d871e/CodeAcceptance.unity",
+  "events": [
+    {
+      "utc": "2026-10-31T23:50:37.261259Z",
+      "kind": "phase",
+      "phase": "Armed"
+    },
+    {
+      "utc": "2026-10-31T23:50:37.359275Z",
+      "kind": "phase",
+      "phase": "AwaitImportCompilation"
+    },
+    {
+      "utc": "2026-10-31T23:50:38.000298Z",
+      "kind": "compilation_started",
+      "phase": "AwaitImportCompilation"
+    },
+    {
+      "utc": "2026-10-31T23:50:38.95614Z",
+      "kind": "compilation_started",
+      "phase": "AwaitImportCompilation"
+    },
+    {
+      "utc": "2026-10-31T23:50:40.638768Z",
+      "kind": "compilation_finished",
+      "phase": "AwaitImportCompilation"
+    },
+    {
+      "utc": "2026-10-31T23:50:41.786155Z",
+      "kind": "phase",
+      "phase": "AwaitRestoreCompilation"
+    },
+    {
+      "utc": "2026-10-31T23:50:42.218412Z",
+      "kind": "compilation_started",
+      "phase": "AwaitRestoreCompilation"
+    },
+    {
+      "utc": "2026-10-31T23:50:43.063222Z",
+      "kind": "compilation_finished",
+      "phase": "AwaitRestoreCompilation"
+    }
+  ],
+  "errors": [],
+  "checks": {
+    "importedFileReadback": true,
+    "compilerHistorySuccess": true,
+    "compilerTypeValid": true,
+    "importCompilationFinished": true,
+    "attachedComponentReadback": true,
+    "ownedFixtureDestroyed": true,
+    "standardRevertConfirmed": true,
+    "sourceRestored": true,
+    "restoreCompilationFinished": true,
+    "restoreCompilerErrorsAbsent": true,
+    "testSceneCleaned": true
+  },
+  "scope": "Reviewed code import/compiler feedback/attach/revert; no new LLM calls.",
+  "phase": "AwaitRestoreCompilation",
+  "phaseDeadlineUtc": "2026-10-31T23:53:41.7860190Z",
+  "fixture": {
+    "scene": "Assets/WorldWeaverGenerated/CodeAcceptance/ba286515fb0d49e6841c2bd38b7d871e/CodeAcceptance.unity",
+    "object": "CodeAcceptanceCube-ba286515fb0d49e6841c2bd38b7d871e",
+    "ownerRunId": "ba286515fb0d49e6841c2bd38b7d871e"
+  },
+  "importCompilerErrors": [],
+  "compilerFeedback": [
+    {
+      "Success": true,
+      "Tool": "compile_scripts",
+      "Summary": "Unity завершила компиляцию без ошибок.",
+      "Target": "Assets/WorldWeaverGenerated/Scripts/SmoothYRotationMonoBehaviour.cs",
+      "Error": "",
+      "CreatedAssets": [],
+      "SourceHashes": {
+        "Assets/WorldWeaverGenerated/Scripts/SmoothYRotationMonoBehaviour.cs": "dbb645e834e447fa398d9bf81eba05ac9c6222ef6f8157228077093711701814"
+      }
+    }
+  ],
+  "compiledType": "SmoothYRotationMonoBehaviour",
+  "attachResult": {
+    "Success": true,
+    "Tool": "attach_script",
+    "Summary": "Подключён скомпилированный SmoothYRotationMonoBehaviour.",
+    "Target": "CodeAcceptanceCube-ba286515fb0d49e6841c2bd38b7d871e",
+    "Error": null,
+    "CreatedAssets": [],
+    "SourceHashes": {}
+  },
+  "restoreCompilerErrors": [],
+  "finishedUtc": "2026-10-31T23:50:44.1617280Z",
+  "pendingPlan": null,
+  "sourceAfterSha256": null,
+  "sourceRestoredAtExit": true,
+  "manualCleanupRequired": false,
+  "manualCleanupPaths": [],
+  "standardScriptState": {
+    "Pending": false,
+    "Reverted": true,
+    "Outcome": "Файлы восстановлены, Unity завершила повторную компиляцию без ошибок.",
+    "files": [
+      "Assets/WorldWeaverGenerated/Scripts/SmoothYRotationMonoBehaviour.cs"
+    ],
+    "imports": [
+      {
+        "MessageId": "729eaeedb8ed4041935c632057e66063",
+        "Pending": false,
+        "Reverted": true,
+        "CompilationConfirmed": true,
+        "CompilationSucceeded": true,
+        "Outcome": "Файлы восстановлены, Unity завершила повторную компиляцию без ошибок."
+      }
+    ]
+  },
+  "success": true,
+  "passedChecks": 11,
+  "totalChecks": 11
+}

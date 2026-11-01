@@ -1,0 +1,37 @@
+{
+  "kind": "presentation-source-and-defense-preflight",
+  "recordedUtc": "2026-11-01T00:00:12.501522+00:00",
+  "evidence": {
+    "path": "results/presentation-evidence-1.2.json",
+    "sha256": "b6213f652803b555355ebcde1c73620b0dfcb57c5c6b1b05752b4925124978e1",
+    "jsonSchemaValidated": true,
+    "productFiles397TestsSeparate": true,
+    "frozenPackageFileHashesMatched": 396,
+    "strictVisionOutcome": false
+  },
+  "defense": {
+    "path": "deliverables/Доклад_и_вопросы_WorldWeaver.md",
+    "sha256": "b557d4a577fe464eb71ab33e1b2ea1cf1cf2fb30df1ec16dc5753303dbb50542",
+    "generator": "scripts/build_presentation_defense.py",
+    "generatorSha256": "78c83f7062baa69955a06b8634053cf6eb99c10042a115617249a2b6b082bcb2",
+    "metadata": ".private/presentation-1.2/defense-meta.json",
+    "spokenWords": 1077,
+    "spokenCyrillicWords": 1046,
+    "paceWordsPerMinute": 124.27,
+    "plannedSeconds": 520,
+    "slides": 12,
+    "questionBankCount": 21,
+    "questionBankOutsideSpeech": true
+  },
+  "checks": {
+    "spokenSlideTitlesMatchBuilderOutline": true,
+    "timingSum520Seconds": true,
+    "allMarkdownProofLinksExist": true,
+    "publicSpeechHashMatchesMetadata": true,
+    "cyrillicAndTotalWordsCountedSeparately": true,
+    "questionBankExcludedFromTiming": true
+  },
+  "pptxBuildPerformed": false,
+  "pptxRenderPerformed": false,
+  "nativeCropAndFinalVisualQA": "Await root separate heavy-work signal; no visualPASS claimed."
+}

@@ -1,0 +1,367 @@
+{
+  "schema_version": 1,
+  "created_utc": "2026-11-01T00:23:16.892215+00:00",
+  "edition": "1.2",
+  "stage": "Final E exact rendered document audit",
+  "status": "PASS",
+  "documents": {
+    "thesis": {
+      "docx": {
+        "path": ".private/draft-vkr2026-final-e/ВКР_WorldWeaver.docx",
+        "sha256": "720b65f411079039ec6a0f60bd6fc476d9e1f3bb684a326ffc611c2b6605cf97"
+      },
+      "pdf": {
+        "path": ".private/qa-vkr2026-final-e-thesis/ВКР_WorldWeaver.pdf",
+        "sha256": "7f41d202c1f7d261c9f3fbeb3e8e4cf5fba25ed56332f1779758ccef37ec1f7c"
+      },
+      "pages": 101,
+      "all_A4": true,
+      "styles": {
+        "WWBody": {
+          "font": "Times New Roman",
+          "size_pt": 14.0,
+          "line_spacing": 1.5,
+          "first_line_indent_mm": 14.993
+        },
+        "WWHeading1": {
+          "font": "Times New Roman",
+          "size_pt": 14.0,
+          "line_spacing": 1.5,
+          "first_line_indent_mm": 14.993
+        },
+        "WWHeading2": {
+          "font": "Times New Roman",
+          "size_pt": 14.0,
+          "line_spacing": 1.5,
+          "first_line_indent_mm": 14.993
+        },
+        "WWHeading3": {
+          "font": "Times New Roman",
+          "size_pt": 14.0,
+          "line_spacing": 1.5,
+          "first_line_indent_mm": 14.993
+        },
+        "WWCaption": {
+          "font": "Times New Roman",
+          "size_pt": 14.0,
+          "line_spacing": 1.5,
+          "first_line_indent_mm": 0.0
+        },
+        "WWTable": {
+          "font": "Times New Roman",
+          "size_pt": 14.0,
+          "line_spacing": 1.5,
+          "first_line_indent_mm": 0.0
+        },
+        "WWTOC": {
+          "font": "Times New Roman",
+          "size_pt": 14.0,
+          "line_spacing": 1.5,
+          "first_line_indent_mm": 0.0
+        },
+        "WWCode": {
+          "font": "Times New Roman",
+          "size_pt": 14.0,
+          "line_spacing": 1.5,
+          "first_line_indent_mm": 0.0
+        }
+      },
+      "sections": [
+        {
+          "page_width": 210.009,
+          "page_height": 297.004,
+          "left_margin": 30.004,
+          "right_margin": 15.011,
+          "top_margin": 13.0,
+          "bottom_margin": 11.994
+        },
+        {
+          "page_width": 210.009,
+          "page_height": 297.004,
+          "left_margin": 30.004,
+          "right_margin": 15.011,
+          "top_margin": 15.011,
+          "bottom_margin": 10.001
+        },
+        {
+          "page_width": 210.009,
+          "page_height": 297.004,
+          "left_margin": 30.004,
+          "right_margin": 10.001,
+          "top_margin": 14.993,
+          "bottom_margin": 20.003
+        }
+      ],
+      "embedded_fonts": {
+        "/BAAAAA+TimesNewRomanPSMT": {
+          "embedded": true,
+          "subtype": "/TrueType"
+        },
+        "/CAAAAA+TimesNewRomanPSMT": {
+          "embedded": true,
+          "subtype": "/TrueType"
+        },
+        "/DAAAAA+TimesNewRomanPSMT": {
+          "embedded": true,
+          "subtype": "/TrueType"
+        },
+        "/EAAAAA+TimesNewRomanPS-BoldMT": {
+          "embedded": true,
+          "subtype": "/TrueType"
+        },
+        "/FAAAAA+TimesNewRomanPSMT": {
+          "embedded": true,
+          "subtype": "/TrueType"
+        },
+        "/GAAAAA+TimesNewRomanPSMT": {
+          "embedded": true,
+          "subtype": "/TrueType"
+        },
+        "/HAAAAA+LiberationSerif-Italic": {
+          "embedded": true,
+          "subtype": "/TrueType"
+        },
+        "/IAAAAA+OpenSymbol": {
+          "embedded": true,
+          "subtype": "/TrueType"
+        },
+        "/JAAAAA+LiberationSerif": {
+          "embedded": true,
+          "subtype": "/TrueType"
+        }
+      },
+      "non_TNR_character_scope": {
+        "33": {
+          "HAAAAA+LiberationSerif-Italic": "Fu,voO−aoNfou,fov,sooO−ao",
+          "IAAAAA+OpenSymbol": "()∑()∑",
+          "JAAAAA+LiberationSerif": " = = 0  1 = 0  1"
+        },
+        "34": {
+          "HAAAAA+LiberationSerif-Italic": "cq,diDqidiiDqi·iDdi",
+          "IAAAAA+OpenSymbol": "()∑√∑√∑",
+          "JAAAAA+LiberationSerif": " = = 1 = 12 = 12"
+        }
+      },
+      "math_expressions": 2,
+      "inline_figures": 12,
+      "placeholders": [],
+      "broken_bookmark_links": [],
+      "native_crop_rectangles": [
+        {
+          "l": "0",
+          "t": "7857",
+          "r": "0",
+          "b": "4286"
+        },
+        {
+          "l": "17241",
+          "t": "13723",
+          "r": "40690",
+          "b": "23628"
+        },
+        {
+          "l": "17241",
+          "t": "13723",
+          "r": "40690",
+          "b": "23628"
+        }
+      ]
+    },
+    "tz": {
+      "docx": {
+        "path": ".private/draft-vkr2026-final-e/Техническое_задание_WorldWeaver.docx",
+        "sha256": "bcce62e764181cfdfe226569cd7a674baebd76895e56cfe94f506c3cf534e9de"
+      },
+      "pdf": {
+        "path": ".private/qa-vkr2026-final-e-tz/Техническое_задание_WorldWeaver.pdf",
+        "sha256": "e214cb61ad422a5a214838fb337abc53f848e9b202033a2e58357bcf8caf5eaa"
+      },
+      "pages": 14,
+      "all_A4": true,
+      "styles": {
+        "WWBody": {
+          "font": "Times New Roman",
+          "size_pt": 14.0,
+          "line_spacing": 1.5,
+          "first_line_indent_mm": 14.993
+        },
+        "WWHeading1": {
+          "font": "Times New Roman",
+          "size_pt": 14.0,
+          "line_spacing": 1.5,
+          "first_line_indent_mm": 14.993
+        },
+        "WWHeading2": {
+          "font": "Times New Roman",
+          "size_pt": 14.0,
+          "line_spacing": 1.5,
+          "first_line_indent_mm": 14.993
+        },
+        "WWHeading3": {
+          "font": "Times New Roman",
+          "size_pt": 14.0,
+          "line_spacing": 1.5,
+          "first_line_indent_mm": 14.993
+        },
+        "WWCaption": {
+          "font": "Times New Roman",
+          "size_pt": 14.0,
+          "line_spacing": 1.5,
+          "first_line_indent_mm": 0.0
+        },
+        "WWTable": {
+          "font": "Times New Roman",
+          "size_pt": 14.0,
+          "line_spacing": 1.5,
+          "first_line_indent_mm": 0.0
+        },
+        "WWTOC": {
+          "font": "Times New Roman",
+          "size_pt": 14.0,
+          "line_spacing": 1.5,
+          "first_line_indent_mm": 0.0
+        },
+        "WWCode": {
+          "font": "Times New Roman",
+          "size_pt": 14.0,
+          "line_spacing": 1.5,
+          "first_line_indent_mm": 0.0
+        }
+      },
+      "sections": [
+        {
+          "page_width": 210.009,
+          "page_height": 297.004,
+          "left_margin": 30.004,
+          "right_margin": 10.001,
+          "top_margin": 14.993,
+          "bottom_margin": 20.003
+        }
+      ],
+      "embedded_fonts": {
+        "/BAAAAA+TimesNewRomanPSMT": {
+          "embedded": true,
+          "subtype": "/TrueType"
+        },
+        "/CAAAAA+TimesNewRomanPS-BoldMT": {
+          "embedded": true,
+          "subtype": "/TrueType"
+        }
+      },
+      "non_TNR_character_scope": {},
+      "math_expressions": 0,
+      "inline_figures": 0,
+      "placeholders": [],
+      "broken_bookmark_links": [],
+      "native_crop_rectangles": []
+    }
+  },
+  "checks": {
+    "templates_unchanged": {
+      "title": {
+        "path": "thesis/templates/official-title.docx",
+        "sha256": "7bdb804346650358e5d7afb53018ae3d11abdbeb1ffc72d87a487f803a271afd"
+      },
+      "assignment": {
+        "path": "thesis/templates/official-assignment.docx",
+        "sha256": "b2d70bf6872f772d0c9aedf37a4786a25b577edb648de7becff3a173cea60642"
+      }
+    },
+    "official_title_opaque_parts_byte_exact": {
+      "docProps/app.xml": true,
+      "_rels/.rels": true,
+      "word/theme/theme1.xml": true,
+      "word/fontTable.xml": true,
+      "word/numbering.xml": true
+    },
+    "cover_paragraph_formatting_changes": [],
+    "genuine_original_JPEG_bytes": {
+      "chat-420.jpg": {
+        "source": {
+          "path": "docs/screenshots/1.2/chat-420.jpg",
+          "sha256": "8971e78d4eef4cd99bb9519d5f614527ca499413d9274ebffed88102e192318a"
+        },
+        "embedded_media_part": "word/media/image8.jpg"
+      },
+      "api-connection-verified.jpg": {
+        "source": {
+          "path": "docs/screenshots/1.2/api-connection-verified.jpg",
+          "sha256": "588a7cbd3701ebfdf09f4e2bb86232ff330975c5125c6cf6efbda69bf69e2109"
+        },
+        "embedded_media_part": "word/media/image9.jpg"
+      },
+      "village-letter-received.jpg": {
+        "source": {
+          "path": "docs/screenshots/1.2/village-letter-received.jpg",
+          "sha256": "a5b1bfd0cc0a043fae765c95491376205f5240e02a4d4e8750c1373e2bbe1938"
+        },
+        "embedded_media_part": "word/media/image11.jpg"
+      },
+      "village-quest-completed.jpg": {
+        "source": {
+          "path": "docs/screenshots/1.2/village-quest-completed.jpg",
+          "sha256": "8087927c9c25555cf0d0d3ceeea008c6d754d428de6a3f4304f2fad80dbd99e7"
+        },
+        "embedded_media_part": "word/media/image12.jpg"
+      }
+    },
+    "appendix_TZ_matches_standalone_after_only_heading_table_citation_renumbering": true,
+    "TZ_compared_text_blocks": 54,
+    "pagination": {
+      "pages": 101,
+      "total_pages": 101,
+      "pages_before_appendices": 80,
+      "introduction_pages": 3,
+      "conclusion_pages": 2,
+      "checks": {
+        "main_50_to_80": true,
+        "intro_2_to_3": true,
+        "conclusion_1_to_2": true
+      },
+      "figures": 12,
+      "tables": 12,
+      "sources": 41,
+      "pdf_sha256": "7f41d202c1f7d261c9f3fbeb3e8e4cf5fba25ed56332f1779758ccef37ec1f7c"
+    },
+    "TOC_entries": 52,
+    "TOC_mismatches": 0,
+    "D_to_E_changed_pages": [
+      5,
+      55,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80
+    ],
+    "personal_review_receipts": [
+      {
+        "path": ".private/qa-vkr2026-final-e-review-root-1-25.json",
+        "sha256": "eaab70b60873e1768e9c38ef423a525c973d20ba38c13c712bdf84daa54e3e85"
+      },
+      {
+        "path": ".private/qa-vkr2026-final-e-review-26-60.json",
+        "sha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "path": ".private/qa-vkr2026-final-e-review-61-101.json",
+        "sha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "path": ".private/qa-vkr2026-final-e-review-tz-1-14.json",
+        "sha256": "a3ff77f893dd1ea74f98985a89dfaf88b31707124a10cdf4a2413f7ffbf6f339"
+      }
+    ],
+    "source_manifest": {
+      "path": ".private/build/document-manifest.json",
+      "sha256": "e686ae2d685ab37cc2b444a35eb3c0f69b6ca4c71e8b0acff1ce5077227fdebd"
+    },
+    "full_markdown": {
+      "path": "thesis/ВКР_полный_текст.md",
+      "sha256": "244d2aec752395b897792e93bd9ef9343a03ce485fc186011beabd5fcf804a89"
+    },
+    "antiplagiarism_certificate_received": false,
+    "unknown_administrative_fields": "Intentionally blank; no signatures, supervisor or approval order fabricated."
+  }
+}

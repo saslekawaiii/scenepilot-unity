@@ -1,4 +1,18 @@
-# WorldWeaver 1.1 — состояние проверки
+# WorldWeaver 1.2 — текущее состояние
+
+Обновлено 01.11.2026. Текущий план — [WORKPLAN-1.2.md](WORKPLAN-1.2.md), запуск и границы — [README](README.md) и [справка агента](docs/agent-architecture-and-limits.md).
+
+- Продукт R3, commit `ee8d9329a53b416b53ec8f0546cd906263abb331`: [397 EditMode и 9 PlayMode](results/integration-1.2-seventh-r3-summary.json), без внешнего inference; focused20 — часть набора.
+- Отдельный [разговор Qwen3.5 9B / Deep на R2](results/chat-agent-acceptance-local-1.2-final.json) завершён 7/7 ограниченных случаев. Это один зависимый разговор, не R3 inference и не benchmark. Его C# отдельно получил [11/11 lifecycle на R3](results/chat-code-acceptance-local-1.2.json) и [измеренное вращение с отрицательным контролем](results/rotation-runtime-acceptance-final-1.2.json).
+- [Image-only vision на R3](results/vision-agent-acceptance-1.2.json) не прошёл строгий критерий куба; частично правильный ответ не переименован в full PASS.
+- [R3 tarball установлен в чистый consumer](results/clean-install-1.2.0.json): exit 0, compiler errors 0. API-форма и срок жизни ключа описаны в [руководстве](docs/custom-api.md). Готовый WorldPlayer требует Input Manager или Both.
+- Материалы версии 1.2 подготовлены: ВКР — 101 страница, 80 до приложений, 52 позиции содержания; ТЗ — 14 страниц; презентация — 12 слайдов; доклад — 1077 слов, ориентир 8 мин 40 с. [Файлы поставки](deliverables/НАЧНИТЕ_ЗДЕСЬ.md). [Итоговый протокол комплекта](results/delivery-validation-1.2.json), [файлы выпуска 1.2.0](https://github.com/saslekawaiii/worldweaver-thesis/releases/tag/v1.2.0) и [состав поставки с исходным commit](https://github.com/saslekawaiii/worldweaver-thesis/releases/download/v1.2.0/%D0%A1%D0%BE%D1%81%D1%82%D0%B0%D0%B2_%D0%BF%D0%BE%D1%81%D1%82%D0%B0%D0%B2%D0%BA%D0%B8.json).
+
+---
+
+# Историческое состояние WorldWeaver 1.1
+
+Ниже сохранён журнал версии 1.1 от 31.10.2026. Его 18 инструментов, 108/3 тестов, 117 страниц и 20 слайдов относятся к прежней редакции, а не к текущей 1.2.
 
 Тема сохранена: «Разработка интеллектуального инструментария для автоматизированного создания динамических игровых миров».
 Дата: 31.10.2026. В протоколах используется UTC.

@@ -8,8 +8,8 @@
 Локальные модели через Ollama, просмотр кода и восстановление изменений.
 
 [![Unity](https://img.shields.io/badge/Unity-6000.3-222C37?logo=unity&logoColor=white)](Packages/com.worldweaver.toolkit/package.json)
-[![UPM](https://img.shields.io/badge/UPM-1.2.0_candidate-E5A841)](WORKPLAN-1.2.md)
-[![Unity checks](https://img.shields.io/badge/Unity_checks-300_Edit_%2B_9_Play-2F866D)](results/integration-1.2-sixth-summary.json)
+[![UPM](https://img.shields.io/badge/UPM-1.2.0-2F866D)](WORKPLAN-1.2.md)
+[![Unity checks](https://img.shields.io/badge/Unity_checks-397_Edit_%2B_9_Play-2F866D)](results/integration-1.2-seventh-r3-summary.json)
 [![Base schema checks](https://img.shields.io/badge/Base_schema-33%2F33-2F866D)](results/editor-schema-verification-1.2.json)
 [![MD skills license](https://img.shields.io/badge/MD_skills-MIT-536DFE)](Packages/com.worldweaver.toolkit/Editor/Skills/THIRD-PARTY-NOTICES.md)
 
@@ -17,9 +17,9 @@
 
 </div>
 
-> **1.2.0 готовится к выпуску.** Репозиторий приватный. Готовность функций и результаты относятся к указанным исходникам и протоколам; публикация релиза выполняется после финальной проверки.
+> **WorldWeaver 1.2.0.** [Файлы выпуска](https://github.com/saslekawaiii/worldweaver-thesis/releases/tag/v1.2.0) · [Проверка комплекта](results/delivery-validation-1.2.json). Репозиторий приватный; результаты относятся к явно указанным версиям и условиям.
 
-![WorldWeaver 1.2 — чат в Unity с выбором модели и режима](docs/screenshots/1.2/chat-wide.jpg)
+![WorldWeaver 1.2 — чат в Unity с выбором модели и режима](docs/screenshots/1.2/chat-final-ready.jpg)
 
 Реальный интерфейс Unity 6000.3.27f1. [Проверка размеров окна и подключения API](results/ui-centering-1.2-native-verification.json).
 
@@ -39,13 +39,13 @@
 **1. Установите пакет.** Целевая среда — Unity 6000.3; разработка ведётся в 6000.3.27f1. В Package Manager выберите **Install package from disk** и `Packages/com.worldweaver.toolkit/package.json`, либо откройте `UnityProject`.
 
 <details>
-<summary>Git URL после публикации 1.2.0</summary>
+<summary>Установка из Git по тегу 1.2.0</summary>
 
 ```text
 https://github.com/saslekawaiii/worldweaver-thesis.git?path=/Packages/com.worldweaver.toolkit#v1.2.0
 ```
 
-Тег будет доступен после публикации релиза. Для приватного репозитория нужен авторизованный Git; токен не вставляется в URL.
+Для приватного репозитория нужен авторизованный Git; токен не вставляется в URL.
 
 </details>
 
@@ -56,7 +56,7 @@ ollama pull qwen3.5:9b
 ollama pull embeddinggemma
 ```
 
-**3. Откройте Tools → WorldWeaver → Чат.** Выберите Qwen3.5 9B и «Баланс». Начните с режима **Спланировать**, проверьте предложенные изменения и нажмите **Применить**.
+**3. Откройте Tools → WorldWeaver → Чат.** Для создания мира выберите Qwen3.5 9B и **«Глубоко»** — этот бюджет использован в завершённом локальном разговоре. Начните с режима **Спланировать**, проверьте предложенные изменения и нажмите **Применить**.
 
 ```text
 Создай деревню с пятью домами, площадью, северными воротами,
@@ -65,7 +65,11 @@ ollama pull embeddinggemma
 
 Затем уточняйте ту же сцену следующими репликами. В режиме **Спросить** помощник читает и объясняет; **Выполнить** применяет допустимые операции. Начальный C# и патчи требуют просмотра.
 
+На испытанном Mac M4 с 16 ГиБ и включённым энергосбережением отдельные задания Deep заняли примерно 1,7–5,4 минуты. «Баланс» и «Быстро» уменьшают бюджет; для крупных изменений они могут завершиться раньше выполнения всех условий.
+
 **Готовая игровая демонстрация:** Tools → WorldWeaver → **Создать играбельную деревню** → Play. Команда предлагает сохранить текущие правки, создаёт новую сцену под уникальным именем и добавляет её в Build Settings, сохраняя прежние записи. Это заранее заданный план без LLM. В игре: **WASD**, правая кнопка мыши для камеры, **E** для действия; Save/Load доступны на экране.
+
+Готовый `WorldPlayer` требует **Input Manager (Old)** или **Both** в Active Input Handling. В проектах только с New Input System нужна интеграция соответствующего контроллера/ввода; все конфигурации ввода не испытывались.
 
 [Снимок завершённой доставки письма и награды](docs/screenshots/1.2/village-quest-completed.jpg) — реальное прохождение в Unity Play Mode без LLM.
 
@@ -116,10 +120,16 @@ flowchart LR
 | [Участие и воспроизведение проверок](CONTRIBUTING.md) | [Сопоставление с Unity Assistant](docs/research/chat-agent-comparison.md) |
 | [План версии 1.2](WORKPLAN-1.2.md) | [Сохранённые результаты 1.1](docs/releases-v1.1.md) |
 
-Бейджи ведут на конкретные сохранённые протоколы, а не на CI. [300 EditMode и 9 PlayMode проверок](results/integration-1.2-sixth-summary.json) прошли на зафиксированном снимке 1.2 без внешнего inference. Base schema относится к одной матрице из 33 случаев для полной и decoder-схемы. Общая надёжность LLM и экономия времени разработчика по этим данным не установлены; исторические показатели не переносятся на новый код.
+Бейджи ведут на конкретные сохранённые протоколы, а не на CI. [397 EditMode и 9 PlayMode проверок](results/integration-1.2-seventh-r3-summary.json) прошли на снимке R3 без внешнего inference. Отдельный [разговор из семи последовательных заданий](results/chat-agent-acceptance-local-1.2-final.json) завершён 7/7 на R2 с Qwen3.5 9B / Deep; это один ограниченный сценарий, не inference на R3 и не сравнительный benchmark. Его просмотренный C# отдельно прошёл [11 проверок импорта, компиляции, attach и revert на R3](results/chat-code-acceptance-local-1.2.json).
+
+На R3 отдельно [измерено вращение просмотренного исходника](results/rotation-runtime-acceptance-final-1.2.json): около 60° за 2 с, неподвижный контроль отклонён. Один [image-only ответ](results/vision-agent-acceptance-1.2.json) верно связал стороны и цвета, но назвал куб параллелепипедом: строгий критерий формы не пройден; [независимый разбор](results/vision-agent-semantic-review-1.2.json) сохраняет этот неуспех.
+
+Base schema относится к одной матрице из 33 случаев для полной и decoder-схемы. [Пакет R3 установлен в новый consumer-проект](results/clean-install-1.2.0.json): exit 0, ошибок компиляции нет. Общая надёжность LLM и экономия времени разработчика по этим данным не установлены; исторические показатели не переносятся на новый код. [Итоговая проверка документов и продукта](results/delivery-validation-1.2.json); исходный commit, ZIP и Git bundle фиксируются в [составе поставки](https://github.com/saslekawaiii/worldweaver-thesis/releases/download/v1.2.0/%D0%A1%D0%BE%D1%81%D1%82%D0%B0%D0%B2_%D0%BF%D0%BE%D1%81%D1%82%D0%B0%D0%B2%D0%BA%D0%B8.json).
 
 ## О проекте и лицензиях
 
 WorldWeaver — практическая часть ВКР **«Разработка интеллектуального инструментария для автоматизированного создания динамических игровых миров»**. [Исходники документов и сборка](thesis/README.md).
+
+Материалы версии 1.2: ВКР — 101 страница, 80 до приложений; ТЗ — 14 страниц; презентация — 12 слайдов; доклад — 1077 слов, ориентир 8 мин 40 с. [Начать с файлов поставки](deliverables/НАЧНИТЕ_ЗДЕСЬ.md).
 
 Общая лицензия авторского кода пока не назначена. MIT notices относятся к адаптированной библиотеке MD-навыков; [происхождение и условия](docs/LICENSING.md). Назначение лицензии всему проекту выполняется автором отдельно.

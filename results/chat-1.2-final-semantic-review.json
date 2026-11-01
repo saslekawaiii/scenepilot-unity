@@ -1,0 +1,176 @@
+{
+  "kind": "independent-review-of-real-local-conversation",
+  "reviewedUtc": "2026-10-31T23:47:56.834448+00:00",
+  "modelSourceCheckpoint": "SEVENTH-r2",
+  "sourceCommit": "74ceb3f2312966c88ac9a74d2210788290565226",
+  "sourceTreeSha256": "ecc4767f45b32fec139232e4e788bbf047c18eb00fc2dbb035ccb2f480e7fff1",
+  "rawReport": "results/chat-agent-acceptance-local-1.2-final.json",
+  "rawReportSha256": "1cfb0fbde6498f83f198a5a7a9bd647cdfcb9fdd57414be35d0a1d670e17c8d9",
+  "sourceReceipt": "results/chat-1.2-final-source.json",
+  "sourceReceiptSha256": "c167021119213a790f6c8fa7d10c0bf7d95b31710d0e8eb3d52c513ea94837b0",
+  "unityExitCode": 0,
+  "completed": 7,
+  "automatedPassed": 7,
+  "automatedSuccess": true,
+  "model": "ollama:qwen3.5:9b",
+  "power": "Deep",
+  "caseReviews": [
+    {
+      "case": 1,
+      "verified": "One160x160Terrain,12trees,3houses,4rocks,sun andcamera. Artistic-quality is not measured."
+    },
+    {
+      "case": 2,
+      "verified": "ExistingTerrain height24; previous decoration identity/counts preserved; no secondworld."
+    },
+    {
+      "case": 3,
+      "verified": "Ignat guard/cautious/scoped gate fact created. Actual accepted tools create_npc only; no unrequested bob/navigation added."
+    },
+    {
+      "case": 4,
+      "verified": "Patrol goal text updated; original profile/knowledge preserved. This updates the goal field, not a physical NavMesh route."
+    },
+    {
+      "case": 5,
+      "verified": "3new orangePoint lights at distinct in-boundsXZ, each3m above localTerrain/water surface, range25 reaches ground. ExistingSun preserved. Firstspot_angle180 plan rejectedbeforemutation; secondactual modelplan repaired; thirdresponse verified completion.",
+      "actualLightReadback": [
+        {
+          "id": -4094,
+          "type": "Point",
+          "color": [
+            1.0,
+            0.55,
+            0.0
+          ],
+          "intensity": 2.0,
+          "range": 25.0,
+          "enabled": true,
+          "position": [
+            -45.0,
+            14.6506138,
+            -65.0
+          ],
+          "terrainPlacement": {
+            "terrainId": -1432,
+            "insideBounds": true,
+            "groundY": 11.6506138,
+            "waterY": 9.6,
+            "surfaceY": 11.6506138,
+            "groundClearance": 3.0,
+            "surfaceClearance": 3.0,
+            "minimumPlacementY": 14.6506138,
+            "rangeReachesGround": true
+          }
+        },
+        {
+          "id": -4070,
+          "type": "Point",
+          "color": [
+            0.95,
+            0.45,
+            0.0
+          ],
+          "intensity": 1.8,
+          "range": 25.0,
+          "enabled": true,
+          "position": [
+            -30.0,
+            13.7767811,
+            -70.0
+          ],
+          "terrainPlacement": {
+            "terrainId": -1432,
+            "insideBounds": true,
+            "groundY": 10.7767811,
+            "waterY": 9.6,
+            "surfaceY": 10.7767811,
+            "groundClearance": 3.0,
+            "surfaceClearance": 3.0,
+            "minimumPlacementY": 13.7767811,
+            "rangeReachesGround": true
+          }
+        },
+        {
+          "id": -4048,
+          "type": "Point",
+          "color": [
+            1.0,
+            0.5,
+            0.0
+          ],
+          "intensity": 2.0,
+          "range": 25.0,
+          "enabled": true,
+          "position": [
+            -40.0,
+            14.0089731,
+            -60.0
+          ],
+          "terrainPlacement": {
+            "terrainId": -1432,
+            "insideBounds": true,
+            "groundY": 11.0089731,
+            "waterY": 9.6,
+            "surfaceY": 11.0089731,
+            "groundClearance": 3.0,
+            "surfaceClearance": 3.0,
+            "minimumPlacementY": 14.0089731,
+            "rangeReachesGround": true
+          }
+        },
+        {
+          "id": -3150,
+          "type": "Directional",
+          "color": [
+            1.0,
+            0.96,
+            0.88
+          ],
+          "intensity": 1.25,
+          "range": 10.0,
+          "enabled": true,
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "terrainPlacement": null
+        }
+      ],
+      "unverified": "Near the square is not independently localized against a semantic Square place in this basic forest-world fixture."
+    },
+    {
+      "case": 6,
+      "verified": "Draft preserved for review, no automatic import. Root inspected exact code: onlyMonoBehaviour field+Update, Rotate receives30*Time.deltaTime directly; no I/O or initialization side effects.",
+      "className": "SmoothYRotationMonoBehaviour",
+      "reviewedRawCodeSha256": "2468b871f20cddd64ad5431d897226352a35b6df8992d8cd374b2393bf7e4918",
+      "compilerAndRuntimePending": false,
+      "subsequentR3Verification": {
+        "productSourceCommit": "ee8d9329a53b416b53ec8f0546cd906263abb331",
+        "codeReport": "results/chat-code-acceptance-local-1.2.json",
+        "codeReportSha256": "f527b6ee3fc65be6efd66f8bcc454b16e332623d763ca08a98fb1bbb5b11b058",
+        "passedChecks": 11,
+        "totalChecks": 11,
+        "runtimeReport": "results/rotation-runtime-acceptance-final-1.2.json",
+        "runtimeReportSha256": "9c9f5deb0e485768ae1de0883bb0fcef15036aaf3c70584e47ede8cf269a5480",
+        "actualDegrees": 60.06808174532811,
+        "actualSeconds": 2.0022588647959183,
+        "stationaryNegativeDegrees": 0,
+        "reviewedSourceUnchanged": true,
+        "newInferencePerformed": false
+      }
+    },
+    {
+      "case": 7,
+      "verified": "Chosenmodel, counts, names, PointXZ andNPCgoal are consistent with actual snapshots. Scene/draft unchanged; goal is described as a goal, not an assigned physical route.",
+      "unverified": "Compass-direction wording and near-square region are not independently grounded by named-place checks in this fixture."
+    }
+  ],
+  "finalCodeCheckpointNote": "A later R3 fix only cleans stale anchors on already-anchored light state transitions. This real inference remains R2 evidence; it is not relabeled as an R3 model run.",
+  "limitations": [
+    "Seven known engineering scenarios used during debugging; not a held-out benchmark.",
+    "One serial Deep conversation on one local model/hardware configuration; no model reliability or competitor superiority estimate.",
+    "Automated7/7 covers finite declared criteria; it does not establish every spatial phrase or generated C# behavior. Compiler/runtime/vision checks have separate receipts."
+  ]
+}

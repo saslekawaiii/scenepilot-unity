@@ -1,0 +1,248 @@
+{
+  "schema_version": "worldweaver-delivery-validation.v3",
+  "edition": "1.2.0",
+  "utc": "2026-11-01T00:27:39.101917+00:00",
+  "success": true,
+  "successScope": "Artifact consistency, source binding and required engineering checks. The independent visual model shape-word criterion remains failed; this does not establish arbitrary-task reliability, full developer replacement or competitive superiority.",
+  "topic": "Разработка интеллектуального инструментария для автоматизированного создания динамических игровых миров",
+  "productCoreCommit": "ee8d9329a53b416b53ec8f0546cd906263abb331",
+  "packageTreeSha256": "f6756356eb56ea7f73ecf693f2826c588b7ee97abe1ca45589de028cfdf593aa",
+  "packageFileCount": 396,
+  "documents": {
+    "qa": {
+      "path": "results/document-qa-1.2.json",
+      "sha256": "d7e8290892414555fe34258cf1c9dcf8e6712c3612da8f5b4697324ef6b51774"
+    },
+    "render": {
+      "path": "results/document-pdf-render-1.2.json",
+      "sha256": "2bba9503efd05d044b0df89257876ed890439afe40fe7a67ff658ec10be985dd"
+    },
+    "publicInputRebuild": {
+      "path": "results/document-rebuild-1.2.json",
+      "sha256": "526f5800b55a170413d7ffc51276e7315425647cfc899b40010dbee110a32f15"
+    },
+    "bodyBoundaries": {
+      "path": "results/document-layout-boundaries-1.2.json",
+      "sha256": "baa820584aa9e5c63ad1cc6d1031cae517dca3210746c3c8319114e1b02030cf"
+    },
+    "pages": {
+      "thesis": 101,
+      "technicalSpecification": 14,
+      "beforeAppendices": 80,
+      "introduction": 3,
+      "conclusion": 2
+    },
+    "allPagesVisuallyInspected": true,
+    "tocEntries": 52,
+    "tocMismatches": 0,
+    "artifacts": [
+      {
+        "path": "deliverables/ВКР_WorldWeaver.docx",
+        "sha256": "720b65f411079039ec6a0f60bd6fc476d9e1f3bb684a326ffc611c2b6605cf97",
+        "bytes": 1418782
+      },
+      {
+        "path": "deliverables/ВКР_WorldWeaver.pdf",
+        "sha256": "7f41d202c1f7d261c9f3fbeb3e8e4cf5fba25ed56332f1779758ccef37ec1f7c",
+        "bytes": 2276785
+      },
+      {
+        "path": "deliverables/Техническое_задание_WorldWeaver.docx",
+        "sha256": "bcce62e764181cfdfe226569cd7a674baebd76895e56cfe94f506c3cf534e9de",
+        "bytes": 48629
+      },
+      {
+        "path": "deliverables/Техническое_задание_WorldWeaver.pdf",
+        "sha256": "e214cb61ad422a5a214838fb337abc53f848e9b202033a2e58357bcf8caf5eaa",
+        "bytes": 229787
+      }
+    ]
+  },
+  "presentation": {
+    "qa": {
+      "path": "results/presentation-qa-1.2.json",
+      "sha256": "92b34c830903aa9bb11593a3642c713e330064bca5d83c03836bd50915779e57"
+    },
+    "validation": {
+      "path": "results/presentation-validation-1.2.json",
+      "sha256": "ef623416325ecf559c601a5b6fcd23e0edcde5d2c6742d45044a826e6aa3e8f2"
+    },
+    "nativeImages": {
+      "path": "results/presentation-evidence-qa-1.2.json",
+      "sha256": "b8fc9110b930116bdf5a4645615b5cc87e36c2f64f58daa4243bea1c3f6fca8d"
+    },
+    "artifact": {
+      "path": "deliverables/Презентация_WorldWeaver_финал.pptx",
+      "sha256": "1cb12412a955a1bcb29d4571b8f50fbbb08674645bbb1583fba31d84fb21547d",
+      "bytes": 1001727
+    },
+    "slides": 12,
+    "findings": 0,
+    "warnings": 0,
+    "allSlidesPersonallyInspected": true,
+    "renderer": "ArtifactTool importPptx of exact final4PPTX followed by per-slidePNGexport",
+    "speech": {
+      "file": "deliverables/Доклад_и_вопросы_WorldWeaver.md",
+      "sha256": "b557d4a577fe464eb71ab33e1b2ea1cf1cf2fb30df1ec16dc5753303dbb50542",
+      "generator": "scripts/build_presentation_defense.py",
+      "generator_sha256": "78c83f7062baa69955a06b8634053cf6eb99c10042a115617249a2b6b082bcb2",
+      "slide_titles_match": true,
+      "slide_count": 12,
+      "faq_count": 21,
+      "planned_seconds": 520,
+      "timing_is_rehearsal_guidance": true,
+      "spoken_words": 1077,
+      "spoken_cyrillic_words": 1046,
+      "average_words_per_minute": 124.27,
+      "faq_excluded_from_timing": true,
+      "metadata": ".private/presentation-1.2/defense-meta.json",
+      "metadata_sha256": "9c937e53c444d28e0e33142c4d9091f52382ece1c67aef4d60c6b5c8a843c3b9"
+    }
+  },
+  "programChecks": {
+    "receipt": {
+      "path": "results/integration-1.2-seventh-r3-summary.json",
+      "sha256": "52d26ff3546a3be48f607af6f4da46e59bf98c6e4678e96eb33dfee7bd44e8b7"
+    },
+    "counts": {
+      "edit": {
+        "total": "397",
+        "passed": "397",
+        "failed": "0",
+        "skipped": "0",
+        "inconclusive": "0",
+        "duration": "21.9031262"
+      },
+      "play": {
+        "total": "9",
+        "passed": "9",
+        "failed": "0",
+        "skipped": "0",
+        "inconclusive": "0",
+        "duration": "12.6488121"
+      }
+    },
+    "focused20AreSubsetOf397": true,
+    "api14AreSubsetOf397": true,
+    "externalModelInferenceInUnitSuites": false
+  },
+  "modelConversation": {
+    "sourceCommit": "74ceb3f2312966c88ac9a74d2210788290565226",
+    "sourceTreeSha256": "ecc4767f45b32fec139232e4e788bbf047c18eb00fc2dbb035ccb2f480e7fff1",
+    "report": {
+      "path": "results/chat-agent-acceptance-local-1.2-final.json",
+      "sha256": "1cfb0fbde6498f83f198a5a7a9bd647cdfcb9fdd57414be35d0a1d670e17c8d9"
+    },
+    "semanticReview": {
+      "path": "results/chat-1.2-final-semantic-review.json",
+      "sha256": "1826305a11fab120707ba0a84a0b44fbcff36b621e488733d000e81779eab7e5"
+    },
+    "r2R3StaticReview": {
+      "path": "results/chat-1.2-r2-r3-static-compatibility.json",
+      "sha256": "24af8f3ad6224e7ad4e0dac00e3cfc3a3937a7fec50c069bb66172fa05157d1b"
+    },
+    "model": "ollama:qwen3.5:9b",
+    "power": "Deep",
+    "completed": 7,
+    "passed": 7,
+    "notHeldOutBenchmark": true,
+    "newInferenceOnR3": false
+  },
+  "generatedCode": {
+    "sourceBinding": {
+      "path": "results/code-and-runtime-source-1.2.json",
+      "sha256": "176232ebb4a6575cc6ce18aaeb395e31b2b72a88829a3b2be09b697388f541d9"
+    },
+    "compilerLifecycle": {
+      "path": "results/chat-code-acceptance-local-1.2.json",
+      "sha256": "f527b6ee3fc65be6efd66f8bcc454b16e332623d763ca08a98fb1bbb5b11b058"
+    },
+    "passedChecks": 11,
+    "runtime": {
+      "path": "results/rotation-runtime-acceptance-final-1.2.json",
+      "sha256": "9c9f5deb0e485768ae1de0883bb0fcef15036aaf3c70584e47ede8cf269a5480"
+    },
+    "actualDegrees": 60.06808174532811,
+    "actualSeconds": 2.0022588647959183,
+    "stationaryControlCorrectlyRejected": true,
+    "sourceUnchanged": true
+  },
+  "visualModelObservation": {
+    "report": {
+      "path": "results/vision-agent-acceptance-1.2.json",
+      "sha256": "89d4b3eb2a65bfb0254aeebf4bb6d9cca0b3aa98681326f5b1a3c458d37cae2b"
+    },
+    "semanticReview": {
+      "path": "results/vision-agent-semantic-review-1.2.json",
+      "sha256": "7e31bde49d249f3857ec2dcdfd51c6b0b8907064910e1d195c11c3ca8c9fa0f3"
+    },
+    "strictCriterionPassed": false,
+    "response": "Слева изображён красный параллелепипед, справа — синий шар.",
+    "scope": "Correct image-side/color association and sphere; cube named broader parallelepiped. Original failed outcome preserved."
+  },
+  "consumerInstall": {
+    "path": "results/clean-install-1.2.0.json",
+    "sha256": "cb340f4a927057316f42b05d56e54229c6fb09dd6ed97abd4c458af9879df987"
+  },
+  "package": {
+    "path": "deliverables/com.worldweaver.toolkit-1.2.0.tgz",
+    "sha256": "f8ff8796a3bf97d74a83ab2acd324fee8198c5715f786c33f763a5abc6751eea",
+    "bytes": 345974
+  },
+  "packageSourceBinding": {
+    "path": "results/final-package-source-1.2.json",
+    "sha256": "171b0fa1a84e943b16b0a0643812e15835e78a8fc7df2ee81c5781b0bdc8d233"
+  },
+  "nativeUI": {
+    "path": "results/ui-centering-1.2-native-verification.json",
+    "sha256": "05fe7feb5cacff066422ba78ca8e0a38fa5248bfd9d55687050740abd983db61"
+  },
+  "finalNativeReadiness": {
+    "path": "results/final-native-readiness-1.2.json",
+    "sha256": "009ce6a4f796bcf826f91133b784a87cdae1f86590abb3decba2aae9490777b0"
+  },
+  "playerNativeGameplay": {
+    "path": "results/player-native-smoke-1.2.json",
+    "sha256": "4c8e30fea183d5962f0666ba3a4e6d48d0df2646df8a5381faa8f645506f0b16"
+  },
+  "playerRuntimeSourceCompatibility": {
+    "path": "results/player-runtime-source-compatibility-1.2.json",
+    "sha256": "846dfc8aa3307efcb26e90587a0d9d85b408ba54ffdd0f3699e1423dc310ae55"
+  },
+  "additionalEngineeringReceipts": [
+    {
+      "path": "results/workflow-focused-verification.json",
+      "sha256": "9c749de756635eff3daf1cf39eb126ab72b504f3025114c6430e97b32b64e765"
+    },
+    {
+      "path": "results/world-state-and-job-verification.json",
+      "sha256": "372ce581f2cd165ec560be05ecd5344ccb1361c3bb80350f96d1e23dd5b991c3"
+    },
+    {
+      "path": "results/schema-export-verification-1.2.json",
+      "sha256": "f2c72138bdc82f9c9842c90dbc078bde42b45b8d3e480cb9fa2a7b4308139038"
+    },
+    {
+      "path": "results/github-metadata-1.2.json",
+      "sha256": "19e286d16cbdb4ec9cfee29d8479641f29dba910e58a38c6a48196a88b9b89b4"
+    }
+  ],
+  "archiveAndRemotePublication": "Final source commit, package equality, ZIP CRC, Git bundle restore and remote main/tag readback are recorded after the clean final commit in deliverables/Состав_поставки.json, avoiding circular tracked hashes.",
+  "administrativeFieldsRemainingBlank": "Intentionally blank; no signatures, supervisor or approval order fabricated.",
+  "antiplagiarismCertificateReceived": false,
+  "limitations": [
+    "One local dependent model conversation uses known debugging tasks; no general reliability or competitor-superiority measurement.",
+    "The separate strict image shape-word criterion failed.",
+    "Native Microsoft Word/PowerPoint rendering, physical print, other build platforms and manual Player HUD Save/Load were not independently established by these checks."
+  ],
+  "repositoryChecks": [
+    {
+      "path": "results/release-link-audit-1.2.json",
+      "sha256": "20079f6a9daeab00bc5c71343bd8ac950dced1ef4a1d07089424cba7b1a2c03c"
+    },
+    {
+      "path": "results/release-secret-scan-1.2.json",
+      "sha256": "79b4fed1fc7f0b8a818fb691c7dd4008e070daf77ab09f624c571f8de96296d3"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "kind": "final-native-project-and-chat-readiness",
+  "utc": "2026-11-01T00:21:52.105216+00:00",
+  "unity": "6000.3.27f1",
+  "productCoreCommit": "ee8d9329a53b416b53ec8f0546cd906263abb331",
+  "packageMatchesFrozenR3": true,
+  "sceneConfirmedByNativeAX": "UnityProject/Assets/WorldWeaverGenerated/Scenes/WorldWeaverVillage.unity",
+  "actualModel": "ollama:qwen3.5:9b",
+  "power": "Deep",
+  "mode": "Execute",
+  "connectionStatus": "Connected",
+  "sidebar": "collapsed through native UI",
+  "sceneModificationPerformed": false,
+  "llmInferencePerformed": false,
+  "screenshot": {
+    "path": "docs/screenshots/1.2/chat-final-ready.jpg",
+    "sha256": "2694dd7d7ce30fac9d58d8deac3a91e31206ff6d5a7d2b5a60fe1ffcfa91e5db",
+    "sizePixels": [
+      2940,
+      1714
+    ],
+    "capture": "Original native cua screenshot JPEG; no pixel edits"
+  },
+  "observed": "Main project reopened normally through Unity Hub. Startup capability refresh settled to connected. Native model-depth selector changed to Deep; sidebar collapsed. Hero/cards and composer share the visual centre of the chat viewport, with all controls inside the window.",
+  "scope": "Readiness observation and repeat visual check of the unchanged tested UI; earlier multi-width/API/gameplay observations retain their separate receipts."
+}

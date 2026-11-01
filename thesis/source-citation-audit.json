@@ -1,0 +1,471 @@
+{
+  "scope": "Independent citation-to-claim audit of rewrite; original39 checked plus2 pinned MIT skill upstream records; network failures are not fabricated HTTP successes",
+  "count": 41,
+  "removed_as_imprecise": [
+    "25 usedforgrouping replacedwith@undo-overview",
+    "41 historicalPRnotusedascurrentdecodercontract"
+  ],
+  "material_fixes": [
+    "NavMeshAgent distinctfromBuilder",
+    "GoogleEmbeddingGemma2URLreplacedwith300Mcard",
+    "Unity6.3Gitmanual",
+    "OpenAIactualcreateendpoint",
+    "Prometheanworldbuildingnotclaimedpureprocedural",
+    "PCGbookpagelocatorsandverifiedpublisherdescription"
+  ],
+  "unsupported_claim_scan": "No measuredcompetitive superiority,no replacementofdeveloper,nouniversalmodelknowledgeguarantee",
+  "records": [
+    {
+      "printed_number": 1,
+      "catalog_id": "32",
+      "section": "1.1;1.2",
+      "claim": "Определение PCG и ограничение heightmap",
+      "effective_primary_url": "https://www.pcgbook.com/",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "Авторские главы1,с.1–2,и4,с.58–59; издатель подтвердил выходные данные2016/XVI+237"
+    },
+    {
+      "printed_number": 2,
+      "catalog_id": "3",
+      "section": "1.2;2.5",
+      "claim": "Передача массива heightmap в TerrainData",
+      "effective_primary_url": "https://docs.unity3d.com/6000.3/Documentation/ScriptReference/TerrainData.SetHeights.html",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "Unity6.3 SetHeights: float[,] samples0..1,индексация[y,x]"
+    },
+    {
+      "printed_number": 3,
+      "catalog_id": "16",
+      "section": "1.2",
+      "claim": "Действия с наблюдениями внешней среды",
+      "effective_primary_url": "https://arxiv.org/abs/2210.03629",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "arXiv2210.03629v3 abstract; не переносится чужой benchmark"
+    },
+    {
+      "printed_number": 4,
+      "catalog_id": "17",
+      "section": "1.2;3.5",
+      "claim": "Локальная Ollama JSON Schema",
+      "effective_primary_url": "https://docs.ollama.com/capabilities/structured-outputs",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "Официальная structured outputs: format schema; cloud explicitly unsupported,вработе речьlocal"
+    },
+    {
+      "printed_number": 5,
+      "catalog_id": "26",
+      "section": "1.2",
+      "claim": "Поля, типы и ограничения JSON Schema",
+      "effective_primary_url": "https://json-schema.org/draft/2020-12",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "ПервичныйDraft2020-12,core+validation; не обещаетсясемантикаплана"
+    },
+    {
+      "printed_number": 6,
+      "catalog_id": "14",
+      "section": "1.3",
+      "claim": "Связь retrieval и генерации",
+      "effective_primary_url": "https://arxiv.org/abs/2005.11401",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "arXiv2005.11401 abstract,различиеparametric/nonparametricmemory"
+    },
+    {
+      "printed_number": 7,
+      "catalog_id": "15",
+      "section": "1.3",
+      "claim": "Память и планирование агентов",
+      "effective_primary_url": "https://arxiv.org/abs/2304.03442",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "arXiv2304.03442 abstract; нетприписыванияWorldWeaver25агентов/ихрезультатов"
+    },
+    {
+      "printed_number": 8,
+      "catalog_id": "@navmesh-agent",
+      "section": "1.3",
+      "claim": "Поиск и выполнение пути",
+      "effective_primary_url": "https://docs.unity3d.com/6000.3/Documentation/ScriptReference/AI.NavMeshAgent.html",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "Unity6.3 NavMeshAgent,CalculatePath/SetDestination; добавлена точнаяссылка"
+    },
+    {
+      "printed_number": 9,
+      "catalog_id": "@unity-modes",
+      "section": "1.4",
+      "claim": "Ask/Plan/Agent и модельныеуровни",
+      "effective_primary_url": "https://docs.unity3d.com/Packages/com.unity.ai.assistant@2.21/manual/about/assistant-modes.html",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "Assistant2.21.0-pre.2,официальные modes; безизмеренногосравнения"
+    },
+    {
+      "printed_number": 10,
+      "catalog_id": "@unity-tools",
+      "section": "1.4",
+      "claim": "Чтение и изменение проекта",
+      "effective_primary_url": "https://docs.unity3d.com/Packages/com.unity.ai.assistant@2.21/manual/assets/assistant-tools.html",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "Assistant2.21toolmanual; инструментыаналога неотрицаются"
+    },
+    {
+      "printed_number": 11,
+      "catalog_id": "5",
+      "section": "1.4",
+      "claim": "Gateway и внешниеагенты",
+      "effective_primary_url": "https://docs.unity3d.com/Packages/com.unity.ai.assistant@2.21/manual/integration/ai-gateway-get-started.html",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "Assistant2.21 configure third-party agents+credentials"
+    },
+    {
+      "printed_number": 12,
+      "catalog_id": "@unity-ai-faq",
+      "section": "1.4",
+      "claim": "Бесплатные MCP/CLI и отсутствиепобедыбезопыта",
+      "effective_primary_url": "https://unity.com/features/ai",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "UnityofficialFAQ; trial/платныеподпискинеактивировались"
+    },
+    {
+      "printed_number": 13,
+      "catalog_id": "31",
+      "section": "1.4",
+      "claim": "MCPbridge кEditor",
+      "effective_primary_url": "https://github.com/CoplayDev/unity-mcp",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "README/about исходногорепозитория; беззаявленияfullruntimeNPCworkflow"
+    },
+    {
+      "printed_number": 14,
+      "catalog_id": "6",
+      "section": "1.4",
+      "claim": "Convai NPC actions",
+      "effective_primary_url": "https://github.com/Conv-AI/Convai-Documentation/blob/main/plugins-and-integrations/convai-unity-sdk/features/character-actions/configuring-actions.md",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "Convai4.5.0 reviewed configuring-actions:capabilities/targets/contextpatches"
+    },
+    {
+      "printed_number": 15,
+      "catalog_id": "7",
+      "section": "1.4",
+      "claim": "Inworld Studio retired/Runtime",
+      "effective_primary_url": "https://docs.inworld.ai/character-studio-deprecation",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "Officialdeprecation:legacyclosed,AgentRuntimeSDKtemplates"
+    },
+    {
+      "printed_number": 16,
+      "catalog_id": "8",
+      "section": "1.4",
+      "claim": "ACE дляцифровыхперсонажей",
+      "effective_primary_url": "https://developer.nvidia.com/ace-for-games",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "NVIDIAofficial:speech,intelligence,animation,on-device/cloud"
+    },
+    {
+      "printed_number": 17,
+      "catalog_id": "11",
+      "section": "1.4;2.2",
+      "claim": "ЛокальнаяинтеграциявUnity",
+      "effective_primary_url": "https://github.com/undreamai/LLMUnity",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "AuthorREADME:locallywithoutinternet,remotesupported; неприписываетсялучшаяскорость"
+    },
+    {
+      "printed_number": 18,
+      "catalog_id": "9",
+      "section": "1.4",
+      "claim": "Автоматизацияокружения",
+      "effective_primary_url": "https://www.prometheanai.com/",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "PrometheanofficialAIworldbuilding; формулировкаproceduralснята,нецитируются10xclaims"
+    },
+    {
+      "printed_number": 19,
+      "catalog_id": "10",
+      "section": "1.4",
+      "claim": "Worldbuilding tools",
+      "effective_primary_url": "https://www.procedural-worlds.com/",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "ProceduralWorldsofficialStormterrain/biomes/buildings; безпереносамаркетинговыхоценок"
+    },
+    {
+      "printed_number": 20,
+      "catalog_id": "35",
+      "section": "1.4",
+      "claim": "Университетскийпримерoutdoortool",
+      "effective_primary_url": "https://dcgi.fel.cvut.cz/en/theses/2023/kyzrondr/",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "OfficialCTUcatalog+cachedprimaryPDFtitle/abstract"
+    },
+    {
+      "printed_number": 21,
+      "catalog_id": "36",
+      "section": "1.4",
+      "claim": "УниверситетскийпримерTerrainUnity",
+      "effective_primary_url": "https://repository.tugraz.at/publications/rb5eq-fv649",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "OfficialGrazrepositoryDOI/author/date2024+cachedprimaryPDFabstract"
+    },
+    {
+      "printed_number": 22,
+      "catalog_id": "37",
+      "section": "1.4",
+      "claim": "Университетскийпримерfixedheights",
+      "effective_primary_url": "https://dspace.cuni.cz/handle/20.500.11956/202622",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "OfficialCharlesrepositoryreview+cachedprimaryPDFtitle/abstract; catalogtimeoutотмечен"
+    },
+    {
+      "printed_number": 23,
+      "catalog_id": "38",
+      "section": "1.4",
+      "claim": "ОтдельнаяметодикаоценкиNPC",
+      "effective_primary_url": "https://kth.diva-portal.org/smash/get/diva2%3A1938971/FULLTEXT01.pdf",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "KTHprimaryPDFcachedwebabstract:RGBtasks+userstudiesfuture; directrequesttimeoutнеприравнен404"
+    },
+    {
+      "printed_number": 24,
+      "catalog_id": "2",
+      "section": "2.1;3.1",
+      "claim": "UPMGitdependency",
+      "effective_primary_url": "https://docs.unity3d.com/6000.3/Documentation/Manual/upm-git.html",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "Заменён2022manualнасвежуюUnity6.3первичку"
+    },
+    {
+      "printed_number": 25,
+      "catalog_id": "12",
+      "section": "2.2",
+      "claim": "Разделениеvectors/retrievers",
+      "effective_primary_url": "https://github.com/langchain-ai/docs/blob/main/src/oss/langchain/knowledge-base.mdx",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "LangChainprimaryknowledge-base,queryvector/indices/retrievers"
+    },
+    {
+      "printed_number": 26,
+      "catalog_id": "13",
+      "section": "2.2",
+      "claim": "Индексичанки",
+      "effective_primary_url": "https://developers.llamaindex.ai/python/framework/module_guides/indexing/vector_store_index/",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "LlamaIndexprimaryVectorStoreIndex/IngestionPipeline"
+    },
+    {
+      "printed_number": 27,
+      "catalog_id": "34",
+      "section": "2.2",
+      "claim": "Альтернативныйлокальныйbackend",
+      "effective_primary_url": "https://github.com/ggml-org/llama.cpp",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "llama.cppREADME localinference/C++/server; безпредположениякакойbackendунаснепроверенно"
+    },
+    {
+      "printed_number": 28,
+      "catalog_id": "40",
+      "section": "2.4",
+      "claim": "Ограниченияschema→grammar",
+      "effective_primary_url": "https://github.com/ggml-org/llama.cpp/blob/master/grammars/README.md",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "CurrentprimarygrammarsREADME:unsupportedfeatures;старыйPR5978удалёнизцитированиякакнедостаточныйдляcurrent"
+    },
+    {
+      "printed_number": 29,
+      "catalog_id": "@undo-overview",
+      "section": "2.4",
+      "claim": "ГруппаUndo/rollback",
+      "effective_primary_url": "https://docs.unity3d.com/6000.3/Documentation/ScriptReference/Undo.html",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "Unity6.3Undooverview CollapseUndoOperations/RevertAllDownToGroup;точнеечемRegisterCompleteObjectUndo"
+    },
+    {
+      "printed_number": 30,
+      "catalog_id": "19",
+      "section": "2.6",
+      "claim": "EmbeddingGemma300MвOllama",
+      "effective_primary_url": "https://ollama.com/library/embeddinggemma",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "Ollamacard/apiembed; тегнеподменяетdigestисторическогозапуска"
+    },
+    {
+      "printed_number": 31,
+      "catalog_id": "20",
+      "section": "2.6",
+      "claim": "ПерваяEmbeddingGemma300M",
+      "effective_primary_url": "https://huggingface.co/google/embeddinggemma-300m",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "GoogleHFmodelcard; прежнийinferenceURLтеперьEmbeddingGemma2иотклонёндляэтогоутверждения"
+    },
+    {
+      "printed_number": 32,
+      "catalog_id": "1",
+      "section": "3.1",
+      "claim": "СуществованиеверсииUnity",
+      "effective_primary_url": "https://unity.com/releases/editor/whats-new/6000.3.27f1",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "Officialrelease6000.3.27f1; реальнаямашинаиверсиядоподтверждаютсялокальнымиXML"
+    },
+    {
+      "catalog_id": "@skills-nice-wolf",
+      "section": "3.2",
+      "claim": "Происхождение адаптированных Markdown-навыков, закреплённая версия и лицензия MIT; не качество WorldWeaver",
+      "effective_primary_url": "https://raw.githubusercontent.com/Nice-Wolf-Studio/unity-claude-skills/a149d3e995420432f52b0899092daa4b069f441f/README.md",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "Exact pinned README and LICENSE retrieved as HTTP200; license matches retained package attribution.",
+      "retrieval": [
+        {
+          "name": "nice-readme",
+          "url": "https://raw.githubusercontent.com/Nice-Wolf-Studio/unity-claude-skills/a149d3e995420432f52b0899092daa4b069f441f/README.md",
+          "status": 200,
+          "sha256": "63466063be4639d96976a19091a4971a4c7eded579249b41cf978a81de68ee84",
+          "cache": ".private/reference/vkr2026/nice-readme.txt",
+          "bytes": 7571,
+          "opening": "# Unity Claude Skills Plugin\n\nA comprehensive Claude Code plugin providing **35 skills** covering the entire Unity Game "
+        },
+        {
+          "name": "nice-license",
+          "url": "https://raw.githubusercontent.com/Nice-Wolf-Studio/unity-claude-skills/a149d3e995420432f52b0899092daa4b069f441f/LICENSE",
+          "status": 200,
+          "sha256": "8b56b08eb33751e1676dcd7e17e2d884df389bd2b1c52dcef302ce983e7bf04e",
+          "cache": ".private/reference/vkr2026/nice-license.txt",
+          "bytes": 1073,
+          "opening": "MIT License\n\nCopyright (c) 2026 Nice-Wolf-Studio\n\nPermission is hereby granted, free of charge, to any person obtaining "
+        }
+      ],
+      "printed_number": 33
+    },
+    {
+      "catalog_id": "@skills-besty",
+      "section": "3.2",
+      "claim": "Происхождение адаптированных Markdown-навыков, закреплённая версия и лицензия MIT; не качество WorldWeaver",
+      "effective_primary_url": "https://raw.githubusercontent.com/Besty0728/Unity-Skills/fb7a8d4208671bca1d1013b2776eb2e4917f4964/README.md",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "Exact pinned README and LICENSE retrieved as HTTP200; license matches retained package attribution.",
+      "retrieval": [
+        {
+          "name": "besty-readme",
+          "url": "https://raw.githubusercontent.com/Besty0728/Unity-Skills/fb7a8d4208671bca1d1013b2776eb2e4917f4964/README.md",
+          "status": 200,
+          "sha256": "f0bc496743b37763daa31930a75ac58478360d12e0301c704c2f8187464452d4",
+          "cache": ".private/reference/vkr2026/besty-readme.txt",
+          "bytes": 24082,
+          "opening": "# 🎮 UnitySkills\n\n<p align=\"center\">\n  <img src=\"docs/Unity-Skills-H.png\" alt=\"Unity-Skills\" width=\"800\">\n</p>\n\n<p ali"
+        },
+        {
+          "name": "besty-license",
+          "url": "https://raw.githubusercontent.com/Besty0728/Unity-Skills/fb7a8d4208671bca1d1013b2776eb2e4917f4964/LICENSE",
+          "status": 200,
+          "sha256": "ddf7990f8b3edee6160687f1b365e12e6ed0254da898aef069c41e0264a1e4bf",
+          "cache": ".private/reference/vkr2026/besty-license.txt",
+          "bytes": 1095,
+          "opening": "MIT License\n\nCopyright (c) 2026 Besty0728\nCopyright (c) 2025 CoplayDev\n\nPermission is hereby granted, free of charge, to"
+        }
+      ],
+      "printed_number": 34
+    },
+    {
+      "printed_number": 35,
+      "catalog_id": "21",
+      "section": "3.5",
+      "claim": "Chatmessages/schemaformat",
+      "effective_primary_url": "https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "ТочныйCreatechatcompletionendpoint docs:response_format,json_schema,subsetstrict"
+    },
+    {
+      "printed_number": 36,
+      "catalog_id": "18",
+      "section": "3.5",
+      "claim": "ИмямоделиQwen3.5:2b",
+      "effective_primary_url": "https://ollama.com/library/qwen3.5:2b",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "Ollamacard; текущиепараметрынепереносятсянавчерашнийdigest"
+    },
+    {
+      "printed_number": 37,
+      "catalog_id": "39",
+      "section": "3.5",
+      "claim": "PinnedClassic45s/1500",
+      "effective_primary_url": "https://github.com/pollinations/pollinations/blob/73311dad9465c7ddd0ceb9cdc0f2ab8b171f6dbb/text.pollinations.ai/cloudflare-cache/src/origin.js",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "Actualorigin.js lines25/27,takeSlot(FREE_INTERVAL_MS); клиент46sподтверждаетсякодомпроектаотдельно"
+    },
+    {
+      "printed_number": 38,
+      "catalog_id": "23",
+      "section": "3.5",
+      "claim": "APIDOCS30s discrepancy",
+      "effective_primary_url": "https://github.com/pollinations/pollinations/blob/73311dad9465c7ddd0ceb9cdc0f2ab8b171f6dbb/APIDOCS.md",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "PinnedAPIDOCS.md Text30s vsorigin45s; версионированныйURLвoverride"
+    },
+    {
+      "printed_number": 39,
+      "catalog_id": "4",
+      "section": "3.6",
+      "claim": "Построение NavMeshData",
+      "effective_primary_url": "https://docs.unity3d.com/6000.3/Documentation/ScriptReference/AI.NavMeshBuilder.BuildNavMeshData.html",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "Unity6.3 BuildNavMeshData; больше не используетсядляописанияNavMeshAgent"
+    },
+    {
+      "printed_number": 40,
+      "catalog_id": "24",
+      "section": "4.1",
+      "claim": "Edit/PlayFramework",
+      "effective_primary_url": "https://docs.unity3d.com/6000.3/Documentation/Manual/test-framework/test-framework-introduction.html",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "Unity6.3Manual Testingyourcode:Editor/runtime,NUnit,domainreload"
+    },
+    {
+      "printed_number": 41,
+      "catalog_id": "28",
+      "section": "ПриложениеА",
+      "claim": "ТЗнапрограммноеизделие",
+      "effective_primary_url": "https://protect.gost.ru/gost/details/b64061cf-6bb2-4c75-aee9-18bb5e26e554",
+      "checked": "2026-11-01",
+      "result": "supported_with_stated_scope",
+      "evidence": "Rosstandartactivecardscope+explicitGIArequirement; нетclaimчтоГОСТ7.32универсален"
+    }
+  ],
+  "bibliographic_date_policy": "Для обновляемой документации, репозиториев и model cards без подтверждённой даты публикации указано [б. г.]; фактическая дата обращения сохранена отдельно. Год обращения не выдаётся за год публикации. Датированные исследования, книга, стандарт и release notes сохраняют установленные годы.",
+  "publication_date_policy": "Undated rolling manuals/repos/modelcards use [б. г.]; access date is separate."
+}

@@ -1,0 +1,9 @@
+{
+  "kind": "current-reader-document-local-link-audit",
+  "utc": "2026-11-01T00:30:56.419579+00:00",
+  "documents": 19,
+  "localLinksChecked": 157,
+  "missing": [],
+  "passed": true,
+  "scope": "Current reader-facing Markdown and screenshot paths. Explicit local archive links resolve in delivered local folder; corresponding GitHub release download links are supplied separately. External links and historic versions are not revalidated by this check."
+}

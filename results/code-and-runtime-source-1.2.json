@@ -1,0 +1,28 @@
+{
+  "kind": "reviewed-generated-code-tested-on-final-product",
+  "recordedUtc": "2026-10-31T23:55:17.532300+00:00",
+  "productSourceCommit": "ee8d9329a53b416b53ec8f0546cd906263abb331",
+  "productTreeSha256": "f6756356eb56ea7f73ecf693f2826c588b7ee97abe1ca45589de028cfdf593aa",
+  "productFileCount": 396,
+  "modelGeneratedOnSourceCommit": "74ceb3f2312966c88ac9a74d2210788290565226",
+  "rawCodeSha256": "2468b871f20cddd64ad5431d897226352a35b6df8992d8cd374b2393bf7e4918",
+  "importedSourceSha256": "dbb645e834e447fa398d9bf81eba05ac9c6222ef6f8157228077093711701814",
+  "className": "SmoothYRotationMonoBehaviour",
+  "codeUnityExitCode": 0,
+  "runtimeUnityExitCode": 0,
+  "files": [
+    {
+      "path": "results/chat-code-acceptance-local-1.2.json",
+      "sha256": "f527b6ee3fc65be6efd66f8bcc454b16e332623d763ca08a98fb1bbb5b11b058"
+    },
+    {
+      "path": "results/rotation-runtime-acceptance-final-1.2.json",
+      "sha256": "9c9f5deb0e485768ae1de0883bb0fcef15036aaf3c70584e47ede8cf269a5480"
+    },
+    {
+      "path": "scripts/RotationAcceptanceRunner.cs",
+      "sha256": "03dbcc3e5d68cacd765d3a8813b45eb6f4e5b02a428f2510e80ccd7531d23461"
+    }
+  ],
+  "limitation": "The model generated this exact source on R2. Import, actual compilation, component attachment, revert, and actual rotation with stationary negative control used the immutable R3 package. No new model call in these two runs."
+}

@@ -1,0 +1,1091 @@
+{
+  "schema_version": "worldweaver-document-qa.v3",
+  "edition": "1.2",
+  "utc": "2026-11-01T00:26:40.945582+00:00",
+  "success": true,
+  "status": "PASS with disclosed administrative items and nonblocking chapter-end whitespace",
+  "artifacts": {
+    "thesis_docx": {
+      "path": "deliverables/ВКР_WorldWeaver.docx",
+      "sha256": "720b65f411079039ec6a0f60bd6fc476d9e1f3bb684a326ffc611c2b6605cf97",
+      "exact_rendered_source": ".private/draft-vkr2026-final-e/ВКР_WorldWeaver.docx",
+      "pages": null
+    },
+    "thesis_pdf": {
+      "path": "deliverables/ВКР_WorldWeaver.pdf",
+      "sha256": "7f41d202c1f7d261c9f3fbeb3e8e4cf5fba25ed56332f1779758ccef37ec1f7c",
+      "exact_rendered_source": ".private/qa-vkr2026-final-e-thesis/ВКР_WorldWeaver.pdf",
+      "pages": 101
+    },
+    "tz_docx": {
+      "path": "deliverables/Техническое_задание_WorldWeaver.docx",
+      "sha256": "bcce62e764181cfdfe226569cd7a674baebd76895e56cfe94f506c3cf534e9de",
+      "exact_rendered_source": ".private/draft-vkr2026-final-e/Техническое_задание_WorldWeaver.docx",
+      "pages": null
+    },
+    "tz_pdf": {
+      "path": "deliverables/Техническое_задание_WorldWeaver.pdf",
+      "sha256": "e214cb61ad422a5a214838fb337abc53f848e9b202033a2e58357bcf8caf5eaa",
+      "exact_rendered_source": ".private/qa-vkr2026-final-e-tz/Техническое_задание_WorldWeaver.pdf",
+      "pages": 14
+    }
+  },
+  "pages": {
+    "thesis": 101,
+    "technicalSpecification": 14,
+    "beforeAppendices": 80,
+    "introduction": 3,
+    "conclusion": 2
+  },
+  "statistics": {
+    "figures": 12,
+    "tables": 12,
+    "sources": 41,
+    "nativeOMMLExpressions": 2,
+    "tocEntries": 52,
+    "tocMismatches": 0
+  },
+  "requirementsAudit": "docs/research/vkr-requirements-2026.md",
+  "structureReceipt": {
+    "path": "results/document-structure-1.2.json",
+    "sha256": "2d079f8220f192bd1c5dd62551e95f6980e91039221d7ac28b7306d8e187e318"
+  },
+  "renderReceipt": {
+    "path": "results/document-pdf-render-1.2.json",
+    "sha256": "2bba9503efd05d044b0df89257876ed890439afe40fe7a67ff658ec10be985dd"
+  },
+  "sourceRebuild": {
+    "path": "results/document-rebuild-1.2.json",
+    "sha256": "526f5800b55a170413d7ffc51276e7315425647cfc899b40010dbee110a32f15",
+    "success": true
+  },
+  "bodyBoundaries": {
+    "path": "results/document-layout-boundaries-1.2.json",
+    "sha256": "baa820584aa9e5c63ad1cc6d1031cae517dca3210746c3c8319114e1b02030cf",
+    "passed": true
+  },
+  "allPagesVisuallyInspected": true,
+  "visualReview": {
+    "method": "Each page personally opened full-size. Exact final PNG hashes can transfer a previously personally inspected D page; every changed page was opened again. No contact-sheet-only acceptance.",
+    "sourceReceipts": [
+      {
+        "path": ".private/qa-vkr2026-final-e-review-root-1-25.json",
+        "sha256": "eaab70b60873e1768e9c38ef423a525c973d20ba38c13c712bdf84daa54e3e85",
+        "reviewer": "root",
+        "pages": 25
+      },
+      {
+        "path": ".private/qa-vkr2026-final-e-review-26-60.json",
+        "sha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd",
+        "reviewer": "/root/compare_theses",
+        "pages": 35
+      },
+      {
+        "path": ".private/qa-vkr2026-final-e-review-61-101.json",
+        "sha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8",
+        "reviewer": "thesis_documents",
+        "pages": 41
+      },
+      {
+        "path": ".private/qa-vkr2026-final-e-review-tz-1-14.json",
+        "sha256": "a3ff77f893dd1ea74f98985a89dfaf88b31707124a10cdf4a2413f7ffbf6f339",
+        "reviewer": "thesis_documents",
+        "pages": 14
+      }
+    ],
+    "thesis": [
+      {
+        "page": 1,
+        "pngSha256": "dbad18a6a93d30b1ae0f2c4ac0d5edc2062b24f65b7ab90eaedea5d35a8f8710",
+        "reviewer": "root",
+        "result": "PASS",
+        "method": "Exact PNG SHA match to root personally reviewed D page",
+        "sourcePersonalReceiptSha256": "eaab70b60873e1768e9c38ef423a525c973d20ba38c13c712bdf84daa54e3e85"
+      },
+      {
+        "page": 2,
+        "pngSha256": "a6d7c4a292b81e07b49060df0a1239eef5d8697af5a88008765a0676f40b8f73",
+        "reviewer": "root",
+        "result": "PASS",
+        "method": "Exact PNG SHA match to root personally reviewed D page",
+        "sourcePersonalReceiptSha256": "eaab70b60873e1768e9c38ef423a525c973d20ba38c13c712bdf84daa54e3e85"
+      },
+      {
+        "page": 3,
+        "pngSha256": "048a2330af45a89e2f2f7ab447cfca8d9ee8e31aa7a23ba54fca67e4aaa8b653",
+        "reviewer": "root",
+        "result": "PASS",
+        "method": "Exact PNG SHA match to root personally reviewed D page",
+        "sourcePersonalReceiptSha256": "eaab70b60873e1768e9c38ef423a525c973d20ba38c13c712bdf84daa54e3e85"
+      },
+      {
+        "page": 4,
+        "pngSha256": "b45e92d1b7718742d04cc618d62595b25d18a215aeeff46c13de90e07b5f864e",
+        "reviewer": "root",
+        "result": "PASS",
+        "method": "Exact PNG SHA match to root personally reviewed D page",
+        "sourcePersonalReceiptSha256": "eaab70b60873e1768e9c38ef423a525c973d20ba38c13c712bdf84daa54e3e85"
+      },
+      {
+        "page": 5,
+        "pngSha256": "cc668b08ff923f6021817585765976f9801d9be9ba6aa5d98160f5c77345e990",
+        "reviewer": "root",
+        "result": "PASS",
+        "method": "Fresh final E full page personally opened with view_image",
+        "sourcePersonalReceiptSha256": "eaab70b60873e1768e9c38ef423a525c973d20ba38c13c712bdf84daa54e3e85"
+      },
+      {
+        "page": 6,
+        "pngSha256": "b0f65d4d256cff0d9401560f59fcb7c166e4c1cfdd4c9491a71b6bdb8c7b5962",
+        "reviewer": "root",
+        "result": "PASS",
+        "method": "Exact PNG SHA match to root personally reviewed D page",
+        "sourcePersonalReceiptSha256": "eaab70b60873e1768e9c38ef423a525c973d20ba38c13c712bdf84daa54e3e85"
+      },
+      {
+        "page": 7,
+        "pngSha256": "7306d12cd8d16051b78be6b763847aee5d28df5efcde7c317c79f0508907ab3b",
+        "reviewer": "root",
+        "result": "PASS",
+        "method": "Exact PNG SHA match to root personally reviewed D page",
+        "sourcePersonalReceiptSha256": "eaab70b60873e1768e9c38ef423a525c973d20ba38c13c712bdf84daa54e3e85"
+      },
+      {
+        "page": 8,
+        "pngSha256": "f018365480549f3bb71908c522ace21a250ccd2edc467a9960883ff0d7f99e3f",
+        "reviewer": "root",
+        "result": "PASS",
+        "method": "Exact PNG SHA match to root personally reviewed D page",
+        "sourcePersonalReceiptSha256": "eaab70b60873e1768e9c38ef423a525c973d20ba38c13c712bdf84daa54e3e85"
+      },
+      {
+        "page": 9,
+        "pngSha256": "826662cb0337e48a4905fcbfe3d6d3b2ef52b42c6dc5ead0c13d37c46e9a8c7b",
+        "reviewer": "root",
+        "result": "PASS",
+        "method": "Exact PNG SHA match to root personally reviewed D page",
+        "sourcePersonalReceiptSha256": "eaab70b60873e1768e9c38ef423a525c973d20ba38c13c712bdf84daa54e3e85"
+      },
+      {
+        "page": 10,
+        "pngSha256": "f65ccc17369f6d05331d9d5c35afc01c62a1419d6081ac859e2dbb01690b3ee3",
+        "reviewer": "root",
+        "result": "PASS",
+        "method": "Exact PNG SHA match to root personally reviewed D page",
+        "sourcePersonalReceiptSha256": "eaab70b60873e1768e9c38ef423a525c973d20ba38c13c712bdf84daa54e3e85"
+      },
+      {
+        "page": 11,
+        "pngSha256": "1deea48745223f6465434ede46f8e0cfd17efe85801626be6793b000c386e32d",
+        "reviewer": "root",
+        "result": "PASS",
+        "method": "Exact PNG SHA match to root personally reviewed D page",
+        "sourcePersonalReceiptSha256": "eaab70b60873e1768e9c38ef423a525c973d20ba38c13c712bdf84daa54e3e85"
+      },
+      {
+        "page": 12,
+        "pngSha256": "028d7cc98d90b481d6cf1df13774c2e8dcb91ca80be8a7aedcdbd1f8b9835899",
+        "reviewer": "root",
+        "result": "PASS",
+        "method": "Exact PNG SHA match to root personally reviewed D page",
+        "sourcePersonalReceiptSha256": "eaab70b60873e1768e9c38ef423a525c973d20ba38c13c712bdf84daa54e3e85"
+      },
+      {
+        "page": 13,
+        "pngSha256": "b1deff26cdf9711741bd80e63dd4c27c301c242c8bf5392748432aedaf9620fd",
+        "reviewer": "root",
+        "result": "PASS",
+        "method": "Exact PNG SHA match to root personally reviewed D page",
+        "sourcePersonalReceiptSha256": "eaab70b60873e1768e9c38ef423a525c973d20ba38c13c712bdf84daa54e3e85"
+      },
+      {
+        "page": 14,
+        "pngSha256": "7813b58251c349719b8492b64828dea286041e85a9cb913c63770c350d792513",
+        "reviewer": "root",
+        "result": "PASS",
+        "method": "Exact PNG SHA match to root personally reviewed D page",
+        "sourcePersonalReceiptSha256": "eaab70b60873e1768e9c38ef423a525c973d20ba38c13c712bdf84daa54e3e85"
+      },
+      {
+        "page": 15,
+        "pngSha256": "a2e197266cf41f3b39a7dbe93b2fce9b013556520ff5766730585cd539de88b2",
+        "reviewer": "root",
+        "result": "PASS",
+        "method": "Exact PNG SHA match to root personally reviewed D page",
+        "sourcePersonalReceiptSha256": "eaab70b60873e1768e9c38ef423a525c973d20ba38c13c712bdf84daa54e3e85"
+      },
+      {
+        "page": 16,
+        "pngSha256": "597dcee85ee37a6f0bba9547abbc017856d1f084d27087630a5012febf5d234c",
+        "reviewer": "root",
+        "result": "PASS",
+        "method": "Exact PNG SHA match to root personally reviewed D page",
+        "sourcePersonalReceiptSha256": "eaab70b60873e1768e9c38ef423a525c973d20ba38c13c712bdf84daa54e3e85"
+      },
+      {
+        "page": 17,
+        "pngSha256": "055ca65fe9e582a717760dc59e5fcec06cc8b51c25e2118c460e1d01f29ec758",
+        "reviewer": "root",
+        "result": "PASS",
+        "method": "Exact PNG SHA match to root personally reviewed D page",
+        "sourcePersonalReceiptSha256": "eaab70b60873e1768e9c38ef423a525c973d20ba38c13c712bdf84daa54e3e85"
+      },
+      {
+        "page": 18,
+        "pngSha256": "01191ae8060aa3a00cbabca827af18234d2b53a7e671b4a353724b8a69a611d6",
+        "reviewer": "root",
+        "result": "PASS",
+        "method": "Exact PNG SHA match to root personally reviewed D page",
+        "sourcePersonalReceiptSha256": "eaab70b60873e1768e9c38ef423a525c973d20ba38c13c712bdf84daa54e3e85"
+      },
+      {
+        "page": 19,
+        "pngSha256": "760eabd345a802eceaa69679968103366f79f9202f23d1428802155701af8cda",
+        "reviewer": "root",
+        "result": "PASS",
+        "method": "Exact PNG SHA match to root personally reviewed D page",
+        "sourcePersonalReceiptSha256": "eaab70b60873e1768e9c38ef423a525c973d20ba38c13c712bdf84daa54e3e85"
+      },
+      {
+        "page": 20,
+        "pngSha256": "f84361bb71f6d8c33e2d0cad844bd20ba329b022b008a94c32aa8929cfb928ed",
+        "reviewer": "root",
+        "result": "PASS",
+        "method": "Exact PNG SHA match to root personally reviewed D page",
+        "sourcePersonalReceiptSha256": "eaab70b60873e1768e9c38ef423a525c973d20ba38c13c712bdf84daa54e3e85"
+      },
+      {
+        "page": 21,
+        "pngSha256": "a8c6fd682104e40a72154c4f3624080a920590c399857d5ac7156d0edd9fdba4",
+        "reviewer": "root",
+        "result": "PASS",
+        "method": "Exact PNG SHA match to root personally reviewed D page",
+        "sourcePersonalReceiptSha256": "eaab70b60873e1768e9c38ef423a525c973d20ba38c13c712bdf84daa54e3e85"
+      },
+      {
+        "page": 22,
+        "pngSha256": "b5d35f2df0fd876ab40a33227771c66103c8e366a1cc3807389aa36d2cecb602",
+        "reviewer": "root",
+        "result": "PASS",
+        "method": "Exact PNG SHA match to root personally reviewed D page",
+        "sourcePersonalReceiptSha256": "eaab70b60873e1768e9c38ef423a525c973d20ba38c13c712bdf84daa54e3e85"
+      },
+      {
+        "page": 23,
+        "pngSha256": "c10282964d741af4be2a79d9e9eaf5286a60d1db29abe6915ac67e311f4532c3",
+        "reviewer": "root",
+        "result": "PASS",
+        "method": "Exact PNG SHA match to root personally reviewed D page",
+        "sourcePersonalReceiptSha256": "eaab70b60873e1768e9c38ef423a525c973d20ba38c13c712bdf84daa54e3e85"
+      },
+      {
+        "page": 24,
+        "pngSha256": "f146f43ceae7bf90754b4d6bb86e73c3d6c2f5eb9e9fdd16a836bfc91d4a7734",
+        "reviewer": "root",
+        "result": "PASS",
+        "method": "Exact PNG SHA match to root personally reviewed D page",
+        "sourcePersonalReceiptSha256": "eaab70b60873e1768e9c38ef423a525c973d20ba38c13c712bdf84daa54e3e85"
+      },
+      {
+        "page": 25,
+        "pngSha256": "885a1879b9ad16c0242774b09d3b39f3c7d919ca6bc130bbf551e3188ed332a8",
+        "reviewer": "root",
+        "result": "PASS",
+        "method": "Exact PNG SHA match to root personally reviewed D page",
+        "sourcePersonalReceiptSha256": "eaab70b60873e1768e9c38ef423a525c973d20ba38c13c712bdf84daa54e3e85"
+      },
+      {
+        "page": 26,
+        "pngSha256": "33d02c1aa0c6d7ab6ea12897f9ba40341df5245ed872a5b7b21c28207ce864b5",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 27,
+        "pngSha256": "445fa8d7ea457022ec3b03bfac8f747550901fd350ed3686518521a150421476",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 28,
+        "pngSha256": "9c2333debbd44c2de8d1b8820217c13b4eeef4de2be444e7c1279a8e92b85f1b",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 29,
+        "pngSha256": "08b6f28e22c2014652c15ae6c711258db68bc780501972cb4cc1fe31d6232437",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 30,
+        "pngSha256": "5f8da2187a4dadacee53b118421e9b975709b89e2a955659cd411b7491e6e538",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 31,
+        "pngSha256": "57227fb3e80c3a73da29147d20ebafe43928331fc492ada2d79d9109da694400",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 32,
+        "pngSha256": "99bb254959b6f5d0558022304465d96927e37b2513b0ae92c864507aa51de152",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 33,
+        "pngSha256": "2ab07179e740925ebb0a7fdd002609178d071fea176dd640d9300343fac4ca9b",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 34,
+        "pngSha256": "b3631c0b67c2070c6e555d71db04863f0fdd8bcb91f0592c68bfce13c506c4d9",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 35,
+        "pngSha256": "fef86fbda07702d0a8ccaba6d7eb58b37afde93d63e53621a25d8abc624b85ba",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 36,
+        "pngSha256": "b0aaed33cf383187521770f4a6d7039130438ab6ee8aff3c4512e1b8b2fafd65",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 37,
+        "pngSha256": "ecab9fd0b689fad05c50258bf5866a0e5ba0f8b6d33177efe5f22c09aa3163a4",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 38,
+        "pngSha256": "da22262e9c6e1988af69096d047c9f423511435ae68a5b279f1aa278fe0103f3",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS_WITH_NOTE",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 39,
+        "pngSha256": "b948755650790aefa7411c8b40ee4c5a0b8fa778cbc20ab64c96f788517e27f6",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 40,
+        "pngSha256": "dee4bb9437dc187aee1d162875e4d6946187b7ec58ae2ed05b35308791350838",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 41,
+        "pngSha256": "0f9515867ba10966d1efebd34c47ed54aeacc7d3b6af3bf1a1ce2bb50b772c63",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 42,
+        "pngSha256": "4e0259c1a5545e90fef880be7b7558f6e444d5d6532bca4be2e6ff87c91457bd",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 43,
+        "pngSha256": "7c7deff97aba01c6e2e9a870ac9d0c3f3e22b578d9084980922e43967f25ba36",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 44,
+        "pngSha256": "d5d45da2731bbb36bec1c006bc19480964a7ab1e7b4872198bca0ce4df9ec477",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 45,
+        "pngSha256": "0fc606c3819a5fccac422885cabfe8db4aba46ae9fd286d96ba6ef423eacc22a",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 46,
+        "pngSha256": "789da7e09adca5c2fba81951cef72a6c4f1d1696a16f80c38f92d26393809662",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 47,
+        "pngSha256": "9533f8defdfb9b7d73b78bc18824b0cc660d7429a60f3852996a17a6899f7e77",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 48,
+        "pngSha256": "a5afee69bb4be130390c5c3a9a0fffe3c572bd7fa49ab16e40ae50b1fb861280",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 49,
+        "pngSha256": "bd570c985cc85c71b26b6424cfd0137f2291320f0a24386a81f7628c64014298",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 50,
+        "pngSha256": "5d8eb37bc02ea8849078b58f44148ad9925875137e2b700e09a52653908e715f",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 51,
+        "pngSha256": "8c989513eeb8b3fe6890112ceeef6d7a00e585c51c07d09f34bed4851fadff76",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 52,
+        "pngSha256": "1483c068771fa3c27336f890a784ebce0442d63ad0e9b0622006dcb9bf5a30aa",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 53,
+        "pngSha256": "3e8f6af12c7a6830e06e514ac88b822a41d984f4c57fb3d092a67dae3b7d25ed",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 54,
+        "pngSha256": "d6321ecb6374da3669cfb2ce963853d19bab8bc2432bfeb90496228224c7f95d",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 55,
+        "pngSha256": "f096f58f925625056f3eb7b245c77df0b4b8d1e1c560531559e49d0e44b6a6a3",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "fresh-individual-full-page-view_image",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 56,
+        "pngSha256": "b0242ab27e92681ee0bf14004e1b8408de87c03bca8d5bf41daafb636a1d0422",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 57,
+        "pngSha256": "0b42566554aad7f34f879d6b5e00dd908ae49737b89d7c18968eb92d0af56e7f",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 58,
+        "pngSha256": "c043ac61fdfc16c0b7b43eb2b11f7d4e67636187f6ce01a4481e0fd38c273c3f",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 59,
+        "pngSha256": "b2edc9fe4c847be36851d8523d48d16172c14842034441116723e974f6579a8b",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 60,
+        "pngSha256": "5c8379c18104d97833fd3199f623fd80ab67812fac7115a09d2e5975812b4cb1",
+        "reviewer": "/root/compare_theses",
+        "result": "PASS",
+        "method": "exact-sha256-transfer-from-personally-viewed-D",
+        "sourcePersonalReceiptSha256": "2e34cd67bb96435301fd9dda5c6ea2334f56d1240b1e6c4df17e2984bb66f4dd"
+      },
+      {
+        "page": 61,
+        "pngSha256": "2b5fb01b979bd5f0764ee4445cd011f07637c86f6c0b79eba4d217c60f4bc63b",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "exact_SHA_transfer_from_individually_viewed_D",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 62,
+        "pngSha256": "ddb3510896dcb378c8d47a71bf2a7add55767ccf3cd52c4d778d5f6a24fea8a3",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "exact_SHA_transfer_from_individually_viewed_D",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 63,
+        "pngSha256": "e0c40122d45c8b59f139771b4d9bca15bfb427cbbe32319745fb0aaba13533c7",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "exact_SHA_transfer_from_individually_viewed_D",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 64,
+        "pngSha256": "7b59ae76e7c2a150b84167464875146d53bc81e103b5abb74ddb8b453058a061",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "exact_SHA_transfer_from_individually_viewed_D",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 65,
+        "pngSha256": "4d118c72a070dae86c6b41f30516665f1627faefff0cdb8ae59c4eb504626702",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "exact_SHA_transfer_from_individually_viewed_D",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 66,
+        "pngSha256": "bb97513dd2f89092c111767edd0eaa809bab01b1d62793ecc88fa6816da3d04f",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "exact_SHA_transfer_from_individually_viewed_D",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 67,
+        "pngSha256": "d6fc6d10302c7ff78182d2b97200fa6cefbd3933b833197829e7e5d921a9c8b9",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "exact_SHA_transfer_from_individually_viewed_D",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 68,
+        "pngSha256": "ce9a1a943666c2a2dbb543461dd4c3b9da0fcf3365474bab1c0476c97f1c0518",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "exact_SHA_transfer_from_individually_viewed_D",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 69,
+        "pngSha256": "e7db435e9e9fdea1b44c97508e89d1fad91c28f29d3fefcc9d867e51b78377ac",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "exact_SHA_transfer_from_individually_viewed_D",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 70,
+        "pngSha256": "4baabd42a4112996e93a7d67ccc26fc45e39ee15610471f9069a788118c026fa",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "exact_SHA_transfer_from_individually_viewed_D",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 71,
+        "pngSha256": "c826af9f1a54ec5cc4e5c185959e84564870203be94827f914fd694d728e2c87",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "exact_SHA_transfer_from_individually_viewed_D",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 72,
+        "pngSha256": "06ccbe76018df1bca5ddedee8b14268e170a48d7f2473933e065be71eba9a51d",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "exact_SHA_transfer_from_individually_viewed_D",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 73,
+        "pngSha256": "2544d53962ea71d79db8e11344f836096e4bd5ae3ebd2871f23c7d8c3eb7c595",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "exact_SHA_transfer_from_individually_viewed_D",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 74,
+        "pngSha256": "df33eae848e4a41e8539030492f217478ae35d87d3c5ddf307c2380e19d217cb",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "exact_SHA_transfer_from_individually_viewed_D",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 75,
+        "pngSha256": "6d052511e843f44955fe75e4d6a79803424f4d0e46d7652cef610eb2f33c8fa2",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 76,
+        "pngSha256": "2e2eb2983f10a8a6a49bb03d7cb8d6ba6a004cd5f0578dd5d0172b1619872b64",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 77,
+        "pngSha256": "c07fadf54eb623fa852a0d431084c4dfe8b2db348243ad09c2c479a899da6b4f",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 78,
+        "pngSha256": "d4ea376c35f97c2faf4aaf78c43fe74ac0a31f71583b854d445462803cef7ef6",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 79,
+        "pngSha256": "25b3d043a1d798938b7ece81056552b80305e2b5a2737dabafef33960789dcf8",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 80,
+        "pngSha256": "fc5eaceb879d4d8f07b4b146c44d2eaf443d914e5fc312e08e81fe22fc38cd7e",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 81,
+        "pngSha256": "f5016a37fe04c17c198b1c5175a3d433850167ea310adbf830d7dc9ee42a2be7",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 82,
+        "pngSha256": "fe92ae541827ea14820e73649fc3c474c6c6914f8187fc4a6a66207304bd9908",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 83,
+        "pngSha256": "5d879324fb9e645d1b033da1f847b50b61f0733c964fe4220d8574c94d2aec96",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 84,
+        "pngSha256": "31dd773d85f969978052792151712d4fdc8ebc7757c11bde071cdaf1bbbff9ed",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 85,
+        "pngSha256": "9d6740aefc8230e966b252665bbd2934de1bef6c5d7214261c3769f016426dd8",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 86,
+        "pngSha256": "ae2d3b5eb253a37652226714c4705020e457704144203d371d3dd4a62e2302fa",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 87,
+        "pngSha256": "52b6c300292c24a52a70459c6820485135c4c4b444d81171aef476af09764159",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 88,
+        "pngSha256": "a15ad617e583cf0cb983a75c7408c4da42fe682f2805b405fa2b8b69f37a08fe",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 89,
+        "pngSha256": "6e9722d9f52480f5becad0947e4c23354c07ec59c90eb4deb52ab6563eb9a64a",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 90,
+        "pngSha256": "e31c7137782e4c3d12b9084ae9f0b122669cfaed6e40cc3b847fb180086c9b20",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 91,
+        "pngSha256": "d95d57014d572a6889033c256e0ac20c14f3962af229bf745abe9d3d0ddea58a",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 92,
+        "pngSha256": "1740b84a2ca750c4cdca795f560e7dde62c654e0fd6ad2b33fcfe2234dddd034",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 93,
+        "pngSha256": "25637604ba1f66b720755401a344e51568107f0237dd8308e327cd6126359ad8",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 94,
+        "pngSha256": "bbc42d5dfb59e9dbdf9382bd2661b0ef2618189af71dea9c5cd81be28a63653f",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 95,
+        "pngSha256": "9ca70f2359142b99a033d9563c5534ffc59f387432ef32c00586b25a1f335981",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 96,
+        "pngSha256": "f0774345a1b2ab19327bf9104e20393159bebbd22b1e9393c19c35212b791401",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 97,
+        "pngSha256": "cca20cfed4acc58b7e037dfe3acf0baf92f3503e462f03fc58e151aac719da9f",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 98,
+        "pngSha256": "2c5ca457c3d55e300cdb2c5815cee577ef2fb53395e1a464209edcba64159f99",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 99,
+        "pngSha256": "f9e082b302b3447c57a9b999b76fc369676bf3e82de34ca37e2f27f94e6cc62f",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 100,
+        "pngSha256": "238daa39f6ac8fa789774f7a426336ad7f01a1697469cbe5a88576c065d7fab9",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      },
+      {
+        "page": 101,
+        "pngSha256": "f816d617fbbf548b9a8657b681e7288ec835c3ab5697460bfebdcf55b7b22fa9",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "1b2b9413d872a982e7224da01c7ee8544c08b6ab38efaa1fa86cc0c0d9040ac8"
+      }
+    ],
+    "technicalSpecification": [
+      {
+        "page": 1,
+        "pngSha256": "e1de5747b1620fe03e17ade0abd1c3a244a7cc1aca752b2986620b29d49da3d9",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "a3ff77f893dd1ea74f98985a89dfaf88b31707124a10cdf4a2413f7ffbf6f339"
+      },
+      {
+        "page": 2,
+        "pngSha256": "5f74a7c008233adf1e57d4d6740d8be5b1860b4d53b02f3dcf8e3243138e4b47",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "a3ff77f893dd1ea74f98985a89dfaf88b31707124a10cdf4a2413f7ffbf6f339"
+      },
+      {
+        "page": 3,
+        "pngSha256": "7bef85ce40c1c41062081d7f4696978d330c31b5d30bf51f0736de59a76cac03",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "a3ff77f893dd1ea74f98985a89dfaf88b31707124a10cdf4a2413f7ffbf6f339"
+      },
+      {
+        "page": 4,
+        "pngSha256": "2b27eb285c0f4956290c117905fa21eaeb09dbacb026134adb4f827d63df386e",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "a3ff77f893dd1ea74f98985a89dfaf88b31707124a10cdf4a2413f7ffbf6f339"
+      },
+      {
+        "page": 5,
+        "pngSha256": "e6fae08b3dee08d2b593fd2a2baffa46013154e6f6866e00670af40bf258c9d8",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "a3ff77f893dd1ea74f98985a89dfaf88b31707124a10cdf4a2413f7ffbf6f339"
+      },
+      {
+        "page": 6,
+        "pngSha256": "04e5ab4c903bd792f7446ee7f1b1afc2b97ecfd8bc44a9970675ff11a1c85bb9",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "a3ff77f893dd1ea74f98985a89dfaf88b31707124a10cdf4a2413f7ffbf6f339"
+      },
+      {
+        "page": 7,
+        "pngSha256": "750e624a260bba8a9a28fac5dabe692b90598735da24bb56f0673e7b48111e7a",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "a3ff77f893dd1ea74f98985a89dfaf88b31707124a10cdf4a2413f7ffbf6f339"
+      },
+      {
+        "page": 8,
+        "pngSha256": "2ecb858b79f998962911826b319b2c1557be29e435380b5946f68264b069bbda",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "a3ff77f893dd1ea74f98985a89dfaf88b31707124a10cdf4a2413f7ffbf6f339"
+      },
+      {
+        "page": 9,
+        "pngSha256": "2d93bf64f990686ec5e18423483e66820eb715f2c2de5f3cb42377840949dd68",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "a3ff77f893dd1ea74f98985a89dfaf88b31707124a10cdf4a2413f7ffbf6f339"
+      },
+      {
+        "page": 10,
+        "pngSha256": "5e0d6eef5319391723b3b5d3d899277f70f4efc70082ec5135182230b0818d62",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "a3ff77f893dd1ea74f98985a89dfaf88b31707124a10cdf4a2413f7ffbf6f339"
+      },
+      {
+        "page": 11,
+        "pngSha256": "b5b94a516a500045e7435ae8186aada0003253221c8707dae25df2007ad568a6",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "a3ff77f893dd1ea74f98985a89dfaf88b31707124a10cdf4a2413f7ffbf6f339"
+      },
+      {
+        "page": 12,
+        "pngSha256": "5e81cfbb9e00be495558cd85714370d70c669b59b14f79a35a4188f98a8ae108",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "a3ff77f893dd1ea74f98985a89dfaf88b31707124a10cdf4a2413f7ffbf6f339"
+      },
+      {
+        "page": 13,
+        "pngSha256": "6c7c7369f9693d3b53e179d26240f49f76bacfd19ff5a8da6e2029598c67f67d",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "a3ff77f893dd1ea74f98985a89dfaf88b31707124a10cdf4a2413f7ffbf6f339"
+      },
+      {
+        "page": 14,
+        "pngSha256": "07f62188ce57e6ee88f64dfb13c788d90180584848e2fd1c0c25e3d51ad7dab7",
+        "reviewer": "thesis_documents",
+        "result": "PASS",
+        "method": "fresh_final_E_individual_full_page_view",
+        "sourcePersonalReceiptSha256": "a3ff77f893dd1ea74f98985a89dfaf88b31707124a10cdf4a2413f7ffbf6f339"
+      }
+    ],
+    "blockingFindings": [],
+    "resolvedFindings": [
+      "TOC4.2 title shortened to separate page number55",
+      "Bibliographic URL prefix kept together to avoid an isolated stretched line"
+    ],
+    "nonblockingNotes": [
+      {
+        "page": 38,
+        "note": "Three ending lines of chapter2 before chapter3 starts on a new page."
+      },
+      {
+        "page": 93,
+        "note": "Two ending lines of complete specification before the next appendix."
+      }
+    ]
+  },
+  "officialTemplatesUnchanged": {
+    "title": {
+      "path": "thesis/templates/official-title.docx",
+      "sha256": "7bdb804346650358e5d7afb53018ae3d11abdbeb1ffc72d87a487f803a271afd"
+    },
+    "assignment": {
+      "path": "thesis/templates/official-assignment.docx",
+      "sha256": "b2d70bf6872f772d0c9aedf37a4786a25b577edb648de7becff3a173cea60642"
+    }
+  },
+  "officialOpaquePartsByteExact": {
+    "docProps/app.xml": true,
+    "_rels/.rels": true,
+    "word/theme/theme1.xml": true,
+    "word/fontTable.xml": true,
+    "word/numbering.xml": true
+  },
+  "nativeOriginalJpegBytes": {
+    "chat-420.jpg": {
+      "source": {
+        "path": "docs/screenshots/1.2/chat-420.jpg",
+        "sha256": "8971e78d4eef4cd99bb9519d5f614527ca499413d9274ebffed88102e192318a"
+      },
+      "embedded_media_part": "word/media/image8.jpg"
+    },
+    "api-connection-verified.jpg": {
+      "source": {
+        "path": "docs/screenshots/1.2/api-connection-verified.jpg",
+        "sha256": "588a7cbd3701ebfdf09f4e2bb86232ff330975c5125c6cf6efbda69bf69e2109"
+      },
+      "embedded_media_part": "word/media/image9.jpg"
+    },
+    "village-letter-received.jpg": {
+      "source": {
+        "path": "docs/screenshots/1.2/village-letter-received.jpg",
+        "sha256": "a5b1bfd0cc0a043fae765c95491376205f5240e02a4d4e8750c1373e2bbe1938"
+      },
+      "embedded_media_part": "word/media/image11.jpg"
+    },
+    "village-quest-completed.jpg": {
+      "source": {
+        "path": "docs/screenshots/1.2/village-quest-completed.jpg",
+        "sha256": "8087927c9c25555cf0d0d3ceeea008c6d754d428de6a3f4304f2fad80dbd99e7"
+      },
+      "embedded_media_part": "word/media/image12.jpg"
+    }
+  },
+  "completeTechnicalSpecificationMatchesAppendix": true,
+  "administrativeFieldsRemainingBlank": "Intentionally blank; no signatures, supervisor or approval order fabricated.",
+  "antiplagiarismCertificateReceived": false,
+  "limitations": [
+    "Native Microsoft Word pagination and physical printed copy were not independently checked.",
+    "Unknown approval fields and a real university-issued borrowing-check certificate require university processing.",
+    "The official program controls the applicable local format; no claim of one universal mandatory Russian VKR layout is made."
+  ]
+}
