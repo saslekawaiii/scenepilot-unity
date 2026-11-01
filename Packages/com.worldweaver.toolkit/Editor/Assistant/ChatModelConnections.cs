@@ -155,17 +155,19 @@ namespace WorldWeaver.Editor.Assistant
                 {
                     bool ollama=connection.Protocol==ChatConnectionProtocol.Ollama;var data=await transport.SendAsync(profile.Endpoint+(ollama?"/api/tags":"/models"),null,key,5,0,token);
                     var models=(data[ollama?"models":"data"] as JArray??new JArray());bool found=models.Any(m=>(string)m[ollama?"name":"id"]==connection.Model||ollama&&(string)m["name"]==connection.Model+":latest");bool vision=false;
-                    if(found&&ollama)
+                    bool cloud=ollama&&connection.Model.EndsWith(":cloud",StringComparison.OrdinalIgnoreCase);
+                    if(ollama&&(found||cloud))
                     {
                         try
                         {
                             var details=await transport.SendAsync(profile.Endpoint+"/api/show",new JObject{["model"]=connection.Model},"",5,0,token);var capabilities=(details["capabilities"] as JArray??new JArray()).Values<string>().ToArray();
                             if(capabilities.Length>0&&!capabilities.Contains("completion"))return new ChatConnectionTestResult{ListedModels=models.Count,Message="Модель найдена, но сервер не объявляет поддержку completion. Выберите модель для чата, а не только embeddings."};
+                            if(cloud&&capabilities.Contains("completion"))found=true;
                             vision=new Uri(profile.Endpoint).IsLoopback&&capabilities.Contains("vision");
                         }
                         catch(ProviderException){}
                     }
-                    return new ChatConnectionTestResult{Success=found,ListedModels=models.Count,SupportsVision=vision,Message=found?"Модель найдена в реальном списке сервера. Генерация не запускалась.":"Сервер ответил, но ID модели не найден в списке. Проверьте ID; если /models не поддерживается, можно явно проверить ответ."};
+                    return new ChatConnectionTestResult{Success=found,ListedModels=models.Count,SupportsVision=vision,Message=found?cloud?"Ollama подтвердила облачную модель через /api/show. Скачивание и генерация не запускались; доступ к ответам зависит от аккаунта и квоты.":"Модель найдена в реальном списке сервера. Генерация не запускалась.":"Сервер ответил, но ID модели не найден в списке. Проверьте ID; если /models не поддерживается, можно явно проверить ответ."};
                 }
             }
             catch(ProviderException error){return new ChatConnectionTestResult{ResponseRequested=explicitResponse,Message=ChatHistoryStore.Redact(error.Message)+" Для нестандартного API может потребоваться другой URL или формат ответа."};}

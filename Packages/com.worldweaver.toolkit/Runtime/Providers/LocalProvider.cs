@@ -128,6 +128,11 @@ namespace WorldWeaver
         {
             var response = await transport.SendAsync(profile.Endpoint.TrimEnd('/') + "/api/tags", null, "", 10, 0, token);
             foreach (var model in response["models"] ?? new JArray()) if ((string)model["name"] == profile.Model || (string)model["name"] == profile.Model + ":latest") return true;
+            if(profile.Model.EndsWith(":cloud",StringComparison.OrdinalIgnoreCase))
+            {
+                var details=await transport.SendAsync(profile.Endpoint.TrimEnd('/')+"/api/show",new JObject{["model"]=profile.Model},"",10,0,token);
+                foreach(string capability in details["capabilities"]??new JArray())if(capability=="completion")return true;
+            }
             return false;
         }
         public void Dispose() { streaming.Dispose(); transport.Dispose(); }

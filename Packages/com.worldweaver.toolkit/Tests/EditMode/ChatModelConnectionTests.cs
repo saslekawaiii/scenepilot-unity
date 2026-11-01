@@ -68,6 +68,19 @@ namespace WorldWeaver.Tests
             }
         }
         [UnityTest] public IEnumerator OpenAIRequestModesMapActualHttpBodyAndNeverSendImageCapabilities()=>Await(CheckResponseModes());
+        [UnityTest] public IEnumerator CloudOllamaCanBeSelectedWithoutBeingDownloadedOrListedInTags()=>Await(CheckUnlistedCloud());
+        async Task CheckUnlistedCloud()
+        {
+            using(var server=new ConnectionHttpServer((path,body)=>path.EndsWith("/api/tags")?new JObject{["models"]=new JArray()}:new JObject{["capabilities"]=new JArray("completion","tools")}))
+            using(var controller=new ChatController(null,folder+"/history",folder+"/models"))
+            {
+                var config=Connection(server.Url,ChatConnectionProtocol.Ollama);config.Model="test-model:cloud";
+                controller.AddModelConnection(config);await controller.RefreshModelConnectionsAsync();Assert.IsTrue(controller.Connected);
+                var profile=ChatModelConnections.Profile(config);
+                try{using(var provider=new LocalProvider(profile))Assert.IsTrue(await provider.HealthAsync(CancellationToken.None));}finally{UnityEngine.Object.DestroyImmediate(profile);}
+                Assert.IsTrue(server.Requests.All(r=>r.Path.EndsWith("/api/tags")||r.Path.EndsWith("/api/show")));Assert.IsTrue(server.Requests.Any(r=>r.Path.EndsWith("/api/show")));
+            }
+        }
         [Test] public void EscapedSessionSecretIsRedactedFromJsonHistoryAndMetadata()
         {
             const string escapedSecret="fixtureQuote\"AndBackslash\\Secret0123456789";
