@@ -14,6 +14,29 @@ namespace WorldWeaver.Tests
 {
     public sealed class TransportTests
     {
+        [UnityTest] public IEnumerator NativeStreamingRetriesOnlyBeforeAnyDeliveredFrame() => Await(CheckStreamRetry());
+        static async Task CheckStreamRetry()
+        {
+            foreach(bool partial in new[]{false,true})
+            {
+                string line=new JObject{["message"]=new JObject{["role"]="assistant",["content"]="piece"},["done"]=!partial}.ToString(Newtonsoft.Json.Formatting.None)+"\n";
+                using(var server=new LocalServer(n=>!partial&&n==1?500:200,line))
+                {
+                    var profile=ScriptableObject.CreateInstance<ModelProfile>();
+                    try
+                    {
+                        profile.Endpoint=server.Url.TrimEnd('/');profile.Model="fixture";profile.Retries=1;
+                        var received=new StringBuilder();ProviderException failure=null;CompletionResult result=null;
+                        using(var provider=new LocalProvider(profile))
+                            try{result=await provider.CompleteAsync(new CompletionRequest{Stream=true,OnContentDelta=d=>received.Append(d)},CancellationToken.None);}catch(ProviderException e){failure=e;}
+                        Assert.That(server.Count,Is.EqualTo(partial?1:2));Assert.That(received.ToString(),Is.EqualTo("piece"));
+                        if(partial)Assert.That(failure,Is.Not.Null,"A partially delivered stream must fail rather than replay.");
+                        else{Assert.That(failure,Is.Null);Assert.That(result.Text,Is.EqualTo("piece"));}
+                    }
+                    finally{UnityEngine.Object.DestroyImmediate(profile);}
+                }
+            }
+        }
         [UnityTest] public IEnumerator OllamaCloudReceivesExactContractWithoutUnsupportedFormat() => Await(CheckCloudContract());
         static async Task CheckCloudContract()
         {

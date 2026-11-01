@@ -56,18 +56,32 @@ namespace WorldWeaver
             {
                 var text = new StringBuilder();
                 request.OnActivity?.Invoke("Ожидаю ответ локальной модели…");
-                result = await streaming.SendAsync(profile.Endpoint.TrimEnd('/') + "/api/chat", body, profile.TimeoutSeconds, frame =>
+                for (int attempt = 0; ; attempt++)
                 {
-                    token.ThrowIfCancellationRequested();
-                    string delta = (string)frame["message"]?["content"] ?? "";
-                    if (delta.Length > 0)
+                    bool receivedFrame = false;
+                    try
                     {
-                        if (text.Length == 0) firstToken = Math.Max(1, watch.ElapsedMilliseconds);
-                        text.Append(delta); request.OnContentDelta?.Invoke(delta);
+                        result = await streaming.SendAsync(profile.Endpoint.TrimEnd('/') + "/api/chat", body, profile.TimeoutSeconds, frame =>
+                        {
+                            receivedFrame = true;
+                            token.ThrowIfCancellationRequested();
+                            string delta = (string)frame["message"]?["content"] ?? "";
+                            if (delta.Length > 0)
+                            {
+                                if (text.Length == 0) firstToken = Math.Max(1, watch.ElapsedMilliseconds);
+                                text.Append(delta); request.OnContentDelta?.Invoke(delta);
+                            }
+                            else if (frame["message"]?["thinking"]?.Type == JTokenType.String)
+                                request.OnActivity?.Invoke("Локальная модель обрабатывает запрос…");
+                        }, token);
+                        break;
                     }
-                    else if (frame["message"]?["thinking"]?.Type == JTokenType.String)
-                        request.OnActivity?.Invoke("Локальная модель обрабатывает запрос…");
-                }, token);
+                    catch (ProviderException error) when (error.Transient && !receivedFrame && attempt < profile.Retries)
+                    {
+                        request.OnActivity?.Invoke("Соединение оборвалось до ответа. Повторяю запрос…");
+                        await Task.Delay(500 * (1 << attempt), token);
+                    }
+                }
                 content = text.ToString();
             }
             else
