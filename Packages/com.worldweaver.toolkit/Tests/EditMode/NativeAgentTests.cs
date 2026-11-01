@@ -16,12 +16,12 @@ namespace WorldWeaver.Tests
    EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
    try
    {
-    var task=AgentTaskVerifier.Create("Создай красный мяч на высоте 5 метров. Масса 2 кг, гравитация и отскок 0.7.",true);
+    var task=AgentTaskVerifier.Create("Создай красный мяч на высоте 5 метров. Масса 2 кг, гравитация и отскок 0.7. Площадка под ним с коллайдером.",true);
     var ground=GameObject.CreatePrimitive(PrimitiveType.Plane);AgentTaskVerifier.Verify(task);Assert.IsFalse(task.Checks.Single(c=>task.Requirements.Any(r=>r.Id==c.RequirementId&&r.Kind=="body_physics")).Passed);
     var ball=GameObject.CreatePrimitive(PrimitiveType.Sphere);ball.transform.position=Vector3.up*5;var body=ball.AddComponent<Rigidbody>();body.mass=2;body.useGravity=true;
     AgentTaskVerifier.Verify(task);Assert.IsFalse(task.Checks.Single(c=>task.Requirements.Any(r=>r.Id==c.RequirementId&&r.Kind=="body_physics")).Passed);
     var physics=new PhysicsMaterial{bounciness=.7f};ball.GetComponent<Collider>().sharedMaterial=physics;var material=new Material(Shader.Find("Standard")??Shader.Find("Universal Render Pipeline/Lit"));material.color=Color.red;ball.GetComponent<Renderer>().sharedMaterial=material;
-    AgentTaskVerifier.Verify(task);Assert.IsTrue(task.Checks.Single(c=>task.Requirements.Any(r=>r.Id==c.RequirementId&&r.Kind=="body_physics")).Passed);UnityEngine.Object.DestroyImmediate(physics);UnityEngine.Object.DestroyImmediate(material);
+    AgentTaskVerifier.Verify(task);Assert.IsTrue(task.Checks.Single(c=>task.Requirements.Any(r=>r.Id==c.RequirementId&&r.Kind=="body_physics")).Passed);UnityEngine.Object.DestroyImmediate(ground);AgentTaskVerifier.Verify(task);Assert.IsFalse(task.Checks.Single(c=>task.Requirements.Any(r=>r.Id==c.RequirementId&&r.Kind=="body_physics")).Passed);UnityEngine.Object.DestroyImmediate(physics);UnityEngine.Object.DestroyImmediate(material);
    }
    finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
   }
