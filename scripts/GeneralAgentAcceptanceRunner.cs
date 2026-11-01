@@ -40,9 +40,21 @@ public static class GeneralAgentAcceptanceRunner
             {
                 EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
                 string history=Path.Combine(project,"UserSettings/GeneralAgentAcceptance",Guid.NewGuid().ToString("N"));
+                string selectedModel=model;
+                string connectionFile=Environment.GetEnvironmentVariable("WW_AGENT_CONNECTION");
+                if(!string.IsNullOrEmpty(connectionFile))
+                {
+                    // The same public connection store used by the UI; only model
+                    // configuration changes, never the provider/executor or tool plan.
+                    if(new FileInfo(connectionFile).Length>65536)throw new IOException("Connection metadata too large.");
+                    var connection=Newtonsoft.Json.JsonConvert.DeserializeObject<ChatModelConnection>(File.ReadAllText(connectionFile));
+                    selectedModel=new ChatModelConnections(Path.Combine(history,"models")).Add(connection).ModelKey;
+                    report["model"]=connection.Protocol.ToString().ToLowerInvariant()+":"+connection.Model;
+                    report["connectionEndpoint"]=ChatModelConnections.ApiBase(connection);
+                }
                 controller=new ChatController(historyFolder:history,modelConnectionsFolder:Path.Combine(history,"models"));
-                if(model.StartsWith("ollama:",StringComparison.Ordinal))await controller.RefreshLocalModelsAsync();
-                controller.Settings.ModelKey=model;controller.Settings.Power=AssistantPower.Deep;controller.Settings.Mode=key=="discovery"?AssistantMode.Ask:AssistantMode.Execute;controller.Settings.UseSkills=true;controller.Settings.AutoApply=true;controller.Settings.AutoVerify=true;
+                if(selectedModel.StartsWith("ollama:",StringComparison.Ordinal))await controller.RefreshLocalModelsAsync();
+                controller.Settings.ModelKey=selectedModel;controller.Settings.Power=AssistantPower.Deep;controller.Settings.Mode=key=="discovery"?AssistantMode.Ask:AssistantMode.Execute;controller.Settings.UseSkills=true;controller.Settings.AutoApply=true;controller.Settings.AutoVerify=true;
                 var row=new JObject{["case"]=key,["prompt"]=Prompts[key],["history"]=history,["passed"]=false};((JArray)report["cases"]).Add(row);
                 controller.Changed+=()=>{row["messages"]=JArray.FromObject(controller.Current.Messages);Write(output,report);};
                 await controller.SendAsync(Prompts[key]);var answer=controller.Current.Messages.Last(m=>m.Role=="assistant");
