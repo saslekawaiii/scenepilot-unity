@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.IO;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
+using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using WorldWeaver.Editor.Assistant;
@@ -75,6 +77,31 @@ namespace WorldWeaver.Tests
         {
             var plan=new EditorPlan{actions=new List<EditorCommand>{new EditorCommand{tool="create_animated_player",name="",target="",args=new JObject{["preset"]="adventurer"}}}};
             Assert.DoesNotThrow(()=>SceneToolExecutor.Validate(plan));
+        }
+        [Test] public void FullSceneTransactionKeepsImportedHierarchyOwnedAndSatisfiesActualRequest()
+        {
+            var plan=new EditorPlan{actions=new List<EditorCommand>{new EditorCommand{tool="create_animated_player",name="",target="",args=new JObject{["preset"]="adventurer"}}}};
+            EditorBatchResult result=null;Undo.IncrementCurrentGroup();int undo=Undo.GetCurrentGroup();
+            try
+            {
+                result=SceneToolExecutor.Execute(plan);Assert.IsTrue(result.Success,result.Error);
+                var hero=SceneToolExecutor.ResolveTarget(result.Results.Single().Target);
+                Assert.IsNotNull(hero.GetComponent<WorldPlayer>());
+                Assert.That(hero.GetComponentsInChildren<Transform>(true).All(t=>t.GetComponent<GeneratedSceneObject>()),Is.True,"Imported mesh and bones must participate in ownership, Undo and object budgets.");
+                var answer=new AssistantMessage{Task=AgentTaskVerifier.Create(Request,true)};answer.Steps.AddRange(result.Results);
+                var checks=(IReadOnlyList<AgentCheckResult>)Invoke(typeof(ChatController),"VerifyTask",answer);
+                Assert.That(checks.Count,Is.GreaterThan(0));Assert.That(checks.All(c=>c.Passed),Is.True);
+                Undo.FlushUndoRecordObjects();Undo.RevertAllDownToGroup(undo);
+                Assert.That(UnityEngine.Object.FindObjectsByType<WorldPlayer>(FindObjectsSortMode.None),Is.Empty);
+            }
+            finally
+            {
+                EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
+                var assets=result?.Results.SelectMany(s=>s.CreatedAssets).Distinct().ToArray()??Array.Empty<string>();
+                foreach(string path in assets.Reverse())if(AssetDatabase.LoadMainAssetAtPath(path))AssetDatabase.DeleteAsset(path);
+                foreach(string folder in assets.Select(p=>Path.GetDirectoryName(p).Replace('\\','/')).Distinct())
+                    if(AssetDatabase.IsValidFolder(folder)&&AssetDatabase.FindAssets("",new[]{folder}).Length==0)AssetDatabase.DeleteAsset(folder);
+            }
         }
     }
 }

@@ -121,7 +121,7 @@ namespace WorldWeaver
             input.RegisterValueChangedCallback(_ => RefreshControls());
             input.RegisterCallback<KeyDownEvent>(e =>
             {
-                if ((e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter) && !e.shiftKey && string.IsNullOrEmpty(Input.compositionString))
+                if ((e.keyCode == KeyCode.Return || e.keyCode == KeyCode.KeypadEnter) && !e.shiftKey && !WorldInput.IsComposing)
                 { e.StopImmediatePropagation(); SendFromInput(); }
             }, TrickleDown.TrickleDown);
             var footer = Box(compose, "reply-footer");
@@ -144,7 +144,7 @@ namespace WorldWeaver
         {
             if (!document || View == null) return;
             settings.scale = Mathf.Clamp(Screen.height / 900f, .8f, 1.5f);
-            if (IsOpen && Input.GetKeyDown(KeyCode.Escape)) Close();
+            if (IsOpen && WorldInput.CancelPressed) Close();
             if (Time.unscaledTimeAsDouble >= nextHud) { nextHud = Time.unscaledTimeAsDouble + .25; UpdateHud(); }
             if (IsOpen && Time.unscaledTimeAsDouble >= nextPortrait) { nextPortrait = Time.unscaledTimeAsDouble + .5; RefreshPortrait(); }
         }
@@ -169,7 +169,7 @@ namespace WorldWeaver
         {
             // The E event that opened this view still reaches UI Toolkit later in
             // the frame. Focus only after release so it cannot become typed text.
-            while (Input.GetKey(KeyCode.E)) yield return null;
+            while (WorldInput.InteractHeld) yield return null;
             yield return null;
             if (IsOpen && version == conversationVersion) input.Focus();
         }

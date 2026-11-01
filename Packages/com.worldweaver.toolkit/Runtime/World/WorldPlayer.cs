@@ -21,6 +21,8 @@ namespace WorldWeaver
         private void OnEnable()
         {
             motor = GetComponent<CharacterController>(); yaw = transform.eulerAngles.y; if (View) View.enabled = true;
+            // Keep submillimetre walking/gravity steps at high frame rates; dropping them also resets isGrounded.
+            motor.minMoveDistance = 0;
             if (Application.isPlaying)
             {
                 conversation = GetComponentInChildren<WorldConversationUI>(true);
@@ -33,11 +35,11 @@ namespace WorldWeaver
         {
             if (!motor || !motor.enabled) return;
             if (conversation && conversation.IsOpen) return;
-            float x = Input.GetAxisRaw("Horizontal"), z = Input.GetAxisRaw("Vertical");
-            if (Input.GetMouseButton(1)) yaw += Input.GetAxis("Mouse X") * LookSpeed * Time.deltaTime;
+            var movement = WorldInput.Movement;
+            yaw += WorldInput.TurnDegrees(LookSpeed,Time.deltaTime);
             transform.rotation = Quaternion.Euler(0,yaw,0);
-            MoveFrame(new Vector2(x,z), Input.GetKey(KeyCode.LeftShift)||Input.GetKey(KeyCode.RightShift), Input.GetKeyDown(KeyCode.Space), Time.deltaTime);
-            if (Input.GetKeyDown(KeyCode.E)) OpenNearestConversation();
+            MoveFrame(movement,WorldInput.SprintHeld,WorldInput.JumpPressed,Time.deltaTime);
+            if (WorldInput.InteractPressed) OpenNearestConversation();
         }
         /// <summary>The same movement path is used by keyboard input and deterministic Play Mode checks.</summary>
         public void MoveFrame(Vector2 input, bool sprint, bool jump, float deltaTime)

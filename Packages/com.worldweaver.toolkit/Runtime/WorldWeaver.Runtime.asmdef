@@ -1,4 +1,4 @@
 {
   "name": "WorldWeaver.Runtime", "rootNamespace": "WorldWeaver",
-  "references": ["Unity.Newtonsoft.Json"], "autoReferenced": true
+  "references": ["Unity.Newtonsoft.Json", "Unity.InputSystem"], "autoReferenced": true
 }

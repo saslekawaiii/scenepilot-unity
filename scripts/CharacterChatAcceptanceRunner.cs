@@ -46,6 +46,7 @@ public static class CharacterChatAcceptanceRunner
             controller.Settings.ModelKey=model;controller.Settings.Mode=AssistantMode.Execute;controller.Settings.Power=AssistantPower.Fast;
             controller.Settings.AutoApply=true;controller.Settings.AutoVerify=true;controller.SaveSettings();
             report["modelKey"]=model;report["power"]="Fast";report["historyFolder"]=history;
+            report["activeInputHandler"]=File.ReadLines("ProjectSettings/ProjectSettings.asset").FirstOrDefault(line=>line.TrimStart().StartsWith("activeInputHandler:",StringComparison.Ordinal))?.Trim();
             string package=UnityEditor.PackageManager.PackageInfo.FindForAssembly(typeof(WorldPlayer).Assembly).resolvedPath;
             var files=new JObject();foreach(string path in Directory.GetFiles(package,"*",SearchOption.AllDirectories).OrderBy(p=>p,StringComparer.Ordinal))
                 if(Path.GetFileName(path)!=".DS_Store")files[path.Substring(package.Length+1).Replace('\\','/')]=Hash(File.ReadAllBytes(path));
@@ -67,7 +68,7 @@ public static class CharacterChatAcceptanceRunner
             checks["packageSourcePreserved"]=unchanged;
             if(!checks.Properties().All(p=>(bool)p.Value))throw new InvalidOperationException("Chat acceptance failed; preserved full raw attempts in receipt.");
             Directory.CreateDirectory("Assets/CharacterChatAcceptance");AssetDatabase.Refresh();AssetDatabase.SaveAssets();
-            string scene="Assets/CharacterChatAcceptance/GeneratedHero.unity";if(!EditorSceneManager.SaveScene(players[0].gameObject.scene,scene))throw new IOException("Cannot save generated scene.");
+            string scene="Assets/CharacterChatAcceptance/"+Path.GetFileNameWithoutExtension(output)+".unity";if(!EditorSceneManager.SaveScene(players[0].gameObject.scene,scene))throw new IOException("Cannot save generated scene.");
             report["scene"]=scene;report["chatElapsedMs"]=answer.ElapsedMs;Write(output,report);
             controller.Dispose();controller=null;
             SessionState.SetString(Key,output);EditorApplication.isPlaying=true;
@@ -77,6 +78,14 @@ public static class CharacterChatAcceptanceRunner
             report["error"]=error.ToString();if(!string.IsNullOrEmpty(output))Write(output,report);
             controller?.Dispose();SessionState.EraseString(Key);EditorApplication.Exit(1);
         }
+    }
+    public static void RunMotion()
+    {
+        string source=Environment.GetEnvironmentVariable("WW_CHARACTER_MOTION_SOURCE"),output=Environment.GetEnvironmentVariable("WW_CHARACTER_OUTPUT");
+        if(!Application.isBatchMode||Environment.GetEnvironmentVariable("WW_CHARACTER_ACCEPTANCE")!="1"||string.IsNullOrEmpty(source)||File.Exists(output))throw new InvalidOperationException("Explicit new disposable motion receipt required.");
+        var report=JObject.Parse(File.ReadAllText(source));report["replayedGeneratedSceneFrom"]=source;report["replayedReceiptSha256"]=Hash(File.ReadAllBytes(source));report["motionReplayHarnessSha256"]=Hash(File.ReadAllBytes("Assets/Editor/CharacterChatAcceptanceRunner.cs"));report["passed"]=false;report.Remove("motion");
+        foreach(string key in new[]{"idleIsStill","walkMovesAndDeformsBones","sprintFasterAndDeformsBones","jumpRises","landsOnPhysicalGround"})((JObject)report["checks"]).Remove(key);
+        report["motionReplayNoNewInference"]=true;EditorSceneManager.OpenScene((string)report["scene"]);Write(output,report);SessionState.SetString(Key,output);EditorApplication.isPlaying=true;
     }
     internal static void Write(string output,JObject report){Directory.CreateDirectory(Path.GetDirectoryName(output));File.WriteAllText(output,report.ToString());}
     static string Hash(byte[] bytes){using(var sha=SHA256.Create())return BitConverter.ToString(sha.ComputeHash(bytes)).Replace("-","").ToLowerInvariant();}
@@ -89,6 +98,8 @@ public sealed class CharacterAcceptanceMotionProbe:MonoBehaviour
     IEnumerator Run(string output)
     {
         var report=JObject.Parse(File.ReadAllText(output));var checks=(JObject)report["checks"];
+        // EnteredPlayMode can run before the scene's first normal Update. Let lifecycle and physics initialize first.
+        yield return null;yield return new WaitForFixedUpdate();yield return null;yield return new WaitForSeconds(1);
         var player=UnityEngine.Object.FindFirstObjectByType<WorldPlayer>();var binder=player?player.GetComponent<WorldCharacterAnimation>():null;
         if(!player||!binder){report["error"]="No actual player/binder after entering Play Mode.";CharacterChatAcceptanceRunner.Write(output,report);CharacterChatAcceptanceRunner.Finish();EditorApplication.Exit(1);yield break;}
         player.enabled=false;player.View.enabled=true;Application.runInBackground=true;
@@ -98,17 +109,19 @@ public sealed class CharacterAcceptanceMotionProbe:MonoBehaviour
         {
             float duration=phase=="settle"?.5f:phase=="jump"?.35f:phase=="land"?1.5f:.8f;
             float end=Time.time+duration;var start=player.transform.position;float maxY=start.y,maxPose=0;
+            int frameCount=0;float maxDt=0,integratedDt=0;
             var pose=bones.Select(b=>b.localRotation).ToArray();bool jumped=false;
             while(Time.time<end)
             {
                 bool jump=phase=="jump"&&!jumped;jumped|=jump;
+                frameCount++;maxDt=Mathf.Max(maxDt,Time.deltaTime);integratedDt+=Mathf.Min(Time.deltaTime,.1f);
                 player.MoveFrame(phase=="walk"||phase=="sprint"?Vector2.up:Vector2.zero,phase=="sprint",jump,Time.deltaTime);
                 maxY=Mathf.Max(maxY,player.transform.position.y);
                 for(int i=0;i<bones.Length;i++)maxPose=Mathf.Max(maxPose,Quaternion.Angle(pose[i],bones[i].localRotation));
                 yield return null;
             }
             var clipWeights=new JArray(binder.Animator.GetCurrentAnimatorClipInfo(0).Select(c=>new JObject{["clip"]=c.clip.name,["weight"]=c.weight}));
-            var sample=new JObject{["phase"]=phase,["distance"]=Vector3.Distance(start,player.transform.position),["rise"]=maxY-start.y,["bonePoseMaxDegrees"]=maxPose,["measuredSpeed"]=binder.MeasuredSpeed,["grounded"]=player.IsGrounded,["clips"]=clipWeights};
+            var sample=new JObject{["phase"]=phase,["frames"]=frameCount,["maxFrameDelta"]=maxDt,["movementIntegratedSeconds"]=integratedDt,["distance"]=Vector3.Distance(start,player.transform.position),["rise"]=maxY-start.y,["bonePoseMaxDegrees"]=maxPose,["measuredSpeed"]=binder.MeasuredSpeed,["grounded"]=player.IsGrounded,["clips"]=clipWeights};
             samples.Add(sample);
             if(phase=="idle")checks["idleIsStill"]=(float)sample["distance"]<.08f;
             if(phase=="walk")checks["walkMovesAndDeformsBones"]=(float)sample["distance"]>1&&maxPose>5&&clipWeights.OfType<JObject>().Any(c=>((string)c["clip"]).ToLowerInvariant().Contains("walk")&&(float)c["weight"]>.7f);

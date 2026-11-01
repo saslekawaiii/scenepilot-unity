@@ -1,4 +1,4 @@
 {
-  "name": "WorldWeaver.PlayMode", "references": ["WorldWeaver.Runtime"], "optionalUnityReferences": ["TestAssemblies"],
+  "name": "WorldWeaver.PlayMode", "references": ["WorldWeaver.Runtime", "Unity.InputSystem"], "optionalUnityReferences": ["TestAssemblies"],
   "overrideReferences": true, "precompiledReferences": ["nunit.framework.dll", "Newtonsoft.Json.dll"]
 }

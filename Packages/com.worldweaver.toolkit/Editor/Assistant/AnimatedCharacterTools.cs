@@ -85,7 +85,7 @@ namespace WorldWeaver.Editor.Assistant
                 if (players.Length == 1 && !players[0].GetComponent<GeneratedSceneObject>()) throw new ArgumentException("The existing player is not owned by WorldWeaver.");
             }
         }
-        internal static int EstimateCost(EditorCommand command) => Model(Preset(command)).GetComponentsInChildren<Transform>(true).Length + 3;
+        internal static int EstimateCost(EditorCommand command) => Model(Preset(command)).GetComponentsInChildren<Transform>(true).Length + 5;
 
         internal static WorldGameplayToolResult Execute(EditorCommand command, SceneBuildTransaction tx, Transform parent,
             Func<string, GameObject> resolve, OrchestratorProfile routes)
@@ -109,6 +109,7 @@ namespace WorldWeaver.Editor.Assistant
             }
             Undo.RecordObject(player, "Configure walking and sprinting character");
             player.Speed = 2.2f; player.SprintMultiplier = 2.5f;
+            var collision=go.GetComponent<CharacterController>();Undo.RecordObject(collision,"Preserve small character movements");collision.minMoveDistance=0;
             Undo.RecordObject(go.transform, "Place animated player");
             if (command.args["position"] is JArray position) go.transform.position = new Vector3((float)position[0], (float)position[1], (float)position[2]);
             else if (!reused)
@@ -130,7 +131,13 @@ namespace WorldWeaver.Editor.Assistant
             string preset = Preset(command);
             var visual = (GameObject)PrefabUtility.InstantiatePrefab(Model(preset), go.scene);
             if (!visual) throw new InvalidOperationException("Cannot instantiate the imported character.");
-            Undo.RegisterCreatedObjectUndo(visual, "Import animated character"); tx.Objects.Add(visual);
+            Undo.RegisterCreatedObjectUndo(visual, "Import animated character");
+            foreach(var node in visual.GetComponentsInChildren<Transform>(true))
+            {
+                var owned=node.GetComponent<GeneratedSceneObject>()??Undo.AddComponent<GeneratedSceneObject>(node.gameObject);
+                owned.Kind=node==visual.transform?"character_model":"part";owned.BatchId=tx.BatchId;owned.EnsureUniqueIdentity();
+                tx.Objects.Add(node.gameObject);
+            }
             visual.name = "Облик · " + preset; visual.transform.SetParent(go.transform, false);
             visual.transform.localPosition = Vector3.zero; visual.transform.localRotation = Quaternion.identity;
             // Use imported mesh bounds to fit the actual skinned model to the collision capsule.
@@ -257,6 +264,7 @@ namespace WorldWeaver.Editor.Assistant
             var checks = new JObject {
                 ["worldPlayer"] = go && go.GetComponent<WorldPlayer>(),
                 ["characterController"] = go && go.GetComponent<CharacterController>() && go.GetComponent<CharacterController>().enabled,
+                ["smallMovementSteps"] = go && go.GetComponent<CharacterController>() && go.GetComponent<CharacterController>().minMoveDistance==0,
                 ["camera"] = go && go.GetComponent<WorldPlayer>() && go.GetComponent<WorldPlayer>().View,
                 ["animationBinding"] = binder && binder.Animator && binder.Motor && binder.Visual,
                 ["importedSkinnedMesh"] = renderers.Any(r => r.sharedMesh && r.sharedMesh.vertexCount > 100 && r.bones.Length >= 4 && r.bones.All(b => b)),
