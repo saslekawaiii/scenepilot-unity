@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
@@ -8,12 +9,32 @@ using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using UnityEditor;
+using UnityEngine.TestTools;
 using WorldWeaver.Editor.Assistant;
 
 namespace WorldWeaver.Tests
 {
     public sealed class MaterialHttpTransportTests
     {
+        // Unity must pump its synchronization context while async handlers complete.
+        // NUnit's blocking async assertions can deadlock the Editor main thread.
+        static IEnumerator AwaitCase(Func<Task> run)
+        {
+            Task task=run();double deadline=EditorApplication.timeSinceStartup+20;
+            while(!task.IsCompleted)
+            {
+                if(EditorApplication.timeSinceStartup>deadline)Assert.Fail("Material HTTP fixture exceeded its 20-second deadline.");
+                yield return null;
+            }
+            task.GetAwaiter().GetResult();
+        }
+        static async Task ExpectFailure<T>(Func<Task> action)where T:Exception
+        {
+            try{await action();}
+            catch(Exception error){Assert.That(error,Is.InstanceOf<T>());return;}
+            Assert.Fail("Expected "+typeof(T).Name+" from an invalid/cancelled material transfer.");
+        }
         static readonly Uri Texture=new Uri("https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/fixture/fixture_diff_1k.jpg");
         sealed class Handler:HttpMessageHandler
         {
@@ -26,6 +47,13 @@ namespace WorldWeaver.Tests
             public readonly ConcurrentBag<MaterialTransferProgress> Values=new ConcurrentBag<MaterialTransferProgress>();
             public void Report(MaterialTransferProgress value)=>Values.Add(value);
         }
+        sealed class UnknownLengthContent:HttpContent
+        {
+            readonly byte[] bytes;
+            public UnknownLengthContent(byte[] bytes){this.bytes=bytes;Headers.ContentLength=null;}
+            protected override bool TryComputeLength(out long length){length=0;return false;}
+            protected override Task SerializeToStreamAsync(Stream stream,TransportContext context)=>stream.WriteAsync(bytes,0,bytes.Length);
+        }
         static byte[] Bytes(int count)=>Enumerable.Range(0,count).Select(i=>(byte)((i*131+i/257)%251)).ToArray();
         static HttpResponseMessage Whole(byte[] data)=>new HttpResponseMessage(HttpStatusCode.OK){Content=new ByteArrayContent(data)};
         static HttpResponseMessage Part(HttpRequestMessage request,byte[] data)
@@ -34,14 +62,16 @@ namespace WorldWeaver.Tests
             var response=new HttpResponseMessage(HttpStatusCode.PartialContent){Content=new ByteArrayContent(data.Skip((int)start).Take((int)(end-start+1)).ToArray())};
             response.Content.Headers.ContentRange=new ContentRangeHeaderValue(start,end,data.Length);response.Headers.ETag=new EntityTagHeaderValue("\"fixture-v1\"");return response;
         }
-        [Test] public async Task HealthyTextureUsesOneNormalRequestWithoutFragmenting()
+        [UnityTest] public IEnumerator HealthyTextureUsesOneNormalRequestWithoutFragmenting()=>AwaitCase(HealthyCase);
+        static async Task HealthyCase()
         {
             var data=Bytes(70000);int requests=0;
             var transport=new MaterialHttpTransport(()=>new Handler((request,token)=>
             {Interlocked.Increment(ref requests);Assert.That(request.Headers.Range,Is.Null);return Task.FromResult(Whole(data));}));
             CollectionAssert.AreEqual(data,await transport.GetAsync(Texture,1024*1024,CancellationToken.None));Assert.That(requests,Is.EqualTo(1));
         }
-        [Test] public async Task StalledNormalTransferFallsBackToExactBoundedConcurrentFragments()
+        [UnityTest] public IEnumerator StalledNormalTransferFallsBackToExactBoundedConcurrentFragments()=>AwaitCase(StalledCase);
+        static async Task StalledCase()
         {
             var data=Bytes(110000);int requests=0,active=0,peak=0;var progress=new Progress();
             var transport=new MaterialHttpTransport(()=>new Handler(async(request,token)=>
@@ -60,15 +90,95 @@ namespace WorldWeaver.Tests
             Assert.That(peak,Is.GreaterThanOrEqualTo(2));Assert.That(peak,Is.LessThanOrEqualTo(MaterialHttpTransport.RangeParallelism));
             Assert.That(progress.Values.Any(v=>v.RangeFallback&&v.Bytes==data.Length&&v.TotalBytes==data.Length),Is.True);
         }
-        [Test] public async Task IgnoredInitialRangeAcceptsOneBoundedWholeResponse()
+        [UnityTest] public IEnumerator IgnoredInitialRangeAcceptsOneBoundedWholeResponse()=>AwaitCase(IgnoredInitialCase);
+        static async Task IgnoredInitialCase()
         {
             var data=Bytes(40000);int requests=0;
             var transport=new MaterialHttpTransport(()=>new Handler((request,token)=>
             {Interlocked.Increment(ref requests);if(request.Headers.Range==null)throw new TaskCanceledException();return Task.FromResult(Whole(data));}));
             CollectionAssert.AreEqual(data,await transport.GetAsync(Texture,1024*1024,CancellationToken.None));Assert.That(requests,Is.EqualTo(2));
         }
-        [TestCase("start")][TestCase("total")][TestCase("etag")][TestCase("ignored-later")]
-        public void ChangedRangesOrIgnoredNonzeroRangeAreRejectedBeforeReassembly(string fault)
+        [UnityTest] public IEnumerator ValidChunked206FragmentsNeedNoContentLengthHeader()=>AwaitCase(Chunked206Case);
+        static async Task Chunked206Case()
+        {
+            var data=Bytes(70000);
+            var transport=new MaterialHttpTransport(()=>new Handler((request,token)=>
+            {
+                if(request.Headers.Range==null)throw new TaskCanceledException();var part=Part(request,data);var range=request.Headers.Range.Ranges.Single();
+                long start=range.From.Value,end=Math.Min(range.To.Value,data.Length-1);
+                part.Content=new UnknownLengthContent(data.Skip((int)start).Take((int)(end-start+1)).ToArray());
+                part.Content.Headers.ContentRange=new ContentRangeHeaderValue(start,end,data.Length);part.Content.Headers.ContentLength=null;
+                Assert.That(part.Content.Headers.ContentLength,Is.Null);return Task.FromResult(part);
+            }));
+            CollectionAssert.AreEqual(data,await transport.GetAsync(Texture,1024*1024,CancellationToken.None));
+        }
+        [UnityTest] public IEnumerator IgnoredInitialRangeCanReturnOneBoundedChunked200()=>AwaitCase(Chunked200Case);
+        static async Task Chunked200Case()
+        {
+            var data=Bytes(40000);int requests=0;
+            var transport=new MaterialHttpTransport(()=>new Handler((request,token)=>
+            {
+                Interlocked.Increment(ref requests);if(request.Headers.Range==null)throw new TaskCanceledException();
+                var response=new HttpResponseMessage(HttpStatusCode.OK){Content=new UnknownLengthContent(data)};response.Content.Headers.ContentLength=null;
+                Assert.That(response.Content.Headers.ContentLength,Is.Null);return Task.FromResult(response);
+            }));
+            CollectionAssert.AreEqual(data,await transport.GetAsync(Texture,1024*1024,CancellationToken.None));Assert.That(requests,Is.EqualTo(2));
+        }
+        [UnityTest] public IEnumerator UnsolicitedPartial206TriggersExplicitRangeRecovery()=>AwaitCase(UnsolicitedPartialCase);
+        static async Task UnsolicitedPartialCase()
+        {
+            var data=Bytes(70000);int requests=0;
+            var transport=new MaterialHttpTransport(()=>new Handler((request,token)=>
+            {
+                Interlocked.Increment(ref requests);
+                if(request.Headers.Range!=null)return Task.FromResult(Part(request,data));
+                var unsolicited=new HttpResponseMessage(HttpStatusCode.PartialContent){Content=new ByteArrayContent(data.Take(12345).ToArray())};
+                unsolicited.Content.Headers.ContentRange=new ContentRangeHeaderValue(0,12344,data.Length);return Task.FromResult(unsolicited);
+            }));
+            CollectionAssert.AreEqual(data,await transport.GetAsync(Texture,1024*1024,CancellationToken.None));
+            Assert.That(requests,Is.EqualTo(1+(int)Math.Ceiling(data.Length/(double)MaterialHttpTransport.RangeChunkBytes)));
+        }
+        [UnityTest] public IEnumerator UnsolicitedComplete206CanBeReadAsOneVerifiedWholeBody()=>AwaitCase(UnsolicitedCompleteCase);
+        static async Task UnsolicitedCompleteCase()
+        {
+            var data=Bytes(40000);int requests=0;
+            var transport=new MaterialHttpTransport(()=>new Handler((request,token)=>
+            {
+                Interlocked.Increment(ref requests);Assert.That(request.Headers.Range,Is.Null);
+                var response=new HttpResponseMessage(HttpStatusCode.PartialContent){Content=new UnknownLengthContent(data)};
+                response.Content.Headers.ContentRange=new ContentRangeHeaderValue(0,data.Length-1,data.Length);return Task.FromResult(response);
+            }));
+            CollectionAssert.AreEqual(data,await transport.GetAsync(Texture,1024*1024,CancellationToken.None));Assert.That(requests,Is.EqualTo(1));
+        }
+        [UnityTest] public IEnumerator Chunked206StillRequiresTheActualExactFragmentByteCount()=>AwaitCase(ChunkedLengthCase);
+        static async Task ChunkedLengthCase()
+        {
+            var data=Bytes(70000);
+            var transport=new MaterialHttpTransport(()=>new Handler((request,token)=>
+            {
+                if(request.Headers.Range==null)throw new TaskCanceledException();var part=Part(request,data);var range=request.Headers.Range.Ranges.Single();
+                long start=range.From.Value,end=Math.Min(range.To.Value,data.Length-1);
+                part.Content=new UnknownLengthContent(data.Skip((int)start).Take((int)(end-start)).ToArray());part.Content.Headers.ContentRange=new ContentRangeHeaderValue(start,end,data.Length);
+                return Task.FromResult(part);
+            }));
+            await ExpectFailure<IOException>(async()=>await transport.GetAsync(Texture,1024*1024,CancellationToken.None));
+        }
+        [UnityTest] public IEnumerator IgnoredChunkedRangeStillCannotExceedTheActualBodyBudget()=>AwaitCase(ChunkedBudgetCase);
+        static async Task ChunkedBudgetCase()
+        {
+            var data=Bytes(70000);int requests=0;
+            var transport=new MaterialHttpTransport(()=>new Handler((request,token)=>
+            {
+                Interlocked.Increment(ref requests);if(request.Headers.Range==null)throw new TaskCanceledException();
+                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK){Content=new UnknownLengthContent(data)});
+            }));
+            await ExpectFailure<InvalidDataException>(async()=>await transport.GetAsync(Texture,40000,CancellationToken.None));Assert.That(requests,Is.EqualTo(2));
+        }
+        [UnityTest] public IEnumerator ChangedFragmentStartIsRejectedBeforeReassembly()=>AwaitCase(()=>ChangedRangeCase("start"));
+        [UnityTest] public IEnumerator ChangedFragmentTotalIsRejectedBeforeReassembly()=>AwaitCase(()=>ChangedRangeCase("total"));
+        [UnityTest] public IEnumerator ChangedFragmentEtagIsRejectedBeforeReassembly()=>AwaitCase(()=>ChangedRangeCase("etag"));
+        [UnityTest] public IEnumerator IgnoredNonzeroRangeIsRejectedBeforeReassembly()=>AwaitCase(()=>ChangedRangeCase("ignored-later"));
+        static async Task ChangedRangeCase(string fault)
         {
             var data=Bytes(70000);
             var transport=new MaterialHttpTransport(()=>new Handler((request,token)=>
@@ -83,9 +193,10 @@ namespace WorldWeaver.Tests
                 }
                 return Task.FromResult(part);
             }));
-            Assert.CatchAsync<InvalidDataException>(async()=>await transport.GetAsync(Texture,1024*1024,CancellationToken.None));
+            await ExpectFailure<InvalidDataException>(async()=>await transport.GetAsync(Texture,1024*1024,CancellationToken.None));
         }
-        [Test] public void RedirectsAndOversizedNormalResponseDoNotTriggerFragmentRequests()
+        [UnityTest] public IEnumerator RedirectsAndOversizedNormalResponseDoNotTriggerFragmentRequests()=>AwaitCase(RedirectBudgetCase);
+        static async Task RedirectBudgetCase()
         {
             foreach(bool redirect in new[]{true,false})
             {
@@ -94,10 +205,11 @@ namespace WorldWeaver.Tests
                     requests++;if(redirect){var response=new HttpResponseMessage(HttpStatusCode.Redirect){Content=new ByteArrayContent(Array.Empty<byte>())};response.Headers.Location=new Uri("https://example.com/other.jpg");return Task.FromResult(response);}
                     return Task.FromResult(Whole(Bytes(300)));
                 }));
-                Assert.CatchAsync<InvalidDataException>(async()=>await transport.GetAsync(Texture,100,CancellationToken.None));Assert.That(requests,Is.EqualTo(1));
+                await ExpectFailure<InvalidDataException>(async()=>await transport.GetAsync(Texture,100,CancellationToken.None));Assert.That(requests,Is.EqualTo(1));
             }
         }
-        [Test] public async Task UserCancellationStopsOutstandingFragmentsWithoutRetry()
+        [UnityTest] public IEnumerator UserCancellationStopsOutstandingFragmentsWithoutRetry()=>AwaitCase(CancelCase);
+        static async Task CancelCase()
         {
             int requests=0;var data=Bytes(100000);
             using(var stop=new CancellationTokenSource())
@@ -108,12 +220,13 @@ namespace WorldWeaver.Tests
                     if(request.Headers.Range.Ranges.Single().From>0){stop.CancelAfter(10);await Task.Delay(10000,token);}
                     return Part(request,data);
                 }));
-                Assert.CatchAsync<OperationCanceledException>(async()=>await transport.GetAsync(Texture,1024*1024,stop.Token));
+                await ExpectFailure<OperationCanceledException>(async()=>await transport.GetAsync(Texture,1024*1024,stop.Token));
                 Assert.That(requests,Is.LessThanOrEqualTo(2+MaterialHttpTransport.RangeParallelism));
             }
             await Task.CompletedTask;
         }
-        [Test] public void RepeatedTransientFailuresCannotExceedTheFragmentRequestBudget()
+        [UnityTest] public IEnumerator RepeatedTransientFailuresCannotExceedTheFragmentRequestBudget()=>AwaitCase(RetryBudgetCase);
+        static async Task RetryBudgetCase()
         {
             int requests=0;var attempts=new ConcurrentDictionary<long,int>();var data=Bytes(5*1024*1024);
             var transport=new MaterialHttpTransport(()=>new Handler((request,token)=>
@@ -122,7 +235,7 @@ namespace WorldWeaver.Tests
                 if(attempts.AddOrUpdate(start,1,(_,n)=>n+1)==1)throw new HttpRequestException("simulated transient failure");
                 return Task.FromResult(Part(request,data));
             }));
-            Assert.CatchAsync<InvalidDataException>(async()=>await transport.GetAsync(Texture,8*1024*1024,CancellationToken.None));
+            await ExpectFailure<InvalidDataException>(async()=>await transport.GetAsync(Texture,8*1024*1024,CancellationToken.None));
             Assert.That(requests,Is.LessThanOrEqualTo(MaterialHttpTransport.MaxRangeRequests+1));
         }
     }

@@ -79,6 +79,15 @@ namespace WorldWeaver.Editor.Assistant
                     response.EnsureSuccessStatusCode();
                     long expected=-1,length=response.Content.Headers.ContentLength??-1;bool whole=!from.HasValue;
                     string actualEtag=response.Headers.ETag?.IsWeak==false?response.Headers.ETag.Tag:null;
+                    if(!from.HasValue&&response.StatusCode!=HttpStatusCode.OK)
+                    {
+                        var unsolicited=response.Content.Headers.ContentRange;
+                        if(response.StatusCode!=HttpStatusCode.PartialContent)throw new InvalidDataException("Unexpected material response status.");
+                        if(unsolicited==null||unsolicited.Unit!="bytes"||!unsolicited.HasLength||!unsolicited.HasRange||unsolicited.From!=0||unsolicited.To!=unsolicited.Length-1)
+                            throw new IOException("Unsolicited partial texture response; retry using explicit bounded ranges.");
+                        expected=unsolicited.Length.Value;
+                        if(expected<1||expected>maxBytes||length>=0&&length!=expected)throw new InvalidDataException("Whole 206 response has an invalid length or exceeds the download budget.");
+                    }
                     if(from.HasValue)
                     {
                         if(response.StatusCode==HttpStatusCode.OK&&from.Value==0)
@@ -95,11 +104,11 @@ namespace WorldWeaver.Editor.Assistant
                             if(size<1||size>maxBytes||range.From!=from||range.To!=end||total.HasValue&&size!=total.Value||!string.IsNullOrEmpty(etag)&&actualEtag!=etag)
                                 throw new InvalidDataException("Texture Content-Range/total/ETag changed or is outside the download budget.");
                             expected=end-from.Value+1;
-                            if(expected<1||length!=expected)throw new InvalidDataException("Texture fragment length does not match Content-Range.");
+                            if(expected<1||length>=0&&length!=expected)throw new InvalidDataException("Texture fragment length does not match Content-Range.");
                             total=size;
                         }
                     }
-                    if(length>maxBytes||whole&&from.HasValue&&length<1)throw new InvalidDataException("Material response exceeds or omits the download budget.");
+                    if(length>maxBytes||whole&&from.HasValue&&length==0)throw new InvalidDataException("Material response exceeds or omits the download budget.");
                     int responseLimit=whole?maxBytes:(int)expected;
                     using (var input = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
                     using (var output = new MemoryStream())

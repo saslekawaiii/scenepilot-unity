@@ -1,0 +1,15 @@
+{
+  "kind": "unity-editmode-stalled-run",
+  "snapshot": "integration-1.3-snapshot-r3.json",
+  "utc": "2026-11-01T09:33:42.341652+00:00",
+  "status": "aborted-without-final-xml",
+  "passed": false,
+  "completedTestCount": null,
+  "observation": "Log stopped updating for over five minutes. A two-second sample showed the Unity main thread waiting in a managed Monitor wait. No final test XML was produced.",
+  "suspectedCause": "New asynchronous NUnit HTTP fixtures synchronously wait while their continuations require UnitySynchronizationContext. This is a test-runner diagnosis, not a confirmed product deadlock.",
+  "nextAction": "Replace blocking async fixture assertions with yielding UnityTest wrappers, then repeat actual tests on a new immutable snapshot.",
+  "evidenceSha256": {
+    "integration-1.3-edit-r3.log": "57590574fc87ccc000832a53bcde27aceaef3b769f5eb0bf94a2acbc557088aa",
+    "integration-1.3-edit-r3-stall-sample.txt": "31db1c901dd628c76149454263f3e4881c9231c7e3813d06b6858fffc952310d"
+  }
+}
