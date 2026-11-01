@@ -96,7 +96,7 @@ namespace WorldWeaver
         }
         void StopApproach()
         {
-            if(approaching) { var agent=GetComponent<NavMeshAgent>(); if(agent&&agent.enabled&&agent.isOnNavMesh)agent.ResetPath(); }
+            if(approaching)IntelligentNPC.HaltNavigation(GetComponent<NavMeshAgent>());
             approaching=false;movementUntil=0;
         }
         /// <summary>Explicit API also used by acceptance tests; turn count, participants and world scope are revalidated.</summary>
@@ -139,8 +139,7 @@ namespace WorldWeaver
         }
         static void StopForConversation(IntelligentNPC actor)
         {
-            var agent=actor.GetComponent<NavMeshAgent>();
-            if(agent&&agent.enabled&&agent.isOnNavMesh) { agent.ResetPath(); agent.isStopped=true; }
+            IntelligentNPC.HaltNavigation(actor.GetComponent<NavMeshAgent>());
         }
     }
 }

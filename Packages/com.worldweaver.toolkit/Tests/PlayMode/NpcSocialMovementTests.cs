@@ -38,9 +38,16 @@ namespace WorldWeaver.Tests
             a.RequestConversationSoon();var start=first.transform.position;float deadline=Time.unscaledTime+2;
             while(Time.unscaledTime<deadline&&Vector3.Distance(first.transform.position,start)<1)yield return null;
             Assert.Greater(first.transform.position.x,start.x+1,"The social approach must actually move toward the neighbor despite an existing patrol that wants to move in the opposite direction.");Assert.IsTrue(a.HoldsMovement);
-            first.BeginPlayerConversation();yield return null;
+            var stopped=first.transform.position;first.BeginPlayerConversation();
             Assert.IsFalse(a.HoldsMovement);Assert.IsTrue(first.PlayerConversationActive);Assert.IsTrue(agent.isStopped);Assert.IsFalse(agent.hasPath);
-            var stopped=first.transform.position;yield return new WaitForSeconds(.4f);Assert.Less(Vector3.Distance(first.transform.position,stopped),.05f);
+            float observeUntil=Time.realtimeSinceStartup+.6f,observeDeadline=Time.realtimeSinceStartup+4;int observedFrames=0;float maximumDrift=0;
+            while((observedFrames<20||Time.realtimeSinceStartup<observeUntil)&&Time.realtimeSinceStartup<observeDeadline)
+            {
+                yield return null;observedFrames++;maximumDrift=Mathf.Max(maximumDrift,Vector3.Distance(first.transform.position,stopped));
+                Assert.IsTrue(first.PlayerConversationActive);Assert.IsTrue(agent.isStopped);Assert.IsFalse(agent.hasPath);Assert.Less(maximumDrift,.05f,"A talking NPC must stop immediately and remain stopped while the existing patrol keeps updating. Velocity="+agent.velocity+", simulatedDelta="+(agent.nextPosition-stopped)+", observedFrames="+observedFrames);
+            }
+            TestContext.WriteLine("Actual NPC pause: observedFrames="+observedFrames+", maximumDriftMetres="+maximumDrift+", finalVelocity="+agent.velocity);
+            Assert.GreaterOrEqual(observedFrames,20);Assert.Less(maximumDrift,.05f);
             first.EndPlayerConversation();
         }
         [UnityTest] public IEnumerator DisablingSocialAutonomyStopsItsApproachAndReleasesRoutineOwnership()

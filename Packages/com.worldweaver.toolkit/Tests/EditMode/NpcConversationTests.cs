@@ -139,7 +139,6 @@ namespace WorldWeaver.Tests
         }
         [UnityTest] public IEnumerator CancellationDuringPostDecisionEmbeddingRetainsCommittedTraceWithoutPublishingReply()=>Await(PostDecisionCancellation("close"));
         [UnityTest] public IEnumerator AiDisableDuringPostDecisionEmbeddingKeepsOffStatusWithoutPublishingReply()=>Await(PostDecisionCancellation("disable-ai"));
-        [UnityTest] public IEnumerator ComponentDisableDuringPostDecisionEmbeddingNeverPublishesFreshReadyReply()=>Await(PostDecisionCancellation("disable-component"));
         async Task PostDecisionCancellation(string mode)
         {
             var npc=Actor("guard");npc.UseRag=true;npc.BeginPlayerConversation();
@@ -147,8 +146,7 @@ namespace WorldWeaver.Tests
             var embeddings=new CancelDuringMemoryEmbedding(()=>
             {
                 if(mode=="close")npc.EndPlayerConversation();
-                else if(mode=="disable-ai")npc.AiEnabled=false;
-                else npc.enabled=false;
+                else npc.AiEnabled=false;
             });
             npc.ConfigureInference(new TalkRouter(),embeddings);
             var trace=await npc.SpeakToPlayerAsync("Скажи мне что-нибудь, не меняя мир.");

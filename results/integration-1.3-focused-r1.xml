@@ -1,0 +1,633 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="83" result="Failed(Child)" total="83" passed="80" failed="3" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-01 08:51:33Z" end-time="2026-11-01 08:51:41Z" duration="7.9453673">
+  <test-suite type="TestSuite" id="1000" name="UnityProject" fullname="UnityProject" runstate="Runnable" testcasecount="480" result="Failed" site="Child" start-time="2026-11-01 08:51:33Z" end-time="2026-11-01 08:51:41Z" duration="7.945367" total="83" passed="80" failed="3" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1544" name="WorldWeaver.EditMode.dll" fullname="/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/integrated-test-snapshot/project-1.3/Library/ScriptAssemblies/WorldWeaver.EditMode.dll" runstate="Runnable" testcasecount="480" result="Failed" site="Child" start-time="2026-11-01 08:51:33Z" end-time="2026-11-01 08:51:41Z" duration="7.930617" total="83" passed="80" failed="3" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="13747" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1545" name="WorldWeaver" fullname="WorldWeaver" runstate="Runnable" testcasecount="480" result="Failed" site="Child" start-time="2026-11-01 08:51:33Z" end-time="2026-11-01 08:51:41Z" duration="7.926512" total="83" passed="80" failed="3" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestSuite" id="1546" name="Tests" fullname="WorldWeaver.Tests" runstate="Runnable" testcasecount="480" result="Failed" site="Child" start-time="2026-11-01 08:51:33Z" end-time="2026-11-01 08:51:41Z" duration="7.919513" total="83" passed="80" failed="3" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-suite type="TestFixture" id="1011" name="AgentImplementationPolicyTests" fullname="WorldWeaver.Tests.AgentImplementationPolicyTests" classname="WorldWeaver.Tests.AgentImplementationPolicyTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-11-01 08:51:33Z" end-time="2026-11-01 08:51:33Z" duration="0.062572" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1013" name="CombatWordsInAGoalOnlyNpcUpdateCannotEnableCodeOrAiReconfiguration" fullname="WorldWeaver.Tests.AgentImplementationPolicyTests.CombatWordsInAGoalOnlyNpcUpdateCannotEnableCodeOrAiReconfiguration" methodname="CombatWordsInAGoalOnlyNpcUpdateCannotEnableCodeOrAiReconfiguration" classname="WorldWeaver.Tests.AgentImplementationPolicyTests" runstate="Runnable" seed="860805115" result="Passed" start-time="2026-11-01 08:51:33Z" end-time="2026-11-01 08:51:33Z" duration="0.030622" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1012" name="RequestedMechanicOffersReviewedSourceToolsWithoutTheWordScript" fullname="WorldWeaver.Tests.AgentImplementationPolicyTests.RequestedMechanicOffersReviewedSourceToolsWithoutTheWordScript" methodname="RequestedMechanicOffersReviewedSourceToolsWithoutTheWordScript" classname="WorldWeaver.Tests.AgentImplementationPolicyTests" runstate="Runnable" seed="938868601" result="Passed" start-time="2026-11-01 08:51:33Z" end-time="2026-11-01 08:51:33Z" duration="0.010386" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1014" name="TextureOnlyRequestKeepsFocusedToolsAndAskCannotImport" fullname="WorldWeaver.Tests.AgentImplementationPolicyTests.TextureOnlyRequestKeepsFocusedToolsAndAskCannotImport" methodname="TextureOnlyRequestKeepsFocusedToolsAndAskCannotImport" classname="WorldWeaver.Tests.AgentImplementationPolicyTests" runstate="Runnable" seed="1468294000" result="Passed" start-time="2026-11-01 08:51:33Z" end-time="2026-11-01 08:51:33Z" duration="0.009200" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1376" name="MaterialCheckpointAdmissionTests" fullname="WorldWeaver.Tests.MaterialCheckpointAdmissionTests" classname="WorldWeaver.Tests.MaterialCheckpointAdmissionTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-11-01 08:51:33Z" end-time="2026-11-01 08:51:34Z" duration="1.011200" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1378" name="CacheHitCannotResealOrAbsorbUnrelatedManualEdits" fullname="WorldWeaver.Tests.MaterialCheckpointAdmissionTests.CacheHitCannotResealOrAbsorbUnrelatedManualEdits" methodname="CacheHitCannotResealOrAbsorbUnrelatedManualEdits" classname="WorldWeaver.Tests.MaterialCheckpointAdmissionTests" runstate="Runnable" seed="2092479573" result="Passed" start-time="2026-11-01 08:51:33Z" end-time="2026-11-01 08:51:34Z" duration="0.587024" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1379" name="PreCallbackCancellationAndImportFailureCannotChangeTheSealedJournal" fullname="WorldWeaver.Tests.MaterialCheckpointAdmissionTests.PreCallbackCancellationAndImportFailureCannotChangeTheSealedJournal" methodname="PreCallbackCancellationAndImportFailureCannotChangeTheSealedJournal" classname="WorldWeaver.Tests.MaterialCheckpointAdmissionTests" runstate="Runnable" seed="1459950578" result="Passed" start-time="2026-11-01 08:51:34Z" end-time="2026-11-01 08:51:34Z" duration="0.223948" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1377" name="RejectedMutationCallbackKeepsTheOlderSealedJournalByteExactly" fullname="WorldWeaver.Tests.MaterialCheckpointAdmissionTests.RejectedMutationCallbackKeepsTheOlderSealedJournalByteExactly" methodname="RejectedMutationCallbackKeepsTheOlderSealedJournalByteExactly" classname="WorldWeaver.Tests.MaterialCheckpointAdmissionTests" runstate="Runnable" seed="185286880" result="Passed" start-time="2026-11-01 08:51:34Z" end-time="2026-11-01 08:51:34Z" duration="0.197887" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1380" name="NpcConfigurationToolTests" fullname="WorldWeaver.Tests.NpcConfigurationToolTests" classname="WorldWeaver.Tests.NpcConfigurationToolTests" runstate="Runnable" testcasecount="10" result="Passed" start-time="2026-11-01 08:51:34Z" end-time="2026-11-01 08:51:34Z" duration="0.231126" total="10" passed="10" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1389" name="AssignSelectedModelUsesPassedRouteWithoutMutatingSharedOldProfile" fullname="WorldWeaver.Tests.NpcConfigurationToolTests.AssignSelectedModelUsesPassedRouteWithoutMutatingSharedOldProfile" methodname="AssignSelectedModelUsesPassedRouteWithoutMutatingSharedOldProfile" classname="WorldWeaver.Tests.NpcConfigurationToolTests" runstate="Runnable" seed="943222520" result="Passed" start-time="2026-11-01 08:51:34Z" end-time="2026-11-01 08:51:34Z" duration="0.041108" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1386" name="AuthoringBoundaryProfileSurvivesActualUpdateCaptureAndRestore" fullname="WorldWeaver.Tests.NpcConfigurationToolTests.AuthoringBoundaryProfileSurvivesActualUpdateCaptureAndRestore" classname="WorldWeaver.Tests.NpcConfigurationToolTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-11-01 08:51:34Z" end-time="2026-11-01 08:51:34Z" duration="0.104011" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1381" name="AuthoringBoundaryProfileSurvivesActualUpdateCaptureAndRestore(&quot;role&quot;,&quot;Role&quot;)" fullname="WorldWeaver.Tests.NpcConfigurationToolTests.AuthoringBoundaryProfileSurvivesActualUpdateCaptureAndRestore(&quot;role&quot;,&quot;Role&quot;)" methodname="AuthoringBoundaryProfileSurvivesActualUpdateCaptureAndRestore" classname="WorldWeaver.Tests.NpcConfigurationToolTests" runstate="Runnable" seed="1169623452" result="Passed" start-time="2026-11-01 08:51:34Z" end-time="2026-11-01 08:51:34Z" duration="0.030188" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1382" name="AuthoringBoundaryProfileSurvivesActualUpdateCaptureAndRestore(&quot;personality&quot;,&quot;Personality&quot;)" fullname="WorldWeaver.Tests.NpcConfigurationToolTests.AuthoringBoundaryProfileSurvivesActualUpdateCaptureAndRestore(&quot;personality&quot;,&quot;Personality&quot;)" methodname="AuthoringBoundaryProfileSurvivesActualUpdateCaptureAndRestore" classname="WorldWeaver.Tests.NpcConfigurationToolTests" runstate="Runnable" seed="186203503" result="Passed" start-time="2026-11-01 08:51:34Z" end-time="2026-11-01 08:51:34Z" duration="0.017931" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1383" name="AuthoringBoundaryProfileSurvivesActualUpdateCaptureAndRestore(&quot;biography&quot;,&quot;Biography&quot;)" fullname="WorldWeaver.Tests.NpcConfigurationToolTests.AuthoringBoundaryProfileSurvivesActualUpdateCaptureAndRestore(&quot;biography&quot;,&quot;Biography&quot;)" methodname="AuthoringBoundaryProfileSurvivesActualUpdateCaptureAndRestore" classname="WorldWeaver.Tests.NpcConfigurationToolTests" runstate="Runnable" seed="268201404" result="Passed" start-time="2026-11-01 08:51:34Z" end-time="2026-11-01 08:51:34Z" duration="0.017726" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1384" name="AuthoringBoundaryProfileSurvivesActualUpdateCaptureAndRestore(&quot;goals&quot;,&quot;Goals&quot;)" fullname="WorldWeaver.Tests.NpcConfigurationToolTests.AuthoringBoundaryProfileSurvivesActualUpdateCaptureAndRestore(&quot;goals&quot;,&quot;Goals&quot;)" methodname="AuthoringBoundaryProfileSurvivesActualUpdateCaptureAndRestore" classname="WorldWeaver.Tests.NpcConfigurationToolTests" runstate="Runnable" seed="1289642512" result="Passed" start-time="2026-11-01 08:51:34Z" end-time="2026-11-01 08:51:34Z" duration="0.017476" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1385" name="AuthoringBoundaryProfileSurvivesActualUpdateCaptureAndRestore(&quot;constraints&quot;,&quot;Constraints&quot;)" fullname="WorldWeaver.Tests.NpcConfigurationToolTests.AuthoringBoundaryProfileSurvivesActualUpdateCaptureAndRestore(&quot;constraints&quot;,&quot;Constraints&quot;)" methodname="AuthoringBoundaryProfileSurvivesActualUpdateCaptureAndRestore" classname="WorldWeaver.Tests.NpcConfigurationToolTests" runstate="Runnable" seed="707675488" result="Passed" start-time="2026-11-01 08:51:34Z" end-time="2026-11-01 08:51:34Z" duration="0.017149" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-case id="1390" name="DuplicateCharacterIdRejectsWholeBatchBeforeAnyMutation" fullname="WorldWeaver.Tests.NpcConfigurationToolTests.DuplicateCharacterIdRejectsWholeBatchBeforeAnyMutation" methodname="DuplicateCharacterIdRejectsWholeBatchBeforeAnyMutation" classname="WorldWeaver.Tests.NpcConfigurationToolTests" runstate="Runnable" seed="175945012" result="Passed" start-time="2026-11-01 08:51:34Z" end-time="2026-11-01 08:51:34Z" duration="0.018386" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1388" name="EnableDisableSocialTopicAndUndoPreserveRoutesAndPersona" fullname="WorldWeaver.Tests.NpcConfigurationToolTests.EnableDisableSocialTopicAndUndoPreserveRoutesAndPersona" methodname="EnableDisableSocialTopicAndUndoPreserveRoutesAndPersona" classname="WorldWeaver.Tests.NpcConfigurationToolTests" runstate="Runnable" seed="1073138572" result="Passed" start-time="2026-11-01 08:51:34Z" end-time="2026-11-01 08:51:34Z" duration="0.021061" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1391" name="ExplicitUnownedNpcCanBeConfiguredButEnableNeedsExistingOrExplicitSelectedRoute" fullname="WorldWeaver.Tests.NpcConfigurationToolTests.ExplicitUnownedNpcCanBeConfiguredButEnableNeedsExistingOrExplicitSelectedRoute" methodname="ExplicitUnownedNpcCanBeConfiguredButEnableNeedsExistingOrExplicitSelectedRoute" classname="WorldWeaver.Tests.NpcConfigurationToolTests" runstate="Runnable" seed="494170094" result="Passed" start-time="2026-11-01 08:51:34Z" end-time="2026-11-01 08:51:34Z" duration="0.019185" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1387" name="SaveRoundTripRestoresActualSocialComponentEnabledState" fullname="WorldWeaver.Tests.NpcConfigurationToolTests.SaveRoundTripRestoresActualSocialComponentEnabledState" methodname="SaveRoundTripRestoresActualSocialComponentEnabledState" classname="WorldWeaver.Tests.NpcConfigurationToolTests" runstate="Runnable" seed="495097174" result="Passed" start-time="2026-11-01 08:51:34Z" end-time="2026-11-01 08:51:34Z" duration="0.016878" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1392" name="NpcConversationTests" fullname="WorldWeaver.Tests.NpcConversationTests" classname="WorldWeaver.Tests.NpcConversationTests" runstate="Runnable" testcasecount="17" result="Failed" site="Child" start-time="2026-11-01 08:51:34Z" end-time="2026-11-01 08:51:35Z" duration="0.139421" total="17" passed="16" failed="1" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <test-case id="1403" name="AiDisableCancelsActiveRequestAndNeverPublishesReply" fullname="WorldWeaver.Tests.NpcConversationTests.AiDisableCancelsActiveRequestAndNeverPublishesReply" methodname="AiDisableCancelsActiveRequestAndNeverPublishesReply" classname="WorldWeaver.Tests.NpcConversationTests" runstate="Runnable" seed="563621089" result="Passed" start-time="2026-11-01 08:51:34Z" end-time="2026-11-01 08:51:34Z" duration="0.036530" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1405" name="AiDisableDuringPostDecisionEmbeddingKeepsOffStatusWithoutPublishingReply" fullname="WorldWeaver.Tests.NpcConversationTests.AiDisableDuringPostDecisionEmbeddingKeepsOffStatusWithoutPublishingReply" methodname="AiDisableDuringPostDecisionEmbeddingKeepsOffStatusWithoutPublishingReply" classname="WorldWeaver.Tests.NpcConversationTests" runstate="Runnable" seed="378606413" result="Passed" start-time="2026-11-01 08:51:34Z" end-time="2026-11-01 08:51:34Z" duration="0.012832" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1404" name="CancellationDuringPostDecisionEmbeddingRetainsCommittedTraceWithoutPublishingReply" fullname="WorldWeaver.Tests.NpcConversationTests.CancellationDuringPostDecisionEmbeddingRetainsCommittedTraceWithoutPublishingReply" methodname="CancellationDuringPostDecisionEmbeddingRetainsCommittedTraceWithoutPublishingReply" classname="WorldWeaver.Tests.NpcConversationTests" runstate="Runnable" seed="2134056682" result="Passed" start-time="2026-11-01 08:51:34Z" end-time="2026-11-01 08:51:34Z" duration="0.000905" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1394" name="CancelledQueuedRequestDoesNotRun" fullname="WorldWeaver.Tests.NpcConversationTests.CancelledQueuedRequestDoesNotRun" methodname="CancelledQueuedRequestDoesNotRun" classname="WorldWeaver.Tests.NpcConversationTests" runstate="Runnable" seed="1846268153" result="Passed" start-time="2026-11-01 08:51:34Z" end-time="2026-11-01 08:51:34Z" duration="0.049928" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1406" name="ComponentDisableDuringPostDecisionEmbeddingNeverPublishesFreshReadyReply" fullname="WorldWeaver.Tests.NpcConversationTests.ComponentDisableDuringPostDecisionEmbeddingNeverPublishesFreshReadyReply" methodname="ComponentDisableDuringPostDecisionEmbeddingNeverPublishesFreshReadyReply" classname="WorldWeaver.Tests.NpcConversationTests" runstate="Runnable" seed="1757177860" result="Failed" start-time="2026-11-01 08:51:34Z" end-time="2026-11-01 08:51:34Z" duration="0.007308" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <failure>
+                <message><![CDATA[  Expected: String containing "memory indexing cancelled"
+  But was:  "Decision finished; reply publication cancelled."
+]]></message>
+                <stack-trace><![CDATA[at NUnit.Framework.StringAssert.Contains (System.String expected, System.String actual, System.String message, System.Object[] args) [0x00007] in <f577cd9686154d6ab10efd7e65e64366>:0
+at NUnit.Framework.StringAssert.Contains (System.String expected, System.String actual) [0x00000] in <f577cd9686154d6ab10efd7e65e64366>:0
+at WorldWeaver.Tests.NpcConversationTests.PostDecisionCancellation (System.String mode) [0x00218] in /Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/integrated-test-snapshot/package-1.3-r1/Tests/EditMode/NpcConversationTests.cs:157
+at WorldWeaver.Tests.NpcConversationTests+<Await>d__6.MoveNext () [0x0003d] in /Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/integrated-test-snapshot/package-1.3-r1/Tests/EditMode/NpcConversationTests.cs:30
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in ./Library/PackageCache/com.unity.test-framework@bd7f943e9647/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs:44
+]]></stack-trace>
+              </failure>
+            </test-case>
+            <test-case id="1397" name="EmbeddingOutageUsesAuthoredScopedKnowledgeAndRealRouter" fullname="WorldWeaver.Tests.NpcConversationTests.EmbeddingOutageUsesAuthoredScopedKnowledgeAndRealRouter" methodname="EmbeddingOutageUsesAuthoredScopedKnowledgeAndRealRouter" classname="WorldWeaver.Tests.NpcConversationTests" runstate="Runnable" seed="562697267" result="Passed" start-time="2026-11-01 08:51:34Z" end-time="2026-11-01 08:51:34Z" duration="0.005963" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1395" name="FifthAmbientRequestWithinRollingMinuteIsRefused" fullname="WorldWeaver.Tests.NpcConversationTests.FifthAmbientRequestWithinRollingMinuteIsRefused" methodname="FifthAmbientRequestWithinRollingMinuteIsRefused" classname="WorldWeaver.Tests.NpcConversationTests" runstate="Runnable" seed="705940726" result="Passed" start-time="2026-11-01 08:51:34Z" end-time="2026-11-01 08:51:34Z" duration="0.001287" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1396" name="FreeformRepliesRetainRecentConversationWithoutEmbeddings" fullname="WorldWeaver.Tests.NpcConversationTests.FreeformRepliesRetainRecentConversationWithoutEmbeddings" methodname="FreeformRepliesRetainRecentConversationWithoutEmbeddings" classname="WorldWeaver.Tests.NpcConversationTests" runstate="Runnable" seed="1090609367" result="Passed" start-time="2026-11-01 08:51:34Z" end-time="2026-11-01 08:51:35Z" duration="0.003395" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1399" name="NearbyCharactersExchangeThreeDistinctRealProviderTurns" fullname="WorldWeaver.Tests.NpcConversationTests.NearbyCharactersExchangeThreeDistinctRealProviderTurns" methodname="NearbyCharactersExchangeThreeDistinctRealProviderTurns" classname="WorldWeaver.Tests.NpcConversationTests" runstate="Runnable" seed="278683461" result="Passed" start-time="2026-11-01 08:51:35Z" end-time="2026-11-01 08:51:35Z" duration="0.005435" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1402" name="OfflineModelReportsFailureWithoutFakeNpcUtterance" fullname="WorldWeaver.Tests.NpcConversationTests.OfflineModelReportsFailureWithoutFakeNpcUtterance" methodname="OfflineModelReportsFailureWithoutFakeNpcUtterance" classname="WorldWeaver.Tests.NpcConversationTests" runstate="Runnable" seed="1547915457" result="Passed" start-time="2026-11-01 08:51:35Z" end-time="2026-11-01 08:51:35Z" duration="0.001223" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1408" name="OldVersionOneSavesWithoutNewFieldsStillRestore" fullname="WorldWeaver.Tests.NpcConversationTests.OldVersionOneSavesWithoutNewFieldsStillRestore" methodname="OldVersionOneSavesWithoutNewFieldsStillRestore" classname="WorldWeaver.Tests.NpcConversationTests" runstate="Runnable" seed="29663602" result="Passed" start-time="2026-11-01 08:51:35Z" end-time="2026-11-01 08:51:35Z" duration="0.000457" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1400" name="PartnerSelectionRejectsDifferentWorldDisabledAndPlayerBusy" fullname="WorldWeaver.Tests.NpcConversationTests.PartnerSelectionRejectsDifferentWorldDisabledAndPlayerBusy" methodname="PartnerSelectionRejectsDifferentWorldDisabledAndPlayerBusy" classname="WorldWeaver.Tests.NpcConversationTests" runstate="Runnable" seed="698641744" result="Passed" start-time="2026-11-01 08:51:35Z" end-time="2026-11-01 08:51:35Z" duration="0.000665" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1398" name="PeerDialogueCannotTransferInventoryOrGrantQuestReward" fullname="WorldWeaver.Tests.NpcConversationTests.PeerDialogueCannotTransferInventoryOrGrantQuestReward" methodname="PeerDialogueCannotTransferInventoryOrGrantQuestReward" classname="WorldWeaver.Tests.NpcConversationTests" runstate="Runnable" seed="458119465" result="Passed" start-time="2026-11-01 08:51:35Z" end-time="2026-11-01 08:51:35Z" duration="0.002881" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1393" name="PlayerCancelsActiveAmbientAndPassesQueuedAmbient" fullname="WorldWeaver.Tests.NpcConversationTests.PlayerCancelsActiveAmbientAndPassesQueuedAmbient" methodname="PlayerCancelsActiveAmbientAndPassesQueuedAmbient" classname="WorldWeaver.Tests.NpcConversationTests" runstate="Runnable" seed="1215369802" result="Passed" start-time="2026-11-01 08:51:35Z" end-time="2026-11-01 08:51:35Z" duration="0.000807" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1407" name="SaveRestoresPersonalityAiToggleAndTranscriptAndRejectsForeignRowsAtomically" fullname="WorldWeaver.Tests.NpcConversationTests.SaveRestoresPersonalityAiToggleAndTranscriptAndRejectsForeignRowsAtomically" methodname="SaveRestoresPersonalityAiToggleAndTranscriptAndRejectsForeignRowsAtomically" classname="WorldWeaver.Tests.NpcConversationTests" runstate="Runnable" seed="2064105813" result="Passed" start-time="2026-11-01 08:51:35Z" end-time="2026-11-01 08:51:35Z" duration="0.000931" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1401" name="StandaloneNpcRootsRequireExplicitSharedScope" fullname="WorldWeaver.Tests.NpcConversationTests.StandaloneNpcRootsRequireExplicitSharedScope" methodname="StandaloneNpcRootsRequireExplicitSharedScope" classname="WorldWeaver.Tests.NpcConversationTests" runstate="Runnable" seed="1192309551" result="Passed" start-time="2026-11-01 08:51:35Z" end-time="2026-11-01 08:51:35Z" duration="0.000714" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1409" name="TranscriptCapacityScopeAndDefensiveCopiesStayBounded" fullname="WorldWeaver.Tests.NpcConversationTests.TranscriptCapacityScopeAndDefensiveCopiesStayBounded" methodname="TranscriptCapacityScopeAndDefensiveCopiesStayBounded" classname="WorldWeaver.Tests.NpcConversationTests" runstate="Runnable" seed="1029352453" result="Passed" start-time="2026-11-01 08:51:35Z" end-time="2026-11-01 08:51:35Z" duration="0.000702" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1410" name="OllamaDiscoveryTests" fullname="WorldWeaver.Tests.OllamaDiscoveryTests" classname="WorldWeaver.Tests.OllamaDiscoveryTests" runstate="Runnable" testcasecount="13" result="Passed" start-time="2026-11-01 08:51:35Z" end-time="2026-11-01 08:51:39Z" duration="4.245889" total="13" passed="13" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1416" name="AutomaticDiscoveryCannotProbeRemoteEndpointsOrCredentialUrls" fullname="WorldWeaver.Tests.OllamaDiscoveryTests.AutomaticDiscoveryCannotProbeRemoteEndpointsOrCredentialUrls" methodname="AutomaticDiscoveryCannotProbeRemoteEndpointsOrCredentialUrls" classname="WorldWeaver.Tests.OllamaDiscoveryTests" runstate="Runnable" seed="513020170" result="Passed" start-time="2026-11-01 08:51:35Z" end-time="2026-11-01 08:51:35Z" duration="0.000586" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1423" name="BackgroundPollingIsThrottledAndWaitsForAgentWork" fullname="WorldWeaver.Tests.OllamaDiscoveryTests.BackgroundPollingIsThrottledAndWaitsForAgentWork" methodname="BackgroundPollingIsThrottledAndWaitsForAgentWork" classname="WorldWeaver.Tests.OllamaDiscoveryTests" runstate="Runnable" seed="1081145710" result="Passed" start-time="2026-11-01 08:51:35Z" end-time="2026-11-01 08:51:35Z" duration="0.391360" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1420" name="CapabilityCacheInvalidatesOnDigestAndNeverPromotesUnknownModels" fullname="WorldWeaver.Tests.OllamaDiscoveryTests.CapabilityCacheInvalidatesOnDigestAndNeverPromotesUnknownModels" methodname="CapabilityCacheInvalidatesOnDigestAndNeverPromotesUnknownModels" classname="WorldWeaver.Tests.OllamaDiscoveryTests" runstate="Runnable" seed="1096051822" result="Passed" start-time="2026-11-01 08:51:35Z" end-time="2026-11-01 08:51:37Z" duration="1.600856" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1424" name="ClosingControllerCancelsAnInFlightProbeAndCoalescesConcurrentRefreshes" fullname="WorldWeaver.Tests.OllamaDiscoveryTests.ClosingControllerCancelsAnInFlightProbeAndCoalescesConcurrentRefreshes" methodname="ClosingControllerCancelsAnInFlightProbeAndCoalescesConcurrentRefreshes" classname="WorldWeaver.Tests.OllamaDiscoveryTests" runstate="Runnable" seed="1633332284" result="Passed" start-time="2026-11-01 08:51:37Z" end-time="2026-11-01 08:51:37Z" duration="0.100760" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1417" name="InstalledLoadedVisionAndEmbeddingStatesComeFromActualMetadata" fullname="WorldWeaver.Tests.OllamaDiscoveryTests.InstalledLoadedVisionAndEmbeddingStatesComeFromActualMetadata" methodname="InstalledLoadedVisionAndEmbeddingStatesComeFromActualMetadata" classname="WorldWeaver.Tests.OllamaDiscoveryTests" runstate="Runnable" seed="1908557180" result="Passed" start-time="2026-11-01 08:51:37Z" end-time="2026-11-01 08:51:37Z" duration="0.299397" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1422" name="LargeCatalogHydratesInBoundedBatches" fullname="WorldWeaver.Tests.OllamaDiscoveryTests.LargeCatalogHydratesInBoundedBatches" methodname="LargeCatalogHydratesInBoundedBatches" classname="WorldWeaver.Tests.OllamaDiscoveryTests" runstate="Runnable" seed="656376825" result="Passed" start-time="2026-11-01 08:51:37Z" end-time="2026-11-01 08:51:37Z" duration="0.099304" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1421" name="MalformedCatalogPreservesExistingRowsAsUnavailableInsteadOfTreatingThemAsDeleted" fullname="WorldWeaver.Tests.OllamaDiscoveryTests.MalformedCatalogPreservesExistingRowsAsUnavailableInsteadOfTreatingThemAsDeleted" methodname="MalformedCatalogPreservesExistingRowsAsUnavailableInsteadOfTreatingThemAsDeleted" classname="WorldWeaver.Tests.OllamaDiscoveryTests" runstate="Runnable" seed="1070413327" result="Passed" start-time="2026-11-01 08:51:37Z" end-time="2026-11-01 08:51:38Z" duration="0.600815" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1415" name="ModelAliasesAreCanonicalizedWithoutDroppingExplicitTags" fullname="WorldWeaver.Tests.OllamaDiscoveryTests.ModelAliasesAreCanonicalizedWithoutDroppingExplicitTags" classname="WorldWeaver.Tests.OllamaDiscoveryTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-11-01 08:51:38Z" end-time="2026-11-01 08:51:38Z" duration="0.001141" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1411" name="ModelAliasesAreCanonicalizedWithoutDroppingExplicitTags(&quot;qwen3.5&quot;,&quot;qwen3.5:latest&quot;)" fullname="WorldWeaver.Tests.OllamaDiscoveryTests.ModelAliasesAreCanonicalizedWithoutDroppingExplicitTags(&quot;qwen3.5&quot;,&quot;qwen3.5:latest&quot;)" methodname="ModelAliasesAreCanonicalizedWithoutDroppingExplicitTags" classname="WorldWeaver.Tests.OllamaDiscoveryTests" runstate="Runnable" seed="2041359556" result="Passed" start-time="2026-11-01 08:51:38Z" end-time="2026-11-01 08:51:38Z" duration="0.000210" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1412" name="ModelAliasesAreCanonicalizedWithoutDroppingExplicitTags(&quot;namespace/model&quot;,&quot;namespace/model:latest&quot;)" fullname="WorldWeaver.Tests.OllamaDiscoveryTests.ModelAliasesAreCanonicalizedWithoutDroppingExplicitTags(&quot;namespace/model&quot;,&quot;namespace/model:latest&quot;)" methodname="ModelAliasesAreCanonicalizedWithoutDroppingExplicitTags" classname="WorldWeaver.Tests.OllamaDiscoveryTests" runstate="Runnable" seed="681197449" result="Passed" start-time="2026-11-01 08:51:38Z" end-time="2026-11-01 08:51:38Z" duration="0.000114" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1413" name="ModelAliasesAreCanonicalizedWithoutDroppingExplicitTags(&quot;localhost:5000/team/model&quot;,&quot;localhost:5000/team/model:latest&quot;)" fullname="WorldWeaver.Tests.OllamaDiscoveryTests.ModelAliasesAreCanonicalizedWithoutDroppingExplicitTags(&quot;localhost:5000/team/model&quot;,&quot;localhost:5000/team/model:latest&quot;)" methodname="ModelAliasesAreCanonicalizedWithoutDroppingExplicitTags" classname="WorldWeaver.Tests.OllamaDiscoveryTests" runstate="Runnable" seed="1096759438" result="Passed" start-time="2026-11-01 08:51:38Z" end-time="2026-11-01 08:51:38Z" duration="0.000107" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1414" name="ModelAliasesAreCanonicalizedWithoutDroppingExplicitTags(&quot;namespace/model:2b&quot;,&quot;namespace/model:2b&quot;)" fullname="WorldWeaver.Tests.OllamaDiscoveryTests.ModelAliasesAreCanonicalizedWithoutDroppingExplicitTags(&quot;namespace/model:2b&quot;,&quot;namespace/model:2b&quot;)" methodname="ModelAliasesAreCanonicalizedWithoutDroppingExplicitTags" classname="WorldWeaver.Tests.OllamaDiscoveryTests" runstate="Runnable" seed="102947056" result="Passed" start-time="2026-11-01 08:51:38Z" end-time="2026-11-01 08:51:38Z" duration="0.000105" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-case id="1418" name="ModelsAppearAfterServerStartAndNewDownloadsWithoutReplacingSelectionOrCustomApi" fullname="WorldWeaver.Tests.OllamaDiscoveryTests.ModelsAppearAfterServerStartAndNewDownloadsWithoutReplacingSelectionOrCustomApi" methodname="ModelsAppearAfterServerStartAndNewDownloadsWithoutReplacingSelectionOrCustomApi" classname="WorldWeaver.Tests.OllamaDiscoveryTests" runstate="Runnable" seed="2012572001" result="Passed" start-time="2026-11-01 08:51:38Z" end-time="2026-11-01 08:51:38Z" duration="0.800371" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1419" name="ServerStopsWithoutLosingInstalledRowsOrSelection" fullname="WorldWeaver.Tests.OllamaDiscoveryTests.ServerStopsWithoutLosingInstalledRowsOrSelection" methodname="ServerStopsWithoutLosingInstalledRowsOrSelection" classname="WorldWeaver.Tests.OllamaDiscoveryTests" runstate="Runnable" seed="2120467385" result="Passed" start-time="2026-11-01 08:51:38Z" end-time="2026-11-01 08:51:39Z" duration="0.348847" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1502" name="WorldMaterialLibraryTests" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" testcasecount="29" result="Failed" site="Child" start-time="2026-11-01 08:51:39Z" end-time="2026-11-01 08:51:40Z" duration="1.582344" total="29" passed="27" failed="2" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <test-case id="1509" name="AllStarterMapsHaveCorrectColorSpaceAndNormalImporter" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.AllStarterMapsHaveCorrectColorSpaceAndNormalImporter" methodname="AllStarterMapsHaveCorrectColorSpaceAndNormalImporter" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" seed="385302122" result="Passed" start-time="2026-11-01 08:51:39Z" end-time="2026-11-01 08:51:39Z" duration="0.043206" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1512" name="ApplyingTextureCreatesIsolatedMaterialAndUndoRestoresOriginal" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.ApplyingTextureCreatesIsolatedMaterialAndUndoRestoresOriginal" methodname="ApplyingTextureCreatesIsolatedMaterialAndUndoRestoresOriginal" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" seed="251844857" result="Passed" start-time="2026-11-01 08:51:39Z" end-time="2026-11-01 08:51:39Z" duration="0.109906" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1514" name="ChildRenderersNeedExplicitScopeAndInvalidTilingCannotImportAssets" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.ChildRenderersNeedExplicitScopeAndInvalidTilingCannotImportAssets" methodname="ChildRenderersNeedExplicitScopeAndInvalidTilingCannotImportAssets" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" seed="272073261" result="Passed" start-time="2026-11-01 08:51:39Z" end-time="2026-11-01 08:51:39Z" duration="0.072771" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1531" name="CorruptChecksumOrUnboundedImageIsRejectedBeforeUnityImport" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.CorruptChecksumOrUnboundedImageIsRejectedBeforeUnityImport" methodname="CorruptChecksumOrUnboundedImageIsRejectedBeforeUnityImport" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" seed="1968724538" result="Passed" start-time="2026-11-01 08:51:39Z" end-time="2026-11-01 08:51:39Z" duration="0.036811" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1534" name="GeneratedHouseHasTexturedMaterialsUvAndTangentsWithoutAnyDownload" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.GeneratedHouseHasTexturedMaterialsUvAndTangentsWithoutAnyDownload" methodname="GeneratedHouseHasTexturedMaterialsUvAndTangentsWithoutAnyDownload" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" seed="758483258" result="Passed" start-time="2026-11-01 08:51:39Z" end-time="2026-11-01 08:51:39Z" duration="0.156329" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1511" name="ImportDoesNotSaveAnUnrelatedDirtyConsumerMaterial" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.ImportDoesNotSaveAnUnrelatedDirtyConsumerMaterial" methodname="ImportDoesNotSaveAnUnrelatedDirtyConsumerMaterial" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" seed="1029109256" result="Passed" start-time="2026-11-01 08:51:39Z" end-time="2026-11-01 08:51:39Z" duration="0.117620" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1520" name="MaterialIdsRejectTraversalUrlsAndUnknownBuiltin" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.MaterialIdsRejectTraversalUrlsAndUnknownBuiltin" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-11-01 08:51:39Z" end-time="2026-11-01 08:51:39Z" duration="0.091931" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1515" name="MaterialIdsRejectTraversalUrlsAndUnknownBuiltin(&quot;builtin:../wood&quot;)" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.MaterialIdsRejectTraversalUrlsAndUnknownBuiltin(&quot;builtin:../wood&quot;)" methodname="MaterialIdsRejectTraversalUrlsAndUnknownBuiltin" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" seed="1199268023" result="Passed" start-time="2026-11-01 08:51:39Z" end-time="2026-11-01 08:51:39Z" duration="0.019534" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1516" name="MaterialIdsRejectTraversalUrlsAndUnknownBuiltin(&quot;file:/etc/passwd&quot;)" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.MaterialIdsRejectTraversalUrlsAndUnknownBuiltin(&quot;file:/etc/passwd&quot;)" methodname="MaterialIdsRejectTraversalUrlsAndUnknownBuiltin" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" seed="1786369213" result="Passed" start-time="2026-11-01 08:51:39Z" end-time="2026-11-01 08:51:39Z" duration="0.018005" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1517" name="MaterialIdsRejectTraversalUrlsAndUnknownBuiltin(&quot;polyhaven:a/b&quot;)" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.MaterialIdsRejectTraversalUrlsAndUnknownBuiltin(&quot;polyhaven:a/b&quot;)" methodname="MaterialIdsRejectTraversalUrlsAndUnknownBuiltin" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" seed="1391863119" result="Passed" start-time="2026-11-01 08:51:39Z" end-time="2026-11-01 08:51:39Z" duration="0.017535" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1518" name="MaterialIdsRejectTraversalUrlsAndUnknownBuiltin(&quot;polyhaven:Wood&quot;)" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.MaterialIdsRejectTraversalUrlsAndUnknownBuiltin(&quot;polyhaven:Wood&quot;)" methodname="MaterialIdsRejectTraversalUrlsAndUnknownBuiltin" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" seed="1719379386" result="Passed" start-time="2026-11-01 08:51:39Z" end-time="2026-11-01 08:51:39Z" duration="0.017179" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1519" name="MaterialIdsRejectTraversalUrlsAndUnknownBuiltin(&quot;builtin:missing&quot;)" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.MaterialIdsRejectTraversalUrlsAndUnknownBuiltin(&quot;builtin:missing&quot;)" methodname="MaterialIdsRejectTraversalUrlsAndUnknownBuiltin" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" seed="1373849869" result="Passed" start-time="2026-11-01 08:51:39Z" end-time="2026-11-01 08:51:39Z" duration="0.017060" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-case id="1510" name="ModifiedCachedAssetsArePreservedAndNeverSilentlyOverwritten" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.ModifiedCachedAssetsArePreservedAndNeverSilentlyOverwritten" methodname="ModifiedCachedAssetsArePreservedAndNeverSilentlyOverwritten" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" seed="419873195" result="Passed" start-time="2026-11-01 08:51:39Z" end-time="2026-11-01 08:51:39Z" duration="0.097355" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1529" name="OfflineOnlineIdDoesNotTriggerNetworkOrInventMaterial" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.OfflineOnlineIdDoesNotTriggerNetworkOrInventMaterial" methodname="OfflineOnlineIdDoesNotTriggerNetworkOrInventMaterial" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" seed="1050212392" result="Failed" start-time="2026-11-01 08:51:39Z" end-time="2026-11-01 08:51:40Z" duration="0.023746" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <failure>
+                <message><![CDATA[  Expected: <System.OperationCanceledException>
+  But was:  <System.Threading.Tasks.TaskCanceledException: A task was canceled.
+  at NUnit.Framework.Internal.ExceptionHelper.Rethrow (System.Exception exception) [0x0000b] in <f577cd9686154d6ab10efd7e65e64366>:0 
+  at NUnit.Framework.Internal.AsyncInvocationRegion+AsyncTaskInvocationRegion.WaitForPendingOperationsToComplete (System.Object invocationResult) [0x00030] in <f577cd9686154d6ab10efd7e65e64366>:0 
+  at NUnit.Framework.Assert.ThrowsAsync (NUnit.Framework.Constraints.IResolveConstraint expression, NUnit.Framework.AsyncTestDelegate code, System.String message, System.Object[] args) [0x00010] in <f577cd9686154d6ab10efd7e65e64366>:0 >
+]]></message>
+                <stack-trace><![CDATA[at WorldWeaver.Tests.WorldMaterialLibraryTests.OfflineOnlineIdDoesNotTriggerNetworkOrInventMaterial () [0x0004d] in /Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/integrated-test-snapshot/package-1.3-r1/Tests/EditMode/WorldMaterialLibraryTests.cs:133
+at UnityEngine.TestTools.TestRunner.TestTaskWrapper+<Execute>d__2.MoveNext () [0x00063] in ./Library/PackageCache/com.unity.test-framework@bd7f943e9647/UnityEngine.TestRunner/TestRunner/TestTaskWrapper.cs:31
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in ./Library/PackageCache/com.unity.test-framework@bd7f943e9647/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs:44
+]]></stack-trace>
+              </failure>
+            </test-case>
+            <test-case id="1532" name="ProviderCannotRedirectTextureImportToAnArbitraryWebHost" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.ProviderCannotRedirectTextureImportToAnArbitraryWebHost" methodname="ProviderCannotRedirectTextureImportToAnArbitraryWebHost" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" seed="696182668" result="Passed" start-time="2026-11-01 08:51:40Z" end-time="2026-11-01 08:51:40Z" duration="0.019193" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1530" name="ProviderUsesActualCatalogUrlsAndVerifiesAllReturnedMapBytes" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.ProviderUsesActualCatalogUrlsAndVerifiesAllReturnedMapBytes" methodname="ProviderUsesActualCatalogUrlsAndVerifiesAllReturnedMapBytes" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" seed="270647983" result="Passed" start-time="2026-11-01 08:51:40Z" end-time="2026-11-01 08:51:40Z" duration="0.019560" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1528" name="RussianBuiltinSearchWorksWithoutOnlineService" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.RussianBuiltinSearchWorksWithoutOnlineService" methodname="RussianBuiltinSearchWorksWithoutOnlineService" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" seed="1893666047" result="Passed" start-time="2026-11-01 08:51:40Z" end-time="2026-11-01 08:51:40Z" duration="0.025063" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1533" name="SearchUsesProviderRankingNotInventedSlugsAndCachesTheMetadata" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.SearchUsesProviderRankingNotInventedSlugsAndCachesTheMetadata" methodname="SearchUsesProviderRankingNotInventedSlugsAndCachesTheMetadata" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" seed="1621397533" result="Passed" start-time="2026-11-01 08:51:40Z" end-time="2026-11-01 08:51:40Z" duration="0.020227" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1508" name="StarterMaterialImportsWithoutNetworkAndReusesVerifiedCache" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.StarterMaterialImportsWithoutNetworkAndReusesVerifiedCache" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-11-01 08:51:40Z" end-time="2026-11-01 08:51:40Z" duration="0.316436" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1503" name="StarterMaterialImportsWithoutNetworkAndReusesVerifiedCache(&quot;builtin:grass&quot;)" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.StarterMaterialImportsWithoutNetworkAndReusesVerifiedCache(&quot;builtin:grass&quot;)" methodname="StarterMaterialImportsWithoutNetworkAndReusesVerifiedCache" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" seed="1846901994" result="Passed" start-time="2026-11-01 08:51:40Z" end-time="2026-11-01 08:51:40Z" duration="0.062514" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1504" name="StarterMaterialImportsWithoutNetworkAndReusesVerifiedCache(&quot;builtin:wood&quot;)" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.StarterMaterialImportsWithoutNetworkAndReusesVerifiedCache(&quot;builtin:wood&quot;)" methodname="StarterMaterialImportsWithoutNetworkAndReusesVerifiedCache" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" seed="1623682766" result="Passed" start-time="2026-11-01 08:51:40Z" end-time="2026-11-01 08:51:40Z" duration="0.064859" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1505" name="StarterMaterialImportsWithoutNetworkAndReusesVerifiedCache(&quot;builtin:roof&quot;)" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.StarterMaterialImportsWithoutNetworkAndReusesVerifiedCache(&quot;builtin:roof&quot;)" methodname="StarterMaterialImportsWithoutNetworkAndReusesVerifiedCache" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" seed="1489748732" result="Passed" start-time="2026-11-01 08:51:40Z" end-time="2026-11-01 08:51:40Z" duration="0.062852" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1506" name="StarterMaterialImportsWithoutNetworkAndReusesVerifiedCache(&quot;builtin:cloth&quot;)" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.StarterMaterialImportsWithoutNetworkAndReusesVerifiedCache(&quot;builtin:cloth&quot;)" methodname="StarterMaterialImportsWithoutNetworkAndReusesVerifiedCache" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" seed="365288388" result="Passed" start-time="2026-11-01 08:51:40Z" end-time="2026-11-01 08:51:40Z" duration="0.062276" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1507" name="StarterMaterialImportsWithoutNetworkAndReusesVerifiedCache(&quot;builtin:stone&quot;)" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.StarterMaterialImportsWithoutNetworkAndReusesVerifiedCache(&quot;builtin:stone&quot;)" methodname="StarterMaterialImportsWithoutNetworkAndReusesVerifiedCache" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" seed="109326422" result="Passed" start-time="2026-11-01 08:51:40Z" end-time="2026-11-01 08:51:40Z" duration="0.062268" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-case id="1513" name="TerrainApplyClonesSharedDataPreservesOtherLayerAndUndoRestoresCollider" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.TerrainApplyClonesSharedDataPreservesOtherLayerAndUndoRestoresCollider" methodname="TerrainApplyClonesSharedDataPreservesOtherLayerAndUndoRestoresCollider" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" seed="339611997" result="Failed" start-time="2026-11-01 08:51:40Z" end-time="2026-11-01 08:51:40Z" duration="0.315496" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <failure>
+                <message><![CDATA[  Expected: 0.300000012f +/- 0.01d
+  But was:  1.0f
+]]></message>
+                <stack-trace><![CDATA[at WorldWeaver.Tests.WorldMaterialLibraryTests.TerrainApplyClonesSharedDataPreservesOtherLayerAndUndoRestoresCollider () [0x0018f] in /Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/integrated-test-snapshot/package-1.3-r1/Tests/EditMode/WorldMaterialLibraryTests.cs:107
+]]></stack-trace>
+              </failure>
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1527" name="TextureEndpointsRejectOtherHostsSchemesArchivesCredentialsAndPorts" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.TextureEndpointsRejectOtherHostsSchemesArchivesCredentialsAndPorts" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-11-01 08:51:40Z" end-time="2026-11-01 08:51:40Z" duration="0.111999" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1521" name="TextureEndpointsRejectOtherHostsSchemesArchivesCredentialsAndPorts(&quot;http://api.polyhaven.com/info/wood&quot;)" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.TextureEndpointsRejectOtherHostsSchemesArchivesCredentialsAndPorts(&quot;http://api.polyhaven.com/info/wood&quot;)" methodname="TextureEndpointsRejectOtherHostsSchemesArchivesCredentialsAndPorts" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" seed="212961817" result="Passed" start-time="2026-11-01 08:51:40Z" end-time="2026-11-01 08:51:40Z" duration="0.020919" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1522" name="TextureEndpointsRejectOtherHostsSchemesArchivesCredentialsAndPorts(&quot;https://api.polyhaven.com.evil.test/info/wood&quot;)" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.TextureEndpointsRejectOtherHostsSchemesArchivesCredentialsAndPorts(&quot;https://api.polyhaven.com.evil.test/info/wood&quot;)" methodname="TextureEndpointsRejectOtherHostsSchemesArchivesCredentialsAndPorts" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" seed="1329912228" result="Passed" start-time="2026-11-01 08:51:40Z" end-time="2026-11-01 08:51:40Z" duration="0.018086" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1523" name="TextureEndpointsRejectOtherHostsSchemesArchivesCredentialsAndPorts(&quot;https://127.0.0.1/file/ph-assets/Textures/a.jpg&quot;)" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.TextureEndpointsRejectOtherHostsSchemesArchivesCredentialsAndPorts(&quot;https://127.0.0.1/file/ph-assets/Textures/a.jpg&quot;)" methodname="TextureEndpointsRejectOtherHostsSchemesArchivesCredentialsAndPorts" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" seed="342557707" result="Passed" start-time="2026-11-01 08:51:40Z" end-time="2026-11-01 08:51:40Z" duration="0.018149" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1524" name="TextureEndpointsRejectOtherHostsSchemesArchivesCredentialsAndPorts(&quot;https://dl.polyhaven.org/file/ph-assets/Textures/a.blend&quot;)" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.TextureEndpointsRejectOtherHostsSchemesArchivesCredentialsAndPorts(&quot;https://dl.polyhaven.org/file/ph-assets/Textures/a.blend&quot;)" methodname="TextureEndpointsRejectOtherHostsSchemesArchivesCredentialsAndPorts" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" seed="956117401" result="Passed" start-time="2026-11-01 08:51:40Z" end-time="2026-11-01 08:51:40Z" duration="0.017699" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1525" name="TextureEndpointsRejectOtherHostsSchemesArchivesCredentialsAndPorts(&quot;https://dl.polyhaven.org:444/file/ph-assets/Textures/a.jpg&quot;)" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.TextureEndpointsRejectOtherHostsSchemesArchivesCredentialsAndPorts(&quot;https://dl.polyhaven.org:444/file/ph-assets/Textures/a.jpg&quot;)" methodname="TextureEndpointsRejectOtherHostsSchemesArchivesCredentialsAndPorts" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" seed="6453836" result="Passed" start-time="2026-11-01 08:51:40Z" end-time="2026-11-01 08:51:40Z" duration="0.017417" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1526" name="TextureEndpointsRejectOtherHostsSchemesArchivesCredentialsAndPorts(&quot;https://name:secret@dl.polyhaven.org/file/ph-assets/Textures/a.jpg&quot;)" fullname="WorldWeaver.Tests.WorldMaterialLibraryTests.TextureEndpointsRejectOtherHostsSchemesArchivesCredentialsAndPorts(&quot;https://name:secret@dl.polyhaven.org/file/ph-assets/Textures/a.jpg&quot;)" methodname="TextureEndpointsRejectOtherHostsSchemesArchivesCredentialsAndPorts" classname="WorldWeaver.Tests.WorldMaterialLibraryTests" runstate="Runnable" seed="596057643" result="Passed" start-time="2026-11-01 08:51:40Z" end-time="2026-11-01 08:51:40Z" duration="0.016778" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+          </test-suite>
+          <test-suite type="TestFixture" id="1535" name="WorldMaterialToolTests" fullname="WorldWeaver.Tests.WorldMaterialToolTests" classname="WorldWeaver.Tests.WorldMaterialToolTests" runstate="Runnable" testcasecount="8" result="Passed" start-time="2026-11-01 08:51:40Z" end-time="2026-11-01 08:51:41Z" duration="0.585560" total="8" passed="8" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1542" name="CancelledImportCannotCreateAssetsOrCallMutationHook" fullname="WorldWeaver.Tests.WorldMaterialToolTests.CancelledImportCannotCreateAssetsOrCallMutationHook" methodname="CancelledImportCannotCreateAssetsOrCallMutationHook" classname="WorldWeaver.Tests.WorldMaterialToolTests" runstate="Runnable" seed="62645032" result="Passed" start-time="2026-11-01 08:51:40Z" end-time="2026-11-01 08:51:40Z" duration="0.019112" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1536" name="ContractsExposeThreeTypedMaterialToolsAndOnlySearchIsReadOnly" fullname="WorldWeaver.Tests.WorldMaterialToolTests.ContractsExposeThreeTypedMaterialToolsAndOnlySearchIsReadOnly" methodname="ContractsExposeThreeTypedMaterialToolsAndOnlySearchIsReadOnly" classname="WorldWeaver.Tests.WorldMaterialToolTests" runstate="Runnable" seed="241986097" result="Passed" start-time="2026-11-01 08:51:40Z" end-time="2026-11-01 08:51:40Z" duration="0.019686" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1543" name="ControllerExecutesAsyncMaterialImportAndRetainsRealToolEvidence" fullname="WorldWeaver.Tests.WorldMaterialToolTests.ControllerExecutesAsyncMaterialImportAndRetainsRealToolEvidence" methodname="ControllerExecutesAsyncMaterialImportAndRetainsRealToolEvidence" classname="WorldWeaver.Tests.WorldMaterialToolTests" runstate="Runnable" seed="167260832" result="Passed" start-time="2026-11-01 08:51:40Z" end-time="2026-11-01 08:51:41Z" duration="0.285733" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1541" name="LaterRuntimeFailureRevertsAppliedRendererAndRemovesOnlyNewMaterialAssets" fullname="WorldWeaver.Tests.WorldMaterialToolTests.LaterRuntimeFailureRevertsAppliedRendererAndRemovesOnlyNewMaterialAssets" methodname="LaterRuntimeFailureRevertsAppliedRendererAndRemovesOnlyNewMaterialAssets" classname="WorldWeaver.Tests.WorldMaterialToolTests" runstate="Runnable" seed="833153054" result="Passed" start-time="2026-11-01 08:51:41Z" end-time="2026-11-01 08:51:41Z" duration="0.111825" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1539" name="NetworkToolsCannotShareASceneTransactionOrBlockSynchronousExecute" fullname="WorldWeaver.Tests.WorldMaterialToolTests.NetworkToolsCannotShareASceneTransactionOrBlockSynchronousExecute" methodname="NetworkToolsCannotShareASceneTransactionOrBlockSynchronousExecute" classname="WorldWeaver.Tests.WorldMaterialToolTests" runstate="Runnable" seed="291930721" result="Passed" start-time="2026-11-01 08:51:41Z" end-time="2026-11-01 08:51:41Z" duration="0.020428" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1538" name="OfflineImportReportsActualFilesAndInvokesCheckpointHookOnlyBeforeNewWrites" fullname="WorldWeaver.Tests.WorldMaterialToolTests.OfflineImportReportsActualFilesAndInvokesCheckpointHookOnlyBeforeNewWrites" methodname="OfflineImportReportsActualFilesAndInvokesCheckpointHookOnlyBeforeNewWrites" classname="WorldWeaver.Tests.WorldMaterialToolTests" runstate="Runnable" seed="1601890593" result="Passed" start-time="2026-11-01 08:51:41Z" end-time="2026-11-01 08:51:41Z" duration="0.074752" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1537" name="OfflineSearchUsesAsyncToolPathWithoutAssetsOrUndo" fullname="WorldWeaver.Tests.WorldMaterialToolTests.OfflineSearchUsesAsyncToolPathWithoutAssetsOrUndo" methodname="OfflineSearchUsesAsyncToolPathWithoutAssetsOrUndo" classname="WorldWeaver.Tests.WorldMaterialToolTests" runstate="Runnable" seed="38470828" result="Passed" start-time="2026-11-01 08:51:41Z" end-time="2026-11-01 08:51:41Z" duration="0.027869" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1540" name="UnknownArgumentsUrlsAndNonExistingApplicationTargetsFailBeforeMutation" fullname="WorldWeaver.Tests.WorldMaterialToolTests.UnknownArgumentsUrlsAndNonExistingApplicationTargetsFailBeforeMutation" methodname="UnknownArgumentsUrlsAndNonExistingApplicationTargetsFailBeforeMutation" classname="WorldWeaver.Tests.WorldMaterialToolTests" runstate="Runnable" seed="551056229" result="Passed" start-time="2026-11-01 08:51:41Z" end-time="2026-11-01 08:51:41Z" duration="0.020122" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Saving results to: /Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/integration-1.3-focused-r1.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

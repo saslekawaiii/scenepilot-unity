@@ -99,14 +99,26 @@ namespace WorldWeaver.Tests
             var grass=WorldMaterialLibrary.ImportBuiltIn("builtin:grass");var stone=WorldMaterialLibrary.ImportBuiltIn("builtin:stone");
             var data=new TerrainData{heightmapResolution=33,size=new Vector3(32,10,32),alphamapResolution=16};
             data.terrainLayers=new[]{AssetDatabase.LoadAssetAtPath<TerrainLayer>(grass.TerrainLayerPath),AssetDatabase.LoadAssetAtPath<TerrainLayer>(stone.TerrainLayerPath)};
-            var weights=new float[16,16,2];for(int z=0;z<16;z++)for(int x=0;x<16;x++){weights[z,x,0]=.3f;weights[z,x,1]=.7f;}data.SetAlphamaps(0,0,weights);
+            var weights=new float[16,16,2];for(int z=0;z<16;z++)for(int x=0;x<16;x++){weights[z,x,0]=.2f+x/15f*.6f;weights[z,x,1]=1-weights[z,x,0];}data.SetAlphamaps(0,0,weights);
             var a=Terrain.CreateTerrainGameObject(data);var b=Terrain.CreateTerrainGameObject(data);var originalLayer=data.terrainLayers[1];
+            var before=data.GetAlphamaps(0,0,16,16);
+            Assert.That(before[0,0,0],Is.EqualTo(.2f).Within(.01));Assert.That(before[15,15,0],Is.EqualTo(.8f).Within(.01));
             Undo.IncrementCurrentGroup();int group=Undo.GetCurrentGroup();var result=WorldMaterialLibrary.Apply(a,"builtin:sand",2,4,false,0);var applied=a.GetComponent<Terrain>().terrainData;
             Assert.That(result.AppliedTerrainLayers,Is.EqualTo(1));Assert.That(applied,Is.Not.SameAs(data));Assert.That(b.GetComponent<Terrain>().terrainData,Is.SameAs(data));
             Assert.That(applied.terrainLayers[1],Is.SameAs(originalLayer));Assert.That(applied.terrainLayers[0].tileSize,Is.EqualTo(new Vector2(1,.5f)));
-            Assert.That(applied.GetAlphamaps(0,0,1,1)[0,0,0],Is.EqualTo(.3f).Within(.01));Assert.That(a.GetComponent<TerrainCollider>().terrainData,Is.SameAs(applied));
+            Assert.That(a.GetComponent<TerrainCollider>().terrainData,Is.SameAs(applied));
+            AssertPaintEqual(before,applied.GetAlphamaps(0,0,16,16));AssertPaintEqual(before,data.GetAlphamaps(0,0,16,16));
+            string appliedPath=AssetDatabase.GetAssetPath(applied);AssetDatabase.ImportAsset(appliedPath,ImportAssetOptions.ForceSynchronousImport|ImportAssetOptions.ForceUpdate);
+            AssertPaintEqual(before,AssetDatabase.LoadAssetAtPath<TerrainData>(appliedPath).GetAlphamaps(0,0,16,16));
             Undo.FlushUndoRecordObjects();Undo.RevertAllDownToGroup(group);Assert.That(a.GetComponent<Terrain>().terrainData,Is.SameAs(data));Assert.That(a.GetComponent<TerrainCollider>().terrainData,Is.SameAs(data));
+            AssertPaintEqual(before,data.GetAlphamaps(0,0,16,16));
             Object.DestroyImmediate(a);Object.DestroyImmediate(b);Object.DestroyImmediate(data);
+        }
+        private static void AssertPaintEqual(float[,,] expected,float[,,] actual)
+        {
+            Assert.That(actual.GetLength(0),Is.EqualTo(expected.GetLength(0)));Assert.That(actual.GetLength(1),Is.EqualTo(expected.GetLength(1)));Assert.That(actual.GetLength(2),Is.EqualTo(expected.GetLength(2)));
+            for(int z=0;z<expected.GetLength(0);z++)for(int x=0;x<expected.GetLength(1);x++)for(int layer=0;layer<expected.GetLength(2);layer++)
+                Assert.That(actual[z,x,layer],Is.EqualTo(expected[z,x,layer]).Within(.01),"Terrain paint changed at "+x+","+z+", layer "+layer);
         }
         [Test] public void ChildRenderersNeedExplicitScopeAndInvalidTilingCannotImportAssets()
         {
@@ -130,7 +142,7 @@ namespace WorldWeaver.Tests
         {
             Assert.ThrowsAsync<InvalidOperationException>(async()=>await WorldMaterialLibrary.ImportAsync("polyhaven:uncached_fixture",false));
             var cancelled=new CancellationTokenSource();cancelled.Cancel();
-            Assert.ThrowsAsync<OperationCanceledException>(async()=>await WorldMaterialLibrary.ImportAsync("builtin:wood",false,cancelled.Token));
+            Assert.CatchAsync<OperationCanceledException>(async()=>await WorldMaterialLibrary.ImportAsync("builtin:wood",false,cancelled.Token));
             await Task.CompletedTask;
         }
         private sealed class FakeHttp:IMaterialHttpTransport

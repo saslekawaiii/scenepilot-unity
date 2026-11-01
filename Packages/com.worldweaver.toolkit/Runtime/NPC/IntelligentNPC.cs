@@ -75,7 +75,14 @@ namespace WorldWeaver
         public void BeginPlayerConversation()
         {
             PlayerConversationActive=true; if(runningAmbient)activeRequest?.Cancel(); NpcInferenceScheduler.PrioritizePlayer(); GetComponent<NpcSocialAutonomy>()?.CancelConversation();
-            var agent=GetComponent<NavMeshAgent>(); if(agent&&agent.enabled&&agent.isOnNavMesh) { agent.ResetPath(); agent.isStopped=true; }
+            HaltNavigation(GetComponent<NavMeshAgent>());
+        }
+        internal static void HaltNavigation(NavMeshAgent agent)
+        {
+            if(!agent||!agent.enabled||!agent.isOnNavMesh)return;
+            agent.ResetPath();agent.isStopped=true;
+            // Also clear residual simulation velocity so a conversation pause does not coast along the old path.
+            agent.velocity=Vector3.zero;agent.nextPosition=agent.transform.position;
         }
         public void EndPlayerConversation() { PlayerConversationActive=false; if(Busy&&!runningAmbient)activeRequest?.Cancel(); nextPlan=Time.unscaledTime+PlanningCooldown; }
 
@@ -226,7 +233,7 @@ namespace WorldWeaver
             State = action == "Follow" ? NpcState.Following : NpcState.Moving;
         }
         public void StopMovement()
-        { follow = null; var agent = GetComponent<NavMeshAgent>(); if (agent && agent.isOnNavMesh) { agent.ResetPath(); agent.isStopped = true; } State = NpcState.Waiting; }
+        { follow = null; HaltNavigation(GetComponent<NavMeshAgent>()); State = NpcState.Waiting; }
         public void ClearMemory() { if (!Busy) { persistentMemory.Clear(); pipeline?.ClearMemory(); } }
         public async Task ReindexAsync(CancellationToken token) { if (Busy) throw new InvalidOperationException("NPC is busy."); await Services.ReindexAsync(this, token); }
         public void ReleaseServices() { if (pipeline != null) persistentMemory = pipeline.ExportMemory(); pipeline?.Dispose(); pipeline = null; }

@@ -38,8 +38,13 @@ namespace WorldWeaver.Tests
             var start=player.transform.position;yield return new WaitForSeconds(.25f);Assert.Less(Vector3.Distance(start,player.transform.position),.001f,"Open conversation must prevent WorldPlayer.Update from applying movement and gravity.");
             Assert.AreEqual(DeliveryQuestStage.NotStarted,quest.Stage);Assert.AreEqual(0,player.GetComponent<Inventory>().Count(quest.LetterItem));
             Assert.IsNotNull(player.Conversation.View.Q<TextField>("conversation-input"));Assert.IsNotNull(player.Conversation.View.Q<Button>("conversation-send"));
-            player.Conversation.Close();Assert.IsFalse(npc.PlayerConversationActive);yield return new WaitForSeconds(.25f);
-            Assert.Less(player.transform.position.y,start.y-.01f,"Closing must release the movement guard; gravity then actually resumes.");
+            player.Conversation.Close();Assert.IsFalse(npc.PlayerConversationActive);
+            float dropDeadline=Time.realtimeSinceStartup+4;int resumedFrames=0;
+            while((resumedFrames<20||player.transform.position.y>start.y-.05f)&&Time.realtimeSinceStartup<dropDeadline)
+            { yield return null;resumedFrames++; }
+            TestContext.WriteLine("Actual resumed player update: observedFrames="+resumedFrames+", verticalDropMetres="+(start.y-player.transform.position.y));
+            Assert.GreaterOrEqual(resumedFrames,20,"Observe actual WorldPlayer.Update frames instead of relying on a short wall-clock wait in batchmode.");
+            Assert.Less(player.transform.position.y,start.y-.05f,"Closing must release the movement guard; gravity must produce a meaningful measured drop.");
         }
         [UnityTest] public IEnumerator OnlyActualNpcToNpcUtterancesBecomeAmbientCaptions()
         {
@@ -86,6 +91,20 @@ namespace WorldWeaver.Tests
             var second=Actor(world,"merchant",new Vector3(2,3,0));ui.Open(second);Object.Destroy(second.gameObject);
             yield return new WaitForSeconds(.35f);Assert.IsFalse(ui.IsOpen);Assert.IsNull(ui.ActiveNpc);
         }
+        [UnityTest] public IEnumerator ComponentDisableDuringPostDecisionEmbeddingCancelsActualUnityLifecycleAndSuppressesReply()
+        {
+            var player=Player(out var world);var npc=Actor(world,"guard",new Vector3(1,3,0));npc.UseRag=true;
+            var embedding=new DisableDuringMemoryEmbedding(()=>npc.enabled=false);npc.ConfigureInference(new PostDecisionTalkRouter(),embedding);
+            var utterances=new List<NpcUtterance>();var statuses=new List<string>();npc.SpeechReceived+=line=>utterances.Add(line);npc.AiStatusChanged+=value=>statuses.Add(value);
+            string oldSpeech=npc.LastSpeech;var ui=player.Conversation;ui.Open(npc,player.GetComponent<Inventory>());
+            var pending=ui.SendAsync("Ответь, не меняя мир.");while(!pending.IsCompleted)yield return null;var trace=pending.GetAwaiter().GetResult();
+            Assert.IsTrue(embedding.MemoryIndexingStarted,"Component disable must happen inside post-decision embedding, after a valid Talk decision.");
+            Assert.IsTrue(embedding.CancellationObserved,"In actual PlayMode, IntelligentNPC.OnDisable must cancel the active linked token.");
+            Assert.IsTrue(trace.Validation.Accepted);Assert.AreEqual(1,trace.Validation.Executed.Count);StringAssert.StartsWith("Talk(",trace.Validation.Executed[0]);
+            Assert.IsTrue(trace.ReplySuppressed);Assert.AreSame(trace,TraceLog.Entries.Last());StringAssert.Contains("memory indexing cancelled",trace.Error);
+            Assert.AreEqual(oldSpeech,npc.LastSpeech);Assert.AreEqual(1,utterances.Count);Assert.IsTrue(utterances[0].IsPlayer);Assert.AreEqual(0,npc.ConversationHistory.Count(line=>line.IsAi));Assert.IsFalse(npc.Busy);Assert.IsFalse(statuses.Contains("Ответ готов"));
+            yield return new WaitForSeconds(.35f);Assert.IsFalse(ui.IsOpen);Assert.IsNull(ui.ActiveNpc);Assert.IsFalse(npc.PlayerConversationActive);
+        }
         [UnityTest] public IEnumerator ExplicitQuestActionChangesInventoryOnceWhileOpenDialogueAloneDoesNot()
         {
             var player=Player(out var world);var giver=Actor(world,"giver",new Vector3(1,3,0));var recipient=Actor(world,"recipient",new Vector3(2,3,0));
@@ -97,6 +116,26 @@ namespace WorldWeaver.Tests
             Assert.AreEqual(DeliveryQuestStage.Completed,quest.Stage);Assert.AreEqual(quest.RewardAmount,inventory.Count(quest.RewardItem));Assert.AreEqual(0,inventory.Count(quest.LetterItem));
             InvokeQuest(ui);Assert.AreEqual(quest.RewardAmount,inventory.Count(quest.RewardItem));Assert.IsFalse(ui.View.Q<Button>(className:"quest-action").enabledInHierarchy);
             yield return null;
+        }
+        sealed class PostDecisionTalkRouter:IModelRouter
+        {
+            public Task<CompletionResult> CompleteAsync(ModelTask task,CompletionRequest request,CancellationToken token)
+            {
+                token.ThrowIfCancellationRequested();return Task.FromResult(new CompletionResult {Text="{\"speech\":\"Эта реплика не должна появиться после отключения.\",\"actions\":[{\"type\":\"Talk\",\"target\":\"\",\"item\":\"\",\"amount\":0}]}",Provider="explicit-post-decision-ui-fixture"});
+            }
+            public void Dispose(){}
+        }
+        sealed class DisableDuringMemoryEmbedding:IEmbeddingProvider
+        {
+            readonly Action disable;public bool MemoryIndexingStarted,CancellationObserved;
+            public DisableDuringMemoryEmbedding(Action disable)=>this.disable=disable;
+            public string Identity=>"explicit-post-decision-embedding-fixture";
+            public Task<float[]> EmbedAsync(string text,bool query,CancellationToken token)
+            {
+                if(!query) {MemoryIndexingStarted=true;disable();CancellationObserved=token.IsCancellationRequested;token.ThrowIfCancellationRequested();}
+                return Task.FromResult(new[]{1f,0f});
+            }
+            public void Dispose(){}
         }
         sealed class ReplyRouter:IModelRouter
         {

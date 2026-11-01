@@ -178,6 +178,16 @@ namespace WorldWeaver.Editor.Assistant
             if(!terrain&&renderers.Length==0)throw new ArgumentException("Target has no Renderer; enable include_children for a building root, or target its Terrain explicitly.");
             if(terrain&&(!terrain.terrainData||terrainLayerIndex<0||terrainLayerIndex>7||terrainLayerIndex>=Math.Max(1,terrain.terrainData.terrainLayers.Length)))
                 throw new ArgumentException("Choose an existing terrain layer index (0–7); an empty Terrain accepts index 0.");
+            // Unity may reset/reassign the control textures when TerrainData is made into a new
+            // asset or terrainLayers changes. Capture the actual paint before either operation.
+            float[,,] terrainWeights=null;
+            if(terrain&&terrain.terrainData.terrainLayers.Length>0)
+            {
+                var original=terrain.terrainData;
+                if((long)original.alphamapWidth*original.alphamapHeight*original.alphamapLayers>8L*1024*1024)
+                    throw new InvalidOperationException("Terrain paint exceeds the 32 MiB material-edit budget; reduce alphamap resolution before applying a texture.");
+                terrainWeights=original.GetAlphamaps(0,0,original.alphamapWidth,original.alphamapHeight);
+            }
             var imported=FindCached(materialId);
             if(imported==null&&materialId.StartsWith("builtin:",StringComparison.Ordinal))imported=ImportBuiltIn(materialId);
             if(imported==null)throw new InvalidOperationException("Import the online material first with material_import; material_apply does not access the internet.");
@@ -213,6 +223,7 @@ namespace WorldWeaver.Editor.Assistant
                         {
                             int n=data.alphamapResolution;var weights=new float[n,n,1];for(int z=0;z<n;z++)for(int x=0;x<n;x++)weights[z,x,0]=1;data.SetAlphamaps(0,0,weights);
                         }
+                        else data.SetAlphamaps(0,0,terrainWeights);
                         Undo.RecordObject(terrain,"WorldWeaver textured terrain");terrain.terrainData=data;EditorUtility.SetDirty(terrain);
                         var collider=terrain.GetComponent<TerrainCollider>();if(collider){Undo.RecordObject(collider,"WorldWeaver textured terrain collider");collider.terrainData=data;EditorUtility.SetDirty(collider);PrefabUtility.RecordPrefabInstancePropertyModifications(collider);}
                         PrefabUtility.RecordPrefabInstancePropertyModifications(terrain);EditorUtility.SetDirty(data);result.AppliedTerrainLayers=1;

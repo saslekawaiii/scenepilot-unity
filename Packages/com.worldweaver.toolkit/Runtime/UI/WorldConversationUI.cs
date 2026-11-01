@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -64,7 +65,7 @@ namespace WorldWeaver
             var root = document.rootVisualElement;
             root.Clear(); root.name = "worldweaver-game-ui"; root.AddToClassList("world-ui"); root.pickingMode = PickingMode.Ignore;
             var bodyFont = Resources.Load<Font>("WorldWeaver/UI/Fonts/NotoSans");
-            if (bodyFont) root.style.unityFont = bodyFont;
+            if (bodyFont) root.style.unityFontDefinition = FontDefinition.FromFont(bodyFont);
             if (!GetComponent<NpcAmbientBubbles>()) gameObject.AddComponent<NpcAmbientBubbles>();
             root.RegisterCallback<GeometryChangedEvent>(e => root.EnableInClassList("compact", e.newRect.width < 900));
             var hud = Box(root, "hud"); hud.pickingMode = PickingMode.Ignore;
@@ -97,7 +98,7 @@ namespace WorldWeaver
             Label(heading, "РАЗГОВОР", "eyebrow");
             npcName = Label(heading, "", "conversation-title");
             var headingFont = Resources.Load<Font>("WorldWeaver/UI/Fonts/CormorantGaramond");
-            if (headingFont) { identity.style.unityFont = headingFont; npcName.style.unityFont = headingFont; }
+            if (headingFont) { identity.style.unityFontDefinition = FontDefinition.FromFont(headingFont); npcName.style.unityFontDefinition = FontDefinition.FromFont(headingFont); }
             aiSwitch = Button(header, "ИИ включён", ToggleAi, "ai-toggle");
             Button(header, "Закончить  ×", Close, "close-button");
             history = new ScrollView(ScrollViewMode.Vertical) { name = "conversation-history", horizontalScrollerVisibility = ScrollerVisibility.Hidden };
@@ -157,7 +158,16 @@ namespace WorldWeaver
             identity.text = npc.NpcName; npcName.text = npc.NpcName; role.text = npc.Role;
             input.SetValueWithoutNotify(""); notice.text = "";
             historySignature = null; SetOpen(true); RefreshHistory(); RefreshControls(); RefreshQuestAction(); RefreshPortrait();
-            input.schedule.Execute(() => { if (IsOpen) input.Focus(); });
+            StartCoroutine(FocusReplyAfterOpeningKey(conversationVersion));
+        }
+
+        IEnumerator FocusReplyAfterOpeningKey(int version)
+        {
+            // The E event that opened this view still reaches UI Toolkit later in
+            // the frame. Focus only after release so it cannot become typed text.
+            while (Input.GetKey(KeyCode.E)) yield return null;
+            yield return null;
+            if (IsOpen && version == conversationVersion) input.Focus();
         }
 
         public void Close()
