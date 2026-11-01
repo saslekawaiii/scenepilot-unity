@@ -183,6 +183,34 @@ namespace WorldWeaver.Tests
             Assert.AreEqual(1,answer.Steps.Count);Assert.IsTrue(answer.Steps[0].Success);Assert.AreEqual("material_search",answer.Steps[0].Tool);Assert.IsNull(answer.PendingPlan);Assert.IsFalse(answer.Task.MutationAuthorized);Assert.IsTrue(string.IsNullOrEmpty(answer.Task.CheckpointId));
             Assert.AreEqual(0,testScene.rootCount);CollectionAssert.AreEquivalent(beforeAssets,AssetDatabase.GetAllAssetPaths());
         }
+        [UnityTest] public IEnumerator FirstMixedDiscoveryCannotImportAGuessedIdBeforeItsActualSearchResult()
+        {
+            const string guessed="polyhaven:unverified_before_first_search";
+            var guessedImport=new EditorCommand {tool="material_import",args=new JObject {["material_id"]=guessed,["allow_online"]=false}};
+            string raw=Reply(false,MaterialSearch(),guessedImport,new EditorCommand {tool="material_apply",target="@UnverifiedDiscoveryDoor",args=new JObject {["material_id"]=guessed}});
+            var beforeAssets=AssetDatabase.GetAllAssetPaths();var provider=new RecordingProvider();ChatController controller=null;
+            provider.Respond=(round,request,token)=>
+            {
+                if(round==0)return Task.FromResult(raw);
+                Assert.IsFalse(request.Messages.Any(message=>message.Content.Contains(guessed)||message.Content.Contains("UnverifiedDiscoveryDoor")),"Rejected guessed IDs cannot anchor the next phase.");
+                Assert.IsTrue(string.IsNullOrEmpty(controller.Current.Messages.Last().Task.CheckpointId));Assert.AreEqual(0,testScene.rootCount);CollectionAssert.AreEquivalent(beforeAssets,AssetDatabase.GetAllAssetPaths());
+                if(round==1)
+                {
+                    Assert.IsEmpty(controller.Current.Messages.Last().Steps);
+                    var actions=request.Schema["properties"]["actions"];CollectionAssert.AreEqual(new[]{"material_search"},((JArray)actions["items"]["anyOf"]).OfType<JObject>().Select(EditorToolSchema.ToolName));
+                    Assert.AreEqual(1,(int)actions["minItems"]);Assert.AreEqual(1,(int)actions["maxItems"]);CollectionAssert.AreEqual(new[]{false},request.Schema["properties"]["complete"]["enum"].Values<bool>());
+                    Assert.IsTrue(request.Messages.Any(message=>message.Role=="system"&&message.Content.Contains("EXACTLY ONE material_search")));
+                    return Task.FromResult(Reply(false,MaterialSearch()));
+                }
+                Assert.AreEqual(2,round);var search=controller.Current.Messages.Last().Steps.Single();Assert.AreEqual("material_search",search.Tool);Assert.IsTrue(search.Success);StringAssert.Contains("builtin:wood",search.Summary);
+                return Task.FromResult(Reply(false,MaterialImport()));
+            };
+            controller=Controller(provider);controller.Settings.Mode=AssistantMode.Plan;controller.Settings.Power=AssistantPower.Balanced;
+            yield return Finish(controller.SendAsync("Найди текстуру дерева и подготовь её применение к двери."));
+            var answer=controller.Current.Messages.Last();Assert.IsFalse(answer.IsError,answer.Text);Assert.AreEqual(raw,answer.Attempts[0].RawResponse);Assert.IsFalse(answer.Attempts[0].Accepted);Assert.IsTrue(answer.Attempts[1].Accepted);Assert.IsTrue(answer.Attempts[2].Accepted);
+            Assert.AreEqual(1,answer.Steps.Count);Assert.AreEqual("material_search",answer.Steps[0].Tool);Assert.IsNotNull(answer.PendingPlan);Assert.AreEqual("material_import",answer.PendingPlan.actions.Single().tool);Assert.AreEqual("builtin:wood",(string)answer.PendingPlan.actions[0].args["material_id"]);
+            Assert.IsTrue(string.IsNullOrEmpty(answer.Task.CheckpointId));Assert.AreEqual(0,testScene.rootCount);CollectionAssert.AreEquivalent(beforeAssets,AssetDatabase.GetAllAssetPaths());
+        }
         [UnityTest] public IEnumerator FailedMaterialPlanAfterReadOnlySearchNeverClaimsSceneChanges()
         {
             var beforeAssets=AssetDatabase.GetAllAssetPaths();var provider=new RecordingProvider();
@@ -227,6 +255,29 @@ namespace WorldWeaver.Tests
             var answer=controller.Current.Messages.Last();Assert.IsTrue(answer.IsError,"A successful lookup cannot repair the failed requested mutation.");Assert.IsTrue(answer.Task.MutationAuthorized);Assert.AreEqual("Проверки не пройдены",answer.Status);
             Assert.AreEqual(2,answer.Steps.Count);Assert.IsFalse(answer.Steps[0].Success);Assert.AreEqual("material_search",answer.Steps[1].Tool);Assert.IsTrue(answer.Steps[1].Success);Assert.IsTrue(string.IsNullOrEmpty(answer.Task.CheckpointId));
             Assert.AreEqual(0,testScene.rootCount);CollectionAssert.AreEquivalent(beforeAssets,AssetDatabase.GetAllAssetPaths());
+        }
+        [UnityTest] public IEnumerator FailedAskReadFollowedByUnrelatedProjectInspectionStillReportsFailure()
+        {
+            string missing="absent-skill-"+Guid.NewGuid().ToString("N");var beforeAssets=AssetDatabase.GetAllAssetPaths();var provider=new RecordingProvider();ChatController controller=null;
+            provider.Respond=(round,request,token)=>
+            {
+                if(round==0)
+                {
+                    Assert.IsTrue(((JArray)request.Schema["properties"]["actions"]["items"]["anyOf"]).OfType<JObject>().Any(branch=>EditorToolSchema.ToolName(branch)=="read_skill"));
+                    return Task.FromResult(Reply(false,new EditorCommand {tool="read_skill",args=new JObject {["id"]=missing}}));
+                }
+                if(round==1)
+                {
+                    var failure=controller.Current.Messages.Last().Steps.Single();Assert.IsFalse(failure.Success);StringAssert.Contains("Unknown skill",failure.Error);
+                    return Task.FromResult(Reply(false,new EditorCommand {tool="inspect_project"}));
+                }
+                Assert.AreEqual(2,round);var steps=controller.Current.Messages.Last().Steps;Assert.AreEqual(2,steps.Count);Assert.IsFalse(steps[0].Success);Assert.IsTrue(steps[1].Success);Assert.AreEqual("inspect_project",steps[1].Tool);
+                return Task.FromResult(Reply(true));
+            };
+            controller=Controller(provider);controller.Settings.Mode=AssistantMode.Ask;controller.Settings.Power=AssistantPower.Balanced;
+            yield return Finish(controller.SendAsync("Прочитай навык и осмотри проект. Только объясни, ничего не изменяй."));
+            var answer=controller.Current.Messages.Last();Assert.IsTrue(answer.IsError,"An unrelated successful query cannot resolve a real failed read.");Assert.AreEqual("Проверки не пройдены",answer.Status);Assert.IsFalse(answer.Task.MutationAuthorized);Assert.IsTrue(answer.Attempts.All(attempt=>attempt.Accepted),"The fixture must exercise actual execution failure, not malformed-plan rejection.");
+            Assert.AreEqual(2,answer.Steps.Count);Assert.IsFalse(answer.Steps[0].Success);Assert.IsTrue(answer.Steps[1].Success);Assert.IsTrue(string.IsNullOrEmpty(answer.Task.CheckpointId));Assert.AreEqual(0,testScene.rootCount);CollectionAssert.AreEquivalent(beforeAssets,AssetDatabase.GetAllAssetPaths());
         }
         [UnityTest] public IEnumerator CompleteFlagStillRequiresFreshReadbackAndGoalRepair()
         {

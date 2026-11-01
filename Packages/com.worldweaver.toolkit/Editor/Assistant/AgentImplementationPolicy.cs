@@ -32,10 +32,11 @@ namespace WorldWeaver.Editor.Assistant
             nextTool = "";
             if (rejected?.actions == null || rejected.actions.Count <= 1) return "";
             var allowed = new HashSet<string>(allowedTools ?? Enumerable.Empty<string>(), StringComparer.Ordinal);
-            var next = !readOnlyRequest && allowed.Contains("material_import")
-                ? rejected.actions.FirstOrDefault(action => action?.tool == "material_import") : null;
-            if (next == null && allowed.Contains("material_search"))
-                next = rejected.actions.FirstOrDefault(action => action?.tool == "material_search");
+            // A rejected discovery/import batch has produced no search evidence: search before importing a guessed ID.
+            var next = allowed.Contains("material_search")
+                ? rejected.actions.FirstOrDefault(action => action?.tool == "material_search") : null;
+            if (next == null && !readOnlyRequest && allowed.Contains("material_import"))
+                next = rejected.actions.FirstOrDefault(action => action?.tool == "material_import");
             if (next?.args == null) return "";
             nextTool = next.tool;
             bool import = next.tool == "material_import";

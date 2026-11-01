@@ -27,10 +27,17 @@ namespace WorldWeaver.Tests
         [Test] public void MixedMaterialImportRepairPreservesExactParametersWithoutCopyingApplyPlan()
         {
             var import=Material("material_import",new JObject {["material_id"]="polyhaven:weathered_planks",["allow_online"]=true});
-            var plan=new EditorPlan {actions=new List<EditorCommand>{Material("material_search",new JObject {["query"]="wood",["source"]="polyhaven"}),import,Material("material_apply",new JObject {["material_id"]="polyhaven:weathered_planks"},"@RejectedDoorAnchor")}};
+            var plan=new EditorPlan {actions=new List<EditorCommand>{import,Material("material_apply",new JObject {["material_id"]="polyhaven:weathered_planks"},"@RejectedDoorAnchor")}};
             string before=JsonConvert.SerializeObject(plan);string hint=MaterialHint(plan,new[]{"material_search","material_import","material_apply"});
             StringAssert.Contains("EXACTLY ONE material_import",hint);StringAssert.Contains("complete:false",hint);StringAssert.Contains(import.args.ToString(Formatting.None),hint);StringAssert.DoesNotContain("RejectedDoorAnchor",hint);
             Assert.AreEqual(before,JsonConvert.SerializeObject(plan),"Repair guidance must not split, mutate or normalize the recorded plan.");
+        }
+        [Test] public void UnexecutedMixedSearchImportAndApplyRepairsDiscoveryBeforeAnyGuessedIdImport()
+        {
+            var search=Material("material_search",new JObject {["query"]="weathered wood",["source"]="polyhaven",["limit"]=5});
+            var plan=new EditorPlan {actions=new List<EditorCommand>{search,Material("material_import",new JObject {["material_id"]="polyhaven:guessed_before_discovery",["allow_online"]=true}),Material("material_apply",new JObject {["material_id"]="polyhaven:guessed_before_discovery"},"@GuessedDoor")}};
+            string before=JsonConvert.SerializeObject(plan);string hint=MaterialHint(plan,new[]{"material_search","material_import","material_apply"});
+            StringAssert.Contains("EXACTLY ONE material_search",hint);StringAssert.Contains(search.args.ToString(Formatting.None),hint);StringAssert.DoesNotContain("guessed_before_discovery",hint);StringAssert.DoesNotContain("GuessedDoor",hint);Assert.AreEqual(before,JsonConvert.SerializeObject(plan));
         }
         [Test] public void MixedMaterialSearchRepairPreservesQuerySourceAndLimit()
         {
