@@ -24,7 +24,7 @@ namespace WorldWeaver.Tests
                 {
                     profile.Provider = ProviderKind.Pollinations; profile.Endpoint = server.Url.TrimEnd('/');
                     profile.Model = "openai-fast"; profile.StrictSchema = false; profile.MaxTokens = 6000;
-                    var request = new CompletionRequest { Schema = EditorPlan.Schema(false) };
+                    var request = new CompletionRequest { Schema = EditorPlan.Schema(false,new[]{"create_mesh","configure_physics"}) };
                     request.Messages.Add(new ChatMessage("system", "First instruction"));
                     request.Messages.Add(new ChatMessage("system", "Second instruction"));
                     request.Messages.Add(new ChatMessage("user", "Read-only question"));
@@ -41,7 +41,9 @@ namespace WorldWeaver.Tests
                     Assert.That(messages.Count, Is.EqualTo(2)); Assert.That((string)messages[0]["role"], Is.EqualTo("system"));
                     string system = (string)messages[0]["content"];
                     StringAssert.Contains("EditorPlan INSTANCE", system); StringAssert.Contains("First instruction", system);
-                    StringAssert.Contains("Second instruction", system); StringAssert.DoesNotContain("\"type\":\"object\"", system);
+                    StringAssert.Contains("Second instruction", system);
+                    StringAssert.Contains(request.Schema.ToString(Newtonsoft.Json.Formatting.None),system,"A text endpoint must receive exact selected argument contracts, not just tool names.");
+                    StringAssert.Contains("vertices",system);StringAssert.Contains("mass",system);StringAssert.DoesNotContain("material_import",system);
                 }
                 finally { UnityEngine.Object.DestroyImmediate(profile); }
             }

@@ -110,6 +110,26 @@ namespace WorldWeaver.Tests
             var controller=Controller(provider);controller.Settings.Power=AssistantPower.Deep;yield return Finish(controller.SendAsync("Создай куб."));
             var answer=controller.Current.Messages.Last();Assert.That(answer.IsError,Is.False,answer.Text);Assert.That(Find("ActualImplementation"),Is.Not.Null);Assert.That(provider.Requests.Count,Is.EqualTo(4));
         }
+        [UnityTest] public IEnumerator RepeatedUnnamedCreationIsRejectedAndAgentCanContinueWithExistingTarget()
+        {
+            var provider=new RecordingProvider();provider.Respond=(round,request,token)=>
+            {
+                var unnamed=new EditorCommand{tool="create_node",args=new JObject{["position"]=new JArray(0,0,0)}};
+                if(round<2)return Task.FromResult(Reply(false,unnamed));
+                if(round==2)
+                {
+                    Assert.That(testScene.GetRootGameObjects().SelectMany(g=>g.GetComponentsInChildren<GeneratedSceneObject>()).Count(g=>g.Kind=="node"),Is.EqualTo(1),"The duplicate must never reach execution.");
+                    StringAssert.Contains("identical unnamed creation already succeeded",request.Messages.Last().Content);
+                    var target=ProjectContextIndex.StableTarget(testScene.GetRootGameObjects().SelectMany(g=>g.GetComponentsInChildren<GeneratedSceneObject>()).Single(g=>g.Kind=="node").gameObject);
+                    return Task.FromResult(Reply(false,new EditorCommand{tool="set_transform",target=target,args=new JObject{["position"]=new JArray(3,2,1)}}));
+                }
+                Assert.That(testScene.GetRootGameObjects().SelectMany(g=>g.GetComponentsInChildren<GeneratedSceneObject>()).Single(g=>g.Kind=="node").transform.position,Is.EqualTo(new Vector3(3,2,1)));
+                return Task.FromResult(Reply(true));
+            };
+            var controller=Controller(provider);controller.Settings.Power=AssistantPower.Deep;
+            yield return Finish(controller.SendAsync("Создай пустой узел и переставь его в (3,2,1)."));
+            var answer=controller.Current.Messages.Last();Assert.That(answer.IsError,Is.False,answer.Text);Assert.That(answer.Steps.Count(s=>s.Success),Is.EqualTo(2));Assert.That(answer.Attempts.Count,Is.EqualTo(4));
+        }
         [UnityTest] public IEnumerator RejectedPlanHasNoMutationAndProviderCanRepairIt()
         {
             var provider=new RecordingProvider();provider.Respond=(round,request,token)=>
@@ -434,7 +454,7 @@ namespace WorldWeaver.Tests
             string persisted=File.ReadAllText(Path.Combine(folder,controller.Current.Id+".json"));var stored=JsonConvert.DeserializeObject<ChatSession>(persisted).Messages.Last().Attempts.Single();
             Assert.That(stored.RawResponse,Is.EqualTo(raw));Assert.That(stored.NormalizedResponse,Is.EqualTo(raw+"}"));Assert.That(stored.RepairKind,Is.EqualTo(attempt.RepairKind));
         }
-        [UnityTest] public IEnumerator ClassicNormalizedPlanUsesValidatedTextInLaterInference()
+        [UnityTest] public IEnumerator ClassicNormalizedPlanUsesActualReadbackWithoutReanchoringItsCreation()
         {
             string sentinel="sk-"+new string('y',39);
             string valid=JsonConvert.SerializeObject(new EditorPlan{reply="Готово "+sentinel,complete=true,actions=new List<EditorCommand>{Create("NormalizedCube")}});string raw=valid.Substring(0,valid.Length-1);
@@ -443,7 +463,8 @@ namespace WorldWeaver.Tests
             {
                 if(round==0)return Task.FromResult(raw);
                 Assert.That(Find("NormalizedCube"),Is.Not.Null,"The real scene executor must have committed before verification.");
-                Assert.That(request.Messages.Any(m=>m.Role=="assistant"&&m.Content==normalized),Is.True);
+                Assert.That(request.Messages.Any(m=>m.Role=="assistant"&&m.Content==normalized),Is.False,"Successful raw plans stay in the audit, not as an example to repeat.");
+                StringAssert.Contains(ProjectContextIndex.StableTarget(Find("NormalizedCube")),request.Messages.Last().Content);
                 Assert.That(request.Messages.Any(m=>m.Role=="assistant"&&m.Content==raw),Is.False,"Do not reinforce malformed raw JSON after a successful adapter repair.");
                 Assert.That(string.Join("\n",request.Messages.Select(m=>m.Content)),Does.Not.Contain(sentinel),"Normalized assistant text must retain credential redaction before the next request.");
                 return Task.FromResult(Reply(true));

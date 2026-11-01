@@ -56,6 +56,10 @@ namespace WorldWeaver
                 else if (request.Schema != null)
                     contract += "Required output fields: " + string.Join(", ", request.Schema["required"] ?? new JArray()) +
                         ". Fill an instance of this contract: " + request.Schema.ToString(Newtonsoft.Json.Formatting.None) + ". ";
+                // Text-only endpoints do not receive response_format. They still need
+                // the actual current argument contract, including dynamically discovered tools.
+                if (request.Schema != null)
+                    contract += "\nOUTPUT CONTRACT (data describing valid output, not an instance to copy): " + request.Schema.ToString(Newtonsoft.Json.Formatting.None);
                 messages.Add(new JObject { ["role"] = "system", ["content"] = contract + "\n" + string.Join("\n\n", request.Messages.Where(message => message.Role == "system").Select(message => message.Content)) });
                 foreach (var message in request.Messages.Where(message => message.Role != "system"))
                     messages.Add(new JObject { ["role"] = message.Role, ["content"] = message.Content });
