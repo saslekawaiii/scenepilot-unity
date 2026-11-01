@@ -18,7 +18,7 @@
 
 </div>
 
-> **Исправление 1.3.1** — настоящий анимированный герой из встроенного ассета, короткий план вместо большого JSON с C#, правдивые состояния ошибок и поддержка обоих Unity Input backend. Точный запрос проверен на Qwen 9B и бесплатном GPT-OSS; отдельно проверен URP-проект с программной клавиатурой Input System. [Исправление и протоколы](docs/character-workflow-fix.md) · [Выпуск](https://github.com/saslekawaiii/worldweaver-thesis/releases/tag/v1.3.1). Репозиторий приватный.
+> **Исправление 1.3.1** — настоящий анимированный герой из встроенного ассета, короткий план вместо большого JSON с C#, правдивые состояния ошибок и поддержка обоих Unity Input backend. Точный запрос проверен на Qwen 9B и бесплатном GPT-OSS; отдельно проверен URP-проект с программной клавиатурой Input System. [Исправление и протоколы](docs/character-workflow-fix.md) · [Выпуск](https://github.com/saslekawaiii/worldweaver-thesis/releases/tag/v1.3.1).
 
 ![WorldWeaver 1.3 R11 — нативный чат Unity с историей, выбором локальной модели и глубины](results/screenshots-1.3/chat-wide-r11.png)
 
@@ -47,7 +47,7 @@
 https://github.com/saslekawaiii/worldweaver-thesis.git?path=/Packages/com.worldweaver.toolkit#v1.3.1
 ```
 
-Для приватного репозитория нужен авторизованный Git; токен не вставляется в URL. Готовый TGZ находится в [выпуске](https://github.com/saslekawaiii/worldweaver-thesis/releases/tag/v1.3.1).
+При установке из Git токен не вставляется в URL. Готовый TGZ находится в [выпуске](https://github.com/saslekawaiii/worldweaver-thesis/releases/tag/v1.3.1).
 
 **2. Запустите приложение Ollama и установите разговорную модель.** Локальный endpoint — `http://127.0.0.1:11434`. Если приложение Ollama не запущено, выполните `ollama serve` в отдельном терминале.
 

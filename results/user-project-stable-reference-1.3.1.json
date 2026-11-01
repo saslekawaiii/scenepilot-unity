@@ -1,0 +1,7 @@
+{
+  "dependency": "https://github.com/saslekawaiii/worldweaver-thesis.git?path=/Packages/com.worldweaver.toolkit#v1.3.1",
+  "manifestSha256": "d700cdb19f686f16bed8532398ec543419ae4c1e5bb17a0a11ab8be321c1612d",
+  "recordedAfterTagPush": true,
+  "editorResolutionVerified": false,
+  "reason": "Mac locked; editor has not yet refreshed its package lock."
+}
