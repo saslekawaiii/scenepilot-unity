@@ -83,6 +83,7 @@ namespace WorldWeaver.Tests
                 if(round==0)return Task.FromResult(Reply(false,Create("FirstCube")));
                 var created=Find("FirstCube");Assert.That(created,Is.Not.Null,"Later inference began before actual creation.");
                 string observation=request.Messages.Last().Content;StringAssert.Contains("FirstCube",observation);StringAssert.Contains(ProjectContextIndex.StableTarget(created),observation);
+                StringAssert.Contains("Создай куб и затем переставь его.",observation);StringAssert.DoesNotContain("цели NPC",observation);
                 if(round==1)return Task.FromResult(Reply(true,new EditorCommand{tool="set_transform",target="id:"+created.GetInstanceID(),args=new JObject{["position"]=new JArray(4,2,8)}}));
                 Assert.That(round,Is.EqualTo(2));Assert.That(created.transform.position,Is.EqualTo(new Vector3(4,2,8)));
                 return Task.FromResult(Reply(true));
