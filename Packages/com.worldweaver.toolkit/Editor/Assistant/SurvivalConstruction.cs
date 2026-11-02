@@ -13,7 +13,7 @@ namespace WorldWeaver.Editor.Assistant
             var env=world.GetComponent<WorldEnvironment>()??Undo.AddComponent<WorldEnvironment>(world);Undo.RecordObject(env,"Configure survival environment");env.Terrain=terrain;var marker=world.GetComponent<GeneratedSceneObject>();if(env.Profile=="custom"&&marker&&!string.IsNullOrEmpty(marker.Style))env.Profile=marker.Style;
             var survival=player.GetComponent<WorldSurvival>()??Undo.AddComponent<WorldSurvival>(player);Undo.RecordObject(survival,"Configure survival");survival.Environment=env;survival.OxygenSeconds=(float?)c.args["oxygen_seconds"]??180;
             var control=player.GetComponent<WorldPlayer>();Undo.RecordObject(control,"Set local player gravity");control.UseLocalGravity=true;control.Gravity=(float?)c.args["gravity"]??(env.Profile=="moon"?1.62f:9.81f);
-            Vector3 at=player.transform.position;at.y=terrain.SampleHeight(at)+terrain.transform.position.y;
+            Vector3 at=WorldSitePlacement.FindHabitatSite(terrain,survival.Habitat?survival.Habitat.position:player.transform.position,survival.Habitat);
             if(!survival.Habitat)
             {
                 var habitat=tx.Empty("База восстановления",world.transform,"habitat");habitat.transform.position=at;survival.Habitat=habitat.transform;
@@ -26,6 +26,7 @@ namespace WorldWeaver.Editor.Assistant
                 tx.Primitive("Airlock lintel",PrimitiveType.Cube,habitat.transform,shell,new Vector3(0,3.6f,-4),new Vector3(3.2f,.8f,.25f));
                 var lamp=tx.Empty("Recovery light",habitat.transform,"light");lamp.transform.localPosition=new Vector3(0,3.5f,0);var light=Undo.AddComponent<Light>(lamp);light.type=LightType.Point;light.color=new Color(.36f,1,.79f);light.range=10;light.intensity=2;
             }
+            Undo.RecordObject(survival.Habitat,"Place habitat at a clear grounded site");survival.Habitat.position=at;
             survival.Spawn=survival.Habitat.position+Vector3.up*.1f;
             Undo.RecordObject(player.transform,"Ground player in survival world");player.transform.position=survival.Spawn;EditorUtility.SetDirty(survival);EditorUtility.SetDirty(control);
         }

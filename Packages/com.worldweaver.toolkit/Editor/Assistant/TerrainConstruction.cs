@@ -23,6 +23,7 @@ namespace WorldWeaver.Editor.Assistant
                 int needed=RequiredResolution(terrain,width);
                 if(needed>2049)throw new ArgumentException("Cave needs a finer terrain grid than the supported 2049 resolution; choose a wider entrance or a smaller world.");
                 if(x-width<start.x||x+width>start.x+size.x||z-2<start.z||z+length+2>start.z+size.z)throw new ArgumentException("Cave and approach must fit inside terrain.");
+                if(!WorldSitePlacement.Clear(terrain,WorldSitePlacement.CaveFootprint(new Vector3(x,0,z),width,length),null,out var obstruction,false))throw new ArgumentException("Cave approach/footprint is occupied by "+obstruction+". Explicit coordinates were not changed; inspect the scene and choose a clear site.");
                 foreach(var cave in terrain.transform.parent.GetComponentsInChildren<WorldCave>())if(Mathf.Abs(cave.transform.position.x-x)<width+cave.Size.x&&Mathf.Abs(cave.transform.position.z-z)<length+cave.Size.z)throw new ArgumentException("Cave footprints overlap.");
             }
         }

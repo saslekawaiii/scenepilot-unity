@@ -40,6 +40,23 @@ namespace WorldWeaver.Editor.Assistant.Tests
         [TestCase("падающие предметы с отскоком","configure_physics")]
         [TestCase("кислород и выживание","configure_survival")]
         public void CapabilitySelectionCoversDifferentDomains(string query,string tool)=>Assert.That((IEnumerable<string>)typeof(ChatController).Assembly.GetType("WorldWeaver.Editor.Assistant.AgentCapabilities").GetMethod("Match",BindingFlags.Static|BindingFlags.NonPublic).Invoke(null,new object[]{query}),Does.Contain(tool));
+        [TestCase(true)] [TestCase(false)]
+        public void HabitatAndCaveKeepTheirApproachesClearInEitherCreationOrder(bool caveFirst)
+        {
+            World();var player=Run("create_player","SitePlayer","@World",new JObject{["position"]=new JArray(0,0,0)});Assert.IsTrue(player.Success,player.Error);var pawn=SceneToolExecutor.ResolveTarget(player.Results.Single(r=>r.Tool=="create_player").Target);
+            if(caveFirst){var cave=Run("create_cave","SiteCave","@World",new JObject{["position"]=new JArray(0,0),["width"]=6,["length"]=20});Assert.IsTrue(cave.Success,cave.Error);}
+            var configured=Run("configure_survival",target:ProjectContextIndex.StableTarget(pawn),args:new JObject{["world"]="@World"});Assert.IsTrue(configured.Success,configured.Error);
+            var survival=pawn.GetComponent<WorldSurvival>();
+            if(!caveFirst)
+            {
+                var terrain=Named("World").GetComponentInChildren<Terrain>();var before=terrain.terrainData;
+                var blocked=Run("create_cave","Blocked","@World",new JObject{["position"]=new JArray(0,0),["width"]=6,["length"]=20});Assert.IsFalse(blocked.Success);Assert.That(blocked.Error,Does.Contain("occupied"));Assert.AreSame(before,terrain.terrainData);
+                var clear=Run("create_cave","SiteCave","@World",new JObject{["position"]=new JArray(24,24),["width"]=6,["length"]=20});Assert.IsTrue(clear.Success,clear.Error);
+            }
+            var actual=Named("SiteCave").GetComponent<WorldCave>();var position=survival.Habitat.position;
+            Assert.IsFalse(new Rect(position.x-5,position.z-7,10,12).Overlaps(new Rect(actual.transform.position.x-actual.Size.x/2,actual.Entrance.z,actual.Size.x,actual.Size.z+1)));
+            Assert.AreEqual(survival.Habitat.position+Vector3.up*.1f,survival.Spawn);
+        }
         [Test] public void DiscoveryReturnsRealSchemaAndNeverMutatesScene()
         {
             int before=scene.rootCount;var r=Run("discover_tools",args:new JObject{["names"]=new JArray("create_mesh","not_a_tool")});
