@@ -1,0 +1,299 @@
+{
+  "version": "1.6.0",
+  "releaseStatus": "preview",
+  "releaseTag": "v1.6.0",
+  "sourceCommit": "8d714c2c4bef2c37869a640fe8d37798abcee0e6",
+  "packageFiles": 1799,
+  "archive": {
+    "path": "deliverables/com.worldweaver.toolkit-1.6.0.tgz",
+    "bytes": 3522278,
+    "sha256": "5bee85cd7edb148c48c71e4ec0890f1161aef8627f068ad5a66de91f862a3066"
+  },
+  "byteIdenticalCandidate": "com.worldweaver.toolkit-1.6.0-rc7.tgz",
+  "packageProof": {
+    "path": "results/upm-package-1.6.0.json",
+    "bytes": 231536,
+    "sha256": "5e48261d9b8feb974908b5cc07742e893ea04015c0b3cb460adcb1adb8b328bd"
+  },
+  "skills": 114,
+  "referenceRecipes": 466,
+  "referenceRecipesAreExecutableTools": false,
+  "modelCatalog": {
+    "models": 115,
+    "source": "https://github.com/microsoft/Microsoft-Rocketbox",
+    "sourceCommit": "0943055db6ec570bcef9f2c8b41c9e5467c808f9",
+    "license": "MIT",
+    "catalog": {
+      "path": "Packages/com.worldweaver.toolkit/Editor/Assistant/ModelCatalog.json",
+      "bytes": 136319,
+      "sha256": "81b6e6b79ee3fc9df33eb9239dc9366096488061d24e4a216682b69415380c2b"
+    },
+    "allModelsPlayTested": false
+  },
+  "unityVersion": "6000.3.27f1",
+  "editorTests": {
+    "total": 713,
+    "passed": 713,
+    "failed": 0,
+    "skipped": 0,
+    "path": "results/autonomous-agent-edit-packaged-1.6.0-rc7.xml",
+    "bytes": 764883,
+    "sha256": "33a1bca79faa9c7060b4bd9add579a7469f30d7ba9e96ad878155c2e60c342ba",
+    "runnerResult": "Passed",
+    "ignoredTests": []
+  },
+  "playTests": {
+    "total": 28,
+    "passed": 26,
+    "failed": 0,
+    "skipped": 2,
+    "path": "results/autonomous-agent-play-packaged-1.6.0-rc7.xml",
+    "bytes": 36354,
+    "sha256": "9c7dcfceba58ff453bab1e8caab68fc351b1abede8382d2c9ededf65022615eb",
+    "runnerResult": "Skipped:Ignored",
+    "ignoredTests": [
+      "WorldWeaver.Tests.RealProviderIntegration.RealFreeCloudPipeline",
+      "WorldWeaver.Tests.RealProviderIntegration.RealLocalPipeline"
+    ]
+  },
+  "generatedSceneInputTests": {
+    "total": 2,
+    "passed": 2,
+    "failed": 0,
+    "reports": [
+      {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "path": "results/imported-humanoid-play-1.6.0-rc7.xml",
+        "bytes": 4136,
+        "sha256": "985b9edccc77fc3c238611d08dfd480ac373d7b949a8e9cb9a3b637df108236c",
+        "runnerResult": "Passed",
+        "ignoredTests": []
+      },
+      {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "path": "results/imported-male-humanoid-play-1.6.0-rc7-r2.xml",
+        "bytes": 4134,
+        "sha256": "6bb90aeec5504e1214beaa2e97a15c7d797d0fc1d7b1181832fef6a9ad08a09f",
+        "runnerResult": "Passed",
+        "ignoredTests": []
+      }
+    ],
+    "femaleSceneGeneratedBy": "real agent RC2, final RC7 runtime/import fix applied",
+    "maleSceneGeneratedBy": "real agent RC7 cold_realistic_hero",
+    "sceneRepairByHarness": false
+  },
+  "liveRuns": [
+    {
+      "path": "results/agent-transfer-packaged-1.6.0-rc7.json",
+      "bytes": 2687597,
+      "sha256": "e9131a6b68913abb01cab23304c340b51618b6776d7af0e1ac17dd70977d83a2",
+      "model": "beam:cloud",
+      "completed": true,
+      "packageUnchanged": true,
+      "installedPackageDigest": "d761bea033527c6a14508b3200950f09243cb44f0daf926c8e7ce973ffe4e6a5",
+      "providerInjected": false,
+      "sceneRepairByHarness": false,
+      "paidApiUsed": false,
+      "passedCases": 8,
+      "totalCases": 8,
+      "cases": [
+        {
+          "case": "hero",
+          "prompt": "Создай главного героя с реальной моделью и анимацией ходьбы, чтобы им можно было управлять.",
+          "passed": true,
+          "checks": {
+            "onePlayer": true,
+            "skinnedModel": true,
+            "motor": true,
+            "realModelUsed": true,
+            "noError": true,
+            "noPendingPlan": true,
+            "notBlocked": true,
+            "noUnrecoveredProtocolFailure": true
+          },
+          "elapsedMs": 17289,
+          "protocolRepairCount": 0
+        },
+        {
+          "case": "replace_appearance",
+          "prompt": "Мне не нравится этот персонаж. Сделай другого: девушку в стиле реализм. Найди подходящую модель сам и замени облик, сохрани управление и камеру.",
+          "passed": true,
+          "checks": {
+            "onePlayer": true,
+            "sameIdentityAndMotor": true,
+            "realLibraryFemale": true,
+            "validHumanoid": true,
+            "locomotionConfigured": true,
+            "cameraPreserved": true,
+            "realModelUsed": true,
+            "noError": true,
+            "noPendingPlan": true,
+            "notBlocked": true,
+            "noUnrecoveredProtocolFailure": true
+          },
+          "elapsedMs": 18203,
+          "protocolRepairCount": 0
+        },
+        {
+          "case": "seesaw",
+          "prompt": "Через C# собери работающие качели-балансир: доска длиной 6 м и шириной 1 м, центр на высоте 1 м. У доски Rigidbody массой 12 кг и коллайдер. Петля HingeJoint в центре, ось вдоль Z, ограничение от -25 до 25 градусов. Основание неподвижное. Не заменяй физику декоративным объектом.",
+          "passed": true,
+          "checks": {
+            "actualBodyAndJoint": true,
+            "plankDimensions": true,
+            "realModelUsed": true,
+            "noError": true,
+            "noPendingPlan": true,
+            "notBlocked": true,
+            "noUnrecoveredProtocolFailure": true
+          },
+          "elapsedMs": 17928,
+          "protocolRepairCount": 0
+        },
+        {
+          "case": "ramp",
+          "prompt": "Через C# построй пандус из собственного меша: ширина 3 м, длина вдоль Z 7 м, подъём от Y=0 до Y=2. По нему можно ходить, нужен MeshCollider. Примитив вместо меша не подходит. Верни измеренные размеры.",
+          "passed": true,
+          "checks": {
+            "customCollisionMesh": true,
+            "realModelUsed": true,
+            "noError": true,
+            "noPendingPlan": true,
+            "notBlocked": true,
+            "noUnrecoveredProtocolFailure": true
+          },
+          "elapsedMs": 22496,
+          "protocolRepairCount": 0
+        },
+        {
+          "case": "library_inspection",
+          "prompt": "Найди в доступной библиотеке реалистичные модели мужчины, женщины и ребёнка. Назови реальные ID, лицензию и порядок импорта. Ничего не скачивай и сцену не меняй.",
+          "passed": true,
+          "checks": {
+            "sceneUntouched": true,
+            "realCatalogRead": true,
+            "noMutations": true,
+            "realModelUsed": true,
+            "noError": true,
+            "noPendingPlan": true,
+            "notBlocked": true,
+            "noUnrecoveredProtocolFailure": true
+          },
+          "elapsedMs": 4165,
+          "protocolRepairCount": 0
+        },
+        {
+          "case": "new_world",
+          "prompt": "Сделай каменистый мир с горами размером 256 на 256 м, без деревьев и зданий. Земля должна быть оранжевой. Добавь ночное звёздное небо и героя, которым можно ходить по поверхности.",
+          "passed": true,
+          "checks": {
+            "physicalTerrain": true,
+            "orangeTerrainTint": true,
+            "noTreesOrBuildings": true,
+            "stars": true,
+            "player": true,
+            "realModelUsed": true,
+            "noError": true,
+            "noPendingPlan": true,
+            "notBlocked": true,
+            "noUnrecoveredProtocolFailure": true
+          },
+          "elapsedMs": 112620,
+          "protocolRepairCount": 0
+        },
+        {
+          "case": "continue_after_idle",
+          "prompt": "Увеличь высоту гор на этом же мире, а ночное небо, героя и его управление сохрани. Новый мир не создавай.",
+          "passed": true,
+          "checks": {
+            "oneTerrain": true,
+            "heightsIncreased": true,
+            "samePlayer": true,
+            "starsPreserved": true,
+            "realModelUsed": true,
+            "noError": true,
+            "noPendingPlan": true,
+            "notBlocked": true,
+            "noUnrecoveredProtocolFailure": true
+          },
+          "elapsedMs": 13539,
+          "protocolRepairCount": 0
+        },
+        {
+          "case": "cold_realistic_hero",
+          "prompt": "В этой пустой сцене создай управляемого главного героя: реалистичного взрослого мужчину с ригом и анимацией ходьбы. Найди и загрузи подходящую настоящую модель, которой ещё нет в кэше, сохрани возможность движения и камеру. Стилизованный пресет не подходит.",
+          "passed": true,
+          "checks": {
+            "onePlayer": true,
+            "libraryModel": true,
+            "rigAndLocomotion": true,
+            "cameraAndMotor": true,
+            "realModelUsed": true,
+            "noError": true,
+            "noPendingPlan": true,
+            "notBlocked": true,
+            "noUnrecoveredProtocolFailure": true
+          },
+          "elapsedMs": 61704,
+          "protocolRepairCount": 0
+        }
+      ],
+      "harness": {
+        "path": "scripts/AgentTransferAcceptanceRunner.cs",
+        "bytes": 14434,
+        "sha256": "6aec8a6c30fa128c89c8f5ad0614324beece9e32a301086abf3a4009fa25315c"
+      }
+    }
+  ],
+  "consumerIdentity": {
+    "path": "results/installed-package-identity-1.6.0.json",
+    "bytes": 2140,
+    "sha256": "25552ed0137b0523e53507a98397bee661ea7dcc38289ceb052e434514c10283"
+  },
+  "nativeInstallation": {
+    "passed": true,
+    "verifiedFileCount": 1799,
+    "rawByteEqualFileCount": 1798,
+    "normalizedGeneratedMetadata": [
+      "package.json:_fingerprint (UPM-generated)"
+    ],
+    "openUnsavedScenePreserved": true,
+    "sceneMutations": false,
+    "temporaryVerificationHelperRemoved": true,
+    "report": {
+      "path": "results/native-installed-1.6.0.json",
+      "bytes": 594,
+      "sha256": "5da6be44f27a8eb56cb0d6ed93d67b66a001fa730a3b75493f53a34f0b5b939a"
+    },
+    "uiVisuallyVerified": true,
+    "uiReport": {
+      "path": "results/native-ui-1.6.0.json",
+      "bytes": 538,
+      "sha256": "f7d30f71c187d61e6ac0ef9cb5efabe2ecb97a29b40d621ab9e7a3f51f5d0600"
+    },
+    "nativeTypingAndSendVerified": false
+  },
+  "screenshot": {
+    "path": "results/screenshots-1.6/imported-humanoid-rc7.png",
+    "bytes": 306057,
+    "sha256": "42333f9c6d2d0abd70fc47d9669d4a4e3cf92a5ed51de4b569c9898fe60bdc9a"
+  },
+  "limitations": [
+    "Pre-release: no universal task or LLM-quality guarantee; weights were not trained.",
+    "Live results are for temporary free Beam access through Ollama, not every local/cloud model. No paid API purchase or top-up was used.",
+    "114 MD skills and 466 recipes are reference data, not 580 executable tools.",
+    "Only selected models were imported and two imported characters input-tested, not all 115 catalog entries.",
+    "Procedural locomotion animates bones and is not authored or downloaded motion clips.",
+    "Whole-task review is another generation from the same configured model; it can be wrong.",
+    "Physics/geometry receipts confirm measured components and dimensions, not all simulation behavior.",
+    "Editor C# is trusted synchronous code with full Editor permissions, not a sandbox; checkpoints are bounded and not full-project backups.",
+    "Native GUI was inspected, but typing and sending from the user project was not part of the GUI check."
+  ],
+  "createdUtc": "2026-11-02T22:54:37.912833+00:00"
+}

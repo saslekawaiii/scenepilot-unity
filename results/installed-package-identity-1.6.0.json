@@ -1,0 +1,56 @@
+{
+  "version": "1.6.0",
+  "sourceCommit": "8d714c2c4bef2c37869a640fe8d37798abcee0e6",
+  "archiveSha256": "5bee85cd7edb148c48c71e4ec0890f1161aef8627f068ad5a66de91f862a3066",
+  "consumers": [
+    {
+      "consumer": "live-transfer-and-editor-tests",
+      "verifiedFiles": 1799,
+      "rawByteEqualFiles": 1798,
+      "generatedMetadataOnly": [
+        {
+          "file": "package.json",
+          "generatedProperty": "_fingerprint",
+          "generatedValue": "3c4d2f8fc397129ebbc1e15c8062c4ed",
+          "rawSha256": "f456649d2ef65c39155de084f2fe7c620ce6693161c569bf84a48a3db6ebac4e",
+          "sourceSha256": "4f161422841278939d9edddd8f1d44e3bf5393e80068e576676e9e7dff962391"
+        }
+      ],
+      "installedPackageDigest": "d761bea033527c6a14508b3200950f09243cb44f0daf926c8e7ce973ffe4e6a5",
+      "passed": true
+    },
+    {
+      "consumer": "play-input-tests",
+      "verifiedFiles": 1799,
+      "rawByteEqualFiles": 1798,
+      "generatedMetadataOnly": [
+        {
+          "file": "package.json",
+          "generatedProperty": "_fingerprint",
+          "generatedValue": "3c4d2f8fc397129ebbc1e15c8062c4ed",
+          "rawSha256": "f456649d2ef65c39155de084f2fe7c620ce6693161c569bf84a48a3db6ebac4e",
+          "sourceSha256": "4f161422841278939d9edddd8f1d44e3bf5393e80068e576676e9e7dff962391"
+        }
+      ],
+      "installedPackageDigest": "d761bea033527c6a14508b3200950f09243cb44f0daf926c8e7ce973ffe4e6a5",
+      "passed": true
+    },
+    {
+      "consumer": "native-user-project",
+      "verifiedFiles": 1799,
+      "rawByteEqualFiles": 1798,
+      "generatedMetadataOnly": [
+        {
+          "file": "package.json",
+          "generatedProperty": "_fingerprint",
+          "generatedValue": "3c4d2f8fc397129ebbc1e15c8062c4ed",
+          "rawSha256": "f456649d2ef65c39155de084f2fe7c620ce6693161c569bf84a48a3db6ebac4e",
+          "sourceSha256": "4f161422841278939d9edddd8f1d44e3bf5393e80068e576676e9e7dff962391"
+        }
+      ],
+      "installedPackageDigest": "d761bea033527c6a14508b3200950f09243cb44f0daf926c8e7ce973ffe4e6a5",
+      "passed": true
+    }
+  ],
+  "verifiedUtc": "2026-11-02T22:54:37.875005+00:00"
+}

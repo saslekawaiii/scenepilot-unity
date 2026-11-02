@@ -42,9 +42,10 @@ public static class InstalledPackageVerification
             report["recipes"]=UnityRecipeCatalog.CreateDefault().Count;
             var definitions=AgentFunctionProtocol.Definitions(EditorPlan.Schema());
             report["nativeFunctionCount"]=definitions.Count;
-            string[] expected={"execute_editor_code","reflect_api","find_unity_recipes","read_unity_recipe"};
+            string expectedVersion=(string)proof["version"]??"1.5.0";
+            string[] expected=expectedVersion=="1.6.0"?new[]{"execute_editor_code","reflect_api","model_search","model_import","replace_model","read_task_step"}:new[]{"execute_editor_code","reflect_api","find_unity_recipes","read_unity_recipe"};
             report["extensionToolsPresent"]=expected.All(name=>definitions.Any(t=>(string)t["function"]["name"]==name));
-            report["passed"]=equal&&info.version=="1.5.0"&&skills.Count==114&&skills.All(s=>s.Trusted)&&UnityRecipeCatalog.CreateDefault().Count==466&&(bool)report["extensionToolsPresent"];
+            report["passed"]=equal&&info.version==expectedVersion&&skills.Count==114&&skills.All(s=>s.Trusted)&&UnityRecipeCatalog.CreateDefault().Count==466&&(bool)report["extensionToolsPresent"];
         }
         catch(Exception e){report["error"]=e.ToString();}
         report["finishedUtc"]=DateTime.UtcNow.ToString("O");

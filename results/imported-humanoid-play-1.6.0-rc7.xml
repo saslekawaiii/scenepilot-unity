@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="1" result="Passed" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-02 22:33:30Z" end-time="2026-11-02 22:33:32Z" duration="2.5718317">
+  <test-suite type="TestSuite" id="1000" name="test" fullname="test" runstate="Runnable" testcasecount="716" result="Passed" start-time="2026-11-02 22:33:30Z" end-time="2026-11-02 22:33:32Z" duration="2.571832" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1819" name="WorldWeaver.GeneratedSceneTests.dll" fullname="/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/moon-agent-consumer-1.5/Library/ScriptAssemblies/WorldWeaver.GeneratedSceneTests.dll" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-11-02 22:33:30Z" end-time="2026-11-02 22:33:32Z" duration="2.483909" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="46964" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestFixture" id="1817" name="ImportedHumanoidPlayTests" fullname="ImportedHumanoidPlayTests" classname="ImportedHumanoidPlayTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-11-02 22:33:30Z" end-time="2026-11-02 22:33:32Z" duration="2.481826" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1818" name="ImportedHumanoidActuallyWalksAndItsBonesFollowTheController" fullname="ImportedHumanoidPlayTests.ImportedHumanoidActuallyWalksAndItsBonesFollowTheController" methodname="ImportedHumanoidActuallyWalksAndItsBonesFollowTheController" classname="ImportedHumanoidPlayTests" runstate="Runnable" seed="1363679320" result="Passed" start-time="2026-11-02 22:33:24Z" end-time="2026-11-02 22:33:32Z" duration="8.010114" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[WW_TEST_START ImportedHumanoidPlayTests.ImportedHumanoidActuallyWalksAndItsBonesFollowTheController
+HUMANOID_DIAGNOSTIC initialized=True controller=none mapping=Hips:Bip01 Pelvis,Spine:Bip01 Spine,Chest:Bip01 Spine1,UpperChest:Bip01 Spine2,Neck:Bip01 Neck,Head:Bip01 Head,LeftShoulder:Bip01 L Clavicle,RightShoulder:Bip01 R Clavicle,LeftUpperArm:Bip01 L UpperArm,RightUpperArm:Bip01 R UpperArm,LeftLowerArm:Bip01 L Forearm,RightLowerArm:Bip01 R Forearm,LeftHand:Bip01 L Hand,RightHand:Bip01 R Hand,LeftUpperLeg:Bip01 L Thigh,RightUpperLeg:Bip01 R Thigh,LeftLowerLeg:Bip01 L Calf,RightLowerLeg:Bip01 R Calf,LeftFoot:Bip01 L Foot,RightFoot:Bip01 R Foot,LeftToes:Bip01 L Toe0,RightToes:Bip01 R Toe0 skeleton=Female_Adult_01,Bip01,Bip01 Footsteps,Bip01 Pelvis,Bip01 L Thigh,Bip01 L Calf,Bip01 L Foot,Bip01 L Toe0,Bip01 R Thigh,Bip01 R Calf,Bip01 R Foot,Bip01 R Toe0
+POSE_DETAIL speed=0 legAngle=27.99997 actorDelta=(0.00, 0.08, 2.62) hipDelta=(0.00, 0.08, 2.62) legMuscles=Left Upper Leg Front-Back|Left Upper Leg In-Out|Left Upper Leg Twist In-Out|Left Lower Leg Stretch|Left Lower Leg Twist In-Out|Right Upper Leg Front-Back|Right Upper Leg In-Out|Right Upper Leg Twist In-Out|Right Lower Leg Stretch|Right Lower Leg Twist In-Out
+IMPORTED_HUMANOID_MOTION controller=(0.00, 0.08, 2.62) hips=(0.00, 0.08, 2.62) legAngle=27.99997
+WW_TEST_END ImportedHumanoidPlayTests.ImportedHumanoidActuallyWalksAndItsBonesFollowTheController Passed
+Saving results to: /Users/kirillkovalenko/Library/Application Support/DefaultCompany/test/TestResults.xml
+]]></output>
+        </test-case>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>
