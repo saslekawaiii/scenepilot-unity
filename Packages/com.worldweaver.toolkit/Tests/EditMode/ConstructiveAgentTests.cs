@@ -57,6 +57,14 @@ namespace WorldWeaver.Editor.Assistant.Tests
             Assert.IsFalse(new Rect(position.x-5,position.z-7,10,12).Overlaps(new Rect(actual.transform.position.x-actual.Size.x/2,actual.Entrance.z,actual.Size.x,actual.Size.z+1)));
             Assert.AreEqual(survival.Habitat.position+Vector3.up*.1f,survival.Spawn);
         }
+        [Test] public void GroundedNpcPlacementKeepsCaveAccessClearAndDoesNotStackActors()
+        {
+            World();var created=Run("create_cave","ActorCave","@World",new JObject{["position"]=new JArray(0,0),["width"]=7,["length"]=24});Assert.IsTrue(created.Success,created.Error);
+            foreach(string name in new[]{"GroundedA","GroundedB"}){var result=Run("create_npc",name,"@World",new JObject{["position"]=new JArray(0,0,0)});Assert.IsTrue(result.Success,result.Error);}
+            var a=Named("GroundedA");var b=Named("GroundedB");Assert.Greater(Vector3.Distance(a.transform.position,b.transform.position),.7f);
+            foreach(var npc in new[]{a,b})Assert.IsFalse(new Rect(-3.5f,-1,7,25).Contains(new Vector2(npc.transform.position.x,npc.transform.position.z)),"The default grounded route must not spawn on the cave cut/approach.");
+            var exact=Run("create_npc","ExactActor","@World",new JObject{["position"]=new JArray(0,50,0),["on_terrain"]=false});Assert.IsTrue(exact.Success,exact.Error);Assert.AreEqual(new Vector3(0,50,0),Named("ExactActor").transform.position);Assert.IsFalse(Named("ExactActor").GetComponent<GeneratedSceneObject>().SurfaceAnchored);
+        }
         [Test] public void DiscoveryReturnsRealSchemaAndNeverMutatesScene()
         {
             int before=scene.rootCount;var r=Run("discover_tools",args:new JObject{["names"]=new JArray("create_mesh","not_a_tool")});

@@ -25,6 +25,18 @@ namespace WorldWeaver.Editor.Assistant
             }
             obstruction=null;return true;
         }
+        internal static bool ActorClear(Terrain terrain,GameObject actor,Vector3 point)
+        {
+            var data=terrain.terrainData;var origin=terrain.transform.position;int n=data.holesResolution;
+            int x=Mathf.Clamp(Mathf.FloorToInt((point.x-origin.x)/data.size.x*n),0,n-1),z=Mathf.Clamp(Mathf.FloorToInt((point.z-origin.z)/data.size.z*n),0,n-1);
+            if(data.IsHole(x,z))return false;
+            float radius=.38f*Mathf.Max(Mathf.Abs(actor.transform.lossyScale.x),Mathf.Abs(actor.transform.lossyScale.z));
+            foreach(var cave in terrain.transform.parent.GetComponentsInChildren<WorldCave>())
+                if(new Rect(point.x-radius,point.z-radius,radius*2,radius*2).Overlaps(CaveFootprint(cave.transform.position,cave.Size.x,cave.Size.z)))return false;
+            float height=Mathf.Max(radius*2,1.9f*Mathf.Abs(actor.transform.lossyScale.y));
+            return !Physics.OverlapCapsule(point+Vector3.up*(radius+.08f),point+Vector3.up*(height-radius),radius,~0,QueryTriggerInteraction.Ignore)
+                .Any(c=>c.enabled&&c.gameObject.activeInHierarchy&&!(c is TerrainCollider)&&!c.transform.IsChildOf(actor.transform));
+        }
         internal static Vector3 FindHabitatSite(Terrain terrain,Vector3 preferred,Transform ignore)
         {
             // The habitat has no caller-specified coordinates: choose the nearest
