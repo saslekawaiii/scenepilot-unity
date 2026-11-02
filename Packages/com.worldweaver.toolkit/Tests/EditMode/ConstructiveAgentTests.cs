@@ -63,6 +63,9 @@ namespace WorldWeaver.Editor.Assistant.Tests
             foreach(string name in new[]{"GroundedA","GroundedB"}){var result=Run("create_npc",name,"@World",new JObject{["position"]=new JArray(0,0,0)});Assert.IsTrue(result.Success,result.Error);}
             var a=Named("GroundedA");var b=Named("GroundedB");Assert.Greater(Vector3.Distance(a.transform.position,b.transform.position),.7f);
             foreach(var npc in new[]{a,b})Assert.IsFalse(new Rect(-3.5f,-1,7,25).Contains(new Vector2(npc.transform.position.x,npc.transform.position.z)),"The default grounded route must not spawn on the cave cut/approach.");
+            var playerResult=Run("create_player","SpawnProbe","@World",new JObject{["position"]=new JArray(a.transform.position.x,a.transform.position.y,a.transform.position.z)});Assert.IsTrue(playerResult.Success,playerResult.Error);
+            var pawn=SceneToolExecutor.ResolveTarget(playerResult.Results.Single(r=>r.Tool=="create_player").Target);
+            var survival=Run("configure_survival",target:ProjectContextIndex.StableTarget(pawn),args:new JObject{["world"]="@World"});Assert.IsTrue(survival.Success,survival.Error);Assert.Greater(Vector3.Distance(pawn.transform.position,a.transform.position),1,"The player's recovery spawn must not overlap an existing NPC.");
             var exact=Run("create_npc","ExactActor","@World",new JObject{["position"]=new JArray(0,50,0),["on_terrain"]=false});Assert.IsTrue(exact.Success,exact.Error);Assert.AreEqual(new Vector3(0,50,0),Named("ExactActor").transform.position);Assert.IsFalse(Named("ExactActor").GetComponent<GeneratedSceneObject>().SurfaceAnchored);
         }
         [Test] public void DiscoveryReturnsRealSchemaAndNeverMutatesScene()

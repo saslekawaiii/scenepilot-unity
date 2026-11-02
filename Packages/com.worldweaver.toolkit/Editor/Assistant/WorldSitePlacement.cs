@@ -37,7 +37,7 @@ namespace WorldWeaver.Editor.Assistant
             return !Physics.OverlapCapsule(point+Vector3.up*(radius+.08f),point+Vector3.up*(height-radius),radius,~0,QueryTriggerInteraction.Ignore)
                 .Any(c=>c.enabled&&c.gameObject.activeInHierarchy&&!(c is TerrainCollider)&&!c.transform.IsChildOf(actor.transform));
         }
-        internal static Vector3 FindHabitatSite(Terrain terrain,Vector3 preferred,Transform ignore)
+        internal static Vector3 FindHabitatSite(Terrain terrain,Vector3 preferred,Transform ignore,GameObject occupant)
         {
             // The habitat has no caller-specified coordinates: choose the nearest
             // clear bounded site, preserving all existing structures and cave access.
@@ -45,7 +45,7 @@ namespace WorldWeaver.Editor.Assistant
             {
                 float angle=direction*Mathf.PI/8;var point=preferred+new Vector3(Mathf.Cos(angle),0,Mathf.Sin(angle))*(ring*12);
                 if(!Clear(terrain,new Rect(point.x-5,point.z-7,10,12),ignore,out _))continue;
-                point.y=terrain.SampleHeight(point)+terrain.transform.position.y;return point;
+                point.y=terrain.SampleHeight(point)+terrain.transform.position.y;if(!ActorClear(terrain,occupant,point))continue;return point;
             }
             throw new ArgumentException("No clear grounded habitat site fits this world. Existing structures and cave approaches were preserved; choose a larger/open area.");
         }

@@ -13,7 +13,7 @@ namespace WorldWeaver.Editor.Assistant
             var env=world.GetComponent<WorldEnvironment>()??Undo.AddComponent<WorldEnvironment>(world);Undo.RecordObject(env,"Configure survival environment");env.Terrain=terrain;var marker=world.GetComponent<GeneratedSceneObject>();if(env.Profile=="custom"&&marker&&!string.IsNullOrEmpty(marker.Style))env.Profile=marker.Style;
             var survival=player.GetComponent<WorldSurvival>()??Undo.AddComponent<WorldSurvival>(player);Undo.RecordObject(survival,"Configure survival");survival.Environment=env;survival.OxygenSeconds=(float?)c.args["oxygen_seconds"]??180;
             var control=player.GetComponent<WorldPlayer>();Undo.RecordObject(control,"Set local player gravity");control.UseLocalGravity=true;control.Gravity=(float?)c.args["gravity"]??(env.Profile=="moon"?1.62f:9.81f);
-            Vector3 at=WorldSitePlacement.FindHabitatSite(terrain,survival.Habitat?survival.Habitat.position:player.transform.position,survival.Habitat);
+            Vector3 at=WorldSitePlacement.FindHabitatSite(terrain,survival.Habitat?survival.Habitat.position:player.transform.position,survival.Habitat,player);
             if(!survival.Habitat)
             {
                 var habitat=tx.Empty("База восстановления",world.transform,"habitat");habitat.transform.position=at;survival.Habitat=habitat.transform;
