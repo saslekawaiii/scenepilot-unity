@@ -1,0 +1,18 @@
+{
+  "version": "1.5.0",
+  "releaseTag": "v1.5.0",
+  "packageSourceCommit": "36082456d5d0e53b3d97d58c2b78dcd5795a85f3",
+  "observedUtc": "2026-11-02T20:15:33.246976+00:00",
+  "method": "CUA native Unity window accessibility state and screenshots",
+  "unity": "6000.3.27f1",
+  "wideLayoutVisuallyInspected": true,
+  "welcomeCardsAndComposerShareContentCenter": true,
+  "modelLabel": "Beam · облако (временно бесплатно) · beam:cloud",
+  "connectionLabel": "Подключено",
+  "skillCountVisible": 114,
+  "newChatButtonResponded": true,
+  "newChatComposerVisibleAndUnclipped": true,
+  "nativeTypingAndSendVerified": false,
+  "narrowLayoutVerified": false,
+  "note": "Post-release observation after native desktop access became available. The published release validation recorded GUI unavailable at its collection time and remains unchanged. Automated coordinate input was unreliable; no successful native send is claimed. Controller/model and physical input acceptance are recorded separately."
+}
