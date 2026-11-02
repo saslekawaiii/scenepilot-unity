@@ -418,7 +418,7 @@
     },
     {
       "id": "ww-procedural-generation",
-      "sha256": "252df5ce4a54369e32a72520507f0b8b5ac87fcce10e2a614c150ce88b1e4536",
+      "sha256": "393dfd817a6d06559e6e7a7f487604e1b6942cf9de9085477ed1a74a302cd3c3",
       "source_repo": "Nice-Wolf-Studio/unity-claude-skills",
       "source_commit": "a149d3e995420432f52b0899092daa4b069f441f",
       "source_path": "skills/unity-procedural-gen/SKILL.md",
