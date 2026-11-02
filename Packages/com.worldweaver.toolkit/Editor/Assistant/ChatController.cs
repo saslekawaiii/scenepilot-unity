@@ -170,6 +170,7 @@ namespace WorldWeaver.Editor.Assistant
                     int totalActions = 0;
                     var repeatedValidationFailures=new Dictionary<string,int>(StringComparer.Ordinal);
                     var appliedUnnamedCreations=new HashSet<string>(StringComparer.Ordinal);
+                    var repeatedReadResults=new Dictionary<string,int>(StringComparer.Ordinal);
                     int emptyPlanRepairs = 0;
                     int planningRepairs = 0; // One fresh format repair is available even in Fast; it never grants another execution round.
                     int inferenceRepairs=0;
@@ -328,6 +329,20 @@ namespace WorldWeaver.Editor.Assistant
                         if (!batch.Success) unresolvedFailure = true;
                         else if (batch.Results.Any(result => result.Success && (!SceneToolExecutor.IsReadOnlyTool(result.Tool) || readOnlyRequest && !answer.Steps.Any(step => !step.Success)))) unresolvedFailure = false;
                         SanitizeResults(batch); answer.Steps.AddRange(batch.Results); answer.Text = ChatHistoryStore.Redact(plan.reply);
+                        if(Settings.UseNativeFunctions&&!readOnlyRequest&&Settings.Mode==AssistantMode.Execute&&batch.Success&&!hasMutations)
+                            foreach(var result in batch.Results.Where(s=>s.Success&&SceneToolExecutor.IsReadOnlyTool(s.Tool)))
+                            {
+                                string key=result.Tool+":"+TextChunker.Digest(result.Summary??"");
+                                repeatedReadResults.TryGetValue(key,out int seen);repeatedReadResults[key]=seen+1;
+                                if(seen>=1&&VerifyTask(answer).Any(c=>!c.Passed))
+                                {
+                                    // The same read yielded no new evidence while an actual
+                                    // requirement still fails. Ask the model to choose a write;
+                                    // never inject a particular tool, target or arguments.
+                                    requireImplementationStep=true;
+                                    Phase="Данные уже получены · перехожу к недостающему действию";
+                                }
+                            }
                         Save();
                         if(batch.Success&&batch.Results.Any(s=>s.Tool=="discover_tools"||s.Tool=="read_skill"||s.Tool=="plan_task"))rounds=maximumRounds;
                         if(WaitingForEditor(answer))break;
