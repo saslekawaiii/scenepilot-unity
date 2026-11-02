@@ -1,0 +1,4 @@
+{
+  "reason": "The external test harness listed test-runner assemblies both explicitly and through optionalUnityReferences. Duplicate references were corrected in the harness; the toolkit was unchanged.",
+  "log": "/tmp/worldweaver-generated-scene-play-1.5-r1.log"
+}

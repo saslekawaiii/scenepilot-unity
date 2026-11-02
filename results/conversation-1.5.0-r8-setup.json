@@ -1,0 +1,5 @@
+{
+  "accepted": false,
+  "reason": "Invocation supplied WW_AGENT_OUTPUT instead of WW_CONVERSATION_OUTPUT. Harness rejected missing output before scene/model actions. Reran with correct variable.",
+  "productChanges": false
+}

@@ -1,0 +1,3 @@
+b5813461d4eae7c25675e258c8631ff6980b46c77cce72045c4a25986c37415e  com.worldweaver.toolkit-1.5.0.tgz
+f67e948ab9112eeb05519852388553cacec1a8903d55ccbc6d8a644b8cf93745  WorldWeaver-1.5.0-validation.json
+030642d1ad241fe57ad3e778b7ba1a53d9e7b5a9bbc2f2cb0cd676bdb33758a7  WorldWeaver-1.5.0-notes.md

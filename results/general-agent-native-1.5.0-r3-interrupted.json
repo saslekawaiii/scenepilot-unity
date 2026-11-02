@@ -1,0 +1,5 @@
+{
+  "source": "general-agent-native-1.5.0-r3.json",
+  "interruptedUtc": "2026-11-01T22:24:50.396812+00:00",
+  "reason": "Real inference exposed an unrelated named-place NavMesh requirement inferred from a cave entrance. Stopped the diagnostic run to fix the verifier; no overall pass is claimed."
+}

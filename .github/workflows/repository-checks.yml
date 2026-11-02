@@ -1,5 +1,8 @@
 name: Repository checks
 on:
+  push:
+    branches: [main, 'codex/**']
+  pull_request:
   workflow_dispatch:
 permissions:
   contents: read
@@ -8,7 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - run: python3 scripts/check_repository.py
+      - name: Repository invariants and credential scan
+        run: python3 scripts/check_repository.py
+      - name: Pinned skill and recipe integrity (offline)
+        run: python3 scripts/import_agent_skills.py

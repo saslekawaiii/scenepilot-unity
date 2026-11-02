@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="2" result="Failed(Child)" total="2" passed="1" failed="1" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-02 19:22:20Z" end-time="2026-11-02 19:22:21Z" duration="1.9126943">
+  <test-suite type="TestSuite" id="1000" name="test" fullname="test" runstate="Runnable" testcasecount="697" result="Failed" site="Child" start-time="2026-11-02 19:22:20Z" end-time="2026-11-02 19:22:21Z" duration="1.912694" total="2" passed="1" failed="1" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1797" name="WorldWeaver.GeneratedSceneTests.dll" fullname="/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/character-user-urp-consumer-r1/Library/ScriptAssemblies/WorldWeaver.GeneratedSceneTests.dll" runstate="Runnable" testcasecount="2" result="Failed" site="Child" start-time="2026-11-02 19:22:20Z" end-time="2026-11-02 19:22:21Z" duration="1.848230" total="2" passed="1" failed="1" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="17954" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestFixture" id="1794" name="GeneratedAgentScenePlayTests" fullname="GeneratedAgentScenePlayTests" classname="GeneratedAgentScenePlayTests" runstate="Runnable" testcasecount="2" result="Failed" site="Child" start-time="2026-11-02 19:22:20Z" end-time="2026-11-02 19:22:21Z" duration="1.846667" total="2" passed="1" failed="1" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-case id="1796" name="PlayerEntersTheGeneratedCaveThroughItsPhysicalRamp" fullname="GeneratedAgentScenePlayTests.PlayerEntersTheGeneratedCaveThroughItsPhysicalRamp" methodname="PlayerEntersTheGeneratedCaveThroughItsPhysicalRamp" classname="GeneratedAgentScenePlayTests" runstate="Runnable" seed="1018059799" result="Failed" start-time="2026-11-02 19:21:41Z" end-time="2026-11-02 19:22:16Z" duration="34.798852" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+          </properties>
+          <failure>
+            <message><![CDATA[  The character could not reach the reported cave interior through the entrance.
+  Expected: greater than or equal to 13.25f
+  But was:  3.49500012f
+]]></message>
+            <stack-trace><![CDATA[at GeneratedAgentScenePlayTests+<PlayerEntersTheGeneratedCaveThroughItsPhysicalRamp>d__7.MoveNext () [0x00457] in /Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/character-user-urp-consumer-r1/Assets/AgentSceneTests/GeneratedAgentScenePlayTests.cs:63
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in ./Library/PackageCache/com.unity.test-framework@bd7f943e9647/UnityEngine.TestRunner/NUnitExtensions/Attributes/TestEnumerator.cs:44
+]]></stack-trace>
+          </failure>
+          <output><![CDATA[WW_TEST_START GeneratedAgentScenePlayTests.PlayerEntersTheGeneratedCaveThroughItsPhysicalRamp
+AGENT_CAVE_MOTION before=(0.00, 42.25, -1.00) after=(0.00, 42.08, 3.50) rotation=(0.00, 0.00, 0.00) velocity=(0.00, 0.00, 0.00) locked=False cave=(0.00, 42.00, 0.00) size=(6.00, 5.00, 20.00)
+AGENT_CAVE_OBSTRUCTION Back type=BoxCollider at=(0.00, 42.98, 3.88) distance=0.05999988
+AGENT_CAVE_OVERLAP Floor type=BoxCollider
+AGENT_CAVE_OVERLAP Back type=BoxCollider
+AGENT_CAVE_OVERLAP Главный герой type=CharacterController
+WW_TEST_END GeneratedAgentScenePlayTests.PlayerEntersTheGeneratedCaveThroughItsPhysicalRamp Failed
+]]></output>
+        </test-case>
+        <test-case id="1795" name="PlayerWalksOutOfHabitatUsingKeyboardOnTheGeneratedSurface" fullname="GeneratedAgentScenePlayTests.PlayerWalksOutOfHabitatUsingKeyboardOnTheGeneratedSurface" methodname="PlayerWalksOutOfHabitatUsingKeyboardOnTheGeneratedSurface" classname="GeneratedAgentScenePlayTests" runstate="Runnable" seed="1929298540" result="Passed" start-time="2026-11-02 19:22:16Z" end-time="2026-11-02 19:22:21Z" duration="5.770095" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[WW_TEST_START GeneratedAgentScenePlayTests.PlayerWalksOutOfHabitatUsingKeyboardOnTheGeneratedSurface
+WW_TEST_END GeneratedAgentScenePlayTests.PlayerWalksOutOfHabitatUsingKeyboardOnTheGeneratedSurface Passed
+Saving results to: /Users/kirillkovalenko/Library/Application Support/DefaultCompany/test/TestResults.xml
+]]></output>
+        </test-case>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

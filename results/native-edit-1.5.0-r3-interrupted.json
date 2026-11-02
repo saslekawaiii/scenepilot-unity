@@ -1,0 +1,4 @@
+{
+  "reason": "Source changed while tests were running; this attempt is not release evidence. Final checks are rerun against a frozen committed package.",
+  "log": "/tmp/worldweaver-edit-1.5-r3.log"
+}

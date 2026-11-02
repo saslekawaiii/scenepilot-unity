@@ -1,6 +1,8 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Security.Cryptography;
 using Newtonsoft.Json.Linq;
 using UnityEditor;
@@ -24,8 +26,18 @@ public static class InstalledPackageVerification
             var info=UnityEditor.PackageManager.PackageInfo.FindForAssembly(typeof(WorldPlayer).Assembly);
             report["version"]=info.version;report["packagePath"]=info.resolvedPath;report["sourceCommit"]=proof["sourceCommit"].DeepClone();
             var files=(JObject)proof["files"];
-            bool equal=files.Properties().All(p=>File.Exists(Path.Combine(info.resolvedPath,p.Name))&&Hash(File.ReadAllBytes(Path.Combine(info.resolvedPath,p.Name)))==(string)p.Value);
-            report["packageFilesMatchArchive"]=equal;report["verifiedFileCount"]=files.Count;
+            int rawEqual=0;var generatedMetadata=new JArray();
+            bool equal=files.Properties().All(p=>
+            {
+                string path=Path.Combine(info.resolvedPath,p.Name);if(!File.Exists(path))return false;byte[] raw=File.ReadAllBytes(path);
+                if(Hash(raw)==(string)p.Value){rawEqual++;return true;}
+                if(p.Name!="package.json")return false;
+                var json=JObject.Parse(Encoding.UTF8.GetString(raw));
+                if(!Regex.IsMatch((string)json["_fingerprint"]??"",@"^[a-f0-9]{32}$"))return false;
+                json.Remove("_fingerprint");bool metadataOnly=Hash(Encoding.UTF8.GetBytes(json.ToString(Newtonsoft.Json.Formatting.Indented)+"\n"))==(string)p.Value;
+                if(metadataOnly)generatedMetadata.Add("package.json:_fingerprint (UPM-generated)");return metadataOnly;
+            });
+            report["packageFilesMatchArchive"]=equal;report["verifiedFileCount"]=files.Count;report["rawByteEqualFileCount"]=rawEqual;report["normalizedGeneratedMetadata"]=generatedMetadata;
             var skills=AgentSkillCatalog.CreateDefault().List();report["skills"]=skills.Count;report["allSkillsTrusted"]=skills.All(s=>s.Trusted);
             report["recipes"]=UnityRecipeCatalog.CreateDefault().Count;
             var definitions=AgentFunctionProtocol.Definitions(EditorPlan.Schema());

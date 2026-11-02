@@ -26,3 +26,7 @@ deliverables/*.zip
 deliverables/Состав_поставки.json
 
 ~$*
+
+# Intermediate package candidates stay local; the release uses the canonical TGZ.
+deliverables/com.worldweaver.toolkit-*-rc[0-9]*.tgz
+deliverables/com.worldweaver.toolkit-*-r[0-9]*.tgz

@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="32" result="Passed" total="32" passed="32" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-02 19:42:59Z" end-time="2026-11-02 19:43:04Z" duration="4.913878">
+  <test-suite type="TestSuite" id="1000" name="UnityProject" fullname="UnityProject" runstate="Runnable" testcasecount="698" result="Passed" start-time="2026-11-02 19:42:59Z" end-time="2026-11-02 19:43:04Z" duration="4.913878" total="32" passed="32" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1785" name="WorldWeaver.EditMode.dll" fullname="/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/general-agent-cloud-consumer-1.4/Library/ScriptAssemblies/WorldWeaver.EditMode.dll" runstate="Runnable" testcasecount="698" result="Passed" start-time="2026-11-02 19:42:59Z" end-time="2026-11-02 19:43:04Z" duration="4.906468" total="32" passed="32" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="19373" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1786" name="WorldWeaver" fullname="WorldWeaver" runstate="Runnable" testcasecount="698" result="Passed" start-time="2026-11-02 19:42:59Z" end-time="2026-11-02 19:43:04Z" duration="4.906088" total="32" passed="32" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1787" name="Editor" fullname="WorldWeaver.Editor" runstate="Runnable" testcasecount="32" result="Passed" start-time="2026-11-02 19:42:59Z" end-time="2026-11-02 19:43:04Z" duration="4.893307" total="32" passed="32" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1788" name="Assistant" fullname="WorldWeaver.Editor.Assistant" runstate="Runnable" testcasecount="32" result="Passed" start-time="2026-11-02 19:42:59Z" end-time="2026-11-02 19:43:04Z" duration="4.893056" total="32" passed="32" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestSuite" id="1789" name="Tests" fullname="WorldWeaver.Editor.Assistant.Tests" runstate="Runnable" testcasecount="32" result="Passed" start-time="2026-11-02 19:42:59Z" end-time="2026-11-02 19:43:04Z" duration="4.892772" total="32" passed="32" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-suite type="TestFixture" id="1003" name="ConstructiveAgentTests" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" testcasecount="32" result="Passed" start-time="2026-11-02 19:42:59Z" end-time="2026-11-02 19:43:04Z" duration="4.891934" total="32" passed="32" failed="0" inconclusive="0" skipped="0" asserts="0">
+                <properties />
+                <test-case id="1033" name="CanvasButtonHasPersistentRealToggleAction" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.CanvasButtonHasPersistentRealToggleAction" methodname="CanvasButtonHasPersistentRealToggleAction" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="1244504955" result="Passed" start-time="2026-11-02 19:42:59Z" end-time="2026-11-02 19:42:59Z" duration="0.222016" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.CanvasButtonHasPersistentRealToggleAction
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.CanvasButtonHasPersistentRealToggleAction Passed
+]]></output>
+                </test-case>
+                <test-suite type="ParameterizedMethod" id="1009" name="CapabilitySelectionCoversDifferentDomains" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.CapabilitySelectionCoversDifferentDomains" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-11-02 19:42:59Z" end-time="2026-11-02 19:42:59Z" duration="0.090027" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+                  <properties />
+                  <test-case id="1004" name="CapabilitySelectionCoversDifferentDomains(&quot;карта высот с кратерами и лунными жителями&quot;,&quot;shape_terrain&quot;)" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.CapabilitySelectionCoversDifferentDomains(&quot;карта высот с кратерами и лунными жителями&quot;,&quot;shape_terrain&quot;)" methodname="CapabilitySelectionCoversDifferentDomains" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="1867993341" result="Passed" start-time="2026-11-02 19:42:59Z" end-time="2026-11-02 19:42:59Z" duration="0.019391" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                    <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.CapabilitySelectionCoversDifferentDomains("карта высот с кратерами и лунными жителями","shape_terrain")
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.CapabilitySelectionCoversDifferentDomains("карта высот с кратерами и лунными жителями","shape_terrain") Passed
+]]></output>
+                  </test-case>
+                  <test-case id="1005" name="CapabilitySelectionCoversDifferentDomains(&quot;мост из собственного меша&quot;,&quot;create_mesh&quot;)" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.CapabilitySelectionCoversDifferentDomains(&quot;мост из собственного меша&quot;,&quot;create_mesh&quot;)" methodname="CapabilitySelectionCoversDifferentDomains" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="1040351106" result="Passed" start-time="2026-11-02 19:42:59Z" end-time="2026-11-02 19:42:59Z" duration="0.014941" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                    <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.CapabilitySelectionCoversDifferentDomains("мост из собственного меша","create_mesh")
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.CapabilitySelectionCoversDifferentDomains("мост из собственного меша","create_mesh") Passed
+]]></output>
+                  </test-case>
+                  <test-case id="1006" name="CapabilitySelectionCoversDifferentDomains(&quot;меню с кнопкой&quot;,&quot;create_ui_element&quot;)" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.CapabilitySelectionCoversDifferentDomains(&quot;меню с кнопкой&quot;,&quot;create_ui_element&quot;)" methodname="CapabilitySelectionCoversDifferentDomains" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="1634206885" result="Passed" start-time="2026-11-02 19:42:59Z" end-time="2026-11-02 19:42:59Z" duration="0.014511" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                    <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.CapabilitySelectionCoversDifferentDomains("меню с кнопкой","create_ui_element")
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.CapabilitySelectionCoversDifferentDomains("меню с кнопкой","create_ui_element") Passed
+]]></output>
+                  </test-case>
+                  <test-case id="1007" name="CapabilitySelectionCoversDifferentDomains(&quot;падающие предметы с отскоком&quot;,&quot;configure_physics&quot;)" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.CapabilitySelectionCoversDifferentDomains(&quot;падающие предметы с отскоком&quot;,&quot;configure_physics&quot;)" methodname="CapabilitySelectionCoversDifferentDomains" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="1194893595" result="Passed" start-time="2026-11-02 19:42:59Z" end-time="2026-11-02 19:42:59Z" duration="0.014335" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                    <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.CapabilitySelectionCoversDifferentDomains("падающие предметы с отскоком","configure_physics")
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.CapabilitySelectionCoversDifferentDomains("падающие предметы с отскоком","configure_physics") Passed
+]]></output>
+                  </test-case>
+                  <test-case id="1008" name="CapabilitySelectionCoversDifferentDomains(&quot;кислород и выживание&quot;,&quot;configure_survival&quot;)" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.CapabilitySelectionCoversDifferentDomains(&quot;кислород и выживание&quot;,&quot;configure_survival&quot;)" methodname="CapabilitySelectionCoversDifferentDomains" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="1781002014" result="Passed" start-time="2026-11-02 19:42:59Z" end-time="2026-11-02 19:42:59Z" duration="0.014405" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                    <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.CapabilitySelectionCoversDifferentDomains("кислород и выживание","configure_survival")
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.CapabilitySelectionCoversDifferentDomains("кислород и выживание","configure_survival") Passed
+]]></output>
+                  </test-case>
+                </test-suite>
+                <test-case id="1031" name="CaveHasOpenTerrainFootprintAndPhysicalRampAndRoof" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.CaveHasOpenTerrainFootprintAndPhysicalRampAndRoof" methodname="CaveHasOpenTerrainFootprintAndPhysicalRampAndRoof" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="1951664316" result="Passed" start-time="2026-11-02 19:42:59Z" end-time="2026-11-02 19:43:00Z" duration="0.451011" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.CaveHasOpenTerrainFootprintAndPhysicalRampAndRoof
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.CaveHasOpenTerrainFootprintAndPhysicalRampAndRoof Passed
+]]></output>
+                </test-case>
+                <test-case id="1014" name="DiscoveryReturnsRealSchemaAndNeverMutatesScene" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.DiscoveryReturnsRealSchemaAndNeverMutatesScene" methodname="DiscoveryReturnsRealSchemaAndNeverMutatesScene" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="514967847" result="Passed" start-time="2026-11-02 19:43:00Z" end-time="2026-11-02 19:43:00Z" duration="0.105770" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.DiscoveryReturnsRealSchemaAndNeverMutatesScene
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.DiscoveryReturnsRealSchemaAndNeverMutatesScene Passed
+]]></output>
+                </test-case>
+                <test-case id="1034" name="ExistingButtonCanBeBoundAndConfiguredWithoutDraftingCode" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.ExistingButtonCanBeBoundAndConfiguredWithoutDraftingCode" methodname="ExistingButtonCanBeBoundAndConfiguredWithoutDraftingCode" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="122266085" result="Passed" start-time="2026-11-02 19:43:00Z" end-time="2026-11-02 19:43:00Z" duration="0.033294" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.ExistingButtonCanBeBoundAndConfiguredWithoutDraftingCode
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.ExistingButtonCanBeBoundAndConfiguredWithoutDraftingCode Passed
+]]></output>
+                </test-case>
+                <test-case id="1019" name="ExplicitEmptyHostCanBePlannedBeforeNewCodeWithoutExecutingRejectedActions" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.ExplicitEmptyHostCanBePlannedBeforeNewCodeWithoutExecutingRejectedActions" methodname="ExplicitEmptyHostCanBePlannedBeforeNewCodeWithoutExecutingRejectedActions" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="1239476457" result="Passed" start-time="2026-11-02 19:43:00Z" end-time="2026-11-02 19:43:00Z" duration="0.038484" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.ExplicitEmptyHostCanBePlannedBeforeNewCodeWithoutExecutingRejectedActions
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.ExplicitEmptyHostCanBePlannedBeforeNewCodeWithoutExecutingRejectedActions Passed
+]]></output>
+                </test-case>
+                <test-case id="1035" name="ExplicitPhysicsShapeChangeIsAppliedAndReadBack" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.ExplicitPhysicsShapeChangeIsAppliedAndReadBack" methodname="ExplicitPhysicsShapeChangeIsAppliedAndReadBack" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="1230908356" result="Passed" start-time="2026-11-02 19:43:00Z" end-time="2026-11-02 19:43:00Z" duration="0.075485" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.ExplicitPhysicsShapeChangeIsAppliedAndReadBack
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.ExplicitPhysicsShapeChangeIsAppliedAndReadBack Passed
+]]></output>
+                </test-case>
+                <test-case id="1036" name="FailedIndependentAssertionReturnsFailureWithoutChangingScene" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.FailedIndependentAssertionReturnsFailureWithoutChangingScene" methodname="FailedIndependentAssertionReturnsFailureWithoutChangingScene" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="1472174913" result="Passed" start-time="2026-11-02 19:43:00Z" end-time="2026-11-02 19:43:00Z" duration="0.023206" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.FailedIndependentAssertionReturnsFailureWithoutChangingScene
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.FailedIndependentAssertionReturnsFailureWithoutChangingScene Passed
+]]></output>
+                </test-case>
+                <test-case id="1013" name="GroundedNpcPlacementKeepsCaveAccessClearAndDoesNotStackActors" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.GroundedNpcPlacementKeepsCaveAccessClearAndDoesNotStackActors" methodname="GroundedNpcPlacementKeepsCaveAccessClearAndDoesNotStackActors" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="1466614604" result="Passed" start-time="2026-11-02 19:43:00Z" end-time="2026-11-02 19:43:01Z" duration="1.178754" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.GroundedNpcPlacementKeepsCaveAccessClearAndDoesNotStackActors
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.GroundedNpcPlacementKeepsCaveAccessClearAndDoesNotStackActors Passed
+]]></output>
+                </test-case>
+                <test-suite type="ParameterizedMethod" id="1012" name="HabitatAndCaveKeepTheirApproachesClearInEitherCreationOrder" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.HabitatAndCaveKeepTheirApproachesClearInEitherCreationOrder" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-02 19:43:01Z" end-time="2026-11-02 19:43:02Z" duration="0.801911" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+                  <properties />
+                  <test-case id="1010" name="HabitatAndCaveKeepTheirApproachesClearInEitherCreationOrder(True)" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.HabitatAndCaveKeepTheirApproachesClearInEitherCreationOrder(True)" methodname="HabitatAndCaveKeepTheirApproachesClearInEitherCreationOrder" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="1852940044" result="Passed" start-time="2026-11-02 19:43:01Z" end-time="2026-11-02 19:43:02Z" duration="0.406801" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                    <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.HabitatAndCaveKeepTheirApproachesClearInEitherCreationOrder(True)
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.HabitatAndCaveKeepTheirApproachesClearInEitherCreationOrder(True) Passed
+]]></output>
+                  </test-case>
+                  <test-case id="1011" name="HabitatAndCaveKeepTheirApproachesClearInEitherCreationOrder(False)" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.HabitatAndCaveKeepTheirApproachesClearInEitherCreationOrder(False)" methodname="HabitatAndCaveKeepTheirApproachesClearInEitherCreationOrder" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="1946769474" result="Passed" start-time="2026-11-02 19:43:02Z" end-time="2026-11-02 19:43:02Z" duration="0.387691" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                    <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.HabitatAndCaveKeepTheirApproachesClearInEitherCreationOrder(False)
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.HabitatAndCaveKeepTheirApproachesClearInEitherCreationOrder(False) Passed
+]]></output>
+                  </test-case>
+                </test-suite>
+                <test-case id="1025" name="HeightOfAnObjectDoesNotOfferWorldCreation" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.HeightOfAnObjectDoesNotOfferWorldCreation" methodname="HeightOfAnObjectDoesNotOfferWorldCreation" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="844173354" result="Passed" start-time="2026-11-02 19:43:02Z" end-time="2026-11-02 19:43:02Z" duration="0.037628" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.HeightOfAnObjectDoesNotOfferWorldCreation
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.HeightOfAnObjectDoesNotOfferWorldCreation Passed
+]]></output>
+                </test-case>
+                <test-case id="1022" name="HierarchyPreservesWorldTransformAndRejectsCycles" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.HierarchyPreservesWorldTransformAndRejectsCycles" methodname="HierarchyPreservesWorldTransformAndRejectsCycles" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="1348584974" result="Passed" start-time="2026-11-02 19:43:02Z" end-time="2026-11-02 19:43:02Z" duration="0.027767" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.HierarchyPreservesWorldTransformAndRejectsCycles
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.HierarchyPreservesWorldTransformAndRejectsCycles Passed
+]]></output>
+                </test-case>
+                <test-case id="1017" name="IncompleteActionNamesHavePreciseRepairDiagnostics" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.IncompleteActionNamesHavePreciseRepairDiagnostics" methodname="IncompleteActionNamesHavePreciseRepairDiagnostics" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="1748548081" result="Passed" start-time="2026-11-02 19:43:02Z" end-time="2026-11-02 19:43:02Z" duration="0.017772" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.IncompleteActionNamesHavePreciseRepairDiagnostics
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.IncompleteActionNamesHavePreciseRepairDiagnostics Passed
+]]></output>
+                </test-case>
+                <test-case id="1024" name="LegacyCreationToolsAlsoResolveEmptyNames" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.LegacyCreationToolsAlsoResolveEmptyNames" methodname="LegacyCreationToolsAlsoResolveEmptyNames" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="1539485458" result="Passed" start-time="2026-11-02 19:43:02Z" end-time="2026-11-02 19:43:02Z" duration="0.250920" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.LegacyCreationToolsAlsoResolveEmptyNames
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.LegacyCreationToolsAlsoResolveEmptyNames Passed
+]]></output>
+                </test-case>
+                <test-case id="1018" name="LocalGrammarTraversalHandlesAPropertyNamedType" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.LocalGrammarTraversalHandlesAPropertyNamedType" methodname="LocalGrammarTraversalHandlesAPropertyNamedType" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="2017266429" result="Passed" start-time="2026-11-02 19:43:02Z" end-time="2026-11-02 19:43:02Z" duration="0.026011" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.LocalGrammarTraversalHandlesAPropertyNamedType
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.LocalGrammarTraversalHandlesAPropertyNamedType Passed
+]]></output>
+                </test-case>
+                <test-case id="1016" name="LocalMeshGrammarAvoidsUnsupportedHugeRepetitionsWithoutWeakeningHostBounds" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.LocalMeshGrammarAvoidsUnsupportedHugeRepetitionsWithoutWeakeningHostBounds" methodname="LocalMeshGrammarAvoidsUnsupportedHugeRepetitionsWithoutWeakeningHostBounds" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="2010985699" result="Passed" start-time="2026-11-02 19:43:02Z" end-time="2026-11-02 19:43:02Z" duration="0.020760" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.LocalMeshGrammarAvoidsUnsupportedHugeRepetitionsWithoutWeakeningHostBounds
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.LocalMeshGrammarAvoidsUnsupportedHugeRepetitionsWithoutWeakeningHostBounds Passed
+]]></output>
+                </test-case>
+                <test-case id="1021" name="MeshPersistsAndCollisionMatchesAndBadIndicesCannotPartiallyMutate" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.MeshPersistsAndCollisionMatchesAndBadIndicesCannotPartiallyMutate" methodname="MeshPersistsAndCollisionMatchesAndBadIndicesCannotPartiallyMutate" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="152078717" result="Passed" start-time="2026-11-02 19:43:02Z" end-time="2026-11-02 19:43:02Z" duration="0.097911" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.MeshPersistsAndCollisionMatchesAndBadIndicesCannotPartiallyMutate
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.MeshPersistsAndCollisionMatchesAndBadIndicesCannotPartiallyMutate Passed
+]]></output>
+                </test-case>
+                <test-case id="1032" name="PhysicsSetupUsesOwnedMaterialAndNoDuplicateColliders" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.PhysicsSetupUsesOwnedMaterialAndNoDuplicateColliders" methodname="PhysicsSetupUsesOwnedMaterialAndNoDuplicateColliders" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="1111778617" result="Passed" start-time="2026-11-02 19:43:02Z" end-time="2026-11-02 19:43:03Z" duration="0.101864" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.PhysicsSetupUsesOwnedMaterialAndNoDuplicateColliders
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.PhysicsSetupUsesOwnedMaterialAndNoDuplicateColliders Passed
+]]></output>
+                </test-case>
+                <test-case id="1030" name="ProceduralMoonIsSeededAndHasCraterBowlAndRim" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.ProceduralMoonIsSeededAndHasCraterBowlAndRim" methodname="ProceduralMoonIsSeededAndHasCraterBowlAndRim" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="411715188" result="Passed" start-time="2026-11-02 19:43:03Z" end-time="2026-11-02 19:43:03Z" duration="0.097603" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.ProceduralMoonIsSeededAndHasCraterBowlAndRim
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.ProceduralMoonIsSeededAndHasCraterBowlAndRim Passed
+]]></output>
+                </test-case>
+                <test-case id="1020" name="ReadbackSupportsMeshesWhoseCpuDataWasReleased" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.ReadbackSupportsMeshesWhoseCpuDataWasReleased" methodname="ReadbackSupportsMeshesWhoseCpuDataWasReleased" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="670197190" result="Passed" start-time="2026-11-02 19:43:03Z" end-time="2026-11-02 19:43:03Z" duration="0.020588" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.ReadbackSupportsMeshesWhoseCpuDataWasReleased
+Component of type MeshFilter was added to Imported using GameObject.AddComponent() and had become dangling during an undo operation.
+Use Undo.AddComponent to correctly add a component which can be handle by the undo system
+
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.ReadbackSupportsMeshesWhoseCpuDataWasReleased Passed
+]]></output>
+                </test-case>
+                <test-case id="1037" name="RefusalWithNoChangesCannotPassMutationRequirement" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.RefusalWithNoChangesCannotPassMutationRequirement" methodname="RefusalWithNoChangesCannotPassMutationRequirement" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="1125311242" result="Passed" start-time="2026-11-02 19:43:03Z" end-time="2026-11-02 19:43:03Z" duration="0.027148" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.RefusalWithNoChangesCannotPassMutationRequirement
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.RefusalWithNoChangesCannotPassMutationRequirement Passed
+]]></output>
+                </test-case>
+                <test-case id="1029" name="ResolutionRefinementPreservesExistingCraterHeightsAndHoles" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.ResolutionRefinementPreservesExistingCraterHeightsAndHoles" methodname="ResolutionRefinementPreservesExistingCraterHeightsAndHoles" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="760657149" result="Passed" start-time="2026-11-02 19:43:03Z" end-time="2026-11-02 19:43:03Z" duration="0.424693" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.ResolutionRefinementPreservesExistingCraterHeightsAndHoles
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.ResolutionRefinementPreservesExistingCraterHeightsAndHoles Passed
+]]></output>
+                </test-case>
+                <test-case id="1015" name="SkillsDeclareOnlyRealRegisteredCommands" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.SkillsDeclareOnlyRealRegisteredCommands" methodname="SkillsDeclareOnlyRealRegisteredCommands" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="1163332167" result="Passed" start-time="2026-11-02 19:43:03Z" end-time="2026-11-02 19:43:03Z" duration="0.070967" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.SkillsDeclareOnlyRealRegisteredCommands
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.SkillsDeclareOnlyRealRegisteredCommands Passed
+]]></output>
+                </test-case>
+                <test-case id="1038" name="SurvivalRulesCoverVacuumShelterSuppliesDeathAndWin" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.SurvivalRulesCoverVacuumShelterSuppliesDeathAndWin" methodname="SurvivalRulesCoverVacuumShelterSuppliesDeathAndWin" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="2109810113" result="Passed" start-time="2026-11-02 19:43:03Z" end-time="2026-11-02 19:43:03Z" duration="0.016225" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.SurvivalRulesCoverVacuumShelterSuppliesDeathAndWin
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.SurvivalRulesCoverVacuumShelterSuppliesDeathAndWin Passed
+]]></output>
+                </test-case>
+                <test-suite type="ParameterizedMethod" id="1028" name="TerrainBrushChangesActualHeightsAndPreservesOriginalSharedAsset" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.TerrainBrushChangesActualHeightsAndPreservesOriginalSharedAsset" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-02 19:43:03Z" end-time="2026-11-02 19:43:04Z" duration="0.559166" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+                  <properties />
+                  <test-case id="1026" name="TerrainBrushChangesActualHeightsAndPreservesOriginalSharedAsset(3)" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.TerrainBrushChangesActualHeightsAndPreservesOriginalSharedAsset(3)" methodname="TerrainBrushChangesActualHeightsAndPreservesOriginalSharedAsset" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="1740198562" result="Passed" start-time="2026-11-02 19:43:03Z" end-time="2026-11-02 19:43:03Z" duration="0.280631" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                    <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.TerrainBrushChangesActualHeightsAndPreservesOriginalSharedAsset(3)
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.TerrainBrushChangesActualHeightsAndPreservesOriginalSharedAsset(3) Passed
+]]></output>
+                  </test-case>
+                  <test-case id="1027" name="TerrainBrushChangesActualHeightsAndPreservesOriginalSharedAsset(-3)" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.TerrainBrushChangesActualHeightsAndPreservesOriginalSharedAsset(-3)" methodname="TerrainBrushChangesActualHeightsAndPreservesOriginalSharedAsset" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="586363021" result="Passed" start-time="2026-11-02 19:43:03Z" end-time="2026-11-02 19:43:04Z" duration="0.274276" asserts="0">
+                    <properties>
+                      <property name="retryIteration" value="0" />
+                      <property name="repeatIteration" value="0" />
+                    </properties>
+                    <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.TerrainBrushChangesActualHeightsAndPreservesOriginalSharedAsset(-3)
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.TerrainBrushChangesActualHeightsAndPreservesOriginalSharedAsset(-3) Passed
+]]></output>
+                  </test-case>
+                </test-suite>
+                <test-case id="1023" name="UnnamedCreationsReceiveUniqueDefaultsWithoutRewritingAuditedCommands" fullname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.UnnamedCreationsReceiveUniqueDefaultsWithoutRewritingAuditedCommands" methodname="UnnamedCreationsReceiveUniqueDefaultsWithoutRewritingAuditedCommands" classname="WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests" runstate="Runnable" seed="1085518536" result="Passed" start-time="2026-11-02 19:43:04Z" end-time="2026-11-02 19:43:04Z" duration="0.025629" asserts="0">
+                  <properties>
+                    <property name="retryIteration" value="0" />
+                    <property name="repeatIteration" value="0" />
+                  </properties>
+                  <output><![CDATA[WW_TEST_START WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.UnnamedCreationsReceiveUniqueDefaultsWithoutRewritingAuditedCommands
+WW_TEST_END WorldWeaver.Editor.Assistant.Tests.ConstructiveAgentTests.UnnamedCreationsReceiveUniqueDefaultsWithoutRewritingAuditedCommands Passed
+Saving results to: /tmp/worldweaver-actor-placement-1.5-r2.xml
+]]></output>
+                </test-case>
+              </test-suite>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

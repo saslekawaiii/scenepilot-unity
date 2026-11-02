@@ -8,6 +8,7 @@
 [![UPM](https://img.shields.io/badge/UPM-1.5.0_preview-47876A)](https://github.com/saslekawaiii/worldweaver-thesis/releases/tag/v1.5.0)
 [![Skills](https://img.shields.io/badge/MD_skills-114-536DFE)](docs/unity-recipes.md)
 [![Recipes](https://img.shields.io/badge/Unity_API_references-466-586373)](Packages/com.worldweaver.toolkit/Editor/RecipeLibrary/catalog.json)
+[![Unity checks](https://img.shields.io/badge/Unity_checks-698_Editor_%2B_26_Play_%2B_2_Input-47876A)](deliverables/WorldWeaver-1.5.0-validation.json)
 
 [Установка](#установка) · [Модели](#модели) · [Проверки](#проверки) · [Документация](#документация)
 
@@ -20,6 +21,23 @@ WorldWeaver — исследовательский Unity-пакет с аген�
 ![Настоящий чат WorldWeaver в Unity, снимок версии 1.3 R11](results/screenshots-1.3/chat-wide-r11.png)
 
 Снимок интерфейса относится к версии 1.3 R11; возможности 1.5.0 проверяются отдельными протоколами.
+
+## Как выполняется запрос
+
+```mermaid
+flowchart LR
+    U[Запрос] --> A[Планирование и поиск инструментов]
+    A --> T[Встроенные операции Unity]
+    A --> R[Рецепт и реальные сигнатуры API]
+    R --> C[Компиляция Editor C#]
+    T --> S[Фактическое состояние Unity]
+    C --> S
+    S --> V[Проверки и разбор результата]
+    V -->|Есть несоответствия| A
+    V -->|Подтверждён результат| D[Ответ с доказательствами]
+```
+
+Для собственного C# выполняется отдельный модельный разбор свежих измерений без прежнего ответа исполнителя. Рецепты и результаты инструментов передаются с подходящими лимитами контекста. [Подробный процесс](docs/unity-recipes.md).
 
 ## Возможности
 

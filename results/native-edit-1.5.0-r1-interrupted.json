@@ -1,0 +1,4 @@
+{
+  "reason": "Stopped source test run before completion to incorporate independently observed missing survival verification and active model context. No full-suite pass claimed.",
+  "log": "/tmp/worldweaver-edit-1.5-r1.log"
+}
