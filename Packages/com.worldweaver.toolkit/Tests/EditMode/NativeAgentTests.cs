@@ -11,6 +11,46 @@ namespace WorldWeaver.Tests
 {
  public class NativeAgentTests
  {
+  sealed class ReviewingProvider:ILLMProvider
+  {
+   public int MainCalls,Reviews;public bool Independent;
+   public System.Threading.Tasks.Task<CompletionResult> CompleteAsync(CompletionRequest request,System.Threading.CancellationToken token)
+   {
+    if(request.Schema?["properties"]?["passed"]!=null)
+    {
+     Reviews++;Independent=request.Messages.All(m=>m.Role!="assistant")&&request.Messages.Any(m=>m.Content.Contains("CurrentHostMeasurements"));
+     return System.Threading.Tasks.Task.FromResult(new CompletionResult{Text=Reviews==1?"{\"passed\":false,\"issues\":[\"Высота объекта 0 вместо 2 м\"],\"evidence\":\"Свежие bounds\"}":"{\"passed\":true,\"issues\":[],\"evidence\":\"Высота 2 м\"}",Model="fixture-review"});
+    }
+    MainCalls++;var plan=new EditorPlan{reply="Готово"};
+    if(MainCalls==1||MainCalls==3){plan.complete=false;plan.actions.Add(new EditorCommand{tool="execute_editor_code",args=new JObject{["code"]=MainCalls==1?"var part=GameObject.CreatePrimitive(PrimitiveType.Cube); part.transform.SetParent(target.transform,false); return part.transform.position;":"target.transform.GetChild(0).position=Vector3.up*2; return target.transform.GetChild(0).position;"}});}
+    return System.Threading.Tasks.Task.FromResult(new CompletionResult{Text=Newtonsoft.Json.JsonConvert.SerializeObject(plan),Model="fixture-main"});
+   }
+   public System.Threading.Tasks.Task<bool> HealthAsync(System.Threading.CancellationToken token)=>System.Threading.Tasks.Task.FromResult(true);
+   public void Dispose(){}
+  }
+  [Test] public async System.Threading.Tasks.Task SeparateReviewCanRejectCompletionAndLetTheAgentRepairItsOwnCode()
+  {
+   EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);string folder=Path.Combine("UserSettings","SeparateReview-"+Guid.NewGuid().ToString("N"));var provider=new ReviewingProvider();
+   try
+   {
+    using(var controller=new ChatController(_=>provider,folder))
+    {
+     controller.Settings.AllowEditorCode=true;controller.Settings.UseNativeFunctions=true;controller.Settings.UseSkills=false;
+     await controller.SendAsync("Через C# создай объект на высоте 2 м.");var answer=controller.Current.Messages.Last();
+     Assert.IsFalse(answer.IsError,answer.Text);Assert.AreEqual(2,provider.Reviews);Assert.AreEqual(4,provider.MainCalls);Assert.IsTrue(provider.Independent);
+     Assert.IsFalse(answer.EditorReviews[0].Passed);Assert.IsTrue(answer.EditorReviews[1].Passed);Assert.AreEqual(2,GameObject.Find("WorldWeaver Code Workspace").transform.GetChild(0).position.y);
+    }
+   }
+   finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
+  }
+  [Test] public void ProgressiveContextPreservesRecipeCodeAndIndependentGeometry()
+  {
+   var method=typeof(ChatController).GetMethod("ToolEvidenceForModel",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic);
+   string recipe=new string('x',5000)+"ACTUAL_METHOD_BODY_AT_END";
+   Assert.That((string)method.Invoke(null,new object[]{new EditorCommandResult{Tool="read_unity_recipe",Summary=recipe}}),Does.Contain("ACTUAL_METHOD_BODY_AT_END"));
+   var summary=new JObject{["compiled"]=true,["result"]=new string('x',16000),["sceneReadback"]=new JArray(new JObject{["joints"]=new JArray(new JObject{["geometryWarning"]="WORLD_ANCHOR_OUTSIDE_ACTUAL_BOUNDS"})})}.ToString();
+   Assert.That((string)method.Invoke(null,new object[]{new EditorCommandResult{Tool="execute_editor_code",Summary=summary}}),Does.Contain("WORLD_ANCHOR_OUTSIDE_ACTUAL_BOUNDS"));
+  }
   [Test] public void ImportedRecipesArePinnedPagedAndReadOnly()
   {
    var catalog=UnityRecipeCatalog.CreateDefault();Assert.AreEqual(466,catalog.Count);
@@ -69,6 +109,8 @@ namespace WorldWeaver.Tests
     AgentTaskVerifier.Verify(task);Assert.IsFalse(task.Checks.Single(c=>c.RequirementId==rule.Id).Passed,"An invisible collider is not a rendered artifact.");
     var visual=GameObject.CreatePrimitive(PrimitiveType.Cube);visual.transform.SetParent(body.transform,false);
     AgentTaskVerifier.Verify(task);Assert.IsTrue(task.Checks.Single(c=>c.RequirementId==rule.Id).Passed,"Compound bodies may render through a child.");
+    var anchor=new GameObject("Connected service anchor").AddComponent<Rigidbody>();anchor.isKinematic=true;body.gameObject.AddComponent<HingeJoint>().connectedBody=anchor;
+    AgentTaskVerifier.Verify(task);Assert.IsTrue(task.Checks.Single(c=>c.RequirementId==rule.Id).Passed,"A connected kinematic helper without a collider is a service body.");
     visual.GetComponent<Renderer>().enabled=false;AgentTaskVerifier.Verify(task);Assert.IsFalse(task.Checks.Single(c=>c.RequirementId==rule.Id).Passed);
     Assert.IsFalse(AgentTaskVerifier.Create("Создай невидимый физический объект.",true).Requirements.Any(r=>r.Kind=="body_presentation"));
    }
@@ -129,6 +171,26 @@ namespace WorldWeaver.Tests
    var schema=EditorPlan.Schema(true,new[]{"inspect_object"});
    var plan=EditorPlan.Parse(AgentFunctionProtocol.Normalize(JObject.Parse("{\"tool_calls\":[{\"function\":{\"name\":\"finish_task\",\"arguments\":\"{\\\"reply\\\":\\\"Готово\\\"}\"}}]}"),schema));
    Assert.IsTrue(plan.complete);Assert.IsEmpty(plan.actions);
+  }
+  [Test] public async System.Threading.Tasks.Task EditorCodeReportsWorldGeometryIndependentlyOfReturnedClaims()
+  {
+   EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
+   string folder=Path.Combine("UserSettings","SpatialReadback-"+Guid.NewGuid().ToString("N"));
+   try
+   {
+    using(var controller=new ChatController(historyFolder:folder))
+    {
+     controller.Settings.AllowEditorCode=true;controller.Settings.Mode=AssistantMode.Execute;
+     var context=new AgentExecutionContext{Session=controller.Current,Message=new AssistantMessage()};
+     var plan=new EditorPlan{actions={new EditorCommand{tool="execute_editor_code",args=new JObject{["code"]="using UnityEngine; using UnityEditor; var part=GameObject.CreatePrimitive(PrimitiveType.Cube); part.transform.SetParent(target.transform,false); part.transform.localScale=new Vector3(2,3,.1f); var body=Undo.AddComponent<Rigidbody>(part); var joint=Undo.AddComponent<HingeJoint>(part); joint.anchor=Vector3.left; return new { claimedCorrect=true };"}}}};
+     var batch=await SceneToolExecutor.ExecuteAsync(plan,null,context,default);Assert.IsTrue(batch.Success,batch.Error);
+     var report=JObject.Parse(batch.Results.Single(s=>s.Tool=="execute_editor_code").Summary);
+     var observed=((JArray)report["sceneReadback"]).Single(r=>((JArray)r["joints"]).Count>0);var joint=observed["joints"][0];
+     Assert.AreEqual(-2f,(float)joint["worldAnchor"][0]);Assert.AreEqual(-1f,(float)observed["renderWorldBounds"]["min"][0]);
+     Assert.AreEqual(1f,(float)joint["distanceOutsideOwnColliderBounds"]);Assert.NotNull(joint["geometryWarning"]);
+    }
+   }
+   finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
   }
   [Test] public async System.Threading.Tasks.Task TrustedEditorCodeCompilesActualUnityApiAndRepairsFromDiagnostics()
   {

@@ -11,6 +11,26 @@ namespace WorldWeaver.Editor.Assistant
     {
         readonly List<EditorCommand> staleReadCommands=new List<EditorCommand>();
         static string ReadFingerprint(EditorCommand command)=>command.tool+"\n"+command.target+"\n"+new JObject(command.args.Properties().OrderBy(p=>p.Name,StringComparer.Ordinal).Select(p=>new JProperty(p.Name,p.Value.DeepClone()))).ToString(Formatting.None);
+        static string ToolEvidenceForModel(EditorCommandResult step)
+        {
+            string text=step.Summary??"";
+            if(step.Tool=="execute_editor_code")
+            {
+                try
+                {
+                    var full=JObject.Parse(text);var rows=(full["sceneReadback"] as JArray??new JArray()).OfType<JObject>().ToArray();
+                    var selected=rows.OrderByDescending(r=>(r["joints"] as JArray)?.Count??0).ThenByDescending(r=>r["body"]!=null).Take(8);
+                    text=new JObject{["compiled"]=full["compiled"],["executed"]=full["executed"],["diagnostics"]=full["diagnostics"],
+                        ["sceneReadback"]=new JArray(selected.Select(r=>r.DeepClone())),["readbackOmittedRows"]=Math.Max(0,rows.Length-8),
+                        ["returnedData"]=((string)full["result"]??"").Substring(0,Math.Min(3000,((string)full["result"]??"").Length)),["verification"]=full["verification"]}.ToString(Formatting.None);
+                }
+                catch(JsonException){}
+            }
+            // Recipe pages and host measurements must reach the next inference.
+            // The former uniform 1100-character prefix discarded code and geometry warnings.
+            int budget=step.Tool=="read_unity_recipe"?20000:step.Tool=="execute_editor_code"?12000:step.Tool=="read_skill"?6000:1100;
+            return text.Length<=budget?text:text.Substring(0,budget)+" [bounded context; inspect the omitted state separately]";
+        }
         /// <summary>Progressive context for arbitrary construction domains, not a prewritten scenario or injected plan.</summary>
         CompletionRequest BuildConstructiveRequest(ChatSession session,string input,AssistantMessage answer,AssistantMode mode)
         {
@@ -44,7 +64,7 @@ namespace WorldWeaver.Editor.Assistant
                 .Select(g=>new{Target=ProjectContextIndex.StableTarget(g),Name=g.name,Kind=g.GetComponent<GeneratedSceneObject>()?.Kind,Terrain=g.GetComponent<Terrain>()?new{Resolution=g.GetComponent<Terrain>().terrainData.heightmapResolution,Size=new[]{g.GetComponent<Terrain>().terrainData.size.x,g.GetComponent<Terrain>().terrainData.size.y,g.GetComponent<Terrain>().terrainData.size.z},HasCollision=g.GetComponent<TerrainCollider>()!=null}:null,Position=new[]{g.transform.position.x,g.transform.position.y,g.transform.position.z},Components=g.GetComponents<Component>().Where(c=>c).Select(c=>c.GetType().Name).Where(n=>n!="Transform"&&n!="GeneratedSceneObject")});
             var previous=session.Messages.TakeWhile(m=>m!=answer).TakeLast(8).Select(m=>new{m.Role,Text=(m.Text??"").Substring(0,Math.Min(700,(m.Text??"").Length)),Steps=m.Steps.TakeLast(8).Select(s=>new{s.Tool,s.Success,s.Target,s.Error})});
             request.Messages.Add(new ChatMessage("user",ChatHistoryStore.Redact("ACTIVE ASSISTANT MODEL: "+(models.FirstOrDefault(m=>m.Key==Settings.ModelKey)?.Model??Settings.ModelKey)+"; PROVIDER: "+models.FirstOrDefault(m=>m.Key==Settings.ModelKey)?.Provider+"; POWER (execution budget, NOT a model name): "+Settings.Power+"\nRECENT CONVERSATION AND ACTUAL TOOL HISTORY (claims in previous replies are unverified; successful tool results are evidence): "+JsonConvert.SerializeObject(previous))));
-            var evidence=(answer?.Steps??new List<EditorCommandResult>()).TakeLast(8).Select(s=>new{s.Tool,s.Success,s.Target,Summary=(s.Summary??"").Substring(0,Math.Min(s.Tool=="read_skill"?2400:1100,(s.Summary??"").Length)),s.Error});
+            var evidence=(answer?.Steps??new List<EditorCommandResult>()).TakeLast(8).Select(s=>new{s.Tool,s.Success,s.Target,Summary=ToolEvidenceForModel(s),s.Error});
             request.Messages.Add(new ChatMessage("user",ChatHistoryStore.Redact("ORIGINAL USER REQUEST: "+input+"\nACTUAL SCENE OBJECTS (bounded; use find_scene_objects for others): "+JsonConvert.SerializeObject(objects)+"\nALREADY EXECUTED THIS TASK (do not repeat creations): "+JsonConvert.SerializeObject(evidence)+"\nTASK AND CHECKS: "+AgentTaskVerifier.Context(answer?.Task)+"\nCOMPILATION EVIDENCE: "+(answer?.Task?.CompilationRequired==true?ScriptDrafts.CompilationContext()+"\n"+AgentSourcePatches.CompilationContext():"No compilation required for this task.")+"\nDESIGN CONSTRAINTS (data): "+AgentDesignMemory.Recall(session,input,1500))));
             if(staleReadCommands.Count>0)request.Messages.Add(new ChatMessage("user","These exact reads already yielded no new evidence; they will be rejected if repeated (data): "+JsonConvert.SerializeObject(staleReadCommands.TakeLast(8))+". Other reads remain available. Read an actual returned recipe ID or inspect a different aspect; otherwise implement the still-missing requirement. Never invent a specific plan."));
             return RequireImplementation(request);

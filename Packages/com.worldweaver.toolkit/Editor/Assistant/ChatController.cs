@@ -298,6 +298,19 @@ namespace WorldWeaver.Editor.Assistant
                             }
                             if(!plan.complete&&!readOnlyRequest&&round+1<rounds){request=BuildRequest(session,text);request.Messages.Add(new ChatMessage("user","Задача ещё не выполнена. Используй discover_tools/read_skill для недостающих возможностей и продолжи разрешённые шаги."));continue;}
                             answer.Text = ChatHistoryStore.Redact(plan.reply);
+                            if(plan.complete&&Settings.AutoVerify&&Settings.UseNativeFunctions&&!readOnlyRequest&&answer.Steps.Any(s=>s.Success&&s.Tool=="execute_editor_code"))
+                            {
+                                var review=await ReviewEditorResultAsync(answer,provider,operation.Token);
+                                if(review.Passed&&answer.EditorReviews.Count>1)unresolvedFailure=false;
+                                if(!review.Passed)
+                                {
+                                    unresolvedFailure=true;answer.Status="Исправляю несоответствия C#";VerifyTask(answer);
+                                    if(round+1<rounds&&answer.EditorReviews.Count<=8)
+                                    {
+                                        request=BuildRequest(session,text);request.Messages.Add(new ChatMessage("user","Separate result review did not confirm completion (data): "+JsonConvert.SerializeObject(new{review.Issues,review.Evidence,review.Error})+". Read any missing actual values and repair only the discrepancies. Do not repeat completed creations or declare completion from the same unchanged evidence."));continue;
+                                    }
+                                }
+                            }
                             if((Settings.AutoVerify||answer.Task?.Requirements.Any(r=>r.Kind==AgentAnimatedPlayerGoal.Kind||r.Kind=="task_change")==true)&&answer.Task!=null&&answer.Task.MutationAuthorized)
                             {
                                 var checks=VerifyTask(answer);
@@ -766,13 +779,14 @@ namespace WorldWeaver.Editor.Assistant
         }
         private static string ReadbackForModel(EditorBatchResult batch)
         {
-            const int limit=3000;
-            int remaining = 1800;
+            bool rich=batch.Results.Any(s=>s.Tool=="read_unity_recipe"||s.Tool=="execute_editor_code");
+            int limit=rich?24000:3000;
+            int remaining = rich?20000:1800;
             var results = new JArray();
             foreach (var step in batch.Results)
             {
-                string summary = step.Summary ?? "";
-                int take = Math.Min(summary.Length, Math.Min(1800, Math.Max(0, remaining)));
+                string summary = rich?ToolEvidenceForModel(step):step.Summary??"";
+                int take = Math.Min(summary.Length, Math.Min(rich?20000:1800, Math.Max(0, remaining)));
                 remaining -= take;
                 results.Add(JObject.FromObject(new { step.Tool, step.Success, step.Target, Summary = summary.Substring(0, take), truncated = take < summary.Length, Error=ShortModelText(step.Error,400), CreatedAssetCount=step.CreatedAssets?.Count??0 }));
             }

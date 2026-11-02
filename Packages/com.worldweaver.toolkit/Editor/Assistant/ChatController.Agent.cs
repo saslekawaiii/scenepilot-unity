@@ -54,6 +54,9 @@ namespace WorldWeaver.Editor.Assistant
                 answer.Task.Checks.Add(AgentMaterialApplicationGoal.Verify(requirement,answer.Steps));
             foreach(var requirement in answer.Task.Requirements.Where(r=>r.Kind==AgentAnimatedPlayerGoal.Kind))
                 answer.Task.Checks.Add(AgentAnimatedPlayerGoal.Verify(requirement,answer.Steps));
+            var editorReview=answer.EditorReviews?.LastOrDefault();
+            if(editorReview!=null)answer.Task.Checks.Add(new AgentCheckResult{RequirementId="editor_result_review",Description="Отдельный модельный разбор Editor C# по фактическому состоянию",Passed=editorReview.Passed&&editorReview.StepCount==answer.Steps.Count,
+                Actual=editorReview.Passed&&editorReview.StepCount==answer.Steps.Count?"Модельный разбор пройден":string.Join("; ",editorReview.Issues)+(editorReview.StepCount!=answer.Steps.Count?"; данные изменились после разбора":""),Evidence=editorReview.Evidence??editorReview.Error??"См. отдельный журнал EditorReviews; это не детерминированное доказательство поведения."});
             answer.Task.Status=answer.Task.Checks.Count==0?"actions_need_review":answer.Task.Checks.All(c=>c.Passed)?"checks_passed":"checks_failed";
             return answer.Task.Checks;
         }

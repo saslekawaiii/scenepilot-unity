@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEditor;
@@ -14,7 +15,7 @@ namespace WorldWeaver.Editor.Assistant
     internal static class EditorCodeTools
     {
         internal const string Reference = @"reflect_api: empty target; args {type:string,member?:string}. Read public Unity/project C# signatures before using unfamiliar APIs. No method invocation.
-execute_editor_code: optional existing owned target, otherwise an owned workspace; args {code:string}. Standalone C# METHOD BODY only (no using directives, namespace or class declarations), at most 20000 characters, ending with return object/anonymous data. Usings System, Collections.Generic, Linq, UnityEngine, UnityEditor, WorldWeaver, Newtonsoft.Json.Linq are supplied. Parameter GameObject target is the real object/workspace; use it instead of inventing an ID. Requires the project's autonomous Editor C# setting. Compiles with real Roslyn diagnostics, then executes immediately on Unity main thread with full Editor permissions. Use Undo for every edit, keep new scene objects under target, create persistent runtime assets under Assets/WorldWeaverGenerated only. Return actual measured state. No infinite loops, sleeps, network, shell, secret access, unrelated deletion, scene replacement, or claims of play verification. Runtime MonoBehaviours need saved source and normal compilation; dynamic snippet types cannot be serialized as runtime scripts.";
+execute_editor_code: optional existing owned target, otherwise an owned workspace; args {code:string}. Standalone C# METHOD BODY (optional leading using directives are supported; no namespace or class declarations), at most 20000 characters, ending with return object/anonymous data. Usings System, Collections.Generic, Linq, UnityEngine, UnityEditor, WorldWeaver, Newtonsoft.Json.Linq are supplied. Parameter GameObject target is the real object/workspace; use it instead of inventing an ID. Requires the project's autonomous Editor C# setting. Compiles with real Roslyn diagnostics, then executes immediately on Unity main thread with full Editor permissions. Use Undo for every edit, keep new scene objects under target, create persistent runtime assets under Assets/WorldWeaverGenerated only. Review the automatic sceneReadback and geometric warnings against the request before finishing. Joint.anchor and Collider.center are LOCAL coordinates; use TransformPoint/InverseTransformPoint when comparing with WORLD bounds. Return actual measured state. No infinite loops, sleeps, network, shell, secret access, unrelated deletion, scene replacement, or claims of play verification. Runtime MonoBehaviours need saved source and normal compilation; dynamic snippet types cannot be serialized as runtime scripts.";
         static readonly Dictionary<string,Assembly> Cache=new Dictionary<string,Assembly>();
         internal static string Reflect(string name,string member)
         {
@@ -34,7 +35,13 @@ execute_editor_code: optional existing owned target, otherwise an owned workspac
                 throw new InvalidOperationException("Autonomous Editor C# is disabled in this project. Enable it in chat settings or use reviewed script tools.");
             string code=(string)command.args["code"];
             if(string.IsNullOrWhiteSpace(code)||code.Length>20000)throw new ArgumentException("A complete C# method body up to 20000 characters is required.");
-            string source="using System; using System.Collections.Generic; using System.Linq;\nusing UnityEngine; using UnityEditor; using WorldWeaver; using Newtonsoft.Json.Linq;\npublic static class WWEditorSnippet\n{\n public static object Execute(GameObject target)\n {\n"+code+"\n }\n}";
+            string directives="";
+            while(true)
+            {
+                var directive=Regex.Match(code,@"\A\s*using\s+(?:(?:static\s+)?[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*|[A-Za-z_][A-Za-z0-9_]*\s*=\s*(?:global::)?[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\s*;");
+                if(!directive.Success)break;directives+=directive.Value+"\n";code=code.Substring(directive.Length);
+            }
+            string source="using System; using System.Collections.Generic; using System.Linq;\nusing UnityEngine; using UnityEditor; using WorldWeaver; using Newtonsoft.Json.Linq;\n"+directives+"\npublic static class WWEditorSnippet\n{\n public static object Execute(GameObject target)\n {\n"+code+"\n }\n}";
             string hash=TextChunker.Digest(source);
             if(!Cache.TryGetValue(hash,out var assembly))
             {
@@ -66,9 +73,39 @@ execute_editor_code: optional existing owned target, otherwise an owned workspac
             }
             string data=JsonConvert.SerializeObject(result,new JsonSerializerSettings{ReferenceLoopHandling=ReferenceLoopHandling.Ignore,MaxDepth=8,Converters=new List<JsonConverter>{new UnityReadbackConverter()}});
             if(data.Length>16000)data=data.Substring(0,16000)+" [output truncated]";
-            var report=new JObject{["compiled"]=true,["executed"]=true,["sourceHash"]=hash,["result"]=data,["createdObjects"]=new JArray(created.Take(80).Select(g=>ProjectContextIndex.StableTarget(g))),["verification"]="Compilation and execution only; runtime gameplay was not tested by this command."};
+            var report=new JObject{["compiled"]=true,["executed"]=true,["sourceHash"]=hash,["result"]=data,["createdObjects"]=new JArray(created.Take(80).Select(g=>ProjectContextIndex.StableTarget(g))),["sceneReadback"]=ReadScene(target,created),["verification"]="Compilation and execution only; runtime gameplay was not tested by this command."};
             return new EditorCommandResult{Tool=command.tool,Success=true,Target=ProjectContextIndex.StableTarget(target),Summary=report.ToString(Formatting.None)};
         }
+        // Host measurements, independent of the snippet's self-reported return data.
+        // Spatial evidence works for any generated component composition, not a named scenario.
+        internal static JArray ReadScene(GameObject target,GameObject[] created)
+        {
+            Physics.SyncTransforms();var rows=new JArray();
+            var objects=new[]{target}.Concat(target.GetComponentsInChildren<Transform>(true).Select(t=>t.gameObject)).Concat(created).Where(g=>g).Distinct().Take(32);
+            foreach(var go in objects)
+            {
+                var row=new JObject{["target"]=ProjectContextIndex.StableTarget(go),["name"]=go.name,["worldPosition"]=V(go.transform.position),["localScale"]=V(go.transform.localScale)};
+                var renderers=go.GetComponentsInChildren<Renderer>().Where(r=>r.enabled&&r.gameObject.activeInHierarchy).ToArray();
+                if(renderers.Length>0){var bounds=renderers[0].bounds;foreach(var r in renderers.Skip(1))bounds.Encapsulate(r.bounds);row["renderWorldBounds"]=B(bounds);}
+                var light=go.GetComponent<Light>();if(light)row["light"]=new JObject{["type"]=light.type.ToString(),["range"]=light.range,["intensity"]=light.intensity};
+                var body=go.GetComponent<Rigidbody>();if(body)row["body"]=new JObject{["mass"]=body.mass,["gravity"]=body.useGravity,["kinematic"]=body.isKinematic};
+                var colliders=go.GetComponentsInChildren<Collider>().Where(c=>c.enabled&&c.gameObject.activeInHierarchy).Take(12).ToArray();
+                row["colliders"]=new JArray(colliders.Select(c=>new JObject{["type"]=c.GetType().FullName,["trigger"]=c.isTrigger,["worldBounds"]=B(c.bounds)}));
+                row["joints"]=new JArray(go.GetComponents<Joint>().Select(j=>
+                {
+                    var anchor=j.transform.TransformPoint(j.anchor);var own=colliders.Where(c=>c.attachedRigidbody==body&&!c.isTrigger).ToArray();
+                    float distance=own.Length>0?own.Min(c=>Vector3.Distance(anchor,c.bounds.ClosestPoint(anchor))):0;
+                    var item=new JObject{["type"]=j.GetType().FullName,["localAnchor"]=V(j.anchor),["worldAnchor"]=V(anchor),["worldAxis"]=V(j.transform.TransformDirection(j.axis).normalized),
+                        ["connectedWorldAnchor"]=V(j.connectedBody?j.connectedBody.transform.TransformPoint(j.connectedAnchor):j.connectedAnchor),["distanceOutsideOwnColliderBounds"]=distance};
+                    if(j is HingeJoint hinge){item["useLimits"]=hinge.useLimits;item["minDegrees"]=hinge.limits.min;item["maxDegrees"]=hinge.limits.max;}
+                    if(distance>.02f)item["geometryWarning"]="Anchor lies outside the body's collider bounds in WORLD space. This can be intentional; compare with the user's attachment requirement and local scale. A requested edge anchor must coincide with the actual world-space edge, not an unscaled dimension.";
+                    return item;
+                }));rows.Add(row);
+            }
+            return rows;
+        }
+        static JArray V(Vector3 value)=>new JArray(value.x,value.y,value.z);
+        static JObject B(Bounds value)=>new JObject{["min"]=V(value.min),["max"]=V(value.max),["size"]=V(value.size)};
         sealed class UnityReadbackConverter:JsonConverter
         {
             public override bool CanRead=>false;

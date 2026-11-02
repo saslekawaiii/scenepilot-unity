@@ -139,6 +139,7 @@ namespace WorldWeaver.Editor.Assistant
         public int InputTokens, OutputTokens;
         public List<EditorCommandResult> Steps = new List<EditorCommandResult>();
         public List<EditorPlanAttempt> Attempts = new List<EditorPlanAttempt>();
+        public List<EditorResultReview> EditorReviews = new List<EditorResultReview>();
         public EditorPlan PendingPlan;
         public bool IsError;
         public AgentTaskState Task;

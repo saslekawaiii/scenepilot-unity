@@ -171,10 +171,13 @@ namespace WorldWeaver.Editor.Assistant
                 else if(requirement.Kind=="body_presentation")
                 {
                     var bodies=objects.Select(g=>g.GetComponent<Rigidbody>()).Where(b=>b&&!requirement.BaselineTargets.Contains(ProjectContextIndex.StableTarget(b.gameObject))).ToArray();
+                    var skins=objects.SelectMany(g=>g.GetComponents<SkinnedMeshRenderer>()).Where(r=>r.enabled&&r.gameObject.activeInHierarchy).ToArray();
+                    var joints=objects.SelectMany(g=>g.GetComponents<Joint>()).ToArray();
                     var observations=bodies.Select(b=>new{target=ProjectContextIndex.StableTarget(b.gameObject),
-                        rendered=b.GetComponentsInChildren<Renderer>().Any(r=>r.enabled&&r.gameObject.activeInHierarchy&&r.bounds.size.sqrMagnitude>.0001f),
+                        auxiliary=b.isKinematic&&!b.GetComponentsInChildren<Collider>().Any(c=>c.enabled&&!c.isTrigger&&c.attachedRigidbody==b)&&joints.Any(j=>j.connectedBody==b),
+                        rendered=b.GetComponentsInChildren<Renderer>().Any(r=>r.enabled&&r.gameObject.activeInHierarchy&&r.bounds.size.sqrMagnitude>.0001f)||skins.Any(r=>r.bones.Contains(b.transform)),
                         collision=b.GetComponentsInChildren<Collider>().Any(c=>c.enabled&&!c.isTrigger&&c.attachedRigidbody==b)}).ToArray();
-                    actual=observations.All(o=>o.rendered&&o.collision)?1:0;
+                    actual=observations.All(o=>o.auxiliary||o.rendered&&o.collision)?1:0;
                     evidence="Independent Renderer bounds/enabled and Collider/attachedRigidbody read-back for new bodies: "+JsonConvert.SerializeObject(observations)+". An empty list proves no presentation defect, not task completion.";
                 }
                 else if(requirement.Kind=="body_physics")
