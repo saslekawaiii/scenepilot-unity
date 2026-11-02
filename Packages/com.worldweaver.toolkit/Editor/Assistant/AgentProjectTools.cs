@@ -20,12 +20,13 @@ namespace WorldWeaver.Editor.Assistant
     /// <summary>Typed project operations: no shell, arbitrary reflection invocation or credential file reader.</summary>
     internal static class AgentProjectTools
     {
-        static readonly string[] Names={"find_unity_recipes","read_unity_recipe","execute_editor_code","reflect_api","plan_task","discover_tools","find_scene_objects","inspect_project","inspect_component","set_component","add_component","read_console","capture_scene","run_tests","run_play_check","poll_job","set_build_scenes","build_player","remember_design","list_skills","read_skill","open_scene"};
+        static readonly string[] Names={"find_unity_recipes","read_unity_recipe","read_task_step","execute_editor_code","reflect_api","plan_task","discover_tools","find_scene_objects","inspect_project","inspect_component","set_component","add_component","read_console","capture_scene","run_tests","run_play_check","poll_job","set_build_scenes","build_player","remember_design","list_skills","read_skill","open_scene"};
         internal static bool Handles(string tool)=>Names.Contains(tool);
-        internal static bool IsReadOnly(string tool)=>new[]{"find_unity_recipes","read_unity_recipe","reflect_api","plan_task","discover_tools","find_scene_objects","inspect_project","inspect_component","read_console","capture_scene","poll_job","list_skills","read_skill"}.Contains(tool);
+        internal static bool IsReadOnly(string tool)=>new[]{"find_unity_recipes","read_unity_recipe","read_task_step","reflect_api","plan_task","discover_tools","find_scene_objects","inspect_project","inspect_component","read_console","capture_scene","poll_job","list_skills","read_skill"}.Contains(tool);
         internal static bool IsDeferred(string tool)=>tool=="run_tests"||tool=="run_play_check"||tool=="build_player"||tool=="open_scene";
         internal static bool RequiresReview(EditorCommand c)=>c.tool=="open_scene"||c.tool=="set_build_scenes"||c.tool=="add_component"&&ResolveType((string)c.args["type"]).IsSubclassOf(typeof(MonoBehaviour));
         internal const string ToolInstructions=@"PROJECT TOOLS (exact typed args):
+read_task_step: target empty,args {index:0..127,offset?:0..100000}. Retrieves a persisted earlier tool result from THIS task, including full real IDs, errors and asset paths. Use the durable index to recover evidence outside the recent context window. Paged data only; does not rerun the tool.
 plan_task: target empty,args {steps:[string...]}, 1-12 stages covering ALL parts of a compound request. Records a proposed approach only; never marks stages completed. Plan before complex creation, then use actual tools and live checks.
 find_scene_objects: target empty,args {query:string,limit?:1..50}. Addressed retrieval over all loaded scenes/assets, returns stable targets. Editing remains restricted to active scene.
 inspect_project: target empty,args {}. Actual Unity/platform/packages/build-scenes metadata, no environment files.
@@ -51,6 +52,7 @@ open_scene: target empty,args {path:Assets/...unity}. Standalone reviewed action
             var schema=new Dictionary<string,JObject>{
                 ["find_unity_recipes"]=Obj(new JObject{["query"]=Text(500),["limit"]=Integer(1,8)},"query"),
                 ["read_unity_recipe"]=Obj(new JObject{["id"]=Text(120),["offset"]=Integer(0,65536)},"id"),
+                ["read_task_step"]=Obj(new JObject{["index"]=Integer(0,127),["offset"]=Integer(0,100000)},"index"),
                 ["reflect_api"]=Obj(new JObject{["type"]=Text(240),["member"]=Text(120)},"type"),
                 ["execute_editor_code"]=Obj(new JObject{["code"]=Text(20000)},"code"),
                 ["plan_task"]=Obj(new JObject{["steps"]=new JObject{["type"]="array",["minItems"]=1,["maxItems"]=12,["items"]=Text(300)}},"steps"),
@@ -181,6 +183,13 @@ open_scene: target empty,args {path:Assets/...unity}. Standalone reviewed action
             {
                 case "find_unity_recipes":summary=UnityRecipeCatalog.CreateDefault().Search((string)a["query"],(int?)a["limit"]??6).ToString(Formatting.None);break;
                 case "read_unity_recipe":summary=UnityRecipeCatalog.CreateDefault().Read((string)a["id"],(int?)a["offset"]??0).ToString(Formatting.None);break;
+                case "read_task_step":
+                    int index=(int)a["index"],offset=(int?)a["offset"]??0;
+                    if(context?.Message==null||index>=context.Message.Steps.Count)throw new ArgumentException("Choose an existing step from this task's durable index.");
+                    var evidence=context.Message.Steps[index];string body=evidence.Summary??"";
+                    if(offset>body.Length)throw new ArgumentException("Offset exceeds stored evidence length "+body.Length);
+                    int length=Math.Min(18000,body.Length-offset);
+                    summary=new JObject{["index"]=index,["tool"]=evidence.Tool,["success"]=evidence.Success,["target"]=evidence.Target,["error"]=evidence.Error,["summary"]=body.Substring(offset,length),["offset"]=offset,["nextOffset"]=offset+length<body.Length?(JToken)(offset+length):JValue.CreateNull(),["totalLength"]=body.Length}.ToString(Formatting.None);break;
                 case "execute_editor_code":return EditorCodeTools.Execute(c,resolve,context);
                 case "reflect_api":summary=EditorCodeTools.Reflect((string)a["type"],(string)a["member"]);break;
                 case "plan_task":if(context?.Message?.Task==null)throw new InvalidOperationException("A task context is required.");context.Message.Task.Approach=a["steps"].Values<string>().ToList();summary=new JObject{["stages"]=a["steps"].DeepClone(),["status"]="proposed, not completed",["changesApplied"]=false}.ToString(Formatting.None);break;

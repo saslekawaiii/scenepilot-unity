@@ -35,6 +35,8 @@ namespace WorldWeaver.Editor.Assistant
         public string Id = Guid.NewGuid().ToString("N"), OriginalRequest, Status = "planned", ScopeTarget, CheckpointId, PendingJobId;
         public int ResumeAttempts;
         public string CreatedUtc = DateTime.UtcNow.ToString("o");
+        public string InitialSceneFacts;
+        public List<string> InitialObjectTargets;
         public bool MutationAuthorized, ContinueAfterReload, CompilationRequired, CheckpointSealed;
         public List<string> ReviewedCodeScope = new List<string>();
         public List<AgentRequirement> Requirements = new List<AgentRequirement>();
@@ -60,6 +62,7 @@ namespace WorldWeaver.Editor.Assistant
         public static AgentTaskState Create(string input, bool mutationAuthorized)
         {
             var task = new AgentTaskState { OriginalRequest=input,MutationAuthorized=mutationAuthorized };
+            task.InitialObjectTargets=ProjectContextIndex.Objects().Select(ProjectContextIndex.StableTarget).ToList();
             input=input??"";
             var ambiguousKinds=new HashSet<string>();
             var number = @"(?:\d{1,6}|один|одна|одно|два|две|три|четыре|пять|шесть|семь|восемь|девять|десять|one|two|three|four|five|six|seven|eight|nine|ten)";
@@ -144,6 +147,12 @@ namespace WorldWeaver.Editor.Assistant
         public static IReadOnlyList<AgentCheckResult> Verify(AgentTaskState task)
         {
             if(task==null)return Array.Empty<AgentCheckResult>();
+            // Derive this invariant from actual newly created bodies, irrespective
+            // of the user's language, verb or an unfamiliar object category.
+            if(task.MutationAuthorized&&task.InitialObjectTargets!=null&&!task.Requirements.Any(r=>r.Kind=="body_presentation")&&
+                !Regex.IsMatch(task.OriginalRequest??"",@"(?i)(невидим|invisible|trigger|триггер|пуст\p{L}*\s+(?:объект|узел|хост)|empty\s+(?:object|node|host)|без\s+(?:визуал|геомет|рендер)|(?:только|only)[^.!?\n]{0,20}(?:компонент|component|скрипт|script|код|code))")&&
+                ProjectContextIndex.Objects().Any(g=>g.GetComponent<Rigidbody>()&&!task.InitialObjectTargets.Contains(ProjectContextIndex.StableTarget(g))))
+                task.Requirements.Add(new AgentRequirement{Kind="body_presentation",Number=1,Origin="observed_artifact_invariant",BaselineTargets=task.InitialObjectTargets.ToList(),Description="Новые физические объекты должны быть видимыми и иметь коллайдер; существующие объекты и явные невидимые служебные тела не затрагиваются"});
             GameObject scope=null;
             if(!string.IsNullOrEmpty(task.ScopeTarget))try{scope=SceneToolExecutor.ResolveTarget(task.ScopeTarget);}catch(ArgumentException){}
             bool missingScope=!string.IsNullOrEmpty(task.ScopeTarget)&&!scope;

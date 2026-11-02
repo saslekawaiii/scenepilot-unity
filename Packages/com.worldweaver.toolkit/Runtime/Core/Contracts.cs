@@ -61,7 +61,8 @@ namespace WorldWeaver
     {
         public readonly int Status;
         public readonly bool Transient;
-        public ProviderException(string message, int status = 0, bool transient = false) : base(message)
-        { Status = status; Transient = transient; }
+        public readonly string WireResponse;
+        public ProviderException(string message, int status = 0, bool transient = false, string wireResponse = null) : base(message)
+        { Status = status; Transient = transient; WireResponse=wireResponse; }
     }
 }

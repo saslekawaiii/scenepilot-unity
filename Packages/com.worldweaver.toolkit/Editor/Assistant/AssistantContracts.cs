@@ -53,12 +53,14 @@ namespace WorldWeaver.Editor.Assistant
     {
         public string reply = "";
         public bool complete = true;
+        public string outcome = "";
+        public List<string> blockers = new List<string>();
         public List<EditorCommand> actions = new List<EditorCommand>();
 
         public static EditorPlan Parse(string json)
         {
             var value = JObject.Parse(json, new JsonLoadSettings { DuplicatePropertyNameHandling = DuplicatePropertyNameHandling.Error });
-            if (value.Properties().Any(p => p.Name != "reply" && p.Name != "complete" && p.Name != "actions") ||
+            if (value.Properties().Any(p => p.Name != "reply" && p.Name != "complete" && p.Name != "actions" && p.Name != "outcome" && p.Name != "blockers") ||
                 value["reply"]?.Type != JTokenType.String || value["complete"]?.Type != JTokenType.Boolean || value["actions"]?.Type != JTokenType.Array)
                 throw new ArgumentException("Ответ должен содержать reply, complete и actions.");
             if (((JArray)value["actions"]).Count > 24) throw new ArgumentException("Не более 24 инструментов в одном шаге.");
@@ -73,12 +75,16 @@ namespace WorldWeaver.Editor.Assistant
                 index++;
             }
             var result = value.ToObject<EditorPlan>();
+            if(value["outcome"]!=null&&(value["outcome"].Type!=JTokenType.String||!new[]{"","completed","blocked","partial"}.Contains(result.outcome)))throw new ArgumentException("Unknown terminal outcome.");
+            if(value["blockers"]!=null&&(!(value["blockers"] is JArray reasons)||reasons.Count>8||reasons.Any(r=>r.Type!=JTokenType.String||((string)r).Length>1000)))throw new ArgumentException("Blockers must be at most eight bounded strings.");
+            if(result.outcome=="blocked"||result.outcome=="partial")
+                if(!result.complete||result.actions.Count!=0||result.blockers==null||result.blockers.Count==0||result.blockers.Any(string.IsNullOrWhiteSpace))throw new ArgumentException("A blocked/partial terminal result needs explicit blockers and no actions.");
             if (result.reply.Length > 12000 || result.actions.Any(a => a.tool.Length > 64 || a.name.Length > 160 || a.target.Length > 200 || a.args.ToString().Length > 40000))
                 throw new ArgumentException("Превышен размер ответа инструмента.");
             return result;
         }
 
-        public static JObject Schema(bool typed = true, IEnumerable<string> allowedTools = null)
+        public static JObject Schema(bool typed = true, IEnumerable<string> allowedTools = null, bool nativeFunctions = false)
         {
             var command = new JObject {
                 ["type"] = "object", ["additionalProperties"] = false,
@@ -89,13 +95,19 @@ namespace WorldWeaver.Editor.Assistant
             };
             if (allowedTools != null) command = EditorToolSchema.Restrict(allowedTools, typed);
             else if (typed) command = EditorToolSchema.DecoderCommandSchema();
-            return new JObject {
+            if(nativeFunctions)foreach(var branch in (command["anyOf"] as JArray??new JArray()).OfType<JObject>())
+                branch["x-worldweaver-read-only"]=SceneToolExecutor.IsReadOnlyTool(EditorToolSchema.ToolName(branch))&&!WorldMaterialTools.IsAsync(EditorToolSchema.ToolName(branch));
+            var schema = new JObject {
                 ["type"] = "object", ["additionalProperties"] = false,
                 ["properties"] = new JObject {
                     ["reply"] = new JObject { ["type"] = "string" }, ["complete"] = new JObject { ["type"] = "boolean" },
-                    ["actions"] = new JObject { ["type"] = "array", ["items"] = command }
+                    ["actions"] = new JObject { ["type"] = "array", ["items"] = command },
+                    ["outcome"] = new JObject { ["type"]="string", ["enum"]=new JArray("","completed","blocked","partial") },
+                    ["blockers"] = new JObject { ["type"]="array",["maxItems"]=8,["items"]=new JObject{["type"]="string",["maxLength"]=1000} }
                 }, ["required"] = new JArray("reply", "complete", "actions")
             };
+            if(!nativeFunctions){((JObject)schema["properties"]).Remove("outcome");((JObject)schema["properties"]).Remove("blockers");}
+            return schema;
         }
     }
 

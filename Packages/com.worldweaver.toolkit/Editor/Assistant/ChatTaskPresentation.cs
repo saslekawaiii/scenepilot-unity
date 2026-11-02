@@ -46,6 +46,8 @@ namespace WorldWeaver.Editor.Assistant
                 return new ChatTaskPresentation(true, "task-card-pending", "Проверка ещё не завершена", "Ожидаю результат Unity", "Готовность задачи пока не подтверждена.");
             if (operationActive)
                 return new ChatTaskPresentation(true, "task-card-pending", "Задача выполняется", "Работа продолжается", "Результат будет показан после завершения и проверок.");
+            if (state=="blocked"||state=="partial")
+                return new ChatTaskPresentation(true,"task-card-pending",state=="partial"?"Выполнено частично":"Не хватает ресурса или доступа","Полное выполнение не подтверждено",string.Join("; ",task.OpenQuestions??new List<string>())+priorResults);
             if (task.ContinueAfterReload || Is(state, "waiting_continuation", "interrupted") || Is(outcome, "нужно продолжить вручную", "нужна проверка", "нужно уточнение"))
                 return new ChatTaskPresentation(true, "task-card-pending", "Задача не завершена", "Ожидает продолжения", "Продолжите задачу или проверьте уже выполненные действия.");
             if (checks.Any(check => !check.Passed) || state == "checks_failed")

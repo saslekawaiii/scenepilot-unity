@@ -164,6 +164,13 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
                 if(command.name.Length>160||command.target.Length>200||command.args.ToString().Length>40000)throw new ArgumentException("Command too large.");
                 if(saved)throw new ArgumentException("save_scene must be the final command.");
                 var a=command.args;VirtualTarget target=null;bool creation=false;int cost=0;
+                if(ModelAssetTools.Handles(command.tool))
+                {
+                    ModelAssetTools.Validate(command,s=>Resolve(s,aliases).Object??throw new ArgumentException("Model target must already exist."));
+                    if(command.tool!="model_search"&&plan.actions.Count!=1)throw new ArgumentException("Model import/binding are standalone steps.");
+                    if(command.tool=="replace_model"&&owned+400>SceneLimit)throw new ArgumentException("Insufficient scene object budget for model binding.");
+                    continue;
+                }
                 if(WorldMaterialTools.Handles(command.tool))
                 {
                     WorldMaterialTools.Validate(command,s=>Resolve(s,aliases).Object??throw new ArgumentException("Material target must already exist; apply in a subsequent step after creation."));
@@ -179,7 +186,7 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
                 if(ConstructiveTools.Handles(command.tool))
                 {
                     ConstructiveTools.Validate(command,s=>Resolve(s,aliases).Object??throw new ArgumentException("Constructive targets must exist; run creation and dependent operations in separate steps."));
-                    if(command.tool=="verify_scene"&&plan.actions.Count!=1)throw new ArgumentException("Verification is a standalone read-only step.");
+                    if(command.tool=="verify_scene"&&plan.actions.Any(a=>!IsReadOnlyTool(a.tool)))throw new ArgumentException("Verification is a standalone read-only step.");
                     created+=ConstructiveTools.Cost(command);if(created>BatchLimit||owned+created>SceneLimit)throw new ArgumentException("Constructive object budget exceeded.");
                     continue;
                 }
@@ -272,17 +279,18 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
         private static void Parent(EditorCommand command,Dictionary<string,VirtualTarget> aliases)
         {if(!string.IsNullOrEmpty(command.target)&&!Resolve(command.target,aliases).Owned)throw new ArgumentException("Creation parent must be owned WorldWeaver group/world.");}
 
-        public static bool IsReadOnlyTool(string tool)=>tool=="inspect_object"||tool=="search_project"||tool=="read_script"||WorldGameplayTools.IsReadOnly(tool)||AgentProjectTools.IsReadOnly(tool)||WorldMaterialTools.IsReadOnly(tool)||ConstructiveTools.IsReadOnly(tool);
+        public static bool IsReadOnlyTool(string tool)=>tool=="inspect_object"||tool=="search_project"||tool=="read_script"||WorldGameplayTools.IsReadOnly(tool)||AgentProjectTools.IsReadOnly(tool)||WorldMaterialTools.IsReadOnly(tool)||ConstructiveTools.IsReadOnly(tool)||ModelAssetTools.IsReadOnly(tool);
 
         public static async Task<EditorBatchResult> ExecuteAsync(EditorPlan plan,OrchestratorProfile routes=null,AgentExecutionContext executionContext=null,CancellationToken token=default,Action beforeMutation=null)
         {
             token.ThrowIfCancellationRequested();
-            if(plan?.actions?.Any(a=>a!=null&&WorldMaterialTools.IsAsync(a.tool))!=true)return Execute(plan,routes,executionContext);
+            if(plan?.actions?.Any(a=>a!=null&&(WorldMaterialTools.IsAsync(a.tool)||ModelAssetTools.IsAsync(a.tool)))!=true)return Execute(plan,routes,executionContext);
             try
             {
                 Validate(plan);
                 var command=plan.actions.Single();
-                var result=await WorldMaterialTools.ExecuteAsync(command,token,()=>{token.ThrowIfCancellationRequested();Validate(plan);beforeMutation?.Invoke();});
+                Action admit=()=>{token.ThrowIfCancellationRequested();Validate(plan);beforeMutation?.Invoke();};
+                var result=ModelAssetTools.IsAsync(command.tool)?await ModelAssetTools.ImportAsync(command,token,admit):await WorldMaterialTools.ExecuteAsync(command,token,admit);
                 return new EditorBatchResult{Success=true,Summary="Выполнен инструмент "+command.tool,Results=new List<EditorCommandResult>{result}};
             }
             catch(OperationCanceledException){throw;}
@@ -299,7 +307,7 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
             {
                 plan=SceneCreationDefaults.Resolve(plan);
                 Validate(plan);
-                if(plan.actions.Any(a=>WorldMaterialTools.IsAsync(a.tool)))throw new ArgumentException("Use await SceneToolExecutor.ExecuteAsync for material search/import; synchronous scene transactions never wait for network I/O.");
+                if(plan.actions.Any(a=>WorldMaterialTools.IsAsync(a.tool)||ModelAssetTools.IsAsync(a.tool)))throw new ArgumentException("Use await SceneToolExecutor.ExecuteAsync for material search/import; synchronous scene transactions never wait for network I/O.");
                 if(plan.actions.Count==0){result.Success=true;result.Summary="Нет редакторских действий.";return result;}
                 if(routes&&plan.actions.Any(a=>a.tool=="create_npc"||a.tool=="create_village"||a.tool=="configure_npc_ai"&&(bool?)a.args["assign_selected_model"]==true)){routes.Resolve(ModelTask.Dialogue).Validate();routes.Resolve(ModelTask.Planning).Validate();}
                 if(plan.actions.Any(a=>!IsReadOnlyTool(a.tool))){Undo.IncrementCurrentGroup();undo=Undo.GetCurrentGroup();Undo.SetCurrentGroupName("WorldWeaver assistant batch");result.UndoGroup=undo;}
@@ -310,6 +318,7 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
                 foreach(var command in plan.actions)
                 {
                     int assetStart=tx.Assets.Count;var a=command.args;GameObject go=null;string summary="";
+                    if(ModelAssetTools.Handles(command.tool)){result.Results.Add(ModelAssetTools.Execute(command,resolve,tx));continue;}
                     if(command.tool=="material_apply")
                     {result.Results.Add(WorldMaterialTools.Apply(command,resolve,tx));continue;}
                     if(AgentProjectTools.Handles(command.tool))
@@ -427,7 +436,18 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
         private static void SaveNewAssets(SceneBuildTransaction tx)
         {
             foreach(string path in tx.Assets)
-            {var asset=AssetDatabase.LoadMainAssetAtPath(path);if(asset){EditorUtility.SetDirty(asset);AssetDatabase.SaveAssetIfDirty(asset);}}
+            {
+                var asset=AssetDatabase.LoadMainAssetAtPath(path);
+                if(asset is Material material&&material.HasProperty("_BaseMap")&&material.HasProperty("_MainTex"))
+                {
+                    // URP synchronizes this legacy alias on a later import. Seal
+                    // the already canonical state instead of seeing that flush as
+                    // a manual edit in the next tool. Only this batch's new assets.
+                    material.SetTexture("_MainTex",material.GetTexture("_BaseMap"));
+                    material.SetTextureScale("_MainTex",material.GetTextureScale("_BaseMap"));material.SetTextureOffset("_MainTex",material.GetTextureOffset("_BaseMap"));
+                }
+                if(asset){EditorUtility.SetDirty(asset);AssetDatabase.SaveAssetIfDirty(asset);}
+            }
         }
         private static GameObject OwnedGroup(SceneBuildTransaction tx)
         {

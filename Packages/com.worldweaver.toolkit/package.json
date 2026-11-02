@@ -1,8 +1,8 @@
 {
   "name": "com.worldweaver.toolkit",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "displayName": "WorldWeaver Intelligent World Toolkit",
-  "description": "Unity world agent with automatic Ollama discovery, offline and online CC0 materials, reviewed C# mechanics and freeform autonomous NPC conversations.",
+  "description": "Unity agent with native tools, persistent task evidence, whole-task review, licensed model acquisition, procedural humanoid locomotion and autonomous NPCs.",
   "unity": "6000.3",
   "author": {
     "name": "Kirill Kovalenko"

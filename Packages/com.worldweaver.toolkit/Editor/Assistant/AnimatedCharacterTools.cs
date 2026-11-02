@@ -14,7 +14,7 @@ namespace WorldWeaver.Editor.Assistant
     {
         internal const string ToolName = "create_animated_player";
         internal const string SourceFolder = "Packages/com.worldweaver.toolkit/CharacterAssets/KenneyMiniCharacters/";
-        internal const string ToolReference = "create_animated_player: create or upgrade a playable main character using a built-in licensed, skinned humanoid model (NOT primitives). args {preset?:adventurer|explorer,position?:[x,y,z]}; target existing generated world, or empty for a standalone player. Installs real authored idle/walk/sprint/jump/fall clips, Animator, WASD controller, camera and movement-to-animation binding. adventurer and explorer are stylized Kenney CC0 presets; this tool does not generate arbitrary photorealistic models or download unknown assets. Reuses an existing generated WorldPlayer in the target world; never add a duplicate player. No script generation is needed for the provided behavior.";
+        internal const string ToolReference = "create_animated_player: create or reuse a playable main character. For an imported realistic character pass args {model_path:actual Assets/ or Packages/ FBX/prefab path,height?:.1..20,controller_path?:existing compatible controller,position?:[x,y,z]}; use model_search/model_import first. Creates controls/camera directly with the chosen model; no stylized intermediate actor is needed. Alternatively args {preset?:adventurer|explorer,position?:[x,y,z]} use Kenney CC0 stylized models with authored clips. Choose model_path OR preset. Target an existing owned world/player or empty for a standalone player, even in a completely empty scene. create_player is a different primitive/world tool and requires a world target. Imported Humanoids without a controller use explicitly identified procedural bone locomotion. Reuses an existing player, preserves its controls and unrelated objects. No arbitrary download URLs.";
         internal static bool Handles(string tool) => tool == ToolName;
         internal static bool IsSourceModelPath(string path) => path == SourceFolder + "adventurer.fbx" || path == SourceFolder + "explorer.fbx";
         internal static string CanonicalClipName(string name)
@@ -33,6 +33,9 @@ namespace WorldWeaver.Editor.Assistant
                     ["name"]=new JObject { ["type"]="string" }, ["target"]=new JObject { ["type"]="string" },
                     ["args"]=new JObject { ["type"]="object", ["additionalProperties"]=false,
                         ["properties"]=new JObject {
+                            ["model_path"]=new JObject{["type"]="string",["minLength"]=1,["maxLength"]=240},
+                            ["height"]=new JObject{["type"]="number",["minimum"]=.1,["maximum"]=20},
+                            ["controller_path"]=new JObject{["type"]="string",["minLength"]=1,["maxLength"]=240},
                             ["preset"]=new JObject { ["type"]="string", ["enum"]=new JArray("adventurer","explorer") },
                             ["position"]=new JObject { ["type"]="array", ["minItems"]=3, ["maxItems"]=3,
                                 ["items"]=new JObject { ["type"]="number", ["minimum"]=-100000, ["maximum"]=100000 } }
@@ -61,7 +64,7 @@ namespace WorldWeaver.Editor.Assistant
         internal static void Validate(EditorCommand command, Func<string, GameObject> resolve)
         {
             if (command == null || command.tool != ToolName || command.args == null) throw new ArgumentException("Invalid animated character command.");
-            if (command.args.Properties().Any(p => p.Name != "preset" && p.Name != "position")) throw new ArgumentException("Unknown animated character argument.");
+            if (command.args.Properties().Any(p => p.Name != "preset" && p.Name != "position" && p.Name!="model_path" && p.Name!="controller_path" && p.Name!="height")) throw new ArgumentException("Unknown animated character argument.");
             if (command.args["preset"] != null && command.args["preset"].Type != JTokenType.String) throw new ArgumentException("Character preset must be a string.");
             if (command.args["position"] != null)
             {
@@ -73,7 +76,14 @@ namespace WorldWeaver.Editor.Assistant
                     if (double.IsNaN(number) || double.IsInfinity(number) || Math.Abs(number) > 100000) throw new ArgumentException("Character coordinates are outside the supported range.");
                 }
             }
-            Model(Preset(command));
+            if(command.args["model_path"]!=null)
+            {
+                if(command.args["model_path"].Type!=JTokenType.String||command.args["preset"]!=null)throw new ArgumentException("Choose one model_path or preset.");
+                var source=ModelAssetTools.ProjectModel((string)command.args["model_path"]);
+                if(source.GetComponentsInChildren<MonoBehaviour>(true).Any()||!source.GetComponentsInChildren<SkinnedMeshRenderer>(true).Any(r=>r.sharedMesh&&r.bones.Length>=4))throw new ArgumentException("Choose a skinned data-only character model.");
+                if(command.args["height"]!=null&&((command.args["height"].Type!=JTokenType.Integer&&command.args["height"].Type!=JTokenType.Float)||(double)command.args["height"]<.1||(double)command.args["height"]>20))throw new ArgumentException("Invalid model height.");
+            }
+            else Model(Preset(command));
             if (string.IsNullOrEmpty(command.target) && Object.FindObjectsByType<WorldPlayer>(FindObjectsInactive.Include, FindObjectsSortMode.None).Any(p => p.gameObject.scene == UnityEngine.SceneManagement.SceneManager.GetActiveScene()))
                 throw new ArgumentException("The scene already has a player. Target its generated world or the existing player to upgrade its appearance without creating a duplicate.");
             if (!string.IsNullOrEmpty(command.target))
@@ -85,7 +95,7 @@ namespace WorldWeaver.Editor.Assistant
                 if (players.Length == 1 && !players[0].GetComponent<GeneratedSceneObject>()) throw new ArgumentException("The existing player is not owned by WorldWeaver.");
             }
         }
-        internal static int EstimateCost(EditorCommand command) => Model(Preset(command)).GetComponentsInChildren<Transform>(true).Length + 5;
+        internal static int EstimateCost(EditorCommand command) => (command.args["model_path"]==null?Model(Preset(command)):ModelAssetTools.ProjectModel((string)command.args["model_path"])).GetComponentsInChildren<Transform>(true).Length + 5;
 
         internal static WorldGameplayToolResult Execute(EditorCommand command, SceneBuildTransaction tx, Transform parent,
             Func<string, GameObject> resolve, OrchestratorProfile routes)
@@ -127,6 +137,15 @@ namespace WorldWeaver.Editor.Assistant
             bool previewFloor = EnsureGround(tx, go, target && target.GetComponent<WorldPlayer>() ? target.transform.parent : container);
             var binder = go.GetComponent<WorldCharacterAnimation>() ?? Undo.AddComponent<WorldCharacterAnimation>(go);
             Undo.RecordObject(binder, "Configure animated character");
+            JObject customReport=null;
+            if(command.args["model_path"]!=null)
+            {
+                var arguments=new JObject{["model_path"]=command.args["model_path"].DeepClone(),["height"]=(float?)command.args["height"]??1.8f};
+                if(command.args["controller_path"]!=null)arguments["controller_path"]=command.args["controller_path"].DeepClone();
+                var bound=ModelAssetTools.Execute(new EditorCommand{tool="replace_model",target=ProjectContextIndex.StableTarget(go),args=arguments},_=>go,tx);customReport=JObject.Parse(bound.Summary);
+            }
+            else
+            {
             if (binder.Visual) Undo.DestroyObjectImmediate(binder.Visual.gameObject);
             string preset = Preset(command);
             var visual = (GameObject)PrefabUtility.InstantiatePrefab(Model(preset), go.scene);
@@ -157,6 +176,8 @@ namespace WorldWeaver.Editor.Assistant
             animator.runtimeAnimatorController = CreateController(tx, preset);
             animator.applyRootMotion = false; animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
             binder.Animator = animator; binder.Motor = go.GetComponent<CharacterController>(); binder.Visual = visual.transform;
+            var holder=go.GetComponent<WorldModelVisual>();if(holder){Undo.RecordObject(holder,"Track switched character preset");holder.Visual=visual.transform;holder.SourcePath=SourceFolder+preset+".fbx";}
+            }
             if (!player.View)
             {
                 var camera = tx.Empty("Камера героя", go.transform, "camera");
@@ -165,10 +186,10 @@ namespace WorldWeaver.Editor.Assistant
                 Undo.RecordObject(player, "Assign character camera"); player.View = view;
             }
             EditorUtility.SetDirty(player); EditorUtility.SetDirty(binder);
-            var report = Inspect(go); report["preset"] = preset; report["reusedExistingPlayer"] = reused;
+            var report = customReport??Inspect(go); if(customReport==null)report["preset"] = Preset(command);else report["success"]=player&&player.View&&binder.Visual&&binder.Animator; report["reusedExistingPlayer"] = reused;
             report["createdPreviewFloor"] = previewFloor;
             if (previewFloor) report["previewScope"] = "A small 16 × 16 m walkable presentation stage was added because no suitable physical floor existed at the spawn. This is not a generated full game world.";
-            report["source"] = "Kenney Mini Characters 1 (CC0-1.0)"; report["controls"] = "WASD · Shift — бег · Space — прыжок · правая кнопка мыши — камера · E — разговор";
+            report["source"] = customReport==null?"Kenney Mini Characters 1 (CC0-1.0)":(string)command.args["model_path"]; report["controls"] = "WASD · Shift — бег · Space — прыжок · правая кнопка мыши — камера · E — разговор";
             if (!(bool)report["success"]) throw new InvalidOperationException("Animated character read-back failed: " + report);
             return new WorldGameplayToolResult { Target = go, Summary = report.ToString(Newtonsoft.Json.Formatting.None) };
         }

@@ -1,0 +1,3501 @@
+{
+  "version": 1,
+  "repository": "microsoft/Microsoft-Rocketbox",
+  "commit": "0943055db6ec570bcef9f2c8b41c9e5467c808f9",
+  "license": "MIT",
+  "models": [
+    {
+      "id": "rocketbox:female_adult_01",
+      "name": "Female Adult 01",
+      "tags": "realistic human rigged humanoid adults female adult 01",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_01/Export/Female_Adult_01.fbx",
+          "sha1": "59e6c03fa86691cda806ef5d5b040e462c0fb9c1",
+          "bytes": 609152,
+          "relative": "Export/Female_Adult_01.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_01/Textures/f001_body_color.tga",
+          "sha1": "25852db0db1f44a0de0643ce1e09c88aef587e6f",
+          "bytes": 12582956,
+          "relative": "Textures/f001_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_01/Textures/f001_head_color.tga",
+          "sha1": "0cdc62ab47da3dca01aff0bb179159865a559c63",
+          "bytes": 12582956,
+          "relative": "Textures/f001_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_01/Textures/f001_opacity_color.tga",
+          "sha1": "de21a9e69c88e539da6a5050eaceadd026e99b62",
+          "bytes": 16777260,
+          "relative": "Textures/f001_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:female_adult_02",
+      "name": "Female Adult 02",
+      "tags": "realistic human rigged humanoid adults female adult 02",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_02/Export/Female_Adult_02.fbx",
+          "sha1": "9a165315f36c7a34e339919f84419a9f0b90fa0a",
+          "bytes": 580800,
+          "relative": "Export/Female_Adult_02.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_02/Textures/f002_body_color.tga",
+          "sha1": "5eb8ee83281a7526544a80ddf9804507670eb049",
+          "bytes": 12582956,
+          "relative": "Textures/f002_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_02/Textures/f002_head_color.tga",
+          "sha1": "8f59bb553f24d3581de68bcf4683695c014bcc0f",
+          "bytes": 12582956,
+          "relative": "Textures/f002_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_02/Textures/f002_opacity_color.tga",
+          "sha1": "3d930c42ed476ab3f58548e5ee33e10ea9f02a27",
+          "bytes": 4194348,
+          "relative": "Textures/f002_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:female_adult_03",
+      "name": "Female Adult 03",
+      "tags": "realistic human rigged humanoid adults female adult 03",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_03/Export/Female_Adult_03.fbx",
+          "sha1": "9ff910a80e1572c35f9064bfe649c58898f946c2",
+          "bytes": 791312,
+          "relative": "Export/Female_Adult_03.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_03/Textures/f003_body_color.tga",
+          "sha1": "6e7e0bba4a2c5fd119c2f40bf3886ec2ebd89af0",
+          "bytes": 12582956,
+          "relative": "Textures/f003_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_03/Textures/f003_head_color.tga",
+          "sha1": "b185268832e1b05b2e30434b714ed1a50c79726f",
+          "bytes": 12582956,
+          "relative": "Textures/f003_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_03/Textures/f003_opacity_color.tga",
+          "sha1": "7967eb62237314e3c76ae437a259f94052a032c3",
+          "bytes": 16777260,
+          "relative": "Textures/f003_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:female_adult_04",
+      "name": "Female Adult 04",
+      "tags": "realistic human rigged humanoid adults female adult 04",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_04/Export/Female_Adult_04.fbx",
+          "sha1": "cf5a84ba111473c662e1ad77ae6c68d840e4ec71",
+          "bytes": 635552,
+          "relative": "Export/Female_Adult_04.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_04/Textures/f004_body_color.tga",
+          "sha1": "d087c788a3d06ddff161f7d726e5964d10ab5679",
+          "bytes": 12582956,
+          "relative": "Textures/f004_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_04/Textures/f004_head_color.tga",
+          "sha1": "8431d9774e3d416447096367fecf4a0f75bc7ea5",
+          "bytes": 12582956,
+          "relative": "Textures/f004_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_04/Textures/f004_opacity_color.tga",
+          "sha1": "86f656686004a338b13026515c7395c946170352",
+          "bytes": 16777260,
+          "relative": "Textures/f004_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:female_adult_05",
+      "name": "Female Adult 05",
+      "tags": "realistic human rigged humanoid adults female adult 05",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_05/Export/Female_Adult_05.fbx",
+          "sha1": "274cecdf013dc574f9739f24ed52c31b19f45f0b",
+          "bytes": 594160,
+          "relative": "Export/Female_Adult_05.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_05/Textures/f005_body_color.tga",
+          "sha1": "9d5cbf117974d4b0d72f5c7a5dd690d2da0713f3",
+          "bytes": 12582956,
+          "relative": "Textures/f005_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_05/Textures/f005_head_color.tga",
+          "sha1": "7cf9fba106546281fba14bb9d67c4234e45b069c",
+          "bytes": 12582956,
+          "relative": "Textures/f005_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_05/Textures/f005_opacity_color.tga",
+          "sha1": "7c94e9b9b0bad515023e5e3509a58c874bce29d6",
+          "bytes": 16777260,
+          "relative": "Textures/f005_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:female_adult_06",
+      "name": "Female Adult 06",
+      "tags": "realistic human rigged humanoid adults female adult 06",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_06/Export/Female_Adult_06.fbx",
+          "sha1": "e9e4ab1ae4bf91387bf239984d4b07f875db8f6f",
+          "bytes": 529632,
+          "relative": "Export/Female_Adult_06.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_06/Textures/f202_body_color.tga",
+          "sha1": "ef6cb97a6e4fa9c7608d6688e6778384b9419606",
+          "bytes": 12582956,
+          "relative": "Textures/f202_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_06/Textures/f202_head_color.tga",
+          "sha1": "a9ba3b91c36f00ab080f18ba9b34794dd43f1dd7",
+          "bytes": 12582956,
+          "relative": "Textures/f202_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_06/Textures/f202_opacity_color.tga",
+          "sha1": "b776361993d745d54ac6a5d66002c4840254e5d1",
+          "bytes": 4194348,
+          "relative": "Textures/f202_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:female_adult_07",
+      "name": "Female Adult 07",
+      "tags": "realistic human rigged humanoid adults female adult 07",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_07/Export/Female_Adult_07.fbx",
+          "sha1": "0b8373661b0ba139a9e5bb0058c701b8760a4388",
+          "bytes": 591744,
+          "relative": "Export/Female_Adult_07.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_07/Textures/f007_body_color.tga",
+          "sha1": "680a60b978fc8cdb769c1b934df002849c9a117f",
+          "bytes": 12582956,
+          "relative": "Textures/f007_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_07/Textures/f007_head_color.tga",
+          "sha1": "002178145d7acf33268183ceb639c72e60ebb81a",
+          "bytes": 12582956,
+          "relative": "Textures/f007_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_07/Textures/f007_opacity_color.tga",
+          "sha1": "cb855dcfacb50fe670642822d9323513720d70eb",
+          "bytes": 16777260,
+          "relative": "Textures/f007_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:female_adult_08",
+      "name": "Female Adult 08",
+      "tags": "realistic human rigged humanoid adults female adult 08",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_08/Export/Female_Adult_08.fbx",
+          "sha1": "06bd911984cc8e1b3db7ea71b01416875427c51b",
+          "bytes": 594640,
+          "relative": "Export/Female_Adult_08.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_08/Textures/f008_body_color.tga",
+          "sha1": "3be6c34c2e052b0da560bfc93e90ca6902c87530",
+          "bytes": 12582956,
+          "relative": "Textures/f008_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_08/Textures/f008_head_color.tga",
+          "sha1": "3b23b78796a1ae82557128b85e6c6387b5c521a6",
+          "bytes": 12582956,
+          "relative": "Textures/f008_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_08/Textures/f008_opacity_color.tga",
+          "sha1": "bb23136e3a44738487b774cdf798a0d5593a2143",
+          "bytes": 16777260,
+          "relative": "Textures/f008_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:female_adult_09",
+      "name": "Female Adult 09",
+      "tags": "realistic human rigged humanoid adults female adult 09",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_09/Export/Female_Adult_09.fbx",
+          "sha1": "44874e79c90d36a84ca754c14d56e893ac21dff1",
+          "bytes": 611632,
+          "relative": "Export/Female_Adult_09.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_09/Textures/f009_body_color.tga",
+          "sha1": "a1f63096b3e712c07c6812315f74f4abb79c1fd9",
+          "bytes": 12582956,
+          "relative": "Textures/f009_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_09/Textures/f009_head_color.tga",
+          "sha1": "946e89b15a23173457d17ae3a7e6627d3e5b2166",
+          "bytes": 12582956,
+          "relative": "Textures/f009_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_09/Textures/f009_opacity_color.tga",
+          "sha1": "fef407c359ae03e257944ec1b530cdd1b1f921ea",
+          "bytes": 16777260,
+          "relative": "Textures/f009_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:female_adult_10",
+      "name": "Female Adult 10",
+      "tags": "realistic human rigged humanoid adults female adult 10",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_10/Export/Female_Adult_10.fbx",
+          "sha1": "9f4ca19b4450e888ca5b52955f0dae823bdf6bd1",
+          "bytes": 509024,
+          "relative": "Export/Female_Adult_10.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_10/Textures/f201_body_color.tga",
+          "sha1": "cdab97835021bd3c27fe6c134ca4bc073d09a54b",
+          "bytes": 12582956,
+          "relative": "Textures/f201_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_10/Textures/f201_head_color.tga",
+          "sha1": "a57d6e52f4301760c3049a48ea2e1a8b800eb657",
+          "bytes": 12582956,
+          "relative": "Textures/f201_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_10/Textures/f201_opacity_color.tga",
+          "sha1": "e7530d9fef155a0e4f7a9ae4ca39a6a6598bd180",
+          "bytes": 524332,
+          "relative": "Textures/f201_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:female_adult_11",
+      "name": "Female Adult 11",
+      "tags": "realistic human rigged humanoid adults female adult 11",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_11/Export/Female_Adult_11.fbx",
+          "sha1": "429ca315a7bf742addc4509fe46d93bd8553a343",
+          "bytes": 612192,
+          "relative": "Export/Female_Adult_11.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_11/Textures/f011_body_color.tga",
+          "sha1": "ecf3094eb13c47388c61cc9022eddfedc4004de7",
+          "bytes": 12582956,
+          "relative": "Textures/f011_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_11/Textures/f011_head_color.tga",
+          "sha1": "f0c90595950a7d7cd677e09960e28a4cec9c03b4",
+          "bytes": 12582956,
+          "relative": "Textures/f011_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_11/Textures/f011_opacity_color.tga",
+          "sha1": "c2ad85f17b180e2a1da5a08c0b49130222b7af7a",
+          "bytes": 16777260,
+          "relative": "Textures/f011_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:female_adult_12",
+      "name": "Female Adult 12",
+      "tags": "realistic human rigged humanoid adults female adult 12",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_12/Export/Female_Adult_12.fbx",
+          "sha1": "991062920109d72ef7ecd9aee859fc6eaadf1d67",
+          "bytes": 610352,
+          "relative": "Export/Female_Adult_12.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_12/Textures/f012_body_color.tga",
+          "sha1": "8beaff6c63dd1070d4e903e6c9caeb6915f58a81",
+          "bytes": 12582956,
+          "relative": "Textures/f012_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_12/Textures/f012_head_color.tga",
+          "sha1": "e932e4e53f8f5f456d3ca85ad3a0876bbc21dcdd",
+          "bytes": 12582956,
+          "relative": "Textures/f012_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_12/Textures/f012_opacity_color.tga",
+          "sha1": "8b0f1297045b2d5a448648640a7cc88a2aa9d405",
+          "bytes": 16777260,
+          "relative": "Textures/f012_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:female_adult_13",
+      "name": "Female Adult 13",
+      "tags": "realistic human rigged humanoid adults female adult 13",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_13/Export/Female_Adult_13.fbx",
+          "sha1": "a1299e19788000dab993077e33911ec4511eefb0",
+          "bytes": 605168,
+          "relative": "Export/Female_Adult_13.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_13/Textures/f019_body_color.tga",
+          "sha1": "8ac627d95db5125cabacd38568669aa3b9d674cb",
+          "bytes": 12582956,
+          "relative": "Textures/f019_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_13/Textures/f019_head_color.tga",
+          "sha1": "446c2b74e64e073325486113038ee8990aaadb23",
+          "bytes": 12582956,
+          "relative": "Textures/f019_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_13/Textures/f019_opacity_color.tga",
+          "sha1": "55a9e142e667e6c01d5001e6fba7b46413aaf2dd",
+          "bytes": 16777260,
+          "relative": "Textures/f019_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:female_adult_14",
+      "name": "Female Adult 14",
+      "tags": "realistic human rigged humanoid adults female adult 14",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_14/Export/Female_Adult_14.fbx",
+          "sha1": "869e5ce1c438f305aead7404fde21b8668053a8c",
+          "bytes": 608528,
+          "relative": "Export/Female_Adult_14.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_14/Textures/f017_body_color.tga",
+          "sha1": "67b1eb46b42cdd38ae974e201003568c21472aa6",
+          "bytes": 12582956,
+          "relative": "Textures/f017_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_14/Textures/f017_head_color.tga",
+          "sha1": "4905123421ac87d74b15bda7e3e59c944e035e97",
+          "bytes": 12582956,
+          "relative": "Textures/f017_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_14/Textures/f017_opacity_color.tga",
+          "sha1": "9794bd11e6b465fcd140122863204cb9bbd7cb3b",
+          "bytes": 16777260,
+          "relative": "Textures/f017_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:female_adult_15",
+      "name": "Female Adult 15",
+      "tags": "realistic human rigged humanoid adults female adult 15",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_15/Export/Female_Adult_15.fbx",
+          "sha1": "4ba89224f99fb8b9139f6c6ed31927238bd1f565",
+          "bytes": 651088,
+          "relative": "Export/Female_Adult_15.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_15/Textures/f018_body_color.tga",
+          "sha1": "4636f4dbe6da255187038d7765d8786abdcda393",
+          "bytes": 12582956,
+          "relative": "Textures/f018_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_15/Textures/f018_head_color.tga",
+          "sha1": "5e35ad71ccf6cac670a3c55a8aecfee4e4c7038c",
+          "bytes": 12582956,
+          "relative": "Textures/f018_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_15/Textures/f018_opacity_color.tga",
+          "sha1": "8fcbb41c3d537049e0ed1b6e07d0c94bb6a8e3fb",
+          "bytes": 16777260,
+          "relative": "Textures/f018_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:female_adult_16",
+      "name": "Female Adult 16",
+      "tags": "realistic human rigged humanoid adults female adult 16",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_16/Export/Female_Adult_16.fbx",
+          "sha1": "99e60c6d5e1f01edca7e48927f0c6baef7aa2489",
+          "bytes": 373120,
+          "relative": "Export/Female_Adult_16.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_16/Textures/f204_color.tga",
+          "sha1": "4002dccf2a8a13147b9f6b75143f3f2a25d1e764",
+          "bytes": 12582956,
+          "relative": "Textures/f204_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:female_adult_17",
+      "name": "Female Adult 17",
+      "tags": "realistic human rigged humanoid adults female adult 17",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_17/Export/Female_Adult_17.fbx",
+          "sha1": "a3c977942d7e321966d80d8e95697b752b701f47",
+          "bytes": 593440,
+          "relative": "Export/Female_Adult_17.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_17/Textures/f006_body_color.tga",
+          "sha1": "9902508406abee3a281fb8d277456976920d68d4",
+          "bytes": 12582956,
+          "relative": "Textures/f006_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_17/Textures/f006_head_color.tga",
+          "sha1": "9c037ab08fb2b95a6d97123e3c558ea1e4ed9280",
+          "bytes": 12582956,
+          "relative": "Textures/f006_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Adult_17/Textures/f006_opacity_color.tga",
+          "sha1": "912274783a784715593d8ca4c2132b931f994bbd",
+          "bytes": 4194348,
+          "relative": "Textures/f006_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:female_party_01",
+      "name": "Female Party 01",
+      "tags": "realistic human rigged humanoid adults female party 01",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Female_Party_01/Export/Female_Party_01.fbx",
+          "sha1": "0a76ca91004a07ca0722222da734b64fd718166d",
+          "bytes": 683648,
+          "relative": "Export/Female_Party_01.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Party_01/Textures/f010_body_color.tga",
+          "sha1": "035d03a38d07d59a00a90ec6473c06636aa4859e",
+          "bytes": 12582956,
+          "relative": "Textures/f010_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Party_01/Textures/f010_head_color.tga",
+          "sha1": "98487fb717c60cd08abd76af690c26a27909ea2d",
+          "bytes": 12582956,
+          "relative": "Textures/f010_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Party_01/Textures/f010_opacity_color.tga",
+          "sha1": "c496373f406817155720b7b76a88c5df3db0277c",
+          "bytes": 16777260,
+          "relative": "Textures/f010_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:female_party_02",
+      "name": "Female Party 02",
+      "tags": "realistic human rigged humanoid adults female party 02",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Female_Party_02/Export/Female_Party_02.fbx",
+          "sha1": "dab4a4ab4d4ec8442debcbe859a2701d7fb408fd",
+          "bytes": 657232,
+          "relative": "Export/Female_Party_02.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Party_02/Textures/f022_body_color.tga",
+          "sha1": "b18eeaf76bdcd40607b98b656e4e79a35b765168",
+          "bytes": 12582956,
+          "relative": "Textures/f022_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Party_02/Textures/f022_head_color.tga",
+          "sha1": "776d044828427f9d7e6ff40dbfd639b6f8712472",
+          "bytes": 12582956,
+          "relative": "Textures/f022_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Female_Party_02/Textures/f022_opacity_color.tga",
+          "sha1": "fa6cbaa121dcd820bfb5fbab9a24792d1e1d708e",
+          "bytes": 16777260,
+          "relative": "Textures/f022_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:male_adult_01",
+      "name": "Male Adult 01",
+      "tags": "realistic human rigged humanoid adults male adult 01",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_01/Export/Male_Adult_01.fbx",
+          "sha1": "fdaf4aa7d15054f1601740ea1a09cf111938d210",
+          "bytes": 521472,
+          "relative": "Export/Male_Adult_01.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_01/Textures/m002_body_color.tga",
+          "sha1": "818ec72b6c69655c5853ab0eb1efdd6ab40b2bf0",
+          "bytes": 12582956,
+          "relative": "Textures/m002_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_01/Textures/m002_head_color.tga",
+          "sha1": "0becf592ac705b4a2be8a63aa164266ac2a09d9c",
+          "bytes": 12582956,
+          "relative": "Textures/m002_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_01/Textures/m002_opacity_color.tga",
+          "sha1": "a4088df07a8896761bd209d304b12310f90e5003",
+          "bytes": 16777260,
+          "relative": "Textures/m002_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:male_adult_02",
+      "name": "Male Adult 02",
+      "tags": "realistic human rigged humanoid adults male adult 02",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_02/Export/Male_Adult_02.fbx",
+          "sha1": "26ff800005a7624afa37fc212d870ea4bf0b5a02",
+          "bytes": 539920,
+          "relative": "Export/Male_Adult_02.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_02/Textures/m003_body_color.tga",
+          "sha1": "23e54f1b4e06ca411aa166a016d77f7536316151",
+          "bytes": 12582956,
+          "relative": "Textures/m003_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_02/Textures/m003_head_color.tga",
+          "sha1": "ec68799915ff8aa26cd18a85c09b1e86c51b17a4",
+          "bytes": 12582956,
+          "relative": "Textures/m003_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_02/Textures/m003_opacity_color.tga",
+          "sha1": "8860d347a396261f06cbb2f620a28efffe11c334",
+          "bytes": 16777260,
+          "relative": "Textures/m003_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:male_adult_03",
+      "name": "Male Adult 03",
+      "tags": "realistic human rigged humanoid adults male adult 03",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_03/Export/Male_Adult_03.fbx",
+          "sha1": "9e81e1cee43804851693c7874840e4f76f762126",
+          "bytes": 513728,
+          "relative": "Export/Male_Adult_03.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_03/Textures/m004_body_color.tga",
+          "sha1": "6c74391f617e383371c9cd77775ebbae16998f8e",
+          "bytes": 12582956,
+          "relative": "Textures/m004_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_03/Textures/m004_head_color.tga",
+          "sha1": "bc8c4b56be8bef30ea204ea772451a03457a9d85",
+          "bytes": 12582956,
+          "relative": "Textures/m004_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_03/Textures/m004_opacity_color.tga",
+          "sha1": "7a705836b26da41fbd46d5cf41835bcff82b1e0d",
+          "bytes": 8388652,
+          "relative": "Textures/m004_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:male_adult_04",
+      "name": "Male Adult 04",
+      "tags": "realistic human rigged humanoid adults male adult 04",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_04/Export/Male_Adult_04.fbx",
+          "sha1": "b74a2a8e261a16bebb7acd7335dc41f8c6b7b41e",
+          "bytes": 571296,
+          "relative": "Export/Male_Adult_04.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_04/Textures/m006_body_color.tga",
+          "sha1": "eb98a1056b856d117f54145abef183c93721b8a7",
+          "bytes": 12582956,
+          "relative": "Textures/m006_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_04/Textures/m006_head_color.tga",
+          "sha1": "b8d9af1e5337c9a5ed8969395e73f8fdd6abdda6",
+          "bytes": 12582956,
+          "relative": "Textures/m006_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_04/Textures/m006_opacity_color.tga",
+          "sha1": "dca7411aadf0ba5b62ab314981591fad88dbf1b0",
+          "bytes": 16777260,
+          "relative": "Textures/m006_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:male_adult_05",
+      "name": "Male Adult 05",
+      "tags": "realistic human rigged humanoid adults male adult 05",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_05/Export/Male_Adult_05.fbx",
+          "sha1": "41ae8205dfc179e1243c487ffd50c02461e02d01",
+          "bytes": 536496,
+          "relative": "Export/Male_Adult_05.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_05/Textures/m009_body_color.tga",
+          "sha1": "6ec8e41be51f762e55143b706bdde9636c74316e",
+          "bytes": 12582956,
+          "relative": "Textures/m009_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_05/Textures/m009_head_color.tga",
+          "sha1": "beb0be85c3783d4fbb15e24aba253b67ed10fadc",
+          "bytes": 12582956,
+          "relative": "Textures/m009_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_05/Textures/m009_opacity_color.tga",
+          "sha1": "1eda6be82167a0956c40000eaaabe96094c70dbd",
+          "bytes": 16777260,
+          "relative": "Textures/m009_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:male_adult_06",
+      "name": "Male Adult 06",
+      "tags": "realistic human rigged humanoid adults male adult 06",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_06/Export/Male_Adult_06.fbx",
+          "sha1": "ef6f0bcc0bb271effe791b3922fe5044ca881e19",
+          "bytes": 548576,
+          "relative": "Export/Male_Adult_06.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_06/Textures/m011_body_color.tga",
+          "sha1": "900ab34cf22b1569fe41d5e5e1c656510484fa34",
+          "bytes": 12582956,
+          "relative": "Textures/m011_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_06/Textures/m011_head_color.tga",
+          "sha1": "a24a6e2f77473f30d94ae7b4a0a34515cb215ba7",
+          "bytes": 12582956,
+          "relative": "Textures/m011_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_06/Textures/m011_opacity_color.tga",
+          "sha1": "5b304a95d22629e6d9abf3e6515a7e6b236708f6",
+          "bytes": 16777260,
+          "relative": "Textures/m011_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:male_adult_07",
+      "name": "Male Adult 07",
+      "tags": "realistic human rigged humanoid adults male adult 07",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_07/Export/Male_Adult_07.fbx",
+          "sha1": "58490c5a1483e873c00ad9114ebef5b5eff3eab6",
+          "bytes": 516064,
+          "relative": "Export/Male_Adult_07.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_07/Textures/m013_body_color.tga",
+          "sha1": "cc86e5dd5fd1247fc15b6965c7e95876ae4074ac",
+          "bytes": 12582956,
+          "relative": "Textures/m013_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_07/Textures/m013_head_color.tga",
+          "sha1": "3a4039e40d02b39fe4de0321d597b3cea42d7556",
+          "bytes": 12582956,
+          "relative": "Textures/m013_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_07/Textures/m013_opacity_color.tga",
+          "sha1": "5885f9f683f682ab666290503b3503010fbab8aa",
+          "bytes": 16777260,
+          "relative": "Textures/m013_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:male_adult_08",
+      "name": "Male Adult 08",
+      "tags": "realistic human rigged humanoid adults male adult 08",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_08/Export/Male_Adult_08.fbx",
+          "sha1": "2e6936c594c9c65b44916839340be3b4eecd2202",
+          "bytes": 508784,
+          "relative": "Export/Male_Adult_08.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_08/Textures/m014_body_color.tga",
+          "sha1": "c6162d348435623eb44fa0f2114dc9109a0e0a8d",
+          "bytes": 12582956,
+          "relative": "Textures/m014_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_08/Textures/m014_head_color.tga",
+          "sha1": "66e3ac3c72cfdbd661e36dd9fd98ac611f21a6e4",
+          "bytes": 12582956,
+          "relative": "Textures/m014_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_08/Textures/m014_opacity_color.tga",
+          "sha1": "e008b9abf4901a2f23f32cb9d1e2bc7ef5a60587",
+          "bytes": 16777260,
+          "relative": "Textures/m014_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:male_adult_09",
+      "name": "Male Adult 09",
+      "tags": "realistic human rigged humanoid adults male adult 09",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_09/Export/Male_Adult_09.fbx",
+          "sha1": "78796aac1565ed324548de9b04d5eb7ed6efd6cc",
+          "bytes": 522176,
+          "relative": "Export/Male_Adult_09.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_09/Textures/m017_body_color.tga",
+          "sha1": "717e91ac80e12c53621c3669ed5602eda6354b3e",
+          "bytes": 12582956,
+          "relative": "Textures/m017_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_09/Textures/m017_head_color.tga",
+          "sha1": "378695b6c2717f2c2be37db515dbb0ca07e67f81",
+          "bytes": 12582956,
+          "relative": "Textures/m017_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_09/Textures/m017_opacity_color.tga",
+          "sha1": "36b026f6c66e150cbf89f2ec38071eae60e91081",
+          "bytes": 8388652,
+          "relative": "Textures/m017_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:male_adult_10",
+      "name": "Male Adult 10",
+      "tags": "realistic human rigged humanoid adults male adult 10",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_10/Export/Male_Adult_10.fbx",
+          "sha1": "b7ab6eb1c2e4611c6cf2435b11717de23c60fb14",
+          "bytes": 541104,
+          "relative": "Export/Male_Adult_10.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_10/Textures/m024_body_color.tga",
+          "sha1": "b978eb0ff3fd3e6cebee133a7a2ff594b4e8eeaf",
+          "bytes": 12582956,
+          "relative": "Textures/m024_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_10/Textures/m024_head_color.tga",
+          "sha1": "df934ee3e279fb844e8c8217d214d3d139587dab",
+          "bytes": 12582956,
+          "relative": "Textures/m024_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_10/Textures/m024_opacity_color.tga",
+          "sha1": "51ddd6bec6e6f3abb9a6ce2522d1416082a31474",
+          "bytes": 4194348,
+          "relative": "Textures/m024_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:male_adult_11",
+      "name": "Male Adult 11",
+      "tags": "realistic human rigged humanoid adults male adult 11",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_11/Export/Male_Adult_11.fbx",
+          "sha1": "31d4e255d6fb1660ba35bae4cf6412f1c0a54770",
+          "bytes": 487744,
+          "relative": "Export/Male_Adult_11.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_11/Textures/m001_body_color.tga",
+          "sha1": "43197cfee141efc8ea36052559274b8506242a8c",
+          "bytes": 12582956,
+          "relative": "Textures/m001_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_11/Textures/m001_head_color.tga",
+          "sha1": "c5925e8401109056cd5a5f7cdabef8edf85532e7",
+          "bytes": 12582956,
+          "relative": "Textures/m001_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:male_adult_12",
+      "name": "Male Adult 12",
+      "tags": "realistic human rigged humanoid adults male adult 12",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_12/Export/Male_Adult_12.fbx",
+          "sha1": "15d4f8501d5703600cb3d8a94765a3de1029aaf6",
+          "bytes": 487776,
+          "relative": "Export/Male_Adult_12.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_12/Textures/m007_body_color.tga",
+          "sha1": "1757150789a5fdcf733394ff21a60512530b4f1a",
+          "bytes": 12582956,
+          "relative": "Textures/m007_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_12/Textures/m007_head_color.tga",
+          "sha1": "e5b23c4f55e499893c2a92ec7e52d0252bee2ae3",
+          "bytes": 12582956,
+          "relative": "Textures/m007_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:male_adult_13",
+      "name": "Male Adult 13",
+      "tags": "realistic human rigged humanoid adults male adult 13",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_13/Export/Male_Adult_13.fbx",
+          "sha1": "db17e5295a0726bc6a13c1a7d6eb3da4ebf610fc",
+          "bytes": 494816,
+          "relative": "Export/Male_Adult_13.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_13/Textures/m010_body_color.tga",
+          "sha1": "9edfa935aa69262f295606088495df34d777b746",
+          "bytes": 12582956,
+          "relative": "Textures/m010_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_13/Textures/m010_head_color.tga",
+          "sha1": "6f53314c60a01d1ae8f425178c7ab4148603e9d3",
+          "bytes": 12582956,
+          "relative": "Textures/m010_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:male_adult_14",
+      "name": "Male Adult 14",
+      "tags": "realistic human rigged humanoid adults male adult 14",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_14/Export/Male_Adult_14.fbx",
+          "sha1": "af041c19f5f0e1de4e2ef8531f9e4f34a34f1f36",
+          "bytes": 486032,
+          "relative": "Export/Male_Adult_14.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_14/Textures/m012_body_color.tga",
+          "sha1": "5c1fbd9f483d84ac97feec84a72773bb3b90762c",
+          "bytes": 12582956,
+          "relative": "Textures/m012_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_14/Textures/m012_head_color.tga",
+          "sha1": "d3a74ca56b46de52af2d1c8cb49c874f094785b6",
+          "bytes": 12582956,
+          "relative": "Textures/m012_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:male_adult_15",
+      "name": "Male Adult 15",
+      "tags": "realistic human rigged humanoid adults male adult 15",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_15/Export/Male_Adult_15.fbx",
+          "sha1": "6dcbafe442f74e614c8eff16a7cd736870e54757",
+          "bytes": 532528,
+          "relative": "Export/Male_Adult_15.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_15/Textures/m204_body_color.tga",
+          "sha1": "f7c95bfe928b5fc20a191921e1515596fb73caea",
+          "bytes": 12582956,
+          "relative": "Textures/m204_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_15/Textures/m204_head_color.tga",
+          "sha1": "08011be46ab1f8a76768d633378b8ba4cb326906",
+          "bytes": 12582956,
+          "relative": "Textures/m204_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:male_adult_16",
+      "name": "Male Adult 16",
+      "tags": "realistic human rigged humanoid adults male adult 16",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_16/Export/Male_Adult_16.fbx",
+          "sha1": "c4e2ede0ba75005741094533e964c04a323a79b0",
+          "bytes": 531664,
+          "relative": "Export/Male_Adult_16.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_16/Textures/m019_body_color.tga",
+          "sha1": "459b042cc353d69bb4d2f1a1186f28e9f5e6b4e7",
+          "bytes": 12582956,
+          "relative": "Textures/m019_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_16/Textures/m019_head_color.tga",
+          "sha1": "a7bc5e6aa018e5ddcc96fa2303cf395ac1bbe863",
+          "bytes": 12582956,
+          "relative": "Textures/m019_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:male_adult_17",
+      "name": "Male Adult 17",
+      "tags": "realistic human rigged humanoid adults male adult 17",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_17/Export/Male_Adult_17.fbx",
+          "sha1": "4f48dac347ff0456eb5bc182ff621f3e3b6cc1c0",
+          "bytes": 495328,
+          "relative": "Export/Male_Adult_17.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_17/Textures/m022_body_color.tga",
+          "sha1": "b3ddf7e662510eff72bc06603b53bef6f67c01e2",
+          "bytes": 12582956,
+          "relative": "Textures/m022_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_17/Textures/m022_head_color.tga",
+          "sha1": "625d89815c5f74ea80a7718849393f7182906e71",
+          "bytes": 12582956,
+          "relative": "Textures/m022_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:male_adult_18",
+      "name": "Male Adult 18",
+      "tags": "realistic human rigged humanoid adults male adult 18",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_18/Export/Male_Adult_18.fbx",
+          "sha1": "a5add3c14299549fa9670e9499daf23e19f56032",
+          "bytes": 475888,
+          "relative": "Export/Male_Adult_18.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_18/Textures/m023_body_color.tga",
+          "sha1": "5bd02815a216aa092c6cd30454aa057ac05242eb",
+          "bytes": 12582956,
+          "relative": "Textures/m023_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_18/Textures/m023_head_color.tga",
+          "sha1": "1053c0d4b0710a3c0b6c1b8941a93269e6276767",
+          "bytes": 12582956,
+          "relative": "Textures/m023_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:male_adult_19",
+      "name": "Male Adult 19",
+      "tags": "realistic human rigged humanoid adults male adult 19",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_19/Export/Male_Adult_19.fbx",
+          "sha1": "574dc67b60aa2279bbc4aa026053dde814238142",
+          "bytes": 522160,
+          "relative": "Export/Male_Adult_19.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_19/Textures/m250_body_color.tga",
+          "sha1": "1b98fe126abc6b54c4f327228c965946694efc3b",
+          "bytes": 12582956,
+          "relative": "Textures/m250_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_19/Textures/m250_head_color.tga",
+          "sha1": "cb63f7cc1b1e50ea88552a4e46dd2b3664e8a3ca",
+          "bytes": 12582956,
+          "relative": "Textures/m250_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_19/Textures/m250_keffiyeh_color.tga",
+          "sha1": "b4c382cf6eb360d760954aced4c30f6015618a4d",
+          "bytes": 12582956,
+          "relative": "Textures/m250_keffiyeh_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:male_adult_20",
+      "name": "Male Adult 20",
+      "tags": "realistic human rigged humanoid adults male adult 20",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_20/Export/Male_Adult_20.fbx",
+          "sha1": "fdd6a591e946e12e4e7c4d6fbf2acd1e743c38fd",
+          "bytes": 519408,
+          "relative": "Export/Male_Adult_20.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_20/Textures/m027_body_color.tga",
+          "sha1": "7258cf12c5bd20635df1fd443dc21eef27037dad",
+          "bytes": 12582956,
+          "relative": "Textures/m027_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_20/Textures/m027_head_color.tga",
+          "sha1": "9efe471b09ab2b10bb79c75bfb98d2467e6dcb78",
+          "bytes": 12582956,
+          "relative": "Textures/m027_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:male_adult_21",
+      "name": "Male Adult 21",
+      "tags": "realistic human rigged humanoid adults male adult 21",
+      "files": [
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_21/Export/Male_Adult_21.fbx",
+          "sha1": "fffe19be4c1f76b603c858baf90cc49ee2fd4df8",
+          "bytes": 518928,
+          "relative": "Export/Male_Adult_21.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_21/Textures/m251_body_color.tga",
+          "sha1": "4bea33e6fcb94c54192514e7a2c706a21d8dbd8e",
+          "bytes": 12582956,
+          "relative": "Textures/m251_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_21/Textures/m251_head_color.tga",
+          "sha1": "103118ea646490375ef6aabeb072c8c76325395d",
+          "bytes": 12582956,
+          "relative": "Textures/m251_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Adults/Male_Adult_21/Textures/m251_keffiyeh_color.tga",
+          "sha1": "d660cf6c46694d8eb165f372bd9672448525bb8d",
+          "bytes": 12582956,
+          "relative": "Textures/m251_keffiyeh_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:female_child_01",
+      "name": "Female Child 01",
+      "tags": "realistic human rigged humanoid children female child 01",
+      "files": [
+        {
+          "path": "Assets/Avatars/Children/Female_Child_01/Export/Female_Child_01.fbx",
+          "sha1": "24882ec1809ae617788ccc63c686479a5fea67e4",
+          "bytes": 521968,
+          "relative": "Export/Female_Child_01.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Children/Female_Child_01/Textures/cf001_body_color.tga",
+          "sha1": "ef91edfdcbc95ef6a26e5b3fa4b4f4f8388b0348",
+          "bytes": 12582956,
+          "relative": "Textures/cf001_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Children/Female_Child_01/Textures/cf001_head_color.tga",
+          "sha1": "611ce1b19a1a12207b3ee1dc0a467e95af0e59c3",
+          "bytes": 12582956,
+          "relative": "Textures/cf001_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:female_child_02",
+      "name": "Female Child 02",
+      "tags": "realistic human rigged humanoid children female child 02",
+      "files": [
+        {
+          "path": "Assets/Avatars/Children/Female_Child_02/Export/Female_Child_02.fbx",
+          "sha1": "505c74be38f823178b0b5fda88a09ba71ee3b1e7",
+          "bytes": 519088,
+          "relative": "Export/Female_Child_02.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Children/Female_Child_02/Textures/cf011_body_color.tga",
+          "sha1": "8764e6f4749f9c526c909f1130fd2e54b0fef888",
+          "bytes": 12582956,
+          "relative": "Textures/cf011_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Children/Female_Child_02/Textures/cf011_head_color.tga",
+          "sha1": "72953e211787f725ed047efafc8d195ae7f62dbd",
+          "bytes": 12582956,
+          "relative": "Textures/cf011_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:male_child_01",
+      "name": "Male Child 01",
+      "tags": "realistic human rigged humanoid children male child 01",
+      "files": [
+        {
+          "path": "Assets/Avatars/Children/Male_Child_01/Export/Male_Child_01.fbx",
+          "sha1": "c203ce7399bc611f71e2cf7fe418e3706aa92fee",
+          "bytes": 506912,
+          "relative": "Export/Male_Child_01.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Children/Male_Child_01/Textures/cm001_body_color.tga",
+          "sha1": "afee29cc2289eb1403cbe6e6a68c26b8d7618c31",
+          "bytes": 12582956,
+          "relative": "Textures/cm001_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Children/Male_Child_01/Textures/cm001_head_color.tga",
+          "sha1": "aa7d4cb1931eab13a6227562038b1ecb34110dbb",
+          "bytes": 12582956,
+          "relative": "Textures/cm001_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:male_child_02",
+      "name": "Male Child 02",
+      "tags": "realistic human rigged humanoid children male child 02",
+      "files": [
+        {
+          "path": "Assets/Avatars/Children/Male_Child_02/Export/Male_Child_02.fbx",
+          "sha1": "395d432e4f69d2637079eab562b79557bf70c5bd",
+          "bytes": 538256,
+          "relative": "Export/Male_Child_02.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Children/Male_Child_02/Textures/cm012_body_color.tga",
+          "sha1": "11e5406d5270364089ed7489f1497c994ad7cf81",
+          "bytes": 12582956,
+          "relative": "Textures/cm012_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Children/Male_Child_02/Textures/cm012_head_color.tga",
+          "sha1": "899fac07d89cf85696beb33ee0b782a6056420f3",
+          "bytes": 12582956,
+          "relative": "Textures/cm012_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:business_female_01",
+      "name": "Business Female 01",
+      "tags": "realistic human rigged humanoid professions business female 01",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Business_Female_01/Export/Business_Female_01.fbx",
+          "sha1": "408977c02f0ccc970cbac76137d966569cb63914",
+          "bytes": 616576,
+          "relative": "Export/Business_Female_01.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Female_01/Textures/f014_body_color.tga",
+          "sha1": "0af4f272bb58a0108eb5b67fca27a4529be9bc46",
+          "bytes": 12582956,
+          "relative": "Textures/f014_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Female_01/Textures/f014_head_color.tga",
+          "sha1": "e9c636056a5c8414347653757656f8af4b102b88",
+          "bytes": 12582956,
+          "relative": "Textures/f014_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Female_01/Textures/f014_opacity_color.tga",
+          "sha1": "6b87a2b0f9e53a843a39112013ef9785e0110742",
+          "bytes": 16777260,
+          "relative": "Textures/f014_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:business_female_02",
+      "name": "Business Female 02",
+      "tags": "realistic human rigged humanoid professions business female 02",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Business_Female_02/Export/Business_Female_02.fbx",
+          "sha1": "b574cf754e39b1fe4bf43e02aef8e7dc6f5a82ca",
+          "bytes": 612848,
+          "relative": "Export/Business_Female_02.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Female_02/Textures/f015_body_color.tga",
+          "sha1": "9a3d5fbd2b69e34628ec0220572b64cb314c51d7",
+          "bytes": 12582956,
+          "relative": "Textures/f015_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Female_02/Textures/f015_glasses_opacity_color.tga",
+          "sha1": "4041db975842d4655e0fb76ff673ee59fd9a7c3d",
+          "bytes": 524332,
+          "relative": "Textures/f015_glasses_opacity_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Female_02/Textures/f015_head_color.tga",
+          "sha1": "41eac4aaed7ed8f36b32d53ae96599694a7fd687",
+          "bytes": 12582956,
+          "relative": "Textures/f015_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Female_02/Textures/f015_opacity_color.tga",
+          "sha1": "b96abab3f5c8fae7bd72fab26a17a31b91c70ac5",
+          "bytes": 16777260,
+          "relative": "Textures/f015_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:business_female_03",
+      "name": "Business Female 03",
+      "tags": "realistic human rigged humanoid professions business female 03",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Business_Female_03/Export/Business_Female_03.fbx",
+          "sha1": "6411eddfa4deacd6ed2a3213eea19bd5a430a9d6",
+          "bytes": 603024,
+          "relative": "Export/Business_Female_03.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Female_03/Textures/f016_body_color.tga",
+          "sha1": "a6ab28709927f82df72e32e4d61c0ba575998832",
+          "bytes": 12582956,
+          "relative": "Textures/f016_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Female_03/Textures/f016_head_color.tga",
+          "sha1": "7ce72e3977de2cd0fa4d05a67743b783d8c4dc05",
+          "bytes": 12582956,
+          "relative": "Textures/f016_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Female_03/Textures/f016_opacity_color.tga",
+          "sha1": "1ca7fcd8030c6630cf000e6e9ce39057838251bc",
+          "bytes": 16777260,
+          "relative": "Textures/f016_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:business_female_04",
+      "name": "Business Female 04",
+      "tags": "realistic human rigged humanoid professions business female 04",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Business_Female_04/Export/Business_Female_04.fbx",
+          "sha1": "649706db3132dbee6ecfe17df504a0c6245d21c0",
+          "bytes": 588672,
+          "relative": "Export/Business_Female_04.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Female_04/Textures/f020_body_color.tga",
+          "sha1": "560b52b40ddd056def5385176a76897645ea322a",
+          "bytes": 12582956,
+          "relative": "Textures/f020_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Female_04/Textures/f020_head_color.tga",
+          "sha1": "8ea1df2f4d723f98548c5456e3cb7a17e8f8120e",
+          "bytes": 12582956,
+          "relative": "Textures/f020_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Female_04/Textures/f020_opacity_color.tga",
+          "sha1": "e3d2d54055c606fac90d5c176a71377bd8d8bf60",
+          "bytes": 2097196,
+          "relative": "Textures/f020_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:business_male_01",
+      "name": "Business Male 01",
+      "tags": "realistic human rigged humanoid professions business male 01",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Business_Male_01/Export/Business_Male_01.fbx",
+          "sha1": "705ee1b9ce18c3ddb3e4e5850d9272f2e8607738",
+          "bytes": 520704,
+          "relative": "Export/Business_Male_01.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Male_01/Textures/m005_body_color.tga",
+          "sha1": "3ae157b9ee900809770d4754cc7fd5ccefbbe106",
+          "bytes": 12582956,
+          "relative": "Textures/m005_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Male_01/Textures/m005_head_color.tga",
+          "sha1": "25473b6a8daf5b92f13be239ac6c758c41e9b466",
+          "bytes": 12582956,
+          "relative": "Textures/m005_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Male_01/Textures/m005_opacity_color.tga",
+          "sha1": "85521bcee9b307ca431fdad86926e997ce7d3e0a",
+          "bytes": 4194348,
+          "relative": "Textures/m005_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:business_male_02",
+      "name": "Business Male 02",
+      "tags": "realistic human rigged humanoid professions business male 02",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Business_Male_02/Export/Business_Male_02.fbx",
+          "sha1": "a9c2440c2ca9695fcf8b4bee950d5218ef8deda4",
+          "bytes": 521088,
+          "relative": "Export/Business_Male_02.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Male_02/Textures/m008_body_color.tga",
+          "sha1": "9269c2726510ad15a348bbca9ff27ac2672353f6",
+          "bytes": 12582956,
+          "relative": "Textures/m008_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Male_02/Textures/m008_head_color.tga",
+          "sha1": "c5b559bf94fa6ed2cfd99393bcced92ed790ef0e",
+          "bytes": 12582956,
+          "relative": "Textures/m008_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Male_02/Textures/m008_opacity_color.tga",
+          "sha1": "ea9aa0391466411756111e880f0cfed25bbd7f58",
+          "bytes": 16777260,
+          "relative": "Textures/m008_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:business_male_03",
+      "name": "Business Male 03",
+      "tags": "realistic human rigged humanoid professions business male 03",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Business_Male_03/Export/Business_Male_03.fbx",
+          "sha1": "90d5a0ef48c870a33ec31c3d3160e084a83b45a8",
+          "bytes": 534112,
+          "relative": "Export/Business_Male_03.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Male_03/Textures/m020_body_color.tga",
+          "sha1": "67e0fdf3f2c94386f490c2cb00b2576fe479c572",
+          "bytes": 12582956,
+          "relative": "Textures/m020_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Male_03/Textures/m020_head_color.tga",
+          "sha1": "2a9997ac7f28cdd63bc34b8607725f488be37351",
+          "bytes": 12582956,
+          "relative": "Textures/m020_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Male_03/Textures/m020_opacity_color.tga",
+          "sha1": "72972c248d2ebbd5b744914ccf17a0f28ad06e02",
+          "bytes": 16777260,
+          "relative": "Textures/m020_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:business_male_04",
+      "name": "Business Male 04",
+      "tags": "realistic human rigged humanoid professions business male 04",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Business_Male_04/Export/Business_Male_04.fbx",
+          "sha1": "c853fc5a70ade21d0abb45674ed4ce11af99c0fe",
+          "bytes": 505728,
+          "relative": "Export/Business_Male_04.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Male_04/Textures/m015_body_color.tga",
+          "sha1": "8b5bce3ea6ced893565cac1d9668654eaee0f06b",
+          "bytes": 12582956,
+          "relative": "Textures/m015_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Male_04/Textures/m015_head_color.tga",
+          "sha1": "4b4b314a1ce905f9d47d4eb83b2c97d3494f2d1e",
+          "bytes": 12582956,
+          "relative": "Textures/m015_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:business_male_05",
+      "name": "Business Male 05",
+      "tags": "realistic human rigged humanoid professions business male 05",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Business_Male_05/Export/Business_Male_05.fbx",
+          "sha1": "cc6000ade33c05bc8a5c4c5be178c3537a7efe8d",
+          "bytes": 501296,
+          "relative": "Export/Business_Male_05.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Male_05/Textures/m016_body_color.tga",
+          "sha1": "349b93755c48862d47b2fe6aba9094ea07693d51",
+          "bytes": 12582956,
+          "relative": "Textures/m016_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Male_05/Textures/m016_head_color.tga",
+          "sha1": "a9f6b6f4a36352089639dcd42c7e3b0fcea128ea",
+          "bytes": 12582956,
+          "relative": "Textures/m016_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:business_male_06",
+      "name": "Business Male 06",
+      "tags": "realistic human rigged humanoid professions business male 06",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Business_Male_06/Export/Business_Male_06.fbx",
+          "sha1": "206130a1b01ae0320773fff4088a4a14e12d1f83",
+          "bytes": 507712,
+          "relative": "Export/Business_Male_06.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Male_06/Textures/m025_body_color.tga",
+          "sha1": "cec2659255236a8fc25232ba19073e313921a4c2",
+          "bytes": 12582956,
+          "relative": "Textures/m025_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Male_06/Textures/m025_head_color.tga",
+          "sha1": "90de47970d57dcb4ff2e8657656b52fb8cbd8217",
+          "bytes": 12582956,
+          "relative": "Textures/m025_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:business_male_07",
+      "name": "Business Male 07",
+      "tags": "realistic human rigged humanoid professions business male 07",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Business_Male_07/Export/Business_Male_07.fbx",
+          "sha1": "875a53c8ac45a7098c7e155dfe4d45e71109899d",
+          "bytes": 487360,
+          "relative": "Export/Business_Male_07.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Male_07/Textures/m018_body_color.tga",
+          "sha1": "d81c12017038658f81bc7940306a9118052f519f",
+          "bytes": 12582956,
+          "relative": "Textures/m018_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Business_Male_07/Textures/m018_head_color.tga",
+          "sha1": "22b418ad5270d11747c66f27b0217b19691d7c0a",
+          "bytes": 12582956,
+          "relative": "Textures/m018_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:chef_female_01",
+      "name": "Chef Female 01",
+      "tags": "realistic human rigged humanoid professions chef female 01",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Chef_Female_01/Export/Chef_Female_01.fbx",
+          "sha1": "1815e2d6362e673dfd118e8f6d8f8636160806af",
+          "bytes": 544192,
+          "relative": "Export/Chef_Female_01.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Chef_Female_01/Textures/f110_body_color.tga",
+          "sha1": "4dee4a0a54a06918cf17eff6801c8c9a17086d93",
+          "bytes": 12582956,
+          "relative": "Textures/f110_body_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:construction_female_01",
+      "name": "Construction Female 01",
+      "tags": "realistic human rigged humanoid professions construction female 01",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Construction_Female_01/Export/Construction_Female_01.fbx",
+          "sha1": "93f554c55a7ef294c5d274b0430d6f6384022ca3",
+          "bytes": 603248,
+          "relative": "Export/Construction_Female_01.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Female_01/Textures/f101_body_color.tga",
+          "sha1": "50d49e1d549ba369d1a69964b584b7d1c83248f3",
+          "bytes": 12582956,
+          "relative": "Textures/f101_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Female_01/Textures/f101_head_color.tga",
+          "sha1": "79c9c380b8496a3a839ba9fe6900c23d57413599",
+          "bytes": 12582956,
+          "relative": "Textures/f101_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Female_01/Textures/f101_helmet_color.tga",
+          "sha1": "3f51f17cc0b7f783993b132463a17391fecd04e2",
+          "bytes": 6291500,
+          "relative": "Textures/f101_helmet_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:construction_male_01",
+      "name": "Construction Male 01",
+      "tags": "realistic human rigged humanoid professions construction male 01",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_01/Export/Construction_Male_01.fbx",
+          "sha1": "cfcf667eb5c712e5a1510a2ea3e46d157b49ea42",
+          "bytes": 676496,
+          "relative": "Export/Construction_Male_01.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_01/Textures/m111_body_color.tga",
+          "sha1": "ea180a862d949f5f16c1c430362ae199b8d572df",
+          "bytes": 12582956,
+          "relative": "Textures/m111_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_01/Textures/m111_head_color.tga",
+          "sha1": "bb0038aba62407f7823420e1a6114f8980a81888",
+          "bytes": 12582956,
+          "relative": "Textures/m111_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_01/Textures/m111_helmet_color.tga",
+          "sha1": "45f8a87ad06cc30d215e4071b228622b1588c9e1",
+          "bytes": 6291500,
+          "relative": "Textures/m111_helmet_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_01/Textures/m111_opacity_color.tga",
+          "sha1": "bf2c986d67533db898c19b2e9f0e695a0043623e",
+          "bytes": 524332,
+          "relative": "Textures/m111_opacity_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_01/Textures/m111_tools_color.tga",
+          "sha1": "ae5872a6808aa115c84aff5a5d8859ac7bedab6f",
+          "bytes": 3145772,
+          "relative": "Textures/m111_tools_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:construction_male_02",
+      "name": "Construction Male 02",
+      "tags": "realistic human rigged humanoid professions construction male 02",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_02/Export/Construction_Male_02.fbx",
+          "sha1": "76b497909897cb9c50e6ad737b9bd1dd96d78bb5",
+          "bytes": 542464,
+          "relative": "Export/Construction_Male_02.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_02/Textures/m101_body_color.tga",
+          "sha1": "a10ff14d5e2bf334abd423af3b39259621d7a36e",
+          "bytes": 12582956,
+          "relative": "Textures/m101_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_02/Textures/m101_head_color.tga",
+          "sha1": "8d685c4e7d7cb58007dfcaea56b1d6067bb7f729",
+          "bytes": 12582956,
+          "relative": "Textures/m101_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_02/Textures/m101_helmet_color.tga",
+          "sha1": "3f51f17cc0b7f783993b132463a17391fecd04e2",
+          "bytes": 6291500,
+          "relative": "Textures/m101_helmet_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:construction_male_03",
+      "name": "Construction Male 03",
+      "tags": "realistic human rigged humanoid professions construction male 03",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_03/Export/Construction_Male_03.fbx",
+          "sha1": "cd8e28acb2fe5af5483b1f83ddb3db90f56ea36d",
+          "bytes": 629920,
+          "relative": "Export/Construction_Male_03.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_03/Textures/m102_body_color.tga",
+          "sha1": "72ab212168030695e77020e209435527bb132ddb",
+          "bytes": 12582956,
+          "relative": "Textures/m102_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_03/Textures/m102_head_color.tga",
+          "sha1": "98a6141e24e4653b8046d3d35b3f5e4a225d896a",
+          "bytes": 12582956,
+          "relative": "Textures/m102_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_03/Textures/m102_helmet_color.tga",
+          "sha1": "3f51f17cc0b7f783993b132463a17391fecd04e2",
+          "bytes": 6291500,
+          "relative": "Textures/m102_helmet_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_03/Textures/m102_tools_color.tga",
+          "sha1": "ae5872a6808aa115c84aff5a5d8859ac7bedab6f",
+          "bytes": 3145772,
+          "relative": "Textures/m102_tools_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:construction_male_04",
+      "name": "Construction Male 04",
+      "tags": "realistic human rigged humanoid professions construction male 04",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_04/Export/Construction_Male_04.fbx",
+          "sha1": "e659b7074a44fc82163b2722809d471b78d43f43",
+          "bytes": 663472,
+          "relative": "Export/Construction_Male_04.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_04/Textures/m103_body_color.tga",
+          "sha1": "e47c4561400e27cbe7c5c6baf196b3fc024f2c3e",
+          "bytes": 12582956,
+          "relative": "Textures/m103_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_04/Textures/m103_head_color.tga",
+          "sha1": "73c53324532962e42a97b5dfc31270e9115acc6d",
+          "bytes": 12582956,
+          "relative": "Textures/m103_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_04/Textures/m103_helmet_color.tga",
+          "sha1": "3f51f17cc0b7f783993b132463a17391fecd04e2",
+          "bytes": 6291500,
+          "relative": "Textures/m103_helmet_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_04/Textures/m103_tools_color.tga",
+          "sha1": "ae5872a6808aa115c84aff5a5d8859ac7bedab6f",
+          "bytes": 3145772,
+          "relative": "Textures/m103_tools_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:construction_male_05",
+      "name": "Construction Male 05",
+      "tags": "realistic human rigged humanoid professions construction male 05",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_05/Export/Construction_Male_05.fbx",
+          "sha1": "905f76b972d81978dcbbc74abc3b8ffd38ef2916",
+          "bytes": 530144,
+          "relative": "Export/Construction_Male_05.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_05/Textures/m104_body_color.tga",
+          "sha1": "45defc19c6d6823d2c2e4f4e256c4ec1d40caf6a",
+          "bytes": 12582956,
+          "relative": "Textures/m104_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_05/Textures/m104_head_color.tga",
+          "sha1": "6cecb6232d4009dd151ad2b3fa424b14ee338792",
+          "bytes": 12582956,
+          "relative": "Textures/m104_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_05/Textures/m104_helmet_color.tga",
+          "sha1": "3f51f17cc0b7f783993b132463a17391fecd04e2",
+          "bytes": 6291500,
+          "relative": "Textures/m104_helmet_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:construction_male_06",
+      "name": "Construction Male 06",
+      "tags": "realistic human rigged humanoid professions construction male 06",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_06/Export/Construction_Male_06.fbx",
+          "sha1": "ac2490a07d132fad6fa8026a4cc554828ce2acea",
+          "bytes": 640288,
+          "relative": "Export/Construction_Male_06.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_06/Textures/m105_body_color.tga",
+          "sha1": "de255e5ceaec0be29449f303ed584c8831d4a1cf",
+          "bytes": 12582956,
+          "relative": "Textures/m105_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_06/Textures/m105_head_color.tga",
+          "sha1": "c0150a7d1e3cfa03ddcf1504240bce6f7a37385d",
+          "bytes": 12582956,
+          "relative": "Textures/m105_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_06/Textures/m105_helmet_color.tga",
+          "sha1": "3f51f17cc0b7f783993b132463a17391fecd04e2",
+          "bytes": 6291500,
+          "relative": "Textures/m105_helmet_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_06/Textures/m105_tools_color.tga",
+          "sha1": "ae5872a6808aa115c84aff5a5d8859ac7bedab6f",
+          "bytes": 3145772,
+          "relative": "Textures/m105_tools_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:construction_male_07",
+      "name": "Construction Male 07",
+      "tags": "realistic human rigged humanoid professions construction male 07",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_07/Export/Construction_Male_07.fbx",
+          "sha1": "d23e4a74ff9f314635114f5accd4a52d6d1a3060",
+          "bytes": 566144,
+          "relative": "Export/Construction_Male_07.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_07/Textures/m107_body_color.tga",
+          "sha1": "a9b22e98dfee3a045aa63e8a684acc16e782393c",
+          "bytes": 12582956,
+          "relative": "Textures/m107_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_07/Textures/m107_head_color.tga",
+          "sha1": "e532a84c2cbdd8d6ed15e2f5ef5fd7c795f34206",
+          "bytes": 12582956,
+          "relative": "Textures/m107_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_07/Textures/m107_helmet_color.tga",
+          "sha1": "52091bfe4c47827b572910761452d380fad80824",
+          "bytes": 6291500,
+          "relative": "Textures/m107_helmet_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:construction_male_08",
+      "name": "Construction Male 08",
+      "tags": "realistic human rigged humanoid professions construction male 08",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_08/Export/Construction_Male_08.fbx",
+          "sha1": "69682d9d4fe4a9c76c73748327975ef61f7ff4b8",
+          "bytes": 584816,
+          "relative": "Export/Construction_Male_08.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_08/Textures/m108_body_color.tga",
+          "sha1": "50d49e1d549ba369d1a69964b584b7d1c83248f3",
+          "bytes": 12582956,
+          "relative": "Textures/m108_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_08/Textures/m108_head_color.tga",
+          "sha1": "d792a53251663a7ac4c9091a214fca7ea3a23954",
+          "bytes": 12582956,
+          "relative": "Textures/m108_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Construction_Male_08/Textures/m108_helmet_color.tga",
+          "sha1": "3f51f17cc0b7f783993b132463a17391fecd04e2",
+          "bytes": 6291500,
+          "relative": "Textures/m108_helmet_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:delivery_male_01",
+      "name": "Delivery Male 01",
+      "tags": "realistic human rigged humanoid professions delivery male 01",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Delivery_Male_01/Export/Delivery_Male_01.fbx",
+          "sha1": "b1d9677ab745d09b6807f12422db8dece3532dba",
+          "bytes": 511312,
+          "relative": "Export/Delivery_Male_01.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Delivery_Male_01/Textures/m112_body_color.tga",
+          "sha1": "a2453085d7c7050948e3b5a80a080f1c3ae329b2",
+          "bytes": 12582956,
+          "relative": "Textures/m112_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Delivery_Male_01/Textures/m112_head_color.tga",
+          "sha1": "5e6ef334c1a4af3f8670201d35c0edf7d34725e2",
+          "bytes": 12582956,
+          "relative": "Textures/m112_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:fire_female_01",
+      "name": "Fire Female 01",
+      "tags": "realistic human rigged humanoid professions fire female 01",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Fire_Female_01/Export/Fire_Female_01.fbx",
+          "sha1": "a4ee8ace11d9599fd86853d94efbe84a553e8d4f",
+          "bytes": 763632,
+          "relative": "Export/Fire_Female_01.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Female_01/Textures/m131_body_color.tga",
+          "sha1": "b6b74adc36297eb858af416c4630103cf4e89891",
+          "bytes": 12582956,
+          "relative": "Textures/m131_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Female_01/Textures/m131_flashlight_color.tga",
+          "sha1": "5010eafcfdb4c84483fc2c827af76669b9b8c79e",
+          "bytes": 786476,
+          "relative": "Textures/m131_flashlight_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Female_01/Textures/m131_head_color.tga",
+          "sha1": "527089948e29a739c052d68612b61cc0dc54db15",
+          "bytes": 12582956,
+          "relative": "Textures/m131_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Female_01/Textures/m131_helmet_color.tga",
+          "sha1": "19068edc11e187b29b2cdb1c4ef80a10f616d780",
+          "bytes": 3145772,
+          "relative": "Textures/m131_helmet_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Female_01/Textures/m131_mask_color.tga",
+          "sha1": "4b1b834482822b72d64990675d7cd260d1b3c78d",
+          "bytes": 6291500,
+          "relative": "Textures/m131_mask_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Female_01/Textures/m131_opacity_color.tga",
+          "sha1": "824c7014a4be844e5541927da4b354a3c4b70cb5",
+          "bytes": 1048620,
+          "relative": "Textures/m131_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:fire_female_02",
+      "name": "Fire Female 02",
+      "tags": "realistic human rigged humanoid professions fire female 02",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Fire_Female_02/Export/Fire_Female_02.fbx",
+          "sha1": "6b7e2863a73ffe51698b24ef5d41b09ccde594da",
+          "bytes": 761296,
+          "relative": "Export/Fire_Female_02.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Female_02/Textures/m133_body_color.tga",
+          "sha1": "635f54cca420027b23f3b52ef746f31cfd5ab0c7",
+          "bytes": 12582956,
+          "relative": "Textures/m133_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Female_02/Textures/m133_flashlight_color.tga",
+          "sha1": "ccbf661b8fa2974c48f9130021182b18c82512d0",
+          "bytes": 786476,
+          "relative": "Textures/m133_flashlight_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Female_02/Textures/m133_head_color.tga",
+          "sha1": "7cf8eaf639a3e61070a4f9b265a76c165ecac56b",
+          "bytes": 12582956,
+          "relative": "Textures/m133_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Female_02/Textures/m133_helmet_color.tga",
+          "sha1": "b0bde198e037f373141fb9dcc7a912bc9aecea27",
+          "bytes": 3145772,
+          "relative": "Textures/m133_helmet_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Female_02/Textures/m133_mask_color.tga",
+          "sha1": "4b1b834482822b72d64990675d7cd260d1b3c78d",
+          "bytes": 6291500,
+          "relative": "Textures/m133_mask_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Female_02/Textures/m133_opacity_color.tga",
+          "sha1": "a9feb2458398b7266776e62da3cc6b0856235e8d",
+          "bytes": 1048620,
+          "relative": "Textures/m133_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:fire_female_03",
+      "name": "Fire Female 03",
+      "tags": "realistic human rigged humanoid professions fire female 03",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Fire_Female_03/Export/Fire_Female_03.fbx",
+          "sha1": "2cc529ac8cb97bf70dbb0ebd440ea5ccbd6f4a12",
+          "bytes": 769312,
+          "relative": "Export/Fire_Female_03.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Female_03/Textures/m137_body_color.tga",
+          "sha1": "cbec628aefd96ca7dbd11b413f390dc0a4a6b2ef",
+          "bytes": 12582956,
+          "relative": "Textures/m137_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Female_03/Textures/m137_flashlight_color.tga",
+          "sha1": "fc7f8ec41048b493ffacf4c1d54ac32382bbdec1",
+          "bytes": 786476,
+          "relative": "Textures/m137_flashlight_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Female_03/Textures/m137_head_color.tga",
+          "sha1": "bcac4491bbe4851df9d522abe51bca6b171907dc",
+          "bytes": 12582956,
+          "relative": "Textures/m137_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Female_03/Textures/m137_helmet_color.tga",
+          "sha1": "4016ac2d4635e4e1f7acdc7dffe83f0b9ba9edd1",
+          "bytes": 3145772,
+          "relative": "Textures/m137_helmet_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Female_03/Textures/m137_mask_color.tga",
+          "sha1": "de0c32356e937fb99a26c4968659eb9ebe43dc3d",
+          "bytes": 6291500,
+          "relative": "Textures/m137_mask_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Female_03/Textures/m137_opacity_color.tga",
+          "sha1": "ac55a26990446de7ca850f23f13df1c45247e9d3",
+          "bytes": 2097196,
+          "relative": "Textures/m137_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:fire_male_01",
+      "name": "Fire Male 01",
+      "tags": "realistic human rigged humanoid professions fire male 01",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_01/Export/Fire_Male_01.fbx",
+          "sha1": "029dca36fe4aeb2fc23125f3b8a5a89166adf044",
+          "bytes": 596000,
+          "relative": "Export/Fire_Male_01.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_01/Textures/m138_body_color.tga",
+          "sha1": "37848d1863fd5faf4b30c74cf89fd9b7cc3f3324",
+          "bytes": 12582956,
+          "relative": "Textures/m138_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_01/Textures/m138_head_color.tga",
+          "sha1": "4f66cb5124472cd29f4fffbe13d58a4f740b23d6",
+          "bytes": 12582956,
+          "relative": "Textures/m138_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_01/Textures/m138_helmet_color.tga",
+          "sha1": "bb26521fb0599b2fff83431ab4f3305cbc8ac392",
+          "bytes": 3145772,
+          "relative": "Textures/m138_helmet_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:fire_male_02",
+      "name": "Fire Male 02",
+      "tags": "realistic human rigged humanoid professions fire male 02",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_02/Export/Fire_Male_02.fbx",
+          "sha1": "895f67018b9b08bcd591c73ddb2b710e4737f275",
+          "bytes": 585824,
+          "relative": "Export/Fire_Male_02.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_02/Textures/m132_body_color.tga",
+          "sha1": "88beab5ade9d120060a1996ad096046b00d071bb",
+          "bytes": 12582956,
+          "relative": "Textures/m132_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_02/Textures/m132_head_color.tga",
+          "sha1": "7cf8eaf639a3e61070a4f9b265a76c165ecac56b",
+          "bytes": 12582956,
+          "relative": "Textures/m132_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_02/Textures/m132_helmet_color.tga",
+          "sha1": "b0bde198e037f373141fb9dcc7a912bc9aecea27",
+          "bytes": 3145772,
+          "relative": "Textures/m132_helmet_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_02/Textures/m132_opacity_color.tga",
+          "sha1": "037f508bb363dedde76f99c79528da9f23e8a341",
+          "bytes": 524332,
+          "relative": "Textures/m132_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:fire_male_03",
+      "name": "Fire Male 03",
+      "tags": "realistic human rigged humanoid professions fire male 03",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_03/Export/Fire_Male_03.fbx",
+          "sha1": "0dbb0406e06582c48094dcbbbeca779dca9674dd",
+          "bytes": 596944,
+          "relative": "Export/Fire_Male_03.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_03/Textures/m134_body_color.tga",
+          "sha1": "2834b94d06c5d4e40e6eb8b36ffa0779c4fa95db",
+          "bytes": 12582956,
+          "relative": "Textures/m134_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_03/Textures/m134_head_color.tga",
+          "sha1": "585835c944e2d225c6cef4d727e50892e91a776f",
+          "bytes": 12582956,
+          "relative": "Textures/m134_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_03/Textures/m134_helmet_color.tga",
+          "sha1": "eee694ecbc117565bca8be7b9fe3d49d677011e8",
+          "bytes": 3145772,
+          "relative": "Textures/m134_helmet_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:fire_male_04",
+      "name": "Fire Male 04",
+      "tags": "realistic human rigged humanoid professions fire male 04",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_04/Export/Fire_Male_04.fbx",
+          "sha1": "45165d3bfa5fa18dfd98416f736f2bd412b7570c",
+          "bytes": 814224,
+          "relative": "Export/Fire_Male_04.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_04/Textures/m135_body_color.tga",
+          "sha1": "91627fe4e5b5e140e057c5263824a9df0b1522e8",
+          "bytes": 12582956,
+          "relative": "Textures/m135_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_04/Textures/m135_flashlight_color.tga",
+          "sha1": "5010eafcfdb4c84483fc2c827af76669b9b8c79e",
+          "bytes": 786476,
+          "relative": "Textures/m135_flashlight_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_04/Textures/m135_head_color.tga",
+          "sha1": "585835c944e2d225c6cef4d727e50892e91a776f",
+          "bytes": 12582956,
+          "relative": "Textures/m135_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_04/Textures/m135_helmet_color.tga",
+          "sha1": "eee694ecbc117565bca8be7b9fe3d49d677011e8",
+          "bytes": 3145772,
+          "relative": "Textures/m135_helmet_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_04/Textures/m135_mask_color.tga",
+          "sha1": "de0c32356e937fb99a26c4968659eb9ebe43dc3d",
+          "bytes": 6291500,
+          "relative": "Textures/m135_mask_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_04/Textures/m135_opacity_color.tga",
+          "sha1": "1f6dc0c9e23343542a65a0bbef57ebbbdcccc48c",
+          "bytes": 1048620,
+          "relative": "Textures/m135_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:fire_male_05",
+      "name": "Fire Male 05",
+      "tags": "realistic human rigged humanoid professions fire male 05",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_05/Export/Fire_Male_05.fbx",
+          "sha1": "12fa1af95517b2d91cdeaf97f8270dc7204d1180",
+          "bytes": 555040,
+          "relative": "Export/Fire_Male_05.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_05/Textures/m136_body_color.tga",
+          "sha1": "8fcaa9984940932c25261e5a0b46d7bb21c7db75",
+          "bytes": 12582956,
+          "relative": "Textures/m136_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_05/Textures/m136_head_color.tga",
+          "sha1": "bcac4491bbe4851df9d522abe51bca6b171907dc",
+          "bytes": 12582956,
+          "relative": "Textures/m136_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_05/Textures/m136_helmet_color.tga",
+          "sha1": "4016ac2d4635e4e1f7acdc7dffe83f0b9ba9edd1",
+          "bytes": 3145772,
+          "relative": "Textures/m136_helmet_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_05/Textures/m136_opacity_color.tga",
+          "sha1": "215a0ca7e96988c755ac0c1ddb1fadc85b318f27",
+          "bytes": 1048620,
+          "relative": "Textures/m136_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:fire_male_06",
+      "name": "Fire Male 06",
+      "tags": "realistic human rigged humanoid professions fire male 06",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_06/Export/Fire_Male_06.fbx",
+          "sha1": "29a04e255f5ded7c2f84895cf2fb3cd00e0e8925",
+          "bytes": 555680,
+          "relative": "Export/Fire_Male_06.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_06/Textures/m130_body_color.tga",
+          "sha1": "6d1cfa818276d011bae07d4c2fd241835a65bb8b",
+          "bytes": 12582956,
+          "relative": "Textures/m130_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_06/Textures/m130_head_color.tga",
+          "sha1": "695a54a37c2a656b2c2a1df3b48f24c09e83c140",
+          "bytes": 12582956,
+          "relative": "Textures/m130_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_06/Textures/m130_helmet_color.tga",
+          "sha1": "19068edc11e187b29b2cdb1c4ef80a10f616d780",
+          "bytes": 3145772,
+          "relative": "Textures/m130_helmet_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:fire_male_07",
+      "name": "Fire Male 07",
+      "tags": "realistic human rigged humanoid professions fire male 07",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_07/Export/Fire_Male_07.fbx",
+          "sha1": "ccbd5f80f89b31b00ff5188c5ca69ed81a9acd11",
+          "bytes": 807456,
+          "relative": "Export/Fire_Male_07.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_07/Textures/m139_body_color.tga",
+          "sha1": "46724c2aa257dcb20e877848e5a6c114fd4cf0d3",
+          "bytes": 12582956,
+          "relative": "Textures/m139_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_07/Textures/m139_flashlight_color.tga",
+          "sha1": "fc7f8ec41048b493ffacf4c1d54ac32382bbdec1",
+          "bytes": 786476,
+          "relative": "Textures/m139_flashlight_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_07/Textures/m139_head_color.tga",
+          "sha1": "4f66cb5124472cd29f4fffbe13d58a4f740b23d6",
+          "bytes": 12582956,
+          "relative": "Textures/m139_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_07/Textures/m139_helmet_color.tga",
+          "sha1": "bb26521fb0599b2fff83431ab4f3305cbc8ac392",
+          "bytes": 3145772,
+          "relative": "Textures/m139_helmet_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_07/Textures/m139_mask_color.tga",
+          "sha1": "de0c32356e937fb99a26c4968659eb9ebe43dc3d",
+          "bytes": 6291500,
+          "relative": "Textures/m139_mask_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Fire_Male_07/Textures/m139_opacity_color.tga",
+          "sha1": "1f6dc0c9e23343542a65a0bbef57ebbbdcccc48c",
+          "bytes": 1048620,
+          "relative": "Textures/m139_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:gardener_male_01",
+      "name": "Gardener Male 01",
+      "tags": "realistic human rigged humanoid professions gardener male 01",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Gardener_Male_01/Export/Gardener_Male_01.fbx",
+          "sha1": "d1def87bb530743db2df841edb77c607d8924937",
+          "bytes": 517152,
+          "relative": "Export/Gardener_Male_01.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Gardener_Male_01/Textures/m106_body_color.tga",
+          "sha1": "5ccd297d5609765d8d6cfccbc34113a94944d27a",
+          "bytes": 12582956,
+          "relative": "Textures/m106_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Gardener_Male_01/Textures/m106_head_color.tga",
+          "sha1": "cbcb8b66787378c76bb74c810f14208d721606ba",
+          "bytes": 12582956,
+          "relative": "Textures/m106_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Gardener_Male_01/Textures/m106_opacity_color.tga",
+          "sha1": "1eda6be82167a0956c40000eaaabe96094c70dbd",
+          "bytes": 16777260,
+          "relative": "Textures/m106_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:medical_female_01",
+      "name": "Medical Female 01",
+      "tags": "realistic human rigged humanoid professions medical female 01",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Medical_Female_01/Export/Medical_Female_01.fbx",
+          "sha1": "dad7fc77e6c1f33404f0ee0d1dbfb885de88cc35",
+          "bytes": 583200,
+          "relative": "Export/Medical_Female_01.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Medical_Female_01/Textures/f152_body_color.tga",
+          "sha1": "6eda5f78c726625bad60516b742e524637ee3459",
+          "bytes": 12582956,
+          "relative": "Textures/f152_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Medical_Female_01/Textures/f152_head_color.tga",
+          "sha1": "13a42d44b341c9f122230bfd16868d7e3dc619d9",
+          "bytes": 12582956,
+          "relative": "Textures/f152_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Medical_Female_01/Textures/f152_opacity_color.tga",
+          "sha1": "c2ad85f17b180e2a1da5a08c0b49130222b7af7a",
+          "bytes": 16777260,
+          "relative": "Textures/f152_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:medical_female_02",
+      "name": "Medical Female 02",
+      "tags": "realistic human rigged humanoid professions medical female 02",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Medical_Female_02/Export/Medical_Female_02.fbx",
+          "sha1": "1a7f1f167dd31ce8e9f8f9af7fe94036ee817d63",
+          "bytes": 629008,
+          "relative": "Export/Medical_Female_02.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Medical_Female_02/Textures/f153_body_color.tga",
+          "sha1": "c2440cb565374f0e9780a9f36b14e286d8b77f58",
+          "bytes": 12582956,
+          "relative": "Textures/f153_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Medical_Female_02/Textures/f153_head_color.tga",
+          "sha1": "6a51a9a4970b1c8fbc5829ed8e88ad9c394aa3cb",
+          "bytes": 12582956,
+          "relative": "Textures/f153_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Medical_Female_02/Textures/f153_opacity_color.tga",
+          "sha1": "e3d2d54055c606fac90d5c176a71377bd8d8bf60",
+          "bytes": 2097196,
+          "relative": "Textures/f153_opacity_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Medical_Female_02/Textures/f153_stetoskop_color.tga",
+          "sha1": "9e5a7f7d898bdf8a1ec046dce5591664966ee0d9",
+          "bytes": 786476,
+          "relative": "Textures/f153_stetoskop_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:medical_female_03",
+      "name": "Medical Female 03",
+      "tags": "realistic human rigged humanoid professions medical female 03",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Medical_Female_03/Export/Medical_Female_03.fbx",
+          "sha1": "9ef3c861d3d04f5871521462729f9e6208d23b2c",
+          "bytes": 551376,
+          "relative": "Export/Medical_Female_03.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Medical_Female_03/Textures/f154_head_color.tga",
+          "sha1": "68111c2a73a3c7a5f0d4915f86461faf0e03dcd6",
+          "bytes": 12582956,
+          "relative": "Textures/f154_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Medical_Female_03/Textures/f154_opacity_color.tga",
+          "sha1": "fef407c359ae03e257944ec1b530cdd1b1f921ea",
+          "bytes": 16777260,
+          "relative": "Textures/f154_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:medical_male_01",
+      "name": "Medical Male 01",
+      "tags": "realistic human rigged humanoid professions medical male 01",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Medical_Male_01/Export/Medical_Male_01.fbx",
+          "sha1": "612eb4d79de6588c2e2fdf91fc06e20093d08170",
+          "bytes": 552016,
+          "relative": "Export/Medical_Male_01.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Medical_Male_01/Textures/m152_body_color.tga",
+          "sha1": "aee1de062c7a59c96fa8528ef97b51ba574a742e",
+          "bytes": 12582956,
+          "relative": "Textures/m152_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Medical_Male_01/Textures/m152_head_color.tga",
+          "sha1": "7d53da68e92a39a224b5df11ab429f9cd1f32e72",
+          "bytes": 12582956,
+          "relative": "Textures/m152_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Medical_Male_01/Textures/m152_opacity_color.tga",
+          "sha1": "85521bcee9b307ca431fdad86926e997ce7d3e0a",
+          "bytes": 4194348,
+          "relative": "Textures/m152_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:medical_male_02",
+      "name": "Medical Male 02",
+      "tags": "realistic human rigged humanoid professions medical male 02",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Medical_Male_02/Export/Medical_Male_02.fbx",
+          "sha1": "d3106c31cc3972dbbdb832a1cb36009df7485fca",
+          "bytes": 542416,
+          "relative": "Export/Medical_Male_02.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Medical_Male_02/Textures/m154_head_color.tga",
+          "sha1": "5529918adebc20d594946fb078be05324e8a4468",
+          "bytes": 12582956,
+          "relative": "Textures/m154_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Medical_Male_02/Textures/m154_opacity_color.tga",
+          "sha1": "5b304a95d22629e6d9abf3e6515a7e6b236708f6",
+          "bytes": 16777260,
+          "relative": "Textures/m154_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:medical_male_03",
+      "name": "Medical Male 03",
+      "tags": "realistic human rigged humanoid professions medical male 03",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Medical_Male_03/Export/Medical_Male_03.fbx",
+          "sha1": "c2033a653554dcf2b35c5d2bdcd14fa61f005968",
+          "bytes": 573120,
+          "relative": "Export/Medical_Male_03.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Medical_Male_03/Textures/m153_body_color.tga",
+          "sha1": "2159913d68a2feadef620ab9bfab838cc7b909b2",
+          "bytes": 12582956,
+          "relative": "Textures/m153_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Medical_Male_03/Textures/m153_head_color.tga",
+          "sha1": "1e5156289e3e51e9d38bbb3fbd55f2b631ce2f26",
+          "bytes": 12582956,
+          "relative": "Textures/m153_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Medical_Male_03/Textures/m153_stetoskop_color.tga",
+          "sha1": "9e5a7f7d898bdf8a1ec046dce5591664966ee0d9",
+          "bytes": 786476,
+          "relative": "Textures/m153_stetoskop_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:medical_male_04",
+      "name": "Medical Male 04",
+      "tags": "realistic human rigged humanoid professions medical male 04",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Medical_Male_04/Export/Medical_Male_04.fbx",
+          "sha1": "3917f4052beeb59df0de3a40b90af92e9d2670b1",
+          "bytes": 580928,
+          "relative": "Export/Medical_Male_04.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Medical_Male_04/Textures/m162_body_color.tga",
+          "sha1": "18f7b6bde75d89befb56160b676552e30afb4f31",
+          "bytes": 12582956,
+          "relative": "Textures/m162_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Medical_Male_04/Textures/m162_head_color.tga",
+          "sha1": "02f877e92d9f698a7bc63e0faae263edffe24142",
+          "bytes": 12582956,
+          "relative": "Textures/m162_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Medical_Male_04/Textures/m162_protection_color.tga",
+          "sha1": "e2ee1f8759cdccf551827f7e971e7ef7f6e8adb7",
+          "bytes": 12582956,
+          "relative": "Textures/m162_protection_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:medical_male_05",
+      "name": "Medical Male 05",
+      "tags": "realistic human rigged humanoid professions medical male 05",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Medical_Male_05/Export/Medical_Male_05.fbx",
+          "sha1": "00f8642c34ec5351dcc6866ca5badc260a12e934",
+          "bytes": 613456,
+          "relative": "Export/Medical_Male_05.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Medical_Male_05/Textures/m163_body_color.tga",
+          "sha1": "f5ade20fb2c43970ee86fa7e0501d466fbcf59f9",
+          "bytes": 12582956,
+          "relative": "Textures/m163_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Medical_Male_05/Textures/m163_head_color.tga",
+          "sha1": "4fa7d323d4aeeb7dc978b5b0d4b71afd68229d06",
+          "bytes": 12582956,
+          "relative": "Textures/m163_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Medical_Male_05/Textures/m163_protection_color.tga",
+          "sha1": "9240da6ae6d7cc40ebb5bb9773b8253f669eb19c",
+          "bytes": 12582956,
+          "relative": "Textures/m163_protection_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:military_female_01",
+      "name": "Military Female 01",
+      "tags": "realistic human rigged humanoid professions military female 01",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Military_Female_01/Export/Military_Female_01.fbx",
+          "sha1": "5a2666098f6428fe2f63d575dd9a08bc771aab89",
+          "bytes": 800992,
+          "relative": "Export/Military_Female_01.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Military_Female_01/Textures/sf003_head_color.tga",
+          "sha1": "cb4258da46d21ef5ae2b3017cefba6b5bf5d3acc",
+          "bytes": 12582956,
+          "relative": "Textures/sf003_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:military_female_02",
+      "name": "Military Female 02",
+      "tags": "realistic human rigged humanoid professions military female 02",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Military_Female_02/Export/Military_Female_02.fbx",
+          "sha1": "1a6ef27f6aefd782cc3f5de26ed50f9fc7b63bf7",
+          "bytes": 798400,
+          "relative": "Export/Military_Female_02.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Military_Female_02/Textures/sf004_head_color.tga",
+          "sha1": "e9c636056a5c8414347653757656f8af4b102b88",
+          "bytes": 12582956,
+          "relative": "Textures/sf004_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:military_male_01",
+      "name": "Military Male 01",
+      "tags": "realistic human rigged humanoid professions military male 01",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Military_Male_01/Export/Military_Male_01.fbx",
+          "sha1": "f7b62ccf95542fd56a3f5548bea4427b3907dc78",
+          "bytes": 908640,
+          "relative": "Export/Military_Male_01.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Military_Male_01/Textures/sm002_combat_knife_color.tga",
+          "sha1": "506bceb98dc9748b1eb847401510e2e78122ed28",
+          "bytes": 3145772,
+          "relative": "Textures/sm002_combat_knife_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Military_Male_01/Textures/sm002_head_color.tga",
+          "sha1": "4ffcbf8a01c155d88576de38cbfaac107420c8e6",
+          "bytes": 12582956,
+          "relative": "Textures/sm002_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:military_male_02",
+      "name": "Military Male 02",
+      "tags": "realistic human rigged humanoid professions military male 02",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Military_Male_02/Export/Military_Male_02.fbx",
+          "sha1": "e3dae53061a4e7fd1472c11ec7d0ae9495f871a1",
+          "bytes": 573440,
+          "relative": "Export/Military_Male_02.fbx"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:military_male_03",
+      "name": "Military Male 03",
+      "tags": "realistic human rigged humanoid professions military male 03",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Military_Male_03/Export/Military_Male_03.fbx",
+          "sha1": "c0aea4ea4abf412ee3a101a6979c88e12e7e65d8",
+          "bytes": 914912,
+          "relative": "Export/Military_Male_03.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Military_Male_03/Textures/sm004_head_color.tga",
+          "sha1": "942bfed6a177c6fb59463c9fd5b1d52b2c19ba8e",
+          "bytes": 12582956,
+          "relative": "Textures/sm004_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Military_Male_03/Textures/sm004_pistol_color.tga",
+          "sha1": "6ed39b6c5c123201e3b3ccec07b5961239e514d8",
+          "bytes": 3145772,
+          "relative": "Textures/sm004_pistol_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:military_male_04",
+      "name": "Military Male 04",
+      "tags": "realistic human rigged humanoid professions military male 04",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Military_Male_04/Export/Military_Male_04.fbx",
+          "sha1": "632aff9a21c1e8e8c4d8c9869d449cbb36ac8f99",
+          "bytes": 880448,
+          "relative": "Export/Military_Male_04.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Military_Male_04/Textures/sm005_head_color.tga",
+          "sha1": "326aa51d55f08066572dbde49522becc4aafef74",
+          "bytes": 12582956,
+          "relative": "Textures/sm005_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:military_male_05",
+      "name": "Military Male 05",
+      "tags": "realistic human rigged humanoid professions military male 05",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Military_Male_05/Export/Military_Male_05.fbx",
+          "sha1": "f5e30cae247fb5d3e662fddcb8ecf3ebb4c28a12",
+          "bytes": 524624,
+          "relative": "Export/Military_Male_05.fbx"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:military_male_06",
+      "name": "Military Male 06",
+      "tags": "realistic human rigged humanoid professions military male 06",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Military_Male_06/Export/Military_Male_06.fbx",
+          "sha1": "550ced964692980ed664d8d528b472ef3ee1f960",
+          "bytes": 520336,
+          "relative": "Export/Military_Male_06.fbx"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:pilot_female_01",
+      "name": "Pilot Female 01",
+      "tags": "realistic human rigged humanoid professions pilot female 01",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Pilot_Female_01/Export/Pilot_Female_01.fbx",
+          "sha1": "b2947834cd84010d24638cdc7b3f0bf0380a4ba9",
+          "bytes": 575424,
+          "relative": "Export/Pilot_Female_01.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Pilot_Female_01/Textures/f168_body_color.tga",
+          "sha1": "84d87a8e429206a257751be36c036778dc0f64c4",
+          "bytes": 12582956,
+          "relative": "Textures/f168_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Pilot_Female_01/Textures/f168_hat_color.tga",
+          "sha1": "a1295ef41480de2564178f2721111f75d5fc7c5d",
+          "bytes": 6291500,
+          "relative": "Textures/f168_hat_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Pilot_Female_01/Textures/f168_head_color.tga",
+          "sha1": "cace14df59675757fe29e9f19db0302d565a1479",
+          "bytes": 12582956,
+          "relative": "Textures/f168_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:pilot_female_02",
+      "name": "Pilot Female 02",
+      "tags": "realistic human rigged humanoid professions pilot female 02",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Pilot_Female_02/Export/Pilot_Female_02.fbx",
+          "sha1": "f9cfb90abd640c8dab704969f5578be79c255af6",
+          "bytes": 579008,
+          "relative": "Export/Pilot_Female_02.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Pilot_Female_02/Textures/f169_body_color.tga",
+          "sha1": "6d3bc988c3477a454819968f81762d974e87515b",
+          "bytes": 12582956,
+          "relative": "Textures/f169_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Pilot_Female_02/Textures/f169_hat_color.tga",
+          "sha1": "a1295ef41480de2564178f2721111f75d5fc7c5d",
+          "bytes": 6291500,
+          "relative": "Textures/f169_hat_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Pilot_Female_02/Textures/f169_head_color.tga",
+          "sha1": "e9c636056a5c8414347653757656f8af4b102b88",
+          "bytes": 12582956,
+          "relative": "Textures/f169_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:pilot_male_01",
+      "name": "Pilot Male 01",
+      "tags": "realistic human rigged humanoid professions pilot male 01",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Pilot_Male_01/Export/Pilot_Male_01.fbx",
+          "sha1": "ee0087ca5068391c9fb17a46e7208490239a827e",
+          "bytes": 557424,
+          "relative": "Export/Pilot_Male_01.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Pilot_Male_01/Textures/m150_body_color.tga",
+          "sha1": "91330ca081a2f7f7485f5dcd5b11b599918d7455",
+          "bytes": 12582956,
+          "relative": "Textures/m150_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Pilot_Male_01/Textures/m150_head_color.tga",
+          "sha1": "319e83895866dfa947dae881da501aec425098c7",
+          "bytes": 12582956,
+          "relative": "Textures/m150_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:pilot_male_02",
+      "name": "Pilot Male 02",
+      "tags": "realistic human rigged humanoid professions pilot male 02",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Pilot_Male_02/Export/Pilot_Male_02.fbx",
+          "sha1": "f41e0f406555c302c79e424a3ff2428de5b3cac2",
+          "bytes": 557856,
+          "relative": "Export/Pilot_Male_02.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Pilot_Male_02/Textures/m151_body_color.tga",
+          "sha1": "448639d2e8dfd34f3d514fd26d5046f6be7136cf",
+          "bytes": 12582956,
+          "relative": "Textures/m151_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Pilot_Male_02/Textures/m151_head_color.tga",
+          "sha1": "6db564101b548a69646b85daa28f40b5bd14206f",
+          "bytes": 12582956,
+          "relative": "Textures/m151_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:pilot_male_03",
+      "name": "Pilot Male 03",
+      "tags": "realistic human rigged humanoid professions pilot male 03",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Pilot_Male_03/Export/Pilot_Male_03.fbx",
+          "sha1": "b49812d2ace7d9394ef0fb8fa7d422547b731f70",
+          "bytes": 548656,
+          "relative": "Export/Pilot_Male_03.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Pilot_Male_03/Textures/m167_body_color.tga",
+          "sha1": "65edde4de8b240f9573f9a5587fe0820cc726618",
+          "bytes": 12582956,
+          "relative": "Textures/m167_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Pilot_Male_03/Textures/m167_head_color.tga",
+          "sha1": "c6751e09735ff9a98d9dd5579bcf77e25f89bbe7",
+          "bytes": 12582956,
+          "relative": "Textures/m167_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:police_female_01",
+      "name": "Police Female 01",
+      "tags": "realistic human rigged humanoid professions police female 01",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Police_Female_01/Export/Police_Female_01.fbx",
+          "sha1": "912f4d02e442e02db2cdd51c25e48d4fbe075c0c",
+          "bytes": 827152,
+          "relative": "Export/Police_Female_01.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Female_01/Textures/m157_body_color.tga",
+          "sha1": "d41b160e89b6d9be7fc6f90e87a52189d9cb4b10",
+          "bytes": 12582956,
+          "relative": "Textures/m157_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Female_01/Textures/m157_equipment_color.tga",
+          "sha1": "959d2994c3eb41fda0d32df2dfe53ec4001c27d0",
+          "bytes": 12582956,
+          "relative": "Textures/m157_equipment_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Female_01/Textures/m157_head_color.tga",
+          "sha1": "4d55c9a7910197ab63d8425ca9720fe40d57d956",
+          "bytes": 12582956,
+          "relative": "Textures/m157_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Female_01/Textures/m157_helmet_color.tga",
+          "sha1": "8509f833394303b0f2be98cb01da1b45e81a4155",
+          "bytes": 12582956,
+          "relative": "Textures/m157_helmet_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Female_01/Textures/m157_machinegun_color.tga",
+          "sha1": "a586c6c3e253600b2da99701ceced11773367b2c",
+          "bytes": 12582956,
+          "relative": "Textures/m157_machinegun_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Female_01/Textures/m157_opacity_color.tga",
+          "sha1": "ca8bac181e7b134ca18950c16eda1c8c8bde976e",
+          "bytes": 1048620,
+          "relative": "Textures/m157_opacity_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Female_01/Textures/m157_pistol_color.tga",
+          "sha1": "18ba972ac37c4c06e0d0ae8c2315555075a80cda",
+          "bytes": 3145772,
+          "relative": "Textures/m157_pistol_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Female_01/Textures/m157_shotgun_color.tga",
+          "sha1": "b12e42d7716b162dfece26274fbb3fb9083b9cb3",
+          "bytes": 12582956,
+          "relative": "Textures/m157_shotgun_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:police_male_01",
+      "name": "Police Male 01",
+      "tags": "realistic human rigged humanoid professions police male 01",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_01/Export/Police_Male_01.fbx",
+          "sha1": "9f7125e0b457c0214e7cfe1ef3a4be7fffd0a567",
+          "bytes": 602400,
+          "relative": "Export/Police_Male_01.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_01/Textures/m220_body_color.tga",
+          "sha1": "70959d9c199e1f463f3e237988db9dd36747578d",
+          "bytes": 12582956,
+          "relative": "Textures/m220_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_01/Textures/m220_equipment_color.tga",
+          "sha1": "1bd58770e8519ec8d6eee8735c67d4f5818a4712",
+          "bytes": 1572908,
+          "relative": "Textures/m220_equipment_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_01/Textures/m220_head_color.tga",
+          "sha1": "f9cf251380ed8822667ec6f42e05c66e406b9bf2",
+          "bytes": 12582956,
+          "relative": "Textures/m220_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_01/Textures/m220_pistol_color.tga",
+          "sha1": "18ba972ac37c4c06e0d0ae8c2315555075a80cda",
+          "bytes": 3145772,
+          "relative": "Textures/m220_pistol_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:police_male_02",
+      "name": "Police Male 02",
+      "tags": "realistic human rigged humanoid professions police male 02",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_02/Export/Police_Male_02.fbx",
+          "sha1": "871f6f0262d024f027af12961d9cc4d8c420681d",
+          "bytes": 695888,
+          "relative": "Export/Police_Male_02.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_02/Textures/m158_body_color.tga",
+          "sha1": "1bbfd822c10d9591ea37afec4cb4989a29e9b03b",
+          "bytes": 12582956,
+          "relative": "Textures/m158_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_02/Textures/m158_equipment_color.tga",
+          "sha1": "829f671c7d6053d4e6d9acb6d7362835c527ec19",
+          "bytes": 3145772,
+          "relative": "Textures/m158_equipment_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_02/Textures/m158_head_color.tga",
+          "sha1": "9d5059984bc9dc3519e10aea4597a83e80dfd87b",
+          "bytes": 12582956,
+          "relative": "Textures/m158_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_02/Textures/m158_helmet_color.tga",
+          "sha1": "b953eb28ac3f781b14a9ef44d837435dd019c23f",
+          "bytes": 12582956,
+          "relative": "Textures/m158_helmet_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_02/Textures/m158_opacity_color.tga",
+          "sha1": "86c28b5e0c89eec78d86b44fc3bbbfd719cbb48f",
+          "bytes": 1048620,
+          "relative": "Textures/m158_opacity_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_02/Textures/m158_pistol_color.tga",
+          "sha1": "18ba972ac37c4c06e0d0ae8c2315555075a80cda",
+          "bytes": 3145772,
+          "relative": "Textures/m158_pistol_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:police_male_03",
+      "name": "Police Male 03",
+      "tags": "realistic human rigged humanoid professions police male 03",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_03/Export/Police_Male_03.fbx",
+          "sha1": "40ea4550ca7a995e70b665a4aead922c50d88ebd",
+          "bytes": 725744,
+          "relative": "Export/Police_Male_03.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_03/Textures/m156_body_color.tga",
+          "sha1": "45d54ac0866faf0a7457148a01e3f289a906e9ef",
+          "bytes": 12582956,
+          "relative": "Textures/m156_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_03/Textures/m156_equipment_color.tga",
+          "sha1": "cb71d60868d4724b4fd19ba7038f8daeb391398a",
+          "bytes": 3145772,
+          "relative": "Textures/m156_equipment_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_03/Textures/m156_head_color.tga",
+          "sha1": "99dbc738640d40548f9b99bc752ee8d2a3d55c0f",
+          "bytes": 12582956,
+          "relative": "Textures/m156_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_03/Textures/m156_pistol_color.tga",
+          "sha1": "18ba972ac37c4c06e0d0ae8c2315555075a80cda",
+          "bytes": 3145772,
+          "relative": "Textures/m156_pistol_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_03/Textures/m172_body_color.tga",
+          "sha1": "6f8deafd4ffd6f82527f0020034a369940af3164",
+          "bytes": 12582956,
+          "relative": "Textures/m172_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_03/Textures/m172_equipment_color.tga",
+          "sha1": "658394654e35207e8711f4608e5e5944dc2a7a2a",
+          "bytes": 12582956,
+          "relative": "Textures/m172_equipment_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_03/Textures/m172_head_color.tga",
+          "sha1": "a587e64c6599f5283e8c3b1597db87792ec1ba44",
+          "bytes": 12582956,
+          "relative": "Textures/m172_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_03/Textures/m172_pistol_color.tga",
+          "sha1": "18ba972ac37c4c06e0d0ae8c2315555075a80cda",
+          "bytes": 3145772,
+          "relative": "Textures/m172_pistol_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:police_male_04",
+      "name": "Police Male 04",
+      "tags": "realistic human rigged humanoid professions police male 04",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_04/Export/Police_Male_04.fbx",
+          "sha1": "6653e43625e80e929ac3a36640e9997c39a97eef",
+          "bytes": 790128,
+          "relative": "Export/Police_Male_04.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_04/Textures/m173_body_color.tga",
+          "sha1": "028f96e627b0bfccc521d1548c6d8619b7a1f7a7",
+          "bytes": 12582956,
+          "relative": "Textures/m173_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_04/Textures/m173_equipment_color.tga",
+          "sha1": "0b336228145ea996b7cfdad7d2f2e3a597ea6157",
+          "bytes": 12582956,
+          "relative": "Textures/m173_equipment_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_04/Textures/m173_head_color.tga",
+          "sha1": "2377ff350e4a27d424a29e39c48d7c58fe5e962c",
+          "bytes": 12582956,
+          "relative": "Textures/m173_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_04/Textures/m173_pistol_color.tga",
+          "sha1": "d49278e4164b4b733b6474af7794cb5ae9253781",
+          "bytes": 3145772,
+          "relative": "Textures/m173_pistol_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:police_male_05",
+      "name": "Police Male 05",
+      "tags": "realistic human rigged humanoid professions police male 05",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_05/Export/Police_Male_05.fbx",
+          "sha1": "c397482b88291cfe404e8d76a41b7cd944e4c5b3",
+          "bytes": 519520,
+          "relative": "Export/Police_Male_05.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_05/Textures/m169_body_color.tga",
+          "sha1": "f545ec40c2287fd0bc06ec5e07eecd4361b7e6da",
+          "bytes": 12582956,
+          "relative": "Textures/m169_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_05/Textures/m169_head_color.tga",
+          "sha1": "920c0c2e44daac6e113d980e074c55f1c857fdeb",
+          "bytes": 12582956,
+          "relative": "Textures/m169_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:police_male_06",
+      "name": "Police Male 06",
+      "tags": "realistic human rigged humanoid professions police male 06",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_06/Export/Police_Male_06.fbx",
+          "sha1": "5482b43a27cdec4eb7f70bb7f0ae154c937edce1",
+          "bytes": 512080,
+          "relative": "Export/Police_Male_06.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_06/Textures/m175_body_color.tga",
+          "sha1": "fd98bccd5f4108c115edb99bac6a326a220f7a6b",
+          "bytes": 12582956,
+          "relative": "Textures/m175_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_06/Textures/m175_head_color.tga",
+          "sha1": "c3fbe4583740095e031c9e148749cb74703b655c",
+          "bytes": 12582956,
+          "relative": "Textures/m175_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:police_male_07",
+      "name": "Police Male 07",
+      "tags": "realistic human rigged humanoid professions police male 07",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_07/Export/Police_Male_07.fbx",
+          "sha1": "521a46a79bc6f35687a985579621331c1abba4d4",
+          "bytes": 509024,
+          "relative": "Export/Police_Male_07.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_07/Textures/m176_body_color.tga",
+          "sha1": "a9223e6b8ef5c5573c9b4641a4400d9be9a497ea",
+          "bytes": 12582956,
+          "relative": "Textures/m176_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Police_Male_07/Textures/m176_head_color.tga",
+          "sha1": "3296dd95e172fe14a070da43438d422b71d3284e",
+          "bytes": 12582956,
+          "relative": "Textures/m176_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:security_female_01",
+      "name": "Security Female 01",
+      "tags": "realistic human rigged humanoid professions security female 01",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Security_Female_01/Export/Security_Female_01.fbx",
+          "sha1": "280c06f131efeefde8da3bf91a1264e72e6cbd58",
+          "bytes": 626544,
+          "relative": "Export/Security_Female_01.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Security_Female_01/Textures/f170_body_color.tga",
+          "sha1": "8971067dc0b6b33ccc2c9e70e7c93d6ee8d9775f",
+          "bytes": 12582956,
+          "relative": "Textures/f170_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Security_Female_01/Textures/f170_hat_color.tga",
+          "sha1": "efd7c886f7f0bc14fcb23fe74069de470ebb0e73",
+          "bytes": 6291500,
+          "relative": "Textures/f170_hat_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Security_Female_01/Textures/f170_head_color.tga",
+          "sha1": "6ce3ce689f5960fe0f657d5b1755e6c1795b09d0",
+          "bytes": 12582956,
+          "relative": "Textures/f170_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Security_Female_01/Textures/f170_pistol_color.tga",
+          "sha1": "18ba972ac37c4c06e0d0ae8c2315555075a80cda",
+          "bytes": 3145772,
+          "relative": "Textures/f170_pistol_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:security_male_01",
+      "name": "Security Male 01",
+      "tags": "realistic human rigged humanoid professions security male 01",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Security_Male_01/Export/Security_Male_01.fbx",
+          "sha1": "0099a9659f10c84f96b52a9ddd020051509ccafa",
+          "bytes": 592928,
+          "relative": "Export/Security_Male_01.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Security_Male_01/Textures/m171_body_color.tga",
+          "sha1": "d4a45f13114d5d802e70ee9256b71c8642344246",
+          "bytes": 12582956,
+          "relative": "Textures/m171_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Security_Male_01/Textures/m171_equipment_color.tga",
+          "sha1": "dfaf5db3ac28095341f841b480cecba3eba516b4",
+          "bytes": 6291500,
+          "relative": "Textures/m171_equipment_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Security_Male_01/Textures/m171_head_color.tga",
+          "sha1": "6b0e168501ef16e81e21feab7ac6a3d8c613d945",
+          "bytes": 12582956,
+          "relative": "Textures/m171_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:sports_female_01",
+      "name": "Sports Female 01",
+      "tags": "realistic human rigged humanoid professions sports female 01",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Sports_Female_01/Export/Sports_Female_01.fbx",
+          "sha1": "d020af6fde28ba7a9f5077f4cbe7f3b2414c49a9",
+          "bytes": 593872,
+          "relative": "Export/Sports_Female_01.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Sports_Female_01/Textures/f021_body_color.tga",
+          "sha1": "e22068125d9d35388f48ccbc493af021c55fecd0",
+          "bytes": 12582956,
+          "relative": "Textures/f021_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Sports_Female_01/Textures/f021_head_color.tga",
+          "sha1": "cb4258da46d21ef5ae2b3017cefba6b5bf5d3acc",
+          "bytes": 12582956,
+          "relative": "Textures/f021_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:sports_female_02",
+      "name": "Sports Female 02",
+      "tags": "realistic human rigged humanoid professions sports female 02",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Sports_Female_02/Export/Sports_Female_02.fbx",
+          "sha1": "7d54ba3eca8dfcf351a8b1192ed774f08f87b64c",
+          "bytes": 600576,
+          "relative": "Export/Sports_Female_02.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Sports_Female_02/Textures/f013_body_color.tga",
+          "sha1": "73b94869174021c871b8efc199b1b78d23e43559",
+          "bytes": 12582956,
+          "relative": "Textures/f013_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Sports_Female_02/Textures/f013_head_color.tga",
+          "sha1": "1985d9eb2cdc1df50020cf73848dce1716c6165e",
+          "bytes": 12582956,
+          "relative": "Textures/f013_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Sports_Female_02/Textures/f013_opacity_color.tga",
+          "sha1": "8897f1280689b5aab5ed6ea089880a3a7d17319c",
+          "bytes": 16777260,
+          "relative": "Textures/f013_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:sports_male_01",
+      "name": "Sports Male 01",
+      "tags": "realistic human rigged humanoid professions sports male 01",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Sports_Male_01/Export/Sports_Male_01.fbx",
+          "sha1": "e06668c448908b434f1032cf5922953aa9c58393",
+          "bytes": 509504,
+          "relative": "Export/Sports_Male_01.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Sports_Male_01/Textures/m021_body_color.tga",
+          "sha1": "fc031787b8c19d93ff8e06bc814456f5646e7c85",
+          "bytes": 12582956,
+          "relative": "Textures/m021_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Sports_Male_01/Textures/m021_head_color.tga",
+          "sha1": "67d497afd907ff3a5dceded82dbed8bef5c8636e",
+          "bytes": 12582956,
+          "relative": "Textures/m021_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:sports_male_02",
+      "name": "Sports Male 02",
+      "tags": "realistic human rigged humanoid professions sports male 02",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Sports_Male_02/Export/Sports_Male_02.fbx",
+          "sha1": "0f49c77aef3d53e7cc37e7b8261f64541e7fa05b",
+          "bytes": 538656,
+          "relative": "Export/Sports_Male_02.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Sports_Male_02/Textures/m301_body_color.tga",
+          "sha1": "88777511e802c39a97701393aca916c8ca7b3ff8",
+          "bytes": 12582956,
+          "relative": "Textures/m301_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Sports_Male_02/Textures/m301_head_color.tga",
+          "sha1": "27b77586c21bb0920a26fc0f0796ea595177cdff",
+          "bytes": 12582956,
+          "relative": "Textures/m301_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:sports_male_03",
+      "name": "Sports Male 03",
+      "tags": "realistic human rigged humanoid professions sports male 03",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Sports_Male_03/Export/Sports_Male_03.fbx",
+          "sha1": "6e1a3e6cb6bb5a52a5fc17968c70ef64132e3a9f",
+          "bytes": 592864,
+          "relative": "Export/Sports_Male_03.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Sports_Male_03/Textures/m300_body_color.tga",
+          "sha1": "6c4920e8c657e9e829326fce37c6e65447922259",
+          "bytes": 12582956,
+          "relative": "Textures/m300_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Sports_Male_03/Textures/m300_head_color.tga",
+          "sha1": "8acd8ddcbc5d2ede2756d30afcc1d84c75b299c5",
+          "bytes": 12582956,
+          "relative": "Textures/m300_head_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Sports_Male_03/Textures/m300_opacity_color.tga",
+          "sha1": "7cc874572152015161e98069bd1400dc301b6ebd",
+          "bytes": 4194348,
+          "relative": "Textures/m300_opacity_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:sports_male_04",
+      "name": "Sports Male 04",
+      "tags": "realistic human rigged humanoid professions sports male 04",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Sports_Male_04/Export/Sports_Male_04.fbx",
+          "sha1": "b299eddcf835389d7f94670437da138703449c00",
+          "bytes": 536704,
+          "relative": "Export/Sports_Male_04.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Sports_Male_04/Textures/m026_body_color.tga",
+          "sha1": "60558a42a11ede73bd6f612d5119640de2836c6e",
+          "bytes": 12582956,
+          "relative": "Textures/m026_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Sports_Male_04/Textures/m026_head_color.tga",
+          "sha1": "17383635513bfbca88dcf6514a6ea9c8c101052a",
+          "bytes": 12582956,
+          "relative": "Textures/m026_head_color.tga"
+        }
+      ]
+    },
+    {
+      "id": "rocketbox:wood_male_01",
+      "name": "Wood Male 01",
+      "tags": "realistic human rigged humanoid professions wood male 01",
+      "files": [
+        {
+          "path": "Assets/Avatars/Professions/Wood_Male_01/Export/Wood_Male_01.fbx",
+          "sha1": "6e0e9bd71adf2498d8c1779b9ce666b075b6154d",
+          "bytes": 501552,
+          "relative": "Export/Wood_Male_01.fbx"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Wood_Male_01/Textures/m110_body_color.tga",
+          "sha1": "0af41e390f173cdf145acb21a84d49e78449f389",
+          "bytes": 12582956,
+          "relative": "Textures/m110_body_color.tga"
+        },
+        {
+          "path": "Assets/Avatars/Professions/Wood_Male_01/Textures/m110_head_color.tga",
+          "sha1": "6e878ffd5c130f72692e7173de09c1f60cfffb98",
+          "bytes": 12582956,
+          "relative": "Textures/m110_head_color.tga"
+        }
+      ]
+    }
+  ]
+}

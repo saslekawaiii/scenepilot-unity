@@ -81,12 +81,22 @@ execute_editor_code: optional existing owned target, otherwise an owned workspac
         internal static JArray ReadScene(GameObject target,GameObject[] created)
         {
             Physics.SyncTransforms();var rows=new JArray();
-            var objects=new[]{target}.Concat(target.GetComponentsInChildren<Transform>(true).Select(t=>t.gameObject)).Concat(created).Where(g=>g).Distinct().Take(32);
+            var objects=new[]{target}.Concat(created).Concat(target.GetComponentsInChildren<Transform>(true).Select(t=>t.gameObject)).Where(g=>g).Distinct().Take(32);
             foreach(var go in objects)
             {
                 var row=new JObject{["target"]=ProjectContextIndex.StableTarget(go),["name"]=go.name,["worldPosition"]=V(go.transform.position),["localScale"]=V(go.transform.localScale)};
+                row["components"]=new JArray(go.GetComponents<Component>().Where(c=>c).Select(c=>c.GetType().Name));
                 var renderers=go.GetComponentsInChildren<Renderer>().Where(r=>r.enabled&&r.gameObject.activeInHierarchy).ToArray();
                 if(renderers.Length>0){var bounds=renderers[0].bounds;foreach(var r in renderers.Skip(1))bounds.Encapsulate(r.bounds);row["renderWorldBounds"]=B(bounds);}
+                row["materials"]=new JArray(renderers.SelectMany(r=>r.sharedMaterials).Where(m=>m).Distinct().Take(4).Select(m=>new JObject{["name"]=m.name,["shader"]=m.shader?m.shader.name:null,["texture"]=m.mainTexture?AssetDatabase.GetAssetPath(m.mainTexture):null,["color"]=m.HasProperty("_BaseColor")?JArray.FromObject(new[]{m.GetColor("_BaseColor").r,m.GetColor("_BaseColor").g,m.GetColor("_BaseColor").b}):m.HasProperty("_Color")?JArray.FromObject(new[]{m.color.r,m.color.g,m.color.b}):null}));
+                var terrain=go.GetComponent<Terrain>();
+                if(terrain&&terrain.terrainData)
+                {
+                    var heights=Enumerable.Range(0,81).Select(i=>terrain.terrainData.GetInterpolatedHeight((i%9)/8f,(i/9)/8f)).ToArray();
+                    row["terrain"]=new JObject{["size"]=V(terrain.terrainData.size),["resolution"]=terrain.terrainData.heightmapResolution,["sampledMinHeight"]=heights.Min(),["sampledMaxHeight"]=heights.Max(),["layers"]=new JArray(terrain.terrainData.terrainLayers.Where(l=>l).Select(l=>new JObject{["name"]=l.name,["diffuse"]=l.diffuseTexture?AssetDatabase.GetAssetPath(l.diffuseTexture):null,["remapMax"]=JArray.FromObject(new[]{l.diffuseRemapMax.x,l.diffuseRemapMax.y,l.diffuseRemapMax.z})}))};
+                }
+                var visual=go.GetComponent<WorldModelVisual>();if(visual)row["modelVisual"]=new JObject{["source"]=visual.SourcePath,["target"]=visual.Visual?ProjectContextIndex.StableTarget(visual.Visual.gameObject):null};
+                var animator=go.GetComponent<Animator>();if(animator)row["animation"]=new JObject{["validAvatar"]=animator.avatar&&animator.avatar.isValid,["humanoid"]=animator.avatar&&animator.avatar.isValid&&animator.avatar.isHuman,["controller"]=animator.runtimeAnimatorController?AssetDatabase.GetAssetPath(animator.runtimeAnimatorController):null,["proceduralLocomotion"]=go.GetComponent<WorldHumanoidLocomotion>()!=null};
                 var light=go.GetComponent<Light>();if(light)row["light"]=new JObject{["type"]=light.type.ToString(),["range"]=light.range,["intensity"]=light.intensity};
                 var body=go.GetComponent<Rigidbody>();if(body)row["body"]=new JObject{["mass"]=body.mass,["gravity"]=body.useGravity,["kinematic"]=body.isKinematic};
                 var colliders=go.GetComponentsInChildren<Collider>().Where(c=>c.enabled&&c.gameObject.activeInHierarchy).Take(12).ToArray();

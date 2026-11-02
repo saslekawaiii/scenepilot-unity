@@ -58,6 +58,7 @@ namespace WorldWeaver.Editor.Assistant
             foreach (var schema in WorldGameplayTools.CommandSchemas()) commands.Add(schema);
             foreach (var schema in ConstructiveTools.CommandSchemas()) commands.Add(schema);
             foreach (var schema in AnimatedCharacterTools.CommandSchemas()) commands.Add(schema);
+            foreach (var schema in ModelAssetTools.CommandSchemas()) commands.Add(schema);
             foreach (var schema in WorldMaterialTools.CommandSchemas()) commands.Add(schema);
             foreach (var schema in AgentProjectTools.CommandSchemas()) commands.Add(schema);
             commands.Add(AgentSourcePatches.CommandSchema());

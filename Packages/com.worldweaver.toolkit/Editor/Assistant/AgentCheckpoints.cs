@@ -136,13 +136,27 @@ namespace WorldWeaver.Editor.Assistant
         }
         public static bool CanExtend(string id)
         {
+            return (bool)ExtensionStatus(id)["canExtend"];
+        }
+        public static JObject ExtensionStatus(string id)
+        {
             try
             {
-                Ready();var journal=Read(id);if(!journal.Sealed||journal.Restored)return false;
-                var actual=Scan();var expected=journal.After.ToDictionary(f=>f.Path,StringComparer.Ordinal);
-                return actual.Count==expected.Count&&actual.All(f=>expected.TryGetValue(f.Path,out var known)&&known.Hash==f.Hash)&&Conflicts(journal).Count==0;
+                Ready();var journal=Read(id);var conflicts=new List<string>();
+                if(!journal.Sealed||journal.Restored)conflicts.Add("Checkpoint is not sealed or has been restored.");
+                else
+                {
+                    var actual=Scan().ToDictionary(f=>f.Path,StringComparer.Ordinal);var expected=journal.After.ToDictionary(f=>f.Path,StringComparer.Ordinal);
+                    foreach(string path in actual.Keys.Union(expected.Keys).OrderBy(p=>p,StringComparer.Ordinal))
+                        if(!actual.TryGetValue(path,out var file)||!expected.TryGetValue(path,out var known)||known.Hash!=file.Hash)conflicts.Add("File changed: "+path);
+                    conflicts.AddRange(Conflicts(journal));
+                }
+                return new JObject{["canExtend"]=conflicts.Count==0,["busy"]=false,["conflicts"]=new JArray(conflicts.Distinct().Take(24))};
             }
-            catch { return false; }
+            catch(Exception error)
+            {
+                return new JObject{["canExtend"]=false,["busy"]=EditorApplication.isUpdating||EditorApplication.isCompiling,["conflicts"]=new JArray(error.Message)};
+            }
         }
         public static JObject Inspect(string id)
         {
