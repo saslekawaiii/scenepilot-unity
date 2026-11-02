@@ -48,7 +48,14 @@ namespace WorldWeaver.Editor.Assistant
             if (target.StartsWith("owned:", StringComparison.Ordinal))
             {
                 var matches = Objects().Where(go => StableTarget(go) == target).Take(2).ToArray();
-                if (matches.Length != 1) throw new ArgumentException("Owned identifier must resolve uniquely in the active scene.");
+                if (matches.Length != 1)
+                {
+                    var objects=Objects().ToArray();
+                    var candidates=objects.Where(go=>go.GetComponent<GeneratedSceneObject>()).Select(go=>new{Go=go,Id=StableTarget(go)})
+                        .OrderByDescending(row=>row.Id.Zip(target,(a,b)=>a==b).TakeWhile(equal=>equal).Count()).ThenBy(row=>row.Go.name,StringComparer.Ordinal).Take(5)
+                        .Select(row=>new JObject{["target"]=row.Id,["name"]=row.Go.name,["uniqueNameTarget"]=objects.Count(go=>go.name==row.Go.name)==1?"@"+row.Go.name:null});
+                    throw new ArgumentException("Owned identifier must resolve uniquely in the active scene. Rejected target: "+target+". No fuzzy resolution was performed. Choose a full actual target below or find_scene_objects for another object. Candidate data: "+new JArray(candidates).ToString(Newtonsoft.Json.Formatting.None));
+                }
                 return matches[0];
             }
             return null;

@@ -43,6 +43,18 @@ namespace WorldWeaver.Tests
    }
    finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
   }
+  [Test] public void InvalidOwnedReferenceReturnsActualCandidatesWithoutFuzzyResolution()
+  {
+   EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
+   try
+   {
+    var go=new GameObject("ReferenceRecoveryProbe");go.AddComponent<GeneratedSceneObject>();string valid=ProjectContextIndex.StableTarget(go);Assert.That(valid,Does.StartWith("owned:"));
+    var error=Assert.Throws<ArgumentException>(()=>ProjectContextIndex.ResolveStable(valid.Substring(0,valid.Length-5)));
+    Assert.That(error.Message,Does.Contain(valid));Assert.That(error.Message,Does.Contain("@ReferenceRecoveryProbe"));Assert.That(error.Message,Does.Contain("No fuzzy resolution"));
+    Assert.AreSame(go,ProjectContextIndex.ResolveStable(valid));
+   }
+   finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
+  }
   [Test] public void ProgressiveContextPreservesRecipeCodeAndIndependentGeometry()
   {
    var method=typeof(ChatController).GetMethod("ToolEvidenceForModel",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic);

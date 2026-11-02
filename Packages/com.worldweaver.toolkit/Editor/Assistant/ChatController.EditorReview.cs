@@ -32,7 +32,9 @@ namespace WorldWeaver.Editor.Assistant
                     try{var go=SceneToolExecutor.ResolveTarget(id);if(go&&!owners.Contains(go))owners.Add(go);}catch(ArgumentException){missing.Add(id);}
             }
             var state=owners.Count>0?EditorCodeTools.ReadScene(owners[0],owners.Skip(1).ToArray()):new JArray();
-            string input=JsonConvert.SerializeObject(new{OriginalRequest=answer.Task?.OriginalRequest,CurrentHostMeasurements=state,MissingFormerTargets=missing,
+            var sceneObjects=ProjectContextIndex.Objects().ToArray();
+            var inventory=sceneObjects.SelectMany(go=>go.GetComponents<Component>().Where(c=>c).Select(c=>c.GetType().FullName)).GroupBy(name=>name).OrderByDescending(group=>group.Count()).Take(80).ToDictionary(group=>group.Key,group=>group.Count());
+            string input=JsonConvert.SerializeObject(new{OriginalRequest=answer.Task?.OriginalRequest,CurrentHostMeasurements=state,SceneComponentCounts=inventory,MissingFormerTargets=missing,
                 ActualToolEvidence=answer.Steps.TakeLast(10).Select(s=>new{s.Tool,s.Success,s.Target,Data=ToolEvidenceForModel(s),s.Error})});
             string digest=TextChunker.Digest(input);
             var existing=answer.EditorReviews.LastOrDefault(r=>r.InputHash==digest&&r.Error==null);
