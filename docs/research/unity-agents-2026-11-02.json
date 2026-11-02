@@ -58,5 +58,25 @@
   "notIncorporated": [
     "IvanMurzak sources were reviewed for architecture; no Apache-2.0 code copied",
     "No upstream agent benchmark claims are reused as WorldWeaver results"
+  ],
+  "additionalReviewedSources": [
+    {
+      "repository": "https://github.com/Unity-Technologies/skills",
+      "commit": "089bedebab64e9e75943b19a364c7aec2162a7e7",
+      "license": "Unity Companion License",
+      "use": "Reviewed; not copied into the MIT recipe library"
+    },
+    {
+      "repository": "https://github.com/Besty0728/Unity-Skills",
+      "commit": "d10e7ff80cde3a73257c3f5ec439a0e6663dd17b",
+      "license": "MIT",
+      "use": "Reviewed backend; existing adapted guides retained, backend not installed"
+    },
+    {
+      "repository": "https://github.com/batihandev/unity-mcp-skills",
+      "commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "license": "MIT",
+      "use": "34 domain-guide adaptations and 466 unchanged reference recipes imported"
+    }
   ]
 }

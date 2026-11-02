@@ -721,6 +721,346 @@
       "source_path": "skills/unity-npc-behavior/SKILL.md",
       "source_sha256": "01a6af737203c4c5e0c8f7442ea3f676eb9eb967bc3d2fa7c76d21399cc42f53",
       "license": "MIT"
+    },
+    {
+      "id": "ww-recipes-animator",
+      "sha256": "fb0355df623a4877a69ee32c5005e491eb2700bef2cc944eb0ae6dba7188ad84",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/animator/SKILL.md",
+      "source_sha256": "6e47577e9ab7a0c6789815310b6db4fcc5d3d90e450f45e6796dd559ab63af1b",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-asset",
+      "sha256": "61c10e0bd39eead3e99fbb0a619c1c41fa665e8442a80b9d4095b1cab7b2bc9f",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/asset/SKILL.md",
+      "source_sha256": "fe45cfd715f8df2f450498e22bbbdb25cd557176dd383b51de2b35fcb3c7deaa",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-camera",
+      "sha256": "df739edfa96726df0ff9e92821f95d38291d64bb19eb41cc1d8fab28f66cf1db",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/camera/SKILL.md",
+      "source_sha256": "e88c8089cd9e5e59bcbe412f3c9ab3d3cbcddc81df8cb3b60c761065b572ca49",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-cinemachine",
+      "sha256": "f4a56b62e1f4a1498937f8bfe71cb88a70665ae6b425fdfbeeaf5bd726236635",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/cinemachine/SKILL.md",
+      "source_sha256": "195b5977c3d225321913bb4f463e93127e8cc4a6ddd4b3808b6196b7178a0160",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-cleaner",
+      "sha256": "77cb2729709d72a6c7de85daa75253268e505b1dad528ddf4c9443bf0a1d0673",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/cleaner/SKILL.md",
+      "source_sha256": "25f685f5b812729110531d11b7b035d2a18e6173182d86b3b4597d358d4b0796",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-component",
+      "sha256": "aa6cb77d65f79ba687b383efa09d0fb51008a46cf1df4799f78ce19d83483885",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/component/SKILL.md",
+      "source_sha256": "1c573b403c85d62d0cd5b4ad6caec659043276cf8bd9f25671a345e2bbf87dbe",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-console",
+      "sha256": "8cecfdcb2f5233dcba2c2be2edf09e3898fc1186871750aecf9459d07709bcb4",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/console/SKILL.md",
+      "source_sha256": "26bade1c53c4710b7843facb434342c520685fe28f04a1d5f85b404291374420",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-editor",
+      "sha256": "369fc7815f7c3c0472469b73218a746b3e074d69cd8aeff72c0fa7e1e0d14216",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/editor/SKILL.md",
+      "source_sha256": "b33c65d10da82a72c34ea488f0329493986135edf60c8523e675806d823c65b4",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-event",
+      "sha256": "6c1b1063fdd9a2111fef2f28c1a62e1e5e179261aeb37e4afa2f4108c06d959b",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/event/SKILL.md",
+      "source_sha256": "8fb4ee9b91ed8bf25349988ae91331ff2f0620bee7d44fea2721c4a0bf881bd3",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-gameobject",
+      "sha256": "b9cce07ebb41e879afc7f4ecdf767642ae03fa3ccd1606036f90511f5cf9f92f",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/gameobject/SKILL.md",
+      "source_sha256": "d3966d46960082e2a1ba63122309df6a5fc01b41bc6a182c045cdb4c27f04f04",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-importer",
+      "sha256": "885f3a20f02aa1d433c85f05188b1f890b3474fa347ffbfaec26756e74e5760e",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/importer/SKILL.md",
+      "source_sha256": "a33dfa6e72650ef07e8472993cc9fb3fcc389479a46de84b9defc2a96a95fcb7",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-light",
+      "sha256": "08096d493a03a2dcc8986aca0206173937b9f086978f3ad28df7cc35f7250c17",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/light/SKILL.md",
+      "source_sha256": "17432a05e3690e78aff906ef21262705c50128c9fd497f960a76ba7aa7fab29f",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-material",
+      "sha256": "cd54b5e742c4b6b61ff3d102ffd299b18915975ab7dd05a58362c9bd2cb5ddf4",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/material/SKILL.md",
+      "source_sha256": "9f6f0c189e5e32fde3b4f111f314a722f9fd5f90c0ece86565d0fca6a381ec02",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-navmesh",
+      "sha256": "6a6fc3f3767bf4ef2c8310e93d2a2c3241c49fa2e415302e690116805936c6db",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/navmesh/SKILL.md",
+      "source_sha256": "ffe85a85debb99e783af90b3767073af2eee461635be1f9c385d115c9d99293d",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-optimization",
+      "sha256": "8bd3f3df140f4e1add89bb87e31781f8060fa1b7495ab3387698e07526a58f22",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/optimization/SKILL.md",
+      "source_sha256": "3c99d957388ef931c4424473c2a5d1df6150f6e8f57155bba20c08eb3a3cb8b1",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-package",
+      "sha256": "ce6e943fe1e311ffab1a3479ef86821ee070dc6dbdbcf707730308312ddceda1",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/package/SKILL.md",
+      "source_sha256": "9441f26e02a25e4cf03849a406dd283f9629caf4566bc3d93abcb425ec934a0c",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-perception",
+      "sha256": "7c038188470fd880423d9b2cc93a7c6968d1bb40b8023509acfac206a3ffc41c",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/perception/SKILL.md",
+      "source_sha256": "570c851761d5622d5cfd9602a89b9aec50fd6095f5596a1544954fd362bbe2b7",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-physics",
+      "sha256": "568141d2a4dcb5652c93c9fc81dab42d0e5ec976cfdbcac73d8eeb52f59dad73",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/physics/SKILL.md",
+      "source_sha256": "13612848b656bcd871ca8cdc5ad4ad19ae8957006ada9df765ec02d5849706ec",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-prefab",
+      "sha256": "15b89f038863da184d953e7f75502ddb236f8af6784b097dffd7393270a56db0",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/prefab/SKILL.md",
+      "source_sha256": "1be6a813a3081cdcf6cb6580947e9cba722e2bd616ba0d2475c82b8d10a77f06",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-probuilder",
+      "sha256": "b30b8d2495b27a6bfca3b7ff35951d452c254ff3e808a075e6db089b42ee42d8",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/probuilder/SKILL.md",
+      "source_sha256": "d4f165351621dca6398ed921d613b5e7f0122df9e023cd32ec48046448db285b",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-project",
+      "sha256": "eee486b60c58ee2f271daa2005c9d934e2d2878a3e1c3c601b0fa0b4766fcc10",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/project/SKILL.md",
+      "source_sha256": "db65862b6d7269d2a70ceb96ff1f9abedcf38dc512270e9f4460faec957a46f2",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-scene",
+      "sha256": "2331b281c8bf5a4048cc12c03ebe77402fe6947a7a9b2f7803491f0921ff6c22",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/scene/SKILL.md",
+      "source_sha256": "63375dd743cca60dffaea61e55c5d3732c7a1b8791af4fa6e33b948e3605bda9",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-script",
+      "sha256": "fc6a0f0c850a3338369ddfd2e71a41514f3a24dc84db8c4b048a12c32095c3f2",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/script/SKILL.md",
+      "source_sha256": "168dc0eba2b5f5bf3f6e432254206480eeade4415f7c43d42108b5a994567021",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-scriptableobject",
+      "sha256": "e25b7a7d8f16029d2fe3fcdb299031f620733c094688b79f7eaa1200aac5c0c2",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/scriptableobject/SKILL.md",
+      "source_sha256": "e887fc2ed80337241b6d9436fa3c4d6cfd1cbf27d9280a6e46b0f8f8a4896bc7",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-shader",
+      "sha256": "d8a3661c80d10a9e8a2615d28785d7d628267bc3ee458b80b684b66764f91cc4",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/shader/SKILL.md",
+      "source_sha256": "eb2bec89f1f4be4173b414dfc7ac1b2cd7d656d22668be943fa1a56b6135097a",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-smart",
+      "sha256": "9801020ce0e50a32e7aa4a35771b575e87b95c6f2676a85988d6db233f0cc184",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/smart/SKILL.md",
+      "source_sha256": "2cf70043399130ccc00b065562b0e97f4d6d79a53d14c656be9ecb4beedb595a",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-terrain",
+      "sha256": "675e8df53096165647075fb34eeea5449d02c866467f67eee234b6372a0c5b37",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/terrain/SKILL.md",
+      "source_sha256": "988790449bbb291273cec37ce06e807911f1f170f2635014a2b04c9cdc19447b",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-test",
+      "sha256": "54878101e57d9925667dabc91a18910ba970ab6c0822b9f8cc3942f10a8745cc",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/test/SKILL.md",
+      "source_sha256": "1718e03886362fb0e7e1aa772447513dbbb5439b8b7068268dd0de3c58637f79",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-timeline",
+      "sha256": "112d86984255c5dd129070fc5b6499e2f08e7bfb13cf7588d489f97fb57a4ef9",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/timeline/SKILL.md",
+      "source_sha256": "5cf8c57e580490a850f95f456345d6ce012d2c2ce26d1686acd53daf5e39812a",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-tooling",
+      "sha256": "4f32cae5d964ce6521f8cc6efffb89d7febbfa0e94747708c267ae6cc5361302",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/tooling/SKILL.md",
+      "source_sha256": "fb0f549391c68afa7b55e9cd0b0b686060ffbf9c592db1a18719471c37d33ade",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-ui",
+      "sha256": "1e8d161c3d78fca80c4c361a128b9eb4533520554b46e073d575c93144205edb",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/ui/SKILL.md",
+      "source_sha256": "5b79bfee8f2dc0b48fd3f9acff740d45bffb6b1ac1b2d6d14764a046b7a5f42f",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-uitoolkit",
+      "sha256": "1148d3a0c9b89f9a1eda85c2c8d53b26deb1c7771c2b046ae236c2cab9d2363c",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/uitoolkit/SKILL.md",
+      "source_sha256": "adf096c0041f202efd958c7a48ae6700f7bb25fb9487863c1b15058b7825ebc8",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-validation",
+      "sha256": "caff3ad19f989a5b67e976ffdf9cac2d8e01afa39dc95c478c8c4bae700648ad",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/validation/SKILL.md",
+      "source_sha256": "9ac9ab525d4459db060050ecc3428ebb19756c75b98004bbfbc8942753a9ee37",
+      "license": "MIT",
+      "source_group": "unity-recipes"
+    },
+    {
+      "id": "ww-recipes-xr",
+      "sha256": "2adba9aec6e27acd26c52557b9064c4d66400e5f0848008a91881da459c7cc44",
+      "source_repo": "batihandev/unity-mcp-skills",
+      "source_commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+      "source_path": "skills/xr/SKILL.md",
+      "source_sha256": "71a0ef7d166ad426414de902d352b3307cb82a8fb995682ecb785bdbd36eadb1",
+      "license": "MIT",
+      "source_group": "unity-recipes"
     }
   ]
 }

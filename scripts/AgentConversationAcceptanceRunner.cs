@@ -32,6 +32,7 @@ public static class AgentConversationAcceptanceRunner
             report["model"]=connection.Model;report["history"]=history;
             controller=new ChatController(historyFolder:history,modelConnectionsFolder:Path.Combine(history,"models"));
             controller.Settings.ModelKey=model;controller.Settings.Power=AssistantPower.Deep;controller.Settings.Mode=AssistantMode.Execute;
+            await controller.RefreshModelConnectionsAsync();report["chatUiConnectionAvailable"]=controller.Connected;if(!controller.Connected)throw new InvalidOperationException("The model is not selectable by the actual chat UI connection gate.");
             controller.Settings.AllowEditorCode=true;controller.Settings.UseNativeFunctions=true;controller.Settings.UseSkills=true;
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
             var prompts=new[]{
@@ -81,6 +82,8 @@ public static class AgentConversationAcceptanceRunner
                 {
                     checks["largePhysicalWorld"]=terrain&&terrain.terrainData.size.x>=512&&terrain.terrainData.size.z>=512&&terrain.GetComponent<TerrainCollider>();
                     checks["realPersistentStars"]=UnityEngine.Object.FindObjectsByType<WorldStarfield>(FindObjectsSortMode.None).Any(s=>s.StarCount>=100&&s.GetComponent<MeshFilter>()&&AssetDatabase.Contains(s.GetComponent<MeshFilter>().sharedMesh));
+                    checks["cavesPreservedAfterResize"]=UnityEngine.Object.FindObjectsByType<WorldCave>(FindObjectsSortMode.None).Any(c=>c.Terrain&&c.GetComponent<MeshCollider>()&&c.Terrain.terrainData.IsHole(Mathf.Clamp((int)((c.Interior.x-c.Terrain.transform.position.x)/c.Terrain.terrainData.size.x*c.Terrain.terrainData.holesResolution),0,c.Terrain.terrainData.holesResolution-1),Mathf.Clamp((int)((c.Interior.z-c.Terrain.transform.position.z)/c.Terrain.terrainData.size.z*c.Terrain.terrainData.holesResolution),0,c.Terrain.terrainData.holesResolution-1)));
+                    checks["survivalPreservedAfterResize"]=player&&player.GetComponent<WorldSurvival>()&&player.GetComponent<WorldSurvival>().Habitat;
                     checks["nightBackground"]=UnityEngine.Object.FindObjectsByType<Camera>(FindObjectsSortMode.None).Any(c=>c.enabled&&c.backgroundColor.maxColorComponent<.12f);
                     Physics.SyncTransforms();checks["groundBelowPlayer"]=player&&Physics.Raycast(player.transform.position+Vector3.up*.4f,Vector3.down,out var hit,3)&&!hit.collider.isTrigger;
                     row["playerPosition"]=player?new JArray(player.transform.position.x,player.transform.position.y,player.transform.position.z):null;

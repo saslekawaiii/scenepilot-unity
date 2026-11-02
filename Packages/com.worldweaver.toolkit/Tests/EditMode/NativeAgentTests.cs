@@ -11,6 +11,38 @@ namespace WorldWeaver.Tests
 {
  public class NativeAgentTests
  {
+  [Test] public void ImportedRecipesArePinnedPagedAndReadOnly()
+  {
+   var catalog=UnityRecipeCatalog.CreateDefault();Assert.AreEqual(466,catalog.Count);
+   var search=catalog.Search("physics raycast",4);var id=(string)search["recipes"][0]["id"];var recipe=catalog.Read(id);
+   Assert.IsFalse((bool)recipe["codeExecuted"]);Assert.That((string)recipe["markdown"],Does.Contain("Physics.Raycast"));Assert.That((string)recipe["guidance"],Does.Contain("NOT installed"));
+   Assert.IsNotEmpty((JArray)recipe["prerequisites"]);var apiSearch=catalog.Search("hinge joint door",4);Assert.That(apiSearch["apiTypes"].Values<string>(),Does.Contain("UnityEngine.HingeJoint"));Assert.That(apiSearch["recipes"].Select(r=>(string)r["id"]),Does.Contain("component-component-add"));Assert.Throws<ArgumentException>(()=>catalog.Read("../../.env"));Assert.Throws<ArgumentException>(()=>catalog.Read(id,-1));
+   var skills=AgentSkillCatalog.CreateDefault();Assert.AreEqual(34,skills.List().Count(m=>m.Id.StartsWith("ww-recipes-")));
+   foreach(var domain in skills.List().Where(m=>m.Id.StartsWith("ww-recipes-")))Assert.IsTrue(domain.Trusted,domain.Id);
+  }
+  sealed class RepeatedReadProvider:ILLMProvider
+  {
+   public int Calls;public bool ForcedImplementation;
+   public System.Threading.Tasks.Task<CompletionResult> CompleteAsync(CompletionRequest request,System.Threading.CancellationToken token)
+   {
+    Calls++;var plan=new EditorPlan();
+    if(Calls<=2){plan.complete=false;plan.actions.Add(new EditorCommand{tool="find_scene_objects",args=new JObject{["query"]="missing-adaptive-host"}});}
+    else if(Calls==3)
+    {
+     ForcedImplementation=request.Messages.Any(m=>m.Content.Contains("exact reads already yielded no new evidence"))&&((JArray)request.Schema["properties"]["actions"]["items"]["anyOf"]).OfType<JObject>().Any(b=>EditorToolSchema.ToolName(b)=="read_unity_recipe");
+     plan.complete=false;plan.actions.Add(new EditorCommand{tool="create_node",name="AdaptiveHost"});
+    }
+    return System.Threading.Tasks.Task.FromResult(new CompletionResult{Text=Newtonsoft.Json.JsonConvert.SerializeObject(plan),Model="fixture"});
+   }
+   public System.Threading.Tasks.Task<bool> HealthAsync(System.Threading.CancellationToken token)=>System.Threading.Tasks.Task.FromResult(true);
+   public void Dispose(){}
+  }
+  [Test] public async System.Threading.Tasks.Task IdenticalReadResultsCannotReplaceMissingImplementation()
+  {
+   EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);string folder=Path.Combine("UserSettings","AdaptiveRead-"+Guid.NewGuid().ToString("N"));var provider=new RepeatedReadProvider();
+   try{using(var controller=new ChatController(_=>provider,folder)){controller.Settings.UseNativeFunctions=true;controller.Settings.UseSkills=false;await controller.SendAsync("Создай пустой узел.");Assert.IsTrue(provider.ForcedImplementation);Assert.IsNotNull(GameObject.Find("AdaptiveHost"));Assert.IsFalse(controller.Current.Messages.Last().IsError);Assert.AreEqual(4,provider.Calls);}}
+   finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
+  }
   [Test] public void PhysicsTaskCannotPassWithOnlyItsGroundOrAnIncompleteBody()
   {
    EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
@@ -22,6 +54,23 @@ namespace WorldWeaver.Tests
     AgentTaskVerifier.Verify(task);Assert.IsFalse(task.Checks.Single(c=>task.Requirements.Any(r=>r.Id==c.RequirementId&&r.Kind=="body_physics")).Passed);
     var physics=new PhysicsMaterial{bounciness=.7f};ball.GetComponent<Collider>().sharedMaterial=physics;var material=new Material(Shader.Find("Standard")??Shader.Find("Universal Render Pipeline/Lit"));material.color=Color.red;ball.GetComponent<Renderer>().sharedMaterial=material;
     AgentTaskVerifier.Verify(task);Assert.IsTrue(task.Checks.Single(c=>task.Requirements.Any(r=>r.Id==c.RequirementId&&r.Kind=="body_physics")).Passed);UnityEngine.Object.DestroyImmediate(ground);AgentTaskVerifier.Verify(task);Assert.IsFalse(task.Checks.Single(c=>task.Requirements.Any(r=>r.Id==c.RequirementId&&r.Kind=="body_physics")).Passed);UnityEngine.Object.DestroyImmediate(physics);UnityEngine.Object.DestroyImmediate(material);
+   }
+   finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
+  }
+  [Test] public void NewPhysicalArtifactMustBeVisibleButExplicitInvisibleAndExistingBodiesAreExempt()
+  {
+   EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
+   try
+   {
+    new GameObject("Existing invisible service").AddComponent<Rigidbody>();
+    var task=AgentTaskVerifier.Create("Создай физический объект.",true);var rule=task.Requirements.Single(r=>r.Kind=="body_presentation");
+    AgentTaskVerifier.Verify(task);Assert.IsTrue(task.Checks.Single(c=>c.RequirementId==rule.Id).Passed,"Pre-existing service bodies are outside this task.");
+    var body=new GameObject("New physical artifact").AddComponent<Rigidbody>();body.gameObject.AddComponent<BoxCollider>();
+    AgentTaskVerifier.Verify(task);Assert.IsFalse(task.Checks.Single(c=>c.RequirementId==rule.Id).Passed,"An invisible collider is not a rendered artifact.");
+    var visual=GameObject.CreatePrimitive(PrimitiveType.Cube);visual.transform.SetParent(body.transform,false);
+    AgentTaskVerifier.Verify(task);Assert.IsTrue(task.Checks.Single(c=>c.RequirementId==rule.Id).Passed,"Compound bodies may render through a child.");
+    visual.GetComponent<Renderer>().enabled=false;AgentTaskVerifier.Verify(task);Assert.IsFalse(task.Checks.Single(c=>c.RequirementId==rule.Id).Passed);
+    Assert.IsFalse(AgentTaskVerifier.Create("Создай невидимый физический объект.",true).Requirements.Any(r=>r.Kind=="body_presentation"));
    }
    finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
   }

@@ -48,7 +48,7 @@ namespace WorldWeaver.Editor.Assistant.Tests
         [Test] public void SkillsDeclareOnlyRealRegisteredCommands()
         {
             var catalog=AgentSkillCatalog.CreateDefault();var known=((JArray)EditorToolSchema.CommandSchema()["anyOf"]).OfType<JObject>().Select(EditorToolSchema.ToolName).ToHashSet();
-            Assert.That(catalog.List().Count,Is.EqualTo(80));foreach(var skill in catalog.List())foreach(string tool in catalog.ToolsFor(skill.Id))Assert.That(known.Contains(tool),Is.True,skill.Id+": "+tool);
+            Assert.That(catalog.List().Count,Is.EqualTo(114));foreach(var skill in catalog.List())foreach(string tool in catalog.ToolsFor(skill.Id))Assert.That(known.Contains(tool),Is.True,skill.Id+": "+tool);
             Assert.That(catalog.ToolsFor("ww-mesh-authoring"),Does.Contain("create_mesh"));
         }
         [Test] public void LocalMeshGrammarAvoidsUnsupportedHugeRepetitionsWithoutWeakeningHostBounds()

@@ -15,6 +15,7 @@ using WorldWeaver.Editor.Assistant;
 public static class GeneralAgentAcceptanceRunner
 {
     static readonly Dictionary<string,string> Prompts=new Dictionary<string,string>{
+        ["recipes"]="Используй библиотеку Unity API/C#-рецептов и создай физическую дверь шириной 2 м, высотой 3 м, на петле HingeJoint с вертикальной осью и ограничением поворота от 0 до 100 градусов. У двери должен быть Rigidbody и коллайдер, а петля должна быть у левого края. Подготовь работающие компоненты сейчас. Сначала найди и прочитай подходящий рецепт, затем адаптируй API-код к нашему исполнителю.",
         ["mesh"]="Построй небольшой мост длиной 8 метров и шириной 3 метра из собственного меша с коллайдером. Не используй куб вместо моста. Проверь геометрию.",
         ["physics"]="Создай красный мяч на высоте 5 метров. Добавь ему физику: масса 2 кг, гравитация и отскок 0.7. Сделай под ним площадку с коллайдером, чтобы он падал на неё.",
         ["ui"]="Создай экранное меню с панелью и кнопкой «Скрыть панель». Кнопка должна реально переключать видимость этой панели.",
@@ -54,7 +55,9 @@ public static class GeneralAgentAcceptanceRunner
                 }
                 controller=new ChatController(historyFolder:history,modelConnectionsFolder:Path.Combine(history,"models"));
                 if(selectedModel.StartsWith("ollama:",StringComparison.Ordinal))await controller.RefreshLocalModelsAsync();
-                controller.Settings.ModelKey=selectedModel;controller.Settings.Power=AssistantPower.Deep;controller.Settings.Mode=key=="discovery"?AssistantMode.Ask:AssistantMode.Execute;controller.Settings.UseSkills=true;controller.Settings.AutoApply=true;controller.Settings.AutoVerify=true;
+                controller.Settings.ModelKey=selectedModel;
+                if(!string.IsNullOrEmpty(connectionFile))await controller.RefreshModelConnectionsAsync();report["chatUiConnectionAvailable"]=controller.Connected;
+                controller.Settings.ModelKey=selectedModel;controller.Settings.Power=AssistantPower.Deep;controller.Settings.Mode=key=="discovery"?AssistantMode.Ask:AssistantMode.Execute;controller.Settings.UseSkills=true;controller.Settings.AutoApply=true;controller.Settings.AutoVerify=true;if(key=="recipes")controller.Settings.AllowEditorCode=true;
                 var row=new JObject{["case"]=key,["prompt"]=Prompts[key],["history"]=history,["passed"]=false};((JArray)report["cases"]).Add(row);
                 float? craterBaseline=null;int observedRound=0,observedSteps=0;
                 controller.Changed+=()=>
@@ -85,6 +88,12 @@ public static class GeneralAgentAcceptanceRunner
                 row["elapsedMs"]=answer.ElapsedMs;row["status"]=answer.Status;row["messages"]=JArray.FromObject(controller.Current.Messages);
                 var objects=UnityEngine.Object.FindObjectsByType<Transform>(FindObjectsInactive.Include,FindObjectsSortMode.None).Where(t=>t.gameObject.scene==UnityEngine.SceneManagement.SceneManager.GetActiveScene()).Select(t=>t.gameObject).ToArray();
                 var checks=new JObject{["realModelUsed"]=answer.Attempts.Count>0,["noError"]=!answer.IsError};
+                if(key=="recipes")
+                {
+                    checks["recipeFoundAndRead"]=answer.Steps.Any(s=>s.Success&&s.Tool=="find_unity_recipes")&&answer.Steps.Any(s=>s.Success&&s.Tool=="read_unity_recipe");
+                    checks["actualJointAndBody"]=objects.Select(g=>g.GetComponent<HingeJoint>()).Any(j=>j&&j.GetComponent<Rigidbody>()&&j.GetComponentInChildren<Collider>()&&j.GetComponentInChildren<Renderer>()&&Math.Abs(j.transform.TransformPoint(j.anchor).x-j.GetComponentInChildren<Renderer>().bounds.min.x)<.2&&Math.Abs(j.GetComponentInChildren<Renderer>().bounds.size.y-3)<.1&&Math.Abs(Mathf.Max(j.GetComponentInChildren<Renderer>().bounds.size.x,j.GetComponentInChildren<Renderer>().bounds.size.z)-2)<.1&&j.useLimits&&Math.Abs(j.limits.min)<.1&&Math.Abs(j.limits.max-100)<.1&&Math.Abs(j.axis.normalized.y)>.99);
+                    checks["actualCodeExecution"]=answer.Steps.Any(s=>s.Success&&s.Tool=="execute_editor_code");
+                }
                 if(key=="mesh")checks["actualCustomBridge"]=objects.Select(g=>g.GetComponent<MeshFilter>()).Any(f=>f&&f.sharedMesh&&AssetDatabase.Contains(f.sharedMesh)&&f.GetComponent<MeshCollider>()&&Math.Abs(Mathf.Max(f.sharedMesh.bounds.size.z,f.sharedMesh.bounds.size.x)-8)<.1f&&Math.Abs(Mathf.Min(f.sharedMesh.bounds.size.z,f.sharedMesh.bounds.size.x)-3)<.1f);
                 if(key=="physics")
                 {checks["redAppearance"]=objects.Select(g=>g.GetComponent<Rigidbody>()).Any(b=>b&&b.GetComponent<Renderer>()&&b.GetComponent<Renderer>().sharedMaterial&&b.GetComponent<Renderer>().sharedMaterial.color.r>.8f&&b.GetComponent<Renderer>().sharedMaterial.color.g<.2f&&b.GetComponent<Renderer>().sharedMaterial.color.b<.2f);checks["actualBody"]=objects.Select(g=>g.GetComponent<Rigidbody>()).Any(b=>b&&b.useGravity&&Math.Abs(b.mass-2)<.01f&&b.transform.position.y>=4.5f&&b.GetComponent<Collider>()&&b.GetComponent<Collider>().sharedMaterial&&Math.Abs(b.GetComponent<Collider>().sharedMaterial.bounciness-.7f)<.01f);checks["physicalGround"]=objects.Select(g=>g.GetComponent<Collider>()).Any(c=>c&&c.enabled&&c.bounds.size.x>=4&&c.bounds.center.y<1);}

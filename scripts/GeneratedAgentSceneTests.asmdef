@@ -1,0 +1,13 @@
+{
+  "name": "WorldWeaver.GeneratedSceneTests",
+  "references": [
+    "WorldWeaver.Runtime",
+    "Unity.InputSystem"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}

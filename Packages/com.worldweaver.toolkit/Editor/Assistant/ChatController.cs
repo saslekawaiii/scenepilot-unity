@@ -150,6 +150,7 @@ namespace WorldWeaver.Editor.Assistant
         {
             bool readOnlyRequest=Settings.Mode==AssistantMode.Ask||ExplicitReadOnlyRequest(text)||answer.Task?.MutationAuthorized==false&&Settings.Mode!=AssistantMode.Plan;
             executingMessage=answer;
+            staleReadCommands.Clear();
             expandToolSelection=false;
             requireImplementationStep=false;
             Busy = true; userCancelled = false; operation = new CancellationTokenSource();
@@ -228,6 +229,7 @@ namespace WorldWeaver.Editor.Assistant
                         {
                             if(completion.OutputTruncated)throw new ArgumentException("Модель достигла лимита ответа ("+(completion.FinishReason??"length")+"). Незавершённый план и код не исполнялись. Нужен новый короткий полный шаг.");
                             plan = EditorPlan.Parse(parsedResponse);
+                            if(Settings.UseNativeFunctions&&plan.actions.Any(a=>staleReadCommands.Any(old=>ReadFingerprint(old)==ReadFingerprint(a))))throw new ArgumentException("An identical read already returned the same evidence while a requirement still fails. Do not repeat it. Read a returned recipe ID, inspect a different aspect, change the query meaningfully, or implement the missing requirement.");
                             if(!Settings.AllowEditorCode&&plan.actions.Any(a=>a.tool=="execute_editor_code"))throw new ArgumentException("Autonomous Editor C# is disabled; use reviewed script tools.");
                             ValidatePlan(plan, SceneSaveRequested(text), readOnlyRequest);if(!readOnlyRequest)AgentTaskSchema.Validate(answer.Task,plan);
                             foreach(var action in plan.actions)
@@ -325,7 +327,7 @@ namespace WorldWeaver.Editor.Assistant
                         if(batch.Success)repeatedValidationFailures.Clear();
                         if(batch.Success)foreach(var action in plan.actions)
                             if(action.tool.StartsWith("create_",StringComparison.Ordinal)&&string.IsNullOrWhiteSpace(action.name))appliedUnnamedCreations.Add(action.tool+"\n"+action.args.ToString(Formatting.None));
-                        if(batch.Success&&batch.Results.Any(s=>s.Success&&!SceneToolExecutor.IsReadOnlyTool(s.Tool)&&s.Tool!="remember_design"&&s.Tool!="save_scene"))requireImplementationStep=false;
+                        if(batch.Success&&batch.Results.Any(s=>s.Success&&!SceneToolExecutor.IsReadOnlyTool(s.Tool)&&s.Tool!="remember_design"&&s.Tool!="save_scene")){requireImplementationStep=false;staleReadCommands.Clear();repeatedReadResults.Clear();}
                         if (!batch.Success) unresolvedFailure = true;
                         else if (batch.Results.Any(result => result.Success && (!SceneToolExecutor.IsReadOnlyTool(result.Tool) || readOnlyRequest && !answer.Steps.Any(step => !step.Success)))) unresolvedFailure = false;
                         SanitizeResults(batch); answer.Steps.AddRange(batch.Results); answer.Text = ChatHistoryStore.Redact(plan.reply);
@@ -336,11 +338,11 @@ namespace WorldWeaver.Editor.Assistant
                                 repeatedReadResults.TryGetValue(key,out int seen);repeatedReadResults[key]=seen+1;
                                 if(seen>=1&&VerifyTask(answer).Any(c=>!c.Passed))
                                 {
-                                    // The same read yielded no new evidence while an actual
-                                    // requirement still fails. Ask the model to choose a write;
-                                    // never inject a particular tool, target or arguments.
-                                    requireImplementationStep=true;
-                                    Phase="Данные уже получены · перехожу к недостающему действию";
+                                    // Block this exact stale read, not all information gathering.
+                                    // Reading a returned recipe or a different API must remain possible.
+                                    foreach(var action in plan.actions.Where(a=>a.tool==result.Tool))
+                                        if(!staleReadCommands.Any(old=>ReadFingerprint(old)==ReadFingerprint(action)))staleReadCommands.Add(action);
+                                    Phase="Повторные данные уже получены · выбираю другой шаг";
                                 }
                             }
                         Save();

@@ -1,0 +1,8 @@
+{
+  "repository": "https://github.com/batihandev/unity-mcp-skills",
+  "commit": "090c8e3eaefa23d57a98e237572a4ffbd19df444",
+  "licenseSha256": "780de02d01ee377178805de03bca9886fdc07e3e751c673ddca74ffbd2c78a36",
+  "recipes": 466,
+  "domains": 34,
+  "recipeCatalogSha256": "0aed58afb9742ceb60618c37d19c52a650fd2c0645d40271b06ce1498e521db2"
+}

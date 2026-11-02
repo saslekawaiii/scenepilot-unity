@@ -23,10 +23,10 @@ namespace WorldWeaver.Tests
         [Test] public void BundledCatalogContainsAuditedTaskSpecificMarkdown()
         {
             var catalog = AgentSkillCatalog.CreateDefault();
-            Assert.That(catalog.List().Count, Is.EqualTo(80));
+            Assert.That(catalog.List().Count, Is.EqualTo(114));
             Assert.That(catalog.List().All(s => s.Trusted && s.BodySha256.Length == 64 && s.SourceUrl.StartsWith("https://github.com/")), Is.True);
             StringAssert.Contains("Time.deltaTime", catalog.ReadStrict("ww-script-review", 6000));
-            Assert.That(catalog.List().Select(s => s.Id).Distinct().Count(), Is.EqualTo(80));
+            Assert.That(catalog.List().Select(s => s.Id).Distinct().Count(), Is.EqualTo(114));
         }
         [TestCase("NPC должен обойти препятствие и дойти до ворот", "ww-navigation-behavior")]
         [TestCase("NavMesh bake agent radius", "ww-navmesh-baking")]

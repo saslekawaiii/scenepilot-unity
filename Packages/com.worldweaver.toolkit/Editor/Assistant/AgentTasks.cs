@@ -130,6 +130,14 @@ namespace WorldWeaver.Editor.Assistant
             if(animatedPlayer!=null)task.Requirements.Add(animatedPlayer);
             if(mutationAuthorized&&task.Requirements.Count==0&&AgentCapabilities.IsChangeRequest(input))
                 task.Requirements.Add(new AgentRequirement{Kind="task_change",Number=1,Description="Запрошенные изменения действительно применены инструментами текущей задачи"});
+            // Presentation invariant for newly created physical artifacts; it does not
+            // substitute for the request's mutation/count/behavior requirements.
+            if(mutationAuthorized&&Regex.IsMatch(input,@"(?i)(Rigidbody|физик|физическ|physics|physical)")&&
+                Regex.IsMatch(input,@"(?i)(созда|постро|сдела|сгенер|create|build|generate|make)")&&
+                !Regex.IsMatch(input,@"(?i)(невидим|invisible|trigger|триггер|пустой|empty|без\s+(?:визуал|геомет|рендер)|(?:только|only)[^.!?\n]{0,20}(?:компонент|component|скрипт|script|код|code))"))
+                task.Requirements.Add(new AgentRequirement{Kind="body_presentation",Number=1,Origin="artifact_invariant",
+                    BaselineTargets=ProjectContextIndex.Objects().Where(g=>g.GetComponent<Rigidbody>()).Select(ProjectContextIndex.StableTarget).ToList(),
+                    Description="Новые физические тела имеют видимую геометрию и действующий коллайдер; невидимые служебные тела создаются только по явному запросу"});
             return task;
         }
         static bool MatchesKind(GameObject go,string expected)=>expected=="light"?go.GetComponent<Light>()!=null:Kind(go)==expected;
@@ -159,6 +167,15 @@ namespace WorldWeaver.Editor.Assistant
                 {
                     var ids=ProjectContextIndex.Objects().Where(go=>MatchesKind(go,requirement.Expected)).Select(ProjectContextIndex.StableTarget).ToArray();
                     actual=requirement.BaselineTargets!=null&&requirement.BaselineTargets.Count==(int)requirement.Number&&requirement.BaselineTargets.All(ids.Contains)?requirement.Number:double.NaN;evidence="Стабильные ID исходных объектов сохранены";
+                }
+                else if(requirement.Kind=="body_presentation")
+                {
+                    var bodies=objects.Select(g=>g.GetComponent<Rigidbody>()).Where(b=>b&&!requirement.BaselineTargets.Contains(ProjectContextIndex.StableTarget(b.gameObject))).ToArray();
+                    var observations=bodies.Select(b=>new{target=ProjectContextIndex.StableTarget(b.gameObject),
+                        rendered=b.GetComponentsInChildren<Renderer>().Any(r=>r.enabled&&r.gameObject.activeInHierarchy&&r.bounds.size.sqrMagnitude>.0001f),
+                        collision=b.GetComponentsInChildren<Collider>().Any(c=>c.enabled&&!c.isTrigger&&c.attachedRigidbody==b)}).ToArray();
+                    actual=observations.All(o=>o.rendered&&o.collision)?1:0;
+                    evidence="Independent Renderer bounds/enabled and Collider/attachedRigidbody read-back for new bodies: "+JsonConvert.SerializeObject(observations)+". An empty list proves no presentation defect, not task completion.";
                 }
                 else if(requirement.Kind=="body_physics")
                 {
