@@ -8,6 +8,23 @@ namespace WorldWeaver.Tests
 {
     public sealed class WebAgentContractTests
     {
+        static bool NativeHistory(CompletionRequest request,AssistantMessage answer)=>(bool)typeof(ChatController).GetMethod("AddNativeToolHistory",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic).Invoke(null,new object[]{request,answer});
+        [Test] public void NativeHistoryBindsActualObservationToItsOriginalCallAndKeepsLegacyHistoryUninvented()
+        {
+            var answer=new AssistantMessage();answer.Attempts.Add(new EditorPlanAttempt{Round=1,Accepted=true,FirstResultIndex=0,ResultCount=1,WireResponse="{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"id\":\"call_actual\",\"function\":{\"name\":\"inspect_object\",\"arguments\":{\"target\":\"owned:original\"}}}]}"});
+            answer.Steps.Add(new EditorCommandResult{Tool="inspect_object",Success=false,Error="Actual object missing",Summary="No object read"});
+            var request=new CompletionRequest();Assert.IsTrue(NativeHistory(request,answer));Assert.AreEqual(2,request.Messages.Count);
+            Assert.AreEqual("assistant",request.Messages[0].Role);Assert.AreEqual("call_actual",(string)request.Messages[0].ToolCalls[0]["id"]);
+            Assert.AreEqual("owned:original",(string)request.Messages[0].ToolCalls[0]["function"]["arguments"]["target"]);
+            Assert.AreEqual("tool",request.Messages[1].Role);Assert.AreEqual("call_actual",request.Messages[1].ToolCallId);Assert.IsFalse((bool)JObject.Parse(request.Messages[1].Content)["success"]);
+            answer.Attempts[0].FirstResultIndex=-1;Assert.IsFalse(NativeHistory(new CompletionRequest(),answer),"Legacy logs without result mapping must not fabricate a tool response");
+        }
+        [Test] public void RejectedNativeCallReceivesExplicitNonExecutionFeedbackInItsToolChannel()
+        {
+            var answer=new AssistantMessage();answer.Attempts.Add(new EditorPlanAttempt{Round=2,Accepted=false,Error="Missing name",WireResponse="{\"tool_calls\":[{\"id\":\"call_rejected\",\"function\":{\"name\":\"attach_script\",\"arguments\":{\"target\":\"owned:original\"}}}]}"});
+            var request=new CompletionRequest();Assert.IsTrue(NativeHistory(request,answer));var result=JObject.Parse(request.Messages[1].Content);
+            Assert.IsFalse((bool)result["success"]);Assert.IsFalse((bool)result["executed"]);Assert.That((string)result["error"],Does.Contain("Missing name"));Assert.AreEqual("call_rejected",request.Messages[1].ToolCallId);
+        }
         [TestCase("true",true)]
         [TestCase("false",false)]
         public void SerializedBooleanProviderLiteralsAreNormalizedAgainstTheActualField(string literal,bool expected)

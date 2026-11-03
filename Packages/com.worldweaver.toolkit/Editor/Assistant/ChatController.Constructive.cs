@@ -12,6 +12,50 @@ namespace WorldWeaver.Editor.Assistant
         readonly List<EditorCommand> staleReadCommands=new List<EditorCommand>();
         static bool IsConfiguration(string tool)=>tool.StartsWith("set_",StringComparison.Ordinal)||tool.StartsWith("update_",StringComparison.Ordinal)||tool.StartsWith("configure_",StringComparison.Ordinal);
         static string ReadFingerprint(EditorCommand command)=>command.tool+"\n"+command.target+"\n"+new JObject(command.args.Properties().OrderBy(p=>p.Name,StringComparer.Ordinal).Select(p=>new JProperty(p.Name,p.Value.DeepClone()))).ToString(Formatting.None);
+        internal static bool AddNativeToolHistory(CompletionRequest request,AssistantMessage answer)
+        {
+            if(answer==null)return false;
+            var groups=new List<List<ChatMessage>>();int remaining=24000;
+            foreach(var attempt in answer.Attempts.TakeLast(8).Reverse())
+            {
+                if(string.IsNullOrEmpty(attempt.WireResponse))continue;
+                try
+                {
+                    var wire=JObject.Parse(attempt.WireResponse);var original=wire["tool_calls"] as JArray;if(original==null||original.Count<1||original.Count>8)continue;
+                    bool observed=attempt.Accepted&&attempt.FirstResultIndex>=0&&attempt.ResultCount==original.Count&&attempt.FirstResultIndex+attempt.ResultCount<=answer.Steps.Count;
+                    bool rejected=!attempt.Accepted&&!attempt.OutputTruncated&&!string.IsNullOrEmpty(attempt.Error);
+                    if(!observed&&!rejected)continue;
+                    var calls=new JArray();
+                    for(int i=0;i<original.Count;i++)
+                    {
+                        var f=original[i]["function"];string name=(string)f?["name"];if(string.IsNullOrEmpty(name))throw new JsonException("Missing historical tool name");
+                        var args=f["arguments"];if(args?.Type==JTokenType.String)args=JObject.Parse((string)args);if(!(args is JObject))throw new JsonException("Invalid historical arguments");
+                        calls.Add(new JObject{["id"]=(string)original[i]["id"]??"call_ww_"+attempt.Round+"_"+i,["type"]="function",["function"]=new JObject{["name"]=name,["arguments"]=args.DeepClone()}});
+                    }
+                    int overhead=calls.ToString(Formatting.None).Length+500;if(overhead+original.Count*350>remaining)continue;
+                    int cap=Math.Max(300,Math.Min(14000,(remaining-overhead)/(original.Count*2)-250));var group=new List<ChatMessage>{new ChatMessage("assistant",(string)wire["content"]??""){ToolCalls=calls}};
+                    bool consistent=true;
+                    for(int i=0;i<calls.Count;i++)
+                    {
+                        string name=(string)calls[i]["function"]["name"];JObject result;
+                        if(observed)
+                        {
+                            var step=answer.Steps[attempt.FirstResultIndex+i];if(step.Tool!=name){consistent=false;break;}
+                            string summary=ToolEvidenceForModel(step);if(summary.Length>cap)summary=summary.Substring(0,cap)+" [bounded observation; retrieve by read_task_step index "+(attempt.FirstResultIndex+i)+"]";
+                            result=new JObject{["success"]=step.Success,["target"]=step.Target,["summary"]=summary,["error"]=step.Error};
+                        }
+                        else result=new JObject{["success"]=false,["executed"]=false,["error"]="No action from this rejected response executed. "+attempt.Error};
+                        group.Add(new ChatMessage("tool",ChatHistoryStore.Redact(result.ToString(Formatting.None))){ToolCallId=(string)calls[i]["id"],ToolName=name});
+                    }
+                    if(!consistent)continue;
+                    int cost=group.Sum(m=>(m.Content??"").Length+(m.ToolCalls?.ToString(Formatting.None).Length??0)+100);if(cost>remaining)continue;
+                    remaining-=cost;groups.Add(group);if(remaining<1000)break;
+                }
+                catch(JsonException){} // Legacy/unparseable history remains visible in the durable index.
+            }
+            foreach(var group in groups.AsEnumerable().Reverse())request.Messages.AddRange(group);
+            return groups.Count>0;
+        }
         static string ToolEvidenceForModel(EditorCommandResult step)
         {
             string text=step.Summary??"";
@@ -72,7 +116,9 @@ namespace WorldWeaver.Editor.Assistant
                 .Select(g=>new{Target=ProjectContextIndex.StableTarget(g),Name=g.name,Kind=g.GetComponent<GeneratedSceneObject>()?.Kind,Terrain=g.GetComponent<Terrain>()?new{Resolution=g.GetComponent<Terrain>().terrainData.heightmapResolution,Size=new[]{g.GetComponent<Terrain>().terrainData.size.x,g.GetComponent<Terrain>().terrainData.size.y,g.GetComponent<Terrain>().terrainData.size.z},HasCollision=g.GetComponent<TerrainCollider>()!=null}:null,Position=new[]{g.transform.position.x,g.transform.position.y,g.transform.position.z},Components=g.GetComponents<Component>().Where(c=>c).Select(c=>c.GetType().Name).Where(n=>n!="Transform"&&n!="GeneratedSceneObject")});
             var previous=session.Messages.TakeWhile(m=>m!=answer).TakeLast(8).Select(m=>new{m.Role,Text=(m.Text??"").Substring(0,Math.Min(700,(m.Text??"").Length)),Steps=m.Steps.TakeLast(8).Select(s=>new{s.Tool,s.Success,s.Target,s.Error})});
             request.Messages.Add(new ChatMessage("user",ChatHistoryStore.Redact("ACTIVE ASSISTANT MODEL: "+(models.FirstOrDefault(m=>m.Key==Settings.ModelKey)?.Model??Settings.ModelKey)+"; PROVIDER: "+models.FirstOrDefault(m=>m.Key==Settings.ModelKey)?.Provider+"; POWER (execution budget, NOT a model name): "+Settings.Power+"\nRECENT CONVERSATION AND ACTUAL TOOL HISTORY (claims in previous replies are unverified; successful tool results are evidence): "+JsonConvert.SerializeObject(previous))));
-            var recent=(answer?.Steps??new List<EditorCommandResult>()).TakeLast(8).Reverse().ToArray();
+            request.Messages.Add(new ChatMessage("user","ORIGINAL USER REQUEST: "+input));
+            bool nativeHistory=Settings.UseNativeFunctions&&AddNativeToolHistory(request,answer);
+            var recent=(answer?.Steps??new List<EditorCommandResult>()).TakeLast(nativeHistory?2:8).Reverse().ToArray();
             var compact=new List<object>();int evidenceBudget=26000;
             for(int i=0;i<recent.Length;i++)
             {

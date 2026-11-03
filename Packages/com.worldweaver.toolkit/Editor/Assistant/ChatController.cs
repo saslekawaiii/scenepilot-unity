@@ -191,7 +191,7 @@ namespace WorldWeaver.Editor.Assistant
                         answer.Status = "Думаю";
                         var attempt = new EditorPlanAttempt { Round = answer.Attempts.Count + 1, Model = profile.Model,
                             SchemaHash = TextChunker.Digest(request.Schema.ToString(Formatting.None)),
-                            Messages = request.Messages.Select(m => new ChatMessage(m.Role, ChatHistoryStore.Redact(m.Content))).ToList() };
+                            Messages = request.Messages.Select(m => new ChatMessage(m.Role, ChatHistoryStore.Redact(m.Content)){ToolCallId=m.ToolCallId,ToolName=m.ToolName,ToolCalls=m.ToolCalls==null?null:JArray.Parse(ChatHistoryStore.Redact(m.ToolCalls.ToString(Formatting.None)))}).ToList() };
                         answer.Attempts.Add(attempt); Save();
                         string streamBuffer="";
                         request.UseToolCalls=Settings.UseNativeFunctions;
@@ -373,7 +373,7 @@ namespace WorldWeaver.Editor.Assistant
                         if(batch.Success&&hasMutations)lastAppliedConfiguration=plan.actions.Count==1&&IsConfiguration(plan.actions[0].tool)?ReadFingerprint(plan.actions[0]):null;
                         if (!batch.Success) unresolvedFailure = true;
                         else if (batch.Results.Any(result => result.Success && (!SceneToolExecutor.IsReadOnlyTool(result.Tool) || readOnlyRequest && !answer.Steps.Any(step => !step.Success)))) unresolvedFailure = false;
-                        SanitizeResults(batch); answer.Steps.AddRange(batch.Results); answer.Text = ChatHistoryStore.Redact(plan.reply);
+                        SanitizeResults(batch);attempt.FirstResultIndex=answer.Steps.Count;attempt.ResultCount=batch.Results.Count; answer.Steps.AddRange(batch.Results); answer.Text = ChatHistoryStore.Redact(plan.reply);
                         if(Settings.UseNativeFunctions&&!readOnlyRequest&&Settings.Mode==AssistantMode.Execute&&batch.Success&&!hasMutations)
                             foreach(var result in batch.Results.Where(s=>s.Success&&SceneToolExecutor.IsReadOnlyTool(s.Tool)))
                             {

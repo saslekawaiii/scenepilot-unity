@@ -30,6 +30,9 @@ namespace WorldWeaver
             foreach (var message in request.Messages)
             {
                 var item = new JObject { ["role"] = message.Role, ["content"] = message.Content };
+                if(message.ToolCalls!=null)item["tool_calls"]=message.ToolCalls.DeepClone();
+                if(message.ToolName!=null)item["tool_name"]=message.ToolName;
+                if(message.ToolCallId!=null)item["tool_call_id"]=message.ToolCallId;
                 if (message.Images != null && message.Images.Count > 0)
                 {
                     var images = new JArray();

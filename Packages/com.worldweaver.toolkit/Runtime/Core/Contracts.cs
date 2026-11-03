@@ -15,6 +15,8 @@ namespace WorldWeaver
         public readonly string Role;
         public readonly string Content;
         public readonly IReadOnlyList<string> Images;
+        public JArray ToolCalls;
+        public string ToolCallId, ToolName;
         public ChatMessage(string role, string content, IEnumerable<string> images = null)
         { Role = role; Content = content; Images = images == null ? new List<string>() : new List<string>(images); }
     }

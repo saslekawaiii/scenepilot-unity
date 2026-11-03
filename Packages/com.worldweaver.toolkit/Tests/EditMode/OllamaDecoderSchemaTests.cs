@@ -12,6 +12,27 @@ namespace WorldWeaver.Tests
 {
     public sealed class OllamaDecoderSchemaTests
     {
+        [UnityTest] public IEnumerator NativeToolHistorySurvivesBothHttpAdaptersWithCorrelatedResults()=>Await(ToolHistoryPayload());
+        async Task ToolHistoryPayload()
+        {
+            foreach(var kind in new[]{ProviderKind.Ollama,ProviderKind.OpenAICompatible})
+            using(var server=new ConnectionHttpServer((path,body)=>kind==ProviderKind.Ollama?new JObject{["message"]=new JObject{["content"]="ok"}}:new JObject{["choices"]=new JArray(new JObject{["message"]=new JObject{["content"]="ok"}})}))
+            {
+                var profile=ScriptableObject.CreateInstance<ModelProfile>();profile.Provider=kind;profile.Endpoint=server.Url.TrimEnd('/');profile.Model="fixture";profile.Retries=0;
+                try
+                {
+                    var request=new CompletionRequest{UseToolCalls=true,Schema=WorldWeaver.Editor.Assistant.EditorPlan.Schema(nativeFunctions:true)};
+                    request.Messages.Add(new ChatMessage("assistant",""){ToolCalls=new JArray(new JObject{["id"]="call_actual",["type"]="function",["function"]=new JObject{["name"]="inspect_object",["arguments"]=new JObject{["target"]="owned:actual"}}})});
+                    request.Messages.Add(new ChatMessage("tool","{\"success\":false,\"error\":\"actual missing object\"}"){ToolCallId="call_actual",ToolName="inspect_object"});
+                    using(var provider=profile.CreateProvider())await provider.CompleteAsync(request,CancellationToken.None);
+                    var sent=JObject.Parse(server.Requests.Single().Body);var assistant=sent["messages"].First(m=>(string)m["role"]=="assistant");var result=sent["messages"].First(m=>(string)m["role"]=="tool");
+                    Assert.AreEqual("call_actual",(string)assistant["tool_calls"][0]["id"]);Assert.AreEqual("call_actual",(string)result["tool_call_id"]);Assert.That((string)result["content"],Does.Contain("actual missing object"));
+                    var args=assistant["tool_calls"][0]["function"]["arguments"];Assert.AreEqual(kind==ProviderKind.Ollama?JTokenType.Object:JTokenType.String,args.Type);
+                    if(kind==ProviderKind.Ollama)Assert.AreEqual("inspect_object",(string)result["tool_name"]);
+                }
+                finally{Object.DestroyImmediate(profile);}
+            }
+        }
         [UnityTest] public IEnumerator CloudReasoningUsesNativeDefaultOnlyWhenEnabled()=>Await(ReasoningPayload());
         async Task ReasoningPayload()
         {

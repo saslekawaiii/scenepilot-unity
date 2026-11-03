@@ -46,7 +46,18 @@ namespace WorldWeaver
             bool classicText = profile.Provider == ProviderKind.Pollinations && !profile.StrictSchema;
             if (request.UseToolCalls)
             {
-                foreach (var message in request.Messages) messages.Add(new JObject { ["role"] = message.Role, ["content"] = message.Content });
+                foreach (var message in request.Messages)
+                {
+                    var item=new JObject{["role"]=message.Role,["content"]=message.Content};
+                    if(message.ToolCalls!=null)
+                    {
+                        var calls=(JArray)message.ToolCalls.DeepClone();
+                        foreach(var call in calls.OfType<JObject>())if(call["function"]?["arguments"] is JToken args&&args.Type!=JTokenType.String)call["function"]["arguments"]=args.ToString(Newtonsoft.Json.Formatting.None);
+                        item["tool_calls"]=calls;
+                    }
+                    if(message.ToolCallId!=null)item["tool_call_id"]=message.ToolCallId;
+                    messages.Add(item);
+                }
                 messages.Add(new JObject { ["role"] = "system", ["content"] = AgentFunctionProtocol.Instructions });
             }
             else if (classicText)

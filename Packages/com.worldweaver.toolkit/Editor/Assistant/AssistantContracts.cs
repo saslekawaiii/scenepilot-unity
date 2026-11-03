@@ -140,6 +140,7 @@ namespace WorldWeaver.Editor.Assistant
         public long ProviderElapsedMs;
         public List<ChatMessage> Messages = new List<ChatMessage>();
         public bool Accepted, OutputTruncated;
+        public int FirstResultIndex=-1, ResultCount;
     }
 
     [Serializable]
