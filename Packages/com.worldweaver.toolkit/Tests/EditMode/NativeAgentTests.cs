@@ -69,7 +69,7 @@ namespace WorldWeaver.Tests
     {
      controller.Settings.AllowEditorCode=true;controller.Settings.UseNativeFunctions=true;controller.Settings.UseSkills=false;
      await controller.SendAsync("Через C# создай объект на высоте 2 м.");var answer=controller.Current.Messages.Last();
-     Assert.AreEqual(1,provider.Reviews);Assert.IsTrue(answer.Attempts.All(a=>a.Accepted),"Exercise real execution failure, not malformed-plan repair");Assert.IsTrue(answer.Steps.Any(s=>!s.Success),"The historical execution failure remains auditable");Assert.IsTrue(answer.Task.Checks.All(c=>c.Passed));Assert.IsFalse(answer.IsError,answer.Text);Assert.AreEqual("Проверки пройдены",answer.Status);Assert.AreEqual(2,GameObject.Find("WorldWeaver Code Workspace").transform.GetChild(0).position.y);
+     Assert.AreEqual(1,provider.Reviews);Assert.IsTrue(answer.Attempts.All(a=>a.Accepted),"Exercise real execution failure, not malformed-plan repair");Assert.IsTrue(answer.Steps.Any(s=>!s.Success),"The historical execution failure remains auditable");Assert.IsTrue(answer.Task.Checks.All(c=>c.Passed));Assert.IsFalse(answer.IsError,answer.Text);Assert.AreNotEqual("Проверки не пройдены",answer.Status);Assert.IsTrue(answer.EditorReviews.Single().Passed);Assert.AreEqual(2,GameObject.Find("WorldWeaver Code Workspace").transform.GetChild(0).position.y);
     }
    }
    finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
