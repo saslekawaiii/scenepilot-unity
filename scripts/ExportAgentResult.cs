@@ -23,6 +23,12 @@ public static class ExportAgentResult
             string before=Hash(scene);EditorSceneManager.OpenScene(scene);
             var paths=new HashSet<string>(AssetDatabase.GetDependencies(scene,true).Where(p=>p.StartsWith("Assets/",StringComparison.Ordinal)&&File.Exists(p)),StringComparer.Ordinal);
             const string web="Assets/WorldWeaverGenerated/Web";if(Directory.Exists(web))foreach(string p in Directory.GetFiles(web,"*",SearchOption.AllDirectories))paths.Add(p.Replace('\\','/'));
+            const string models="Assets/WorldWeaverGenerated/Models/";
+            foreach(string dependency in paths.Where(p=>p.StartsWith(models,StringComparison.Ordinal)).ToArray())
+            {
+                var parts=dependency.Substring(models.Length).Split('/');if(parts.Length<3)continue;string modelRoot=models+parts[0]+"/"+parts[1];
+                if(Directory.Exists(modelRoot))foreach(string p in Directory.GetFiles(modelRoot,"*",SearchOption.AllDirectories).Where(p=>!Path.GetFileName(p).StartsWith(".",StringComparison.Ordinal)))paths.Add(p.Replace('\\','/'));
+            }
             foreach(string p in paths.ToArray())
             {
                 if(File.Exists(p+".meta"))paths.Add(p+".meta");
