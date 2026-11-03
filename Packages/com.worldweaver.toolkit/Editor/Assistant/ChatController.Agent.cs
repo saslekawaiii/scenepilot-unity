@@ -59,7 +59,7 @@ namespace WorldWeaver.Editor.Assistant
         }
         internal static bool IsImplementationProgress(EditorCommandResult step)
         {
-            if(!step.Success||SceneToolExecutor.IsReadOnlyTool(step.Tool)||step.Tool=="remember_design"||step.Tool=="save_scene")return false;
+            if(!step.Success||SceneToolExecutor.IsReadOnlyTool(step.Tool)||new[]{"remember_design","save_scene","run_player_check","run_play_check","run_tests","compile_scripts","compile_patch","build_player","set_build_scenes","open_scene"}.Contains(step.Tool))return false;
             if(step.Tool!="execute_editor_code")return true;
             try{return (bool?)JObject.Parse(step.Summary)["sceneChanged"]==true;}catch(JsonException){return false;}
         }

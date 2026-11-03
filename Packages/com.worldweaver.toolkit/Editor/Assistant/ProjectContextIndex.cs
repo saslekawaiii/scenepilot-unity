@@ -118,6 +118,15 @@ namespace WorldWeaver.Editor.Assistant
             int next=offset+rows.Count;
             return new JObject{["total"]=all.Length,["offset"]=offset,["returned"]=rows.Count,["nextOffset"]=next<all.Length?(JToken)next:JValue.CreateNull(),["objects"]=rows};
         }
+        public static JObject TerrainFacts(Terrain terrain)
+        {
+            var data=terrain.terrainData;if(!data)return new JObject{["target"]=StableTarget(terrain.gameObject),["dataMissing"]=true};
+            float min=float.PositiveInfinity,max=float.NegativeInfinity;
+            for(int y=0;y<=8;y++)for(int x=0;x<=8;x++){float height=data.GetInterpolatedHeight(x/8f,y/8f);min=Mathf.Min(min,height);max=Mathf.Max(max,height);}
+            var collider=terrain.GetComponent<TerrainCollider>();var environment=terrain.GetComponent<WorldEnvironment>()??terrain.GetComponentInParent<WorldEnvironment>();
+            return new JObject{["target"]=StableTarget(terrain.gameObject),["name"]=terrain.name,["dataAsset"]=AssetDatabase.GetAssetPath(data),["position"]=JArray.FromObject(new[]{terrain.transform.position.x,terrain.transform.position.y,terrain.transform.position.z}),["size"]=JArray.FromObject(new[]{data.size.x,data.size.y,data.size.z}),["heightmapResolution"]=data.heightmapResolution,["sampledMinHeight"]=min,["sampledMaxHeight"]=max,["sampleGrid"]=9,["colliderMatches"]=collider&&collider.enabled&&collider.terrainData==data,["heightmapSource"]=environment?environment.HeightmapSource:null};
+        }
+        public static JArray TerrainFacts()=>new JArray(Objects().Select(g=>g.GetComponent<Terrain>()).Where(t=>t).Take(8).Select(TerrainFacts));
         public static JObject Summary() => new JObject {
             ["unityVersion"]=Application.unityVersion,["platform"]=EditorUserBuildSettings.activeBuildTarget.ToString(),
             ["inputBackend"]=WorldInput.Backend,

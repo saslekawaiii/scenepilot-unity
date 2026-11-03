@@ -54,6 +54,24 @@ namespace WorldWeaver.Tests
             try{var bounds=AgentViewCapture.OverviewBounds();Assert.GreaterOrEqual(bounds.size.z,128-.01);Assert.Less(bounds.size.x,300);Assert.Less(bounds.size.y,100);}
             finally{UnityEngine.Object.DestroyImmediate(ground);UnityEngine.Object.DestroyImmediate(plane);UnityEngine.Object.DestroyImmediate(background);UnityEngine.Object.DestroyImmediate(data);EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
         }
+        [Test] public void TerrainInspectionReportsRealDataAndProvenanceRatherThanOnlyGeneratorDefaults()
+        {
+            EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);var data=new TerrainData{heightmapResolution=33,size=new Vector3(80,30,120)};var heights=new float[33,33];for(int y=0;y<33;y++)for(int x=0;x<33;x++)heights[y,x]=.5f;data.SetHeights(0,0,heights);var ground=Terrain.CreateTerrainGameObject(data);
+            try
+            {
+                ground.AddComponent<WorldWeaver.WorldEnvironment>().HeightmapSource="fixture-measured-heightmap sha256:actual";
+                var inspected=(JObject)typeof(SceneToolExecutor).GetMethod("Inspect",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic).Invoke(null,new object[]{ground});var facts=inspected["terrainData"];
+                Assert.AreEqual(80,(float)facts["size"][0]);Assert.AreEqual(30,(float)facts["size"][1]);Assert.AreEqual(33,(int)facts["heightmapResolution"]);Assert.AreEqual(15,(float)facts["sampledMinHeight"],.001);Assert.AreEqual(15,(float)facts["sampledMaxHeight"],.001);Assert.IsTrue((bool)facts["colliderMatches"]);Assert.That((string)facts["heightmapSource"],Does.Contain("sha256:actual"));Assert.AreEqual(1,ProjectContextIndex.TerrainFacts().Count);
+                ground.GetComponent<TerrainCollider>().terrainData=null;Assert.IsFalse((bool)ProjectContextIndex.TerrainFacts(ground.GetComponent<Terrain>())["colliderMatches"]);
+            }
+            finally{UnityEngine.Object.DestroyImmediate(ground);UnityEngine.Object.DestroyImmediate(data);EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
+        }
+        [Test] public void LaunchingVerificationCannotResetTheNoImplementationObservationCounter()
+        {
+            var method=typeof(ChatController).GetMethod("IsImplementationProgress",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic);
+            foreach(string tool in new[]{"run_player_check","run_tests","run_play_check","compile_scripts","build_player"})Assert.IsFalse((bool)method.Invoke(null,new object[]{new EditorCommandResult{Tool=tool,Success=true}}),tool);
+            Assert.IsTrue((bool)method.Invoke(null,new object[]{new EditorCommandResult{Tool="set_component",Success=true}}));
+        }
         [Test] public void NativeVisionPlannerActuallyReceivesItsCapturedImage()
         {
             string folder=Path.Combine("UserSettings","NativeVision-"+Guid.NewGuid().ToString("N"));using(var controller=new ChatController(_=>new ObserverProvider(),folder))
