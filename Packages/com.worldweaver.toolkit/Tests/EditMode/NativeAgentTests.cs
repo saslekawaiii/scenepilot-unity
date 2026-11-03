@@ -54,7 +54,7 @@ namespace WorldWeaver.Tests
     }
     var plan=new EditorPlan{reply="Готово"};Calls++;
     if(Calls==1){plan.complete=false;plan.actions.Add(new EditorCommand{tool="execute_editor_code",args=new JObject{["code"]="var part=GameObject.CreatePrimitive(PrimitiveType.Cube); part.transform.SetParent(target.transform,false); part.transform.position=Vector3.up*2; return part.transform.position;"}});}
-    else if(Calls==2){plan.complete=false;plan.actions.Add(new EditorCommand{tool="inspect_component",target="owned:missing-recovery-observation",args=new JObject{["type"]="WorldWeaver.WorldPlayer"}});}
+    else if(Calls==2){plan.complete=false;plan.actions.Add(new EditorCommand{tool="read_task_step",args=new JObject{["index"]=8191}});}
     return System.Threading.Tasks.Task.FromResult(new CompletionResult{Text=Newtonsoft.Json.JsonConvert.SerializeObject(plan),Model="fixture-main"});
    }
    public System.Threading.Tasks.Task<bool> HealthAsync(System.Threading.CancellationToken token)=>System.Threading.Tasks.Task.FromResult(true);
@@ -69,7 +69,7 @@ namespace WorldWeaver.Tests
     {
      controller.Settings.AllowEditorCode=true;controller.Settings.UseNativeFunctions=true;controller.Settings.UseSkills=false;
      await controller.SendAsync("Через C# создай объект на высоте 2 м.");var answer=controller.Current.Messages.Last();
-     Assert.AreEqual(1,provider.Reviews);Assert.IsTrue(answer.Steps.Any(s=>s.Tool=="inspect_component"&&!s.Success),"The historical failure remains auditable");Assert.IsTrue(answer.Task.Checks.All(c=>c.Passed));Assert.IsFalse(answer.IsError,answer.Text);Assert.AreEqual("Проверки пройдены",answer.Status);Assert.AreEqual(2,GameObject.Find("WorldWeaver Code Workspace").transform.GetChild(0).position.y);
+     Assert.AreEqual(1,provider.Reviews);Assert.IsTrue(answer.Attempts.All(a=>a.Accepted),"Exercise real execution failure, not malformed-plan repair");Assert.IsTrue(answer.Steps.Any(s=>!s.Success),"The historical execution failure remains auditable");Assert.IsTrue(answer.Task.Checks.All(c=>c.Passed));Assert.IsFalse(answer.IsError,answer.Text);Assert.AreEqual("Проверки пройдены",answer.Status);Assert.AreEqual(2,GameObject.Find("WorldWeaver Code Workspace").transform.GetChild(0).position.y);
     }
    }
    finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
