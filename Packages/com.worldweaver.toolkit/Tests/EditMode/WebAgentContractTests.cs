@@ -92,7 +92,7 @@ namespace WorldWeaver.Tests
                 using(var controller=new ChatController(_=>provider,folder))
                 {
                     controller.Settings.UseNativeFunctions=true;controller.Settings.AllowAutonomousScripts=true;controller.Settings.AutoVerify=true;controller.Settings.Power=AssistantPower.Deep;controller.Settings.UseSkills=false;
-                    await controller.SendAsync("Создай пустой узел ObservedGoal.");Assert.IsTrue(provider.FeedbackSeen);Assert.IsTrue(provider.ImplementationPhaseSeen);Assert.AreEqual(6,provider.Reads);Assert.GreaterOrEqual(provider.Reviews,2);Assert.IsTrue(UnityEngine.GameObject.Find("ObservedGoal"));Assert.IsFalse(controller.Current.Messages.Last().IsError,controller.Current.Messages.Last().Text);
+                    await controller.SendAsync("Создай пустой узел ObservedGoal.");Assert.IsTrue(provider.FeedbackSeen,"All request builders must return independent review feedback to the implementer");Assert.IsTrue(provider.ImplementationPhaseSeen,"A stalled read-only phase must expose implementation and discovery");Assert.AreEqual(6,provider.Reads);Assert.GreaterOrEqual(provider.Reviews,2);Assert.IsTrue(UnityEngine.GameObject.Find("ObservedGoal"));Assert.IsFalse(controller.Current.Messages.Last().IsError,controller.Current.Messages.Last().Text);
                 }
             }
             finally{UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.EmptyScene,UnityEditor.SceneManagement.NewSceneMode.Single);}
@@ -145,6 +145,20 @@ namespace WorldWeaver.Tests
             var error=Assert.Throws<ProviderException>(()=>AgentFunctionProtocol.Normalize(new JObject{["tool_calls"]=calls},schema));Assert.That(error.Message,Does.Contain("not advertised in this turn: read_script"));Assert.That(error.Message,Does.Contain("No action executed"));
         }
         static bool NativeHistory(CompletionRequest request,AssistantMessage answer)=>(bool)typeof(ChatController).GetMethod("AddNativeToolHistory",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic).Invoke(null,new object[]{request,answer});
+        [Test] public void NativeHistoryKeepsALargeSourceBatchedBesideSmallObservations()
+        {
+            var answer=new AssistantMessage();var calls=new JArray();
+            for(int i=0;i<4;i++)
+            {
+                string name=i==0?"read_script":"inspect_object";
+                calls.Add(new JObject{["id"]="call_batch_"+i,["function"]=new JObject{["name"]=name,["arguments"]=new JObject()}});
+                answer.Steps.Add(new EditorCommandResult{Tool=name,Success=true,Summary=i==0?new JObject{["source"]=new string('s',15000)+"SOURCE_END"}.ToString():"{\"observed\":true}"});
+            }
+            answer.Attempts.Add(new EditorPlanAttempt{Accepted=true,FirstResultIndex=0,ResultCount=4,WireResponse=new JObject{["tool_calls"]=calls}.ToString()});
+            var request=new CompletionRequest();Assert.IsTrue(NativeHistory(request,answer));
+            Assert.That((string)JObject.Parse(request.Messages.Single(m=>m.ToolCallId=="call_batch_0").Content)["data"]["source"],Does.EndWith("SOURCE_END"));
+            Assert.Less(request.Messages.Sum(m=>(m.Content??"").Length),40000);
+        }
         [Test] public void NativeHistoryBindsActualObservationToItsOriginalCallAndKeepsLegacyHistoryUninvented()
         {
             var answer=new AssistantMessage();answer.Attempts.Add(new EditorPlanAttempt{Round=1,Accepted=true,FirstResultIndex=0,ResultCount=1,WireResponse="{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"id\":\"call_actual\",\"function\":{\"name\":\"inspect_object\",\"arguments\":{\"target\":\"owned:original\"}}}]}"});

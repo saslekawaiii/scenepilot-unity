@@ -370,7 +370,7 @@ namespace WorldWeaver.Editor.Assistant
                         if(batch.Success)repeatedValidationFailures.Clear();
                         if(batch.Success)foreach(var action in plan.actions)
                             if(action.tool.StartsWith("create_",StringComparison.Ordinal)&&string.IsNullOrWhiteSpace(action.name))appliedUnnamedCreations.Add(action.tool+"\n"+action.args.ToString(Formatting.None));
-                        if(batch.Success&&batch.Results.Any(s=>s.Success&&!SceneToolExecutor.IsReadOnlyTool(s.Tool)&&s.Tool!="remember_design"&&s.Tool!="save_scene")){requireImplementationStep=false;staleReadCommands.Clear();repeatedReadResults.Clear();}
+                        if(batch.Success&&batch.Results.Any(IsImplementationProgress)){requireImplementationStep=false;staleReadCommands.Clear();repeatedReadResults.Clear();}
                         if(batch.Success&&hasMutations)lastAppliedConfiguration=plan.actions.Count==1&&IsConfiguration(plan.actions[0].tool)?ReadFingerprint(plan.actions[0]):null;
                         if (!batch.Success) unresolvedFailure = true;
                         else if (batch.Results.Any(result => result.Success && (!SceneToolExecutor.IsReadOnlyTool(result.Tool) || readOnlyRequest && !answer.Steps.Any(step => !step.Success)))) unresolvedFailure = false;
@@ -393,8 +393,8 @@ namespace WorldWeaver.Editor.Assistant
                         // The model need not propose completion before the host can
                         // notice that the goal is already met. Periodic independent
                         // observation prevents long runs of needless further edits.
-                        if(batch.Results.Any(s=>s.Success&&!SceneToolExecutor.IsReadOnlyTool(s.Tool)))observationRounds=0;
-                        else if(plan.actions.All(a=>SceneToolExecutor.IsReadOnlyTool(a.tool)))observationRounds++;
+                        if(batch.Results.Any(IsImplementationProgress))observationRounds=0;
+                        else observationRounds++;
                         bool stalledObservations=Settings.AllowAutonomousScripts&&!readOnlyRequest&&Settings.Mode==AssistantMode.Execute&&observationRounds>=6&&answer.EditorReviews.Count<12;
                         bool changedEnough=batch.Success&&hasMutations&&answer.Steps.Skip(answer.EditorReviews.LastOrDefault()?.StepCount??0).Count(s=>s.Success&&!SceneToolExecutor.IsReadOnlyTool(s.Tool)&&s.Tool!="remember_design")>=4;
                         if(Settings.UseNativeFunctions&&Settings.AutoVerify&&Settings.Power==AssistantPower.Deep&&!WaitingForEditor(answer)&&(changedEnough||stalledObservations))

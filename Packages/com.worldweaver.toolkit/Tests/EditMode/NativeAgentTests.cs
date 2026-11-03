@@ -218,6 +218,10 @@ namespace WorldWeaver.Tests
     var result=await SceneToolExecutor.ExecuteAsync(good,null,context,default);Assert.IsTrue(result.Success,result.Error);
     Assert.AreEqual(17,UnityEngine.Object.FindFirstObjectByType<Light>().range);
     var readback=JObject.Parse((string)JObject.Parse(result.Results.Single(s=>s.Tool=="execute_editor_code").Summary)["result"]);Assert.AreEqual(JTokenType.Array,readback["position"].Type);Assert.AreEqual(result.Results.Single(s=>s.Tool=="execute_editor_code").Target,(string)readback["owner"]["target"]);
+    Assert.IsTrue((bool)JObject.Parse(result.Results.Single(s=>s.Tool=="execute_editor_code").Summary)["sceneChanged"]);
+    var observation=new EditorPlan{actions={new EditorCommand{tool="execute_editor_code",args=new JObject{["code"]="return target.GetComponents<Component>().Length;"}}}};
+    var read=await SceneToolExecutor.ExecuteAsync(observation,null,context,default);Assert.IsTrue(read.Success,read.Error);
+    var readStep=read.Results.Single(s=>s.Tool=="execute_editor_code");Assert.IsFalse((bool)JObject.Parse(readStep.Summary)["sceneChanged"],"A successful inspection snippet must not reset implementation progress");
     session.Settings.AllowEditorCode=false;var denied=await SceneToolExecutor.ExecuteAsync(good,null,context,default);Assert.IsFalse(denied.Success);
    }
    EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);

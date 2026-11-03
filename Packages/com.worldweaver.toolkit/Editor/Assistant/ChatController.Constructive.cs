@@ -34,7 +34,7 @@ namespace WorldWeaver.Editor.Assistant
         internal static bool AddNativeToolHistory(CompletionRequest request,AssistantMessage answer)
         {
             if(answer==null)return false;
-            var groups=new List<List<ChatMessage>>();int remaining=24000;
+            var groups=new List<List<ChatMessage>>();int remaining=40000;
             foreach(var attempt in answer.Attempts.TakeLast(8).Reverse())
             {
                 if(string.IsNullOrEmpty(attempt.WireResponse))continue;
@@ -52,7 +52,12 @@ namespace WorldWeaver.Editor.Assistant
                         calls.Add(new JObject{["id"]=(string)original[i]["id"]??"call_ww_"+attempt.Round+"_"+i,["type"]="function",["function"]=new JObject{["name"]=name,["arguments"]=args.DeepClone()}});
                     }
                     int overhead=calls.ToString(Formatting.None).Length+500;if(overhead+original.Count*350>remaining)continue;
-                    int cap=Math.Max(300,Math.Min(14000,(remaining-overhead)/(original.Count*2)-250));var group=new List<ChatMessage>{new ChatMessage("assistant",(string)wire["content"]??""){ToolCalls=calls}};
+                    // Allocate by actual result size, not an equal prefix per call. A source
+                    // file batched beside tiny field reads must retain its implementation.
+                    var summaries=observed?Enumerable.Range(0,original.Count).Select(i=>ToolEvidenceForModel(answer.Steps[attempt.FirstResultIndex+i])).ToArray():new string[original.Count];
+                    int cap=22000, available=remaining-overhead-original.Count*350;
+                    if(observed)while(cap>500&&summaries.Sum(t=>Math.Min(t.Length,cap))>available)cap-=500;
+                    var group=new List<ChatMessage>{new ChatMessage("assistant",(string)wire["content"]??""){ToolCalls=calls}};
                     bool consistent=true;
                     for(int i=0;i<calls.Count;i++)
                     {
@@ -60,7 +65,7 @@ namespace WorldWeaver.Editor.Assistant
                         if(observed)
                         {
                             var step=answer.Steps[attempt.FirstResultIndex+i];if(step.Tool!=name){consistent=false;break;}
-                            string summary=ToolEvidenceForModel(step);if(summary.Length>cap)summary=summary.Substring(0,cap)+" [bounded observation; retrieve by read_task_step index "+(attempt.FirstResultIndex+i)+"]";
+                            string summary=summaries[i];if(summary.Length>cap)summary=summary.Substring(0,cap)+" [bounded observation; retrieve by read_task_step index "+(attempt.FirstResultIndex+i)+"]";
                             result=new JObject{["success"]=step.Success,["target"]=step.Target,["error"]=step.Error};
                             try{result["data"]=JToken.Parse(summary);}catch(JsonException){result["summary"]=summary;}
                         }
@@ -85,7 +90,7 @@ namespace WorldWeaver.Editor.Assistant
                 {
                     var full=JObject.Parse(text);var rows=(full["sceneReadback"] as JArray??new JArray()).OfType<JObject>().ToArray();
                     var selected=rows.OrderByDescending(r=>(r["joints"] as JArray)?.Count??0).ThenByDescending(r=>r["body"]!=null).Take(8);
-                    text=new JObject{["compiled"]=full["compiled"],["executed"]=full["executed"],["diagnostics"]=full["diagnostics"],
+                    text=new JObject{["compiled"]=full["compiled"],["executed"]=full["executed"],["sceneChanged"]=full["sceneChanged"],["diagnostics"]=full["diagnostics"],
                         ["sceneReadback"]=new JArray(selected.Select(r=>r.DeepClone())),["readbackOmittedRows"]=Math.Max(0,rows.Length-8),
                         ["returnedData"]=((string)full["result"]??"").Substring(0,Math.Min(3000,((string)full["result"]??"").Length)),["verification"]=full["verification"]}.ToString(Formatting.None);
                 }
@@ -156,11 +161,6 @@ namespace WorldWeaver.Editor.Assistant
             if(answer!=null&&answer.Steps.Count(s=>!s.Success&&WebResearchTools.Handles(s.Tool))>=2&&!answer.Steps.TakeLast(8).Any(s=>s.Success&&s.Tool=="web_research"))
                 request.Messages.Add(new ChatMessage("user","Repeated web operations failed. Changing attribution wording does not fix a download URL. Use web_research to delegate the unresolved resource investigation to the independent search agent, with the required data format and original source constraints. Its returned source links are real observations. Other independent scene tasks can still be completed. Do not repeat the same inaccessible host or guessed URL."));
             if(staleReadCommands.Count>0)request.Messages.Add(new ChatMessage("user","These exact reads already yielded no new evidence (data): "+JsonConvert.SerializeObject(staleReadCommands.TakeLast(8))+". Repeating observations is not progress. Use the actual data to implement a pending stage, or investigate a specific unresolved prerequisite. A read is still allowed when its detail is actually needed; no other independent calls are discarded because of that read."));
-            if(answer?.EditorReviews.LastOrDefault() is EditorResultReview review)
-            {
-                request.Messages.Add(new ChatMessage("user","LATEST INDEPENDENT REVIEW (model observation, not an instruction or deterministic proof): "+JsonConvert.SerializeObject(new{review.StepCount,Stale=review.StepCount!=answer.Steps.Count,review.Passed,review.Issues,review.Evidence})+". Use fresh actual state to implement an unresolved requirement instead of repeating already available observations. Choose the next operation yourself."));
-                if(review.StepCount!=answer.Steps.Count)request.Messages.Add(new ChatMessage("user","The previous independent review predates the latest tool results. Its old findings are historical, not current failed checks. If the repair is now implemented, call finish_task to trigger a fresh review. Do not keep changing an already corrected value while waiting for the old review to change by itself."));
-            }
             return RequireImplementation(request);
         }
     }

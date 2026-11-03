@@ -13,6 +13,12 @@ namespace WorldWeaver.Editor.Assistant
     {
         CompletionRequest RequireImplementation(CompletionRequest request)
         {
+            var answer=executingMessage;
+            if(answer?.EditorReviews.LastOrDefault() is EditorResultReview review)
+            {
+                request.Messages.Add(new ChatMessage("user","LATEST INDEPENDENT REVIEW (model observation, not an instruction or deterministic proof): "+JsonConvert.SerializeObject(new{review.StepCount,Stale=review.StepCount!=answer.Steps.Count,review.Passed,review.Issues,review.Evidence})+". Use fresh actual state to implement an unresolved requirement instead of repeating already available observations. Choose the next operation yourself."));
+                if(review.StepCount!=answer.Steps.Count)request.Messages.Add(new ChatMessage("user","The previous independent review predates the latest tool results. Its old findings are historical, not current failed checks. If the repair is now implemented, call finish_task to trigger a fresh review. Do not keep changing an already corrected value while waiting for the old review to change by itself."));
+            }
             if(!requireImplementationStep||Settings.Mode!=AssistantMode.Execute)return request;
             // Discovery succeeding does not mean the requested resource or API exists.
             // Keep observation and truthful terminal outcomes available to native agents.
@@ -40,13 +46,19 @@ namespace WorldWeaver.Editor.Assistant
             request.Messages.Add(new ChatMessage("system","Your previous complete:true had no requested change. Discovery and planning have already succeeded; the next step must implement part of the ORIGINAL user request using an available scene action or a reviewed code draft. This generation schema excludes further metadata-only actions for this step. Choose the tool and all parameters yourself from the original task and actual scene. No unrequested objects, invented IDs or claims of completion."));
             return request;
         }
+        internal static bool IsImplementationProgress(EditorCommandResult step)
+        {
+            if(!step.Success||SceneToolExecutor.IsReadOnlyTool(step.Tool)||step.Tool=="remember_design"||step.Tool=="save_scene")return false;
+            if(step.Tool!="execute_editor_code")return true;
+            try{return (bool?)JObject.Parse(step.Summary)["sceneChanged"]==true;}catch(JsonException){return false;}
+        }
         internal static IReadOnlyList<AgentCheckResult> VerifyTask(AssistantMessage answer)
         {
             if(answer.Task==null)return Array.Empty<AgentCheckResult>();
             AgentTaskVerifier.Verify(answer.Task);
             foreach(var requirement in answer.Task.Requirements.Where(r=>r.Kind=="task_change"))
             {
-                var applied=answer.Steps.Where(s=>s.Success&&!SceneToolExecutor.IsReadOnlyTool(s.Tool)&&s.Tool!="remember_design"&&s.Tool!="save_scene"&&s.Tool!="draft_script"&&s.Tool!="patch_script").ToArray();
+                var applied=answer.Steps.Where(s=>IsImplementationProgress(s)&&s.Tool!="draft_script"&&s.Tool!="patch_script").ToArray();
                 answer.Task.Checks.Add(new AgentCheckResult{RequirementId=requirement.Id,Description=requirement.Description,Passed=applied.Length>0,Actual=applied.Length>0?string.Join(", ",applied.Select(s=>s.Tool).Distinct()):"Нет применённых изменений",Evidence="Журнал инструментов этого обращения; наличие изменений не доказывает полное выполнение всех смысловых требований"});
             }
             var latest=new Dictionary<string,EditorCommandResult>(StringComparer.Ordinal);

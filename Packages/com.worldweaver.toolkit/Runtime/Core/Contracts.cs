@@ -28,6 +28,8 @@ namespace WorldWeaver
         public bool Stream;
         /// <summary>Editor-agent function calls; ordinary runtime structured requests keep their existing protocol.</summary>
         public bool UseToolCalls;
+        /// <summary>Optional per-request Ollama reasoning override for bounded structured reviews.</summary>
+        public bool? EnableThinking;
         public Action<string> OnContentDelta;
         public Action<string> OnActivity;
     }
