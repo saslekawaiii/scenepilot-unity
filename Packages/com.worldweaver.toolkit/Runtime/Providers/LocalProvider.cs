@@ -18,6 +18,7 @@ namespace WorldWeaver
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
             token.ThrowIfCancellationRequested();
+            if(request.LocalKeepAliveSeconds<0||request.LocalKeepAliveSeconds>3600)throw new ArgumentException("Local keep-alive must be 0..3600 seconds.");
             var messages = new JArray();
             // Ollama's :cloud models do not support schema-constrained decoding.
             // Ground them in the exact contract, then keep the caller's unchanged
@@ -53,7 +54,7 @@ namespace WorldWeaver
             }
 
             var body = new JObject { ["model"] = profile.Model, ["messages"] = messages, ["stream"] = request.Stream, ["think"] = false,
-                ["keep_alive"] = "10m",
+                ["keep_alive"] = request.LocalKeepAliveSeconds.HasValue?(JToken)new JValue(request.LocalKeepAliveSeconds.Value):new JValue("10m"),
                 ["options"] = new JObject { ["temperature"] = profile.Temperature, ["num_predict"] = profile.MaxTokens, ["num_ctx"] = profile.ContextWindow } };
             // Cloud reasoning models use different think value types. Omitting the
             // override allows their native default, rather than disabling reasoning.

@@ -28,7 +28,7 @@ namespace WorldWeaver.Tests
         [Test] public async Task LocalObserverReceivesActualPixelsAndRejectsInventedTargetIds()
         {
             var image=Image();var provider=new ObserverProvider();var inventory=new JObject{["objects"]=new JArray(new JObject{["target"]="owned:actual",["name"]="Actual surface"})};var result=await AgentVisualObserver.ObserveAsync(Model(),image,inventory,CancellationToken.None,_=>provider);
-            Assert.AreEqual(1,provider.Calls);Assert.AreEqual(AgentViewCapture.ReadBase64(image),provider.Seen.Messages.Single(m=>m.Images.Count>0).Images.Single());Assert.IsFalse(provider.Seen.UseToolCalls);Assert.AreEqual(false,provider.Seen.EnableThinking);Assert.AreEqual("observed",(string)result["status"]);Assert.AreEqual(image.Sha256,(string)result["imageSha256"]);Assert.AreEqual(1,((JArray)result["candidates"]).Count);Assert.AreEqual("owned:actual",(string)result["candidates"][0]["target"]);Assert.IsTrue((bool)result["advisoryOnly"]);
+            Assert.AreEqual(1,provider.Calls);Assert.AreEqual(AgentViewCapture.ReadBase64(image),provider.Seen.Messages.Single(m=>m.Images.Count>0).Images.Single());Assert.IsFalse(provider.Seen.UseToolCalls);Assert.AreEqual(false,provider.Seen.EnableThinking);Assert.AreEqual(0,provider.Seen.LocalKeepAliveSeconds);Assert.AreEqual("observed",(string)result["status"]);Assert.AreEqual(image.Sha256,(string)result["imageSha256"]);Assert.AreEqual(1,((JArray)result["candidates"]).Count);Assert.AreEqual("owned:actual",(string)result["candidates"][0]["target"]);Assert.IsTrue((bool)result["advisoryOnly"]);
         }
         [Test] public void ObserverSelectionPrefersInstalledCapacityWithoutLoadingHugeOrRemoteModels()
         {

@@ -32,6 +32,8 @@ namespace WorldWeaver
         public bool UseToolCalls;
         /// <summary>Optional per-request Ollama reasoning override for bounded structured reviews.</summary>
         public bool? EnableThinking;
+        /// <summary>Optional Ollama residency override; zero unloads a one-shot observer after inference.</summary>
+        public int? LocalKeepAliveSeconds;
         public Action<string> OnContentDelta;
         public Action<string> OnActivity;
         /// <summary>Some chat templates render instructions only before the first data turn.

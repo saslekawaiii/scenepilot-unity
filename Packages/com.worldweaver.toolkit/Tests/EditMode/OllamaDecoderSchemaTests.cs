@@ -38,6 +38,21 @@ namespace WorldWeaver.Tests
                 finally{Object.DestroyImmediate(profile);}
             }
         }
+        [UnityTest] public IEnumerator OneShotObserverReleasesOllamaResidencyWithoutChangingOrdinaryRequests()=>Await(ResidencyPayload());
+        async Task ResidencyPayload()
+        {
+            foreach(int? seconds in new int?[]{null,0,30})
+            using(var server=new ConnectionHttpServer((path,body)=>new JObject{["message"]=new JObject{["content"]="ok"}}))
+            {
+                var profile=ScriptableObject.CreateInstance<ModelProfile>();profile.Endpoint=server.Url.TrimEnd('/');profile.Retries=0;
+                try
+                {
+                    using(var provider=new LocalProvider(profile))await provider.CompleteAsync(new CompletionRequest{LocalKeepAliveSeconds=seconds},CancellationToken.None);
+                    var body=JObject.Parse(server.Requests.Single().Body);if(seconds.HasValue)Assert.AreEqual(seconds.Value,(int)body["keep_alive"]);else Assert.AreEqual("10m",(string)body["keep_alive"]);
+                }
+                finally{Object.DestroyImmediate(profile);}
+            }
+        }
         [UnityTest] public IEnumerator CloudReasoningUsesNativeDefaultOnlyWhenEnabled()=>Await(ReasoningPayload());
         async Task ReasoningPayload()
         {
