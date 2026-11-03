@@ -37,11 +37,12 @@ namespace WorldWeaver.Tests
         }
         [Test] public void RemovalStageCannotPassFromLiteralNameMissesOrEarlierUnrelatedWrites()
         {
+            bool Needs(AssistantMessage message,int stage,bool renderable,bool primaryVision)=>(bool)typeof(ChatController).GetMethod("NeedsRemovalGrounding",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic).Invoke(null,new object[]{message,stage,renderable,primaryVision});
             var answer=new AssistantMessage{Task=new AgentTaskState()};answer.Task.Approach.AddRange(new[]{"Replace the player", "Remove obsolete scenery"});answer.Steps.Add(new EditorCommandResult{Tool="replace_model",Success=true});answer.EditorReviews.Add(new EditorResultReview{ApproachStage=0,StepCount=1,Passed=true});answer.Steps.Add(new EditorCommandResult{Tool="find_scene_objects",Success=true,Summary="{\"total\":0}"});
-            Assert.IsTrue(ChatController.NeedsRemovalGrounding(answer,1,true,false));Assert.IsFalse(ChatController.NeedsRemovalGrounding(answer,1,false,false),"An actually empty scene is measured absence");
-            answer.Steps.Add(new EditorCommandResult{Tool="capture_scene",Success=true,Summary="{\"visualInspection\":{\"status\":\"unavailable\"}}"});Assert.IsTrue(ChatController.NeedsRemovalGrounding(answer,1,true,false));Assert.IsFalse(ChatController.NeedsRemovalGrounding(answer,1,true,true));
-            answer.Steps.Last().Summary="{\"visualInspection\":{\"status\":\"observed\"}}";Assert.IsFalse(ChatController.NeedsRemovalGrounding(answer,1,true,false));answer.Steps.RemoveAt(answer.Steps.Count-1);answer.Steps.Add(new EditorCommandResult{Tool="delete_object",Success=true});Assert.IsFalse(ChatController.NeedsRemovalGrounding(answer,1,true,false));
-            answer.Task.Approach[1]="Inspect available scenery";answer.Steps.RemoveAt(answer.Steps.Count-1);Assert.IsFalse(ChatController.NeedsRemovalGrounding(answer,1,true,false),"An inspection stage is allowed to return a real negative finding");
+            Assert.IsTrue(Needs(answer,1,true,false));Assert.IsFalse(Needs(answer,1,false,false),"An actually empty scene is measured absence");
+            answer.Steps.Add(new EditorCommandResult{Tool="capture_scene",Success=true,Summary="{\"visualInspection\":{\"status\":\"unavailable\"}}"});Assert.IsTrue(Needs(answer,1,true,false));Assert.IsFalse(Needs(answer,1,true,true));
+            answer.Steps.Last().Summary="{\"visualInspection\":{\"status\":\"observed\"}}";Assert.IsFalse(Needs(answer,1,true,false));answer.Steps.RemoveAt(answer.Steps.Count-1);answer.Steps.Add(new EditorCommandResult{Tool="delete_object",Success=true});Assert.IsFalse(Needs(answer,1,true,false));
+            answer.Task.Approach[1]="Inspect available scenery";answer.Steps.RemoveAt(answer.Steps.Count-1);Assert.IsFalse(Needs(answer,1,true,false),"An inspection stage is allowed to return a real negative finding");
         }
         [Test] public void ObserverNeverFallsBackToRemoteOrCloudModels()
         {
