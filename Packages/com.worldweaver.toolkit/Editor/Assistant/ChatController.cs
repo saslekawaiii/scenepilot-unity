@@ -598,7 +598,10 @@ namespace WorldWeaver.Editor.Assistant
             if(code.Any(a=>a.tool=="patch_script")&&code.Any(a=>a.tool!="patch_script"))throw new ArgumentException("Точечные правки существующих файлов выполняются отдельным просмотренным планом.");
             if(code.Count>4)throw new ArgumentException("Один просмотр содержит не более четырёх файлов.");
             foreach (var action in code)if(action.tool=="patch_script")AgentSourcePatches.Validate(action);else ScriptDrafts.Validate(action);
-            SceneToolExecutor.Validate(new EditorPlan { reply = plan.reply, complete = plan.complete, actions = plan.actions.Where(a => a.tool != "draft_script" && a.tool != "attach_script" && a.tool!="patch_script").ToList() });
+            var scenePlan=new EditorPlan { reply = plan.reply, complete = plan.complete, actions = plan.actions.Where(a => a.tool != "draft_script" && a.tool != "attach_script" && a.tool!="patch_script").ToList() };
+            // Independent observations are validated separately by ExecuteAsync.
+            // A missing component/file must not discard unrelated real readings.
+            if(scenePlan.actions.Count<=1||!scenePlan.actions.All(a=>SceneToolExecutor.IsReadOnlyTool(a.tool)))SceneToolExecutor.Validate(scenePlan);
         }
         private async Task<EditorBatchResult> ExecutePlanAsync(EditorPlan plan, string sessionId, string messageId, ModelProfile profile,bool reviewed=false,CancellationToken token=default)
         {

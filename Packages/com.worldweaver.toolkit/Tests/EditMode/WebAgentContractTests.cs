@@ -8,6 +8,26 @@ namespace WorldWeaver.Tests
 {
     public sealed class WebAgentContractTests
     {
+        [Test] public void MissingComponentObservationReturnsRealDescendantsWithoutAUnityFakeNullException()
+        {
+            var root=new UnityEngine.GameObject("Component root");root.AddComponent<GeneratedSceneObject>();var child=new UnityEngine.GameObject("Animated visual");child.transform.SetParent(root.transform);child.AddComponent<GeneratedSceneObject>();child.AddComponent<UnityEngine.Animator>();
+            try
+            {
+                var plan=new EditorPlan{actions=new System.Collections.Generic.List<EditorCommand>{new EditorCommand{tool="inspect_component",target=ProjectContextIndex.StableTarget(root),args=new JObject{["type"]="UnityEngine.Animator"}}}};
+                var batch=SceneToolExecutor.Execute(plan);Assert.IsTrue(batch.Success,batch.Error);var data=JObject.Parse(batch.Results[0].Summary);Assert.IsFalse((bool)data["exists"]);Assert.AreEqual(ProjectContextIndex.StableTarget(child),(string)data["descendantMatches"][0]["target"]);Assert.That(data["availableComponents"].Values<string>(),Does.Contain("UnityEngine.Transform"));
+            }
+            finally{UnityEngine.Object.DestroyImmediate(root);}
+        }
+        [Test] public async System.Threading.Tasks.Task InvalidLocalReadDoesNotCancelAnIndependentSceneRead()
+        {
+            var root=new UnityEngine.GameObject("Local observation fixture");root.AddComponent<GeneratedSceneObject>();
+            try
+            {
+                var plan=new EditorPlan{complete=false,actions=new System.Collections.Generic.List<EditorCommand>{new EditorCommand{tool="read_script",args=new JObject{["path"]="../forbidden.env"}},new EditorCommand{tool="inspect_object",target=ProjectContextIndex.StableTarget(root)}}};
+                var batch=await SceneToolExecutor.ExecuteAsync(plan);Assert.IsFalse(batch.Success);Assert.AreEqual(2,batch.Results.Count);Assert.AreEqual("read_script",batch.Results[0].Tool);Assert.IsFalse(batch.Results[0].Success);Assert.IsTrue(batch.Results[1].Success);Assert.AreEqual(root.name,(string)JObject.Parse(batch.Results[1].Summary)["name"]);
+            }
+            finally{UnityEngine.Object.DestroyImmediate(root);}
+        }
         [Test] public async System.Threading.Tasks.Task FailedWebReadDoesNotDiscardAnIndependentActualSceneObservation()
         {
             string previous=Environment.GetEnvironmentVariable("WORLDWEAVER_WEB_PYTHON");var root=new UnityEngine.GameObject("Independent observation fixture");root.AddComponent<GeneratedSceneObject>();

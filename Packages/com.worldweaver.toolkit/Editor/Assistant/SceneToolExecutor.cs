@@ -290,20 +290,21 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
         public static async Task<EditorBatchResult> ExecuteAsync(EditorPlan plan,OrchestratorProfile routes=null,AgentExecutionContext executionContext=null,CancellationToken token=default,Action beforeMutation=null)
         {
             token.ThrowIfCancellationRequested();
+            if(plan?.actions?.Count>1&&plan.actions.All(a=>a!=null&&IsReadOnlyTool(a.tool)))
+            {
+                var observations=new EditorBatchResult{Success=true,Summary="Независимые наблюдения выполнены последовательно."};
+                foreach(var observation in plan.actions)
+                {
+                    token.ThrowIfCancellationRequested();var part=await ExecuteAsync(new EditorPlan{complete=false,actions=new List<EditorCommand>{observation}},routes,executionContext,token,beforeMutation);
+                    if(!part.Success&&part.Results.Count==1&&part.Results[0].Tool=="batch")part.Results[0].Tool=observation.tool;
+                    observations.Results.AddRange(part.Results);if(!part.Success){observations.Success=false;observations.Error=string.Join("; ",new[]{observations.Error,part.Error}.Where(s=>!string.IsNullOrEmpty(s)));}
+                }
+                return observations;
+            }
             if(plan?.actions?.Any(a=>a!=null&&(WorldMaterialTools.IsAsync(a.tool)||ModelAssetTools.IsAsync(a.tool)||WebResearchTools.IsAsync(a.tool)))!=true)return Execute(plan,routes,executionContext);
             try
             {
                 Validate(plan);
-                if(plan.actions.Count>1&&plan.actions.All(a=>IsReadOnlyTool(a.tool)))
-                {
-                    var batch=new EditorBatchResult{Success=true,Summary="Независимые наблюдения выполнены последовательно."};
-                    foreach(var observation in plan.actions)
-                    {
-                        token.ThrowIfCancellationRequested();var part=await ExecuteAsync(new EditorPlan{complete=false,actions=new List<EditorCommand>{observation}},routes,executionContext,token,beforeMutation);
-                        batch.Results.AddRange(part.Results);if(!part.Success){batch.Success=false;batch.Error=string.Join("; ",new[]{batch.Error,part.Error}.Where(s=>!string.IsNullOrEmpty(s)));}
-                    }
-                    return batch;
-                }
                 var command=plan.actions.Single();
                 Action admit=()=>{token.ThrowIfCancellationRequested();Validate(plan);beforeMutation?.Invoke();};
                 var result=WebResearchTools.Handles(command.tool)?await WebResearchTools.ExecuteAsync(command,token,admit):ModelAssetTools.IsAsync(command.tool)?await ModelAssetTools.ImportAsync(command,token,admit):await WorldMaterialTools.ExecuteAsync(command,token,admit);

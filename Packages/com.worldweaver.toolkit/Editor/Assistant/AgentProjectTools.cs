@@ -81,7 +81,8 @@ open_scene: target empty,args {path:Assets/...unity}. Standalone reviewed action
             var candidates=TypeCache.GetTypesDerivedFrom<Component>().Where(t=>!t.IsAbstract&&!t.IsGenericTypeDefinition&&(t.FullName==name||t.Name==name)).Take(2).ToArray();
             if(candidates.Length!=1)throw new ArgumentException("Component type is missing or ambiguous; use its full name.");return candidates[0];
         }
-        static Component Component(EditorCommand c,Func<string,GameObject> resolve)=>resolve(c.target).GetComponent(ResolveType((string)c.args["type"]))??throw new ArgumentException("Target lacks that component.");
+        static Component Component(EditorCommand c,Func<string,GameObject> resolve)
+        {var component=resolve(c.target).GetComponent(ResolveType((string)c.args["type"]));if(!component)throw new ArgumentException("Target lacks component "+(string)c.args["type"]+". Inspect the actual child or add the required component first.");return component;}
         internal static void Validate(EditorCommand c,Func<string,GameObject> resolve)
         {
             var schema=CommandSchemas().First(s=>(string)s["properties"]["tool"]["const"]==c.tool);
@@ -206,7 +207,9 @@ open_scene: target empty,args {path:Assets/...unity}. Standalone reviewed action
                 case "list_scene_objects":summary=ProjectContextIndex.ListScene(a).ToString(Formatting.None);break;
                 case "find_scene_objects":summary=ProjectContextIndex.Search((string)a["query"],(int?)a["limit"]??20).ToString(Formatting.None);break;
                 case "inspect_project":summary=ProjectContextIndex.Summary().ToString(Formatting.None);break;
-                case "inspect_component":summary=InspectComponent(Component(c,resolve)).ToString(Formatting.None);break;
+                case "inspect_component":
+                    target=resolve(c.target);var inspectedType=ResolveType((string)a["type"]);var inspected=target.GetComponent(inspectedType);
+                    summary=(inspected?InspectComponent(inspected):new JObject{["component"]=inspectedType.FullName,["exists"]=false,["target"]=ProjectContextIndex.StableTarget(target),["availableComponents"]=new JArray(target.GetComponents<Component>().Where(p=>p).Select(p=>p.GetType().FullName)),["descendantMatches"]=new JArray(target.GetComponentsInChildren(inspectedType,true).Where(p=>p).Take(12).Select(p=>new JObject{["target"]=ProjectContextIndex.StableTarget(p.gameObject),["component"]=p.GetType().FullName,["name"]=p.gameObject.name}))}).ToString(Formatting.None);break;
                 case "set_component":
                     var component=Component(c,resolve);Undo.RecordObject(component,"WorldWeaver serialized property");var serialized=new SerializedObject(component);var field=serialized.FindProperty((string)a["property"]);var value=a["value"];
                     switch(field.propertyType)
