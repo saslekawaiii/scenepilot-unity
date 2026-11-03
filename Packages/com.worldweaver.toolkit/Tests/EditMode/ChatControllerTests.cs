@@ -151,7 +151,7 @@ namespace WorldWeaver.Tests
         [UnityTest] public IEnumerator MixedCodePlanRepairsIntoReviewOnlyWithoutExecutingOrReanchoringRejectedActions()
         {
             const string className="MixedReviewOnly";
-            string source="using UnityEngine; public class "+className+" : MonoBehaviour { void Update() { if(Input.GetKeyDown(KeyCode.F)) enabled=false; } }";
+            string source="using UnityEngine; public class "+className+" : MonoBehaviour { void Update() { if(UnityEngine.InputSystem.Keyboard.current!=null && UnityEngine.InputSystem.Keyboard.current.fKey.wasPressedThisFrame) enabled=false; } }";
             var provider=new RecordingProvider();provider.Respond=(round,request,token)=>
             {
                 if(round==0)return Task.FromResult(Reply(false,Create("RejectedMixedCube"),Draft(className,source),new EditorCommand {tool="attach_script",name=className,target="@RejectedMixedCube",args=new JObject()}));

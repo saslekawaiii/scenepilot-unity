@@ -129,12 +129,14 @@ namespace WorldWeaver.Editor.Assistant
             await RunTaskAsync(session,answer,text);
         }
 
+        internal static int TaskContinuationLimit(ChatSettings settings)=>settings.AllowAutonomousScripts&&settings.UseNativeFunctions?12:3;
+        int ContinuationLimit=>TaskContinuationLimit(Settings);
         public async Task ResumeAsync(string messageId)
         {
             if(Busy||disposed||EditorApplication.isCompiling||EditorApplication.isPlayingOrWillChangePlaymode||ScriptDrafts.Pending||AgentSourcePatches.Pending||AgentEditorJobs.Busy)return;
             var answer=Current.Messages.FirstOrDefault(m=>m.Id==messageId);
             if(answer?.Task==null||answer.PendingPlan!=null)return;
-            if(answer.Task.ResumeAttempts>=3){answer.Task.ContinueAfterReload=false;answer.Status="Нужна проверка";Phase="Исчерпан предел трёх продолжений задачи.";Save();return;}
+            if(answer.Task.ResumeAttempts>=ContinuationLimit){answer.Task.ContinueAfterReload=false;answer.Status="Нужна проверка";Phase="Исчерпан предел продолжений задачи: "+ContinuationLimit;Save();return;}
             if(!string.IsNullOrEmpty(answer.Task.PendingJobId))
             {
                 var job=AgentEditorJobs.Load(answer.Task.PendingJobId);
@@ -202,7 +204,7 @@ namespace WorldWeaver.Editor.Assistant
                         };
                         CompletionResult completion;
                         try { completion = await provider.CompleteAsync(request, operation.Token); inferenceRepairs=0; }
-                        catch(ProviderException error) when((error.Transient||error.Message.StartsWith("FUNCTION_PROTOCOL:",StringComparison.Ordinal))&&inferenceRepairs++<2&&round+1<rounds)
+                        catch(ProviderException error) when((error.Transient||error.Message.StartsWith("FUNCTION_PROTOCOL:",StringComparison.Ordinal))&&inferenceRepairs++<(Settings.UseNativeFunctions&&error.Message.StartsWith("FUNCTION_PROTOCOL:",StringComparison.Ordinal)?6:2)&&round+1<rounds)
                         {
                             // No command from this incomplete response was parsed or executed.
                             // Record the failed inference, then rebuild from the last committed tool state.
@@ -256,8 +258,9 @@ namespace WorldWeaver.Editor.Assistant
                             string failureKey=error.Message;
                             repeatedValidationFailures.TryGetValue(failureKey,out int repeats);repeatedValidationFailures[failureKey]=repeats+1;
                             attempt.Error = ChatHistoryStore.Redact(error.Message);
-                            if(repeats>=2)throw new ArgumentException("Модель трижды повторила недопустимый шаг: "+attempt.Error+" Ничего из отклонённых планов не применялось."); answer.Status = "Исправляю план"; Save();
+                            if(repeats>=2&&!Settings.UseNativeFunctions)throw new ArgumentException("Модель трижды повторила недопустимый шаг: "+attempt.Error+" Ничего из отклонённых планов не применялось."); answer.Status = "Исправляю план"; Save();
                             request = BuildRequest(session, text);
+                            if(repeats>=2)request.Messages.Add(new ChatMessage("system","This exact precondition failure has repeated three times. Rejected calls executed NOTHING. Stop repeating this unchanged path: inspect and repair its prerequisite, use another valid capability, or complete other independent parts. Do not abandon the whole compound request merely because one operation is blocked. Report any actual remaining blocker honestly with finish_task partial/blocked."));
                             // A malformed assistant message can anchor the next generation to
                             // the same broken prefix. Keep the raw answer in the audit trail;
                             // give the repair turn a fresh request and an error as data.
@@ -354,7 +357,7 @@ namespace WorldWeaver.Editor.Assistant
                         }
                         bool hasMutations=plan.actions.Any(a=>!SceneToolExecutor.IsReadOnlyTool(a.tool));
                         bool reviewedRepair=CanRepairWithinScope(answer,plan);
-                        if (hasMutations&&(Settings.Mode==AssistantMode.Plan||!Settings.AutoApply||plan.actions.Any(a => a.tool == "draft_script" || a.tool == "attach_script" || a.tool=="patch_script")&&!reviewedRepair||plan.actions.Any(a=>AgentProjectTools.Handles(a.tool)&&AgentProjectTools.RequiresReview(a)||a.tool=="instantiate_prefab"&&(bool?)a.args["allow_scripts"]==true)))
+                        if (hasMutations&&(Settings.Mode==AssistantMode.Plan||!Settings.AutoApply||plan.actions.Any(a => a.tool == "draft_script" || a.tool == "attach_script" || a.tool=="patch_script")&&!reviewedRepair&&!Settings.AllowAutonomousScripts||plan.actions.Any(a=>AgentProjectTools.Handles(a.tool)&&AgentProjectTools.RequiresReview(a)||a.tool=="instantiate_prefab"&&(bool?)a.args["allow_scripts"]==true)))
                         {
                             answer.Text = ChatHistoryStore.Redact(plan.reply); answer.PendingPlan = plan; answer.Status = "План готов";
                             Phase = plan.actions.Any(a => a.tool == "draft_script") ? "Посмотрите код и нажмите «Применить», чтобы Unity проверила его компиляцию." : "Проверьте предложенные изменения и нажмите «Применить».";
@@ -376,7 +379,7 @@ namespace WorldWeaver.Editor.Assistant
                             {
                                 string key=result.Tool+":"+TextChunker.Digest(result.Summary??"");
                                 repeatedReadResults.TryGetValue(key,out int seen);repeatedReadResults[key]=seen+1;
-                                if(seen>=1&&VerifyTask(answer).Any(c=>!c.Passed))
+                                if(seen>=1)
                                 {
                                     // Block this exact stale read, not all information gathering.
                                     // Reading a returned recipe or a different API must remain possible.
@@ -483,7 +486,7 @@ namespace WorldWeaver.Editor.Assistant
                     if(!WaitingForEditor(answer)&&Settings.AutoVerify)
                     {
                         var checks=VerifyTask(answer);bool failed=checks.Any(c=>!c.Passed);answer.IsError=failed;
-                        if((requestedContinuation||failed)&&answer.Task.OpenQuestions.Count==0&&answer.Task.ResumeAttempts<3){answer.Task.ContinueAfterReload=true;answer.Task.Status="waiting_continuation";answer.Status="Продолжаю задачу";}
+                        if((requestedContinuation||failed)&&answer.Task.OpenQuestions.Count==0&&answer.Task.ResumeAttempts<ContinuationLimit){answer.Task.ContinueAfterReload=true;answer.Task.Status="waiting_continuation";answer.Status="Продолжаю задачу";}
                         else if(failed)answer.Status="Проверки не пройдены";
                     }
                 }
@@ -621,7 +624,7 @@ namespace WorldWeaver.Editor.Assistant
                 }
                 checkpointAdmitted=true;
             }
-            bool deferredImport=plan.actions.Count==1&&(plan.actions[0].tool=="material_import"||plan.actions[0].tool=="model_import");
+            bool deferredImport=plan.actions.Count==1&&(plan.actions[0].tool=="material_import"||plan.actions[0].tool=="model_import"||WebResearchTools.IsAsync(plan.actions[0].tool));
             if(!deferredImport)EnsureCheckpoint();
             EditorBatchResult Finish(EditorBatchResult batch)
             {
@@ -677,7 +680,7 @@ namespace WorldWeaver.Editor.Assistant
             profile.Retries = 1; profile.Temperature = 0;
             profile.MaxTokens = Settings.Power == AssistantPower.Fast ? 1800 : Settings.Power == AssistantPower.Deep ? 6000 : 3500;
             if (choice.Provider == ProviderKind.Pollinations) profile.MaxTokens = Math.Min(profile.MaxTokens, 1500);
-            profile.ContextWindow = Settings.Power == AssistantPower.Fast ? 8192 : 16384;
+            profile.ContextWindow = Settings.Power == AssistantPower.Fast ? 8192 : Settings.Power == AssistantPower.Deep ? 32768 : 16384;
             profile.StrictSchema = choice.Provider == ProviderKind.Ollama||!string.IsNullOrEmpty(choice.ConnectionId)&&choice.ResponseMode==OpenAIResponseMode.JsonSchema; profile.Validate(); return profile;
         }
         private static OrchestratorProfile PersistentRoutes(ModelProfile source, List<string> created)

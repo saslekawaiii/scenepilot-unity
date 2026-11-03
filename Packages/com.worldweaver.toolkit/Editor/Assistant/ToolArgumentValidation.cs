@@ -41,7 +41,7 @@ namespace WorldWeaver.Editor.Assistant
             {
                 double n=(double)value;if(double.IsNaN(n)||double.IsInfinity(n)||n<((double?)schema["minimum"]??double.MinValue)||n>((double?)schema["maximum"]??double.MaxValue))throw new ArgumentException("Number out of range: "+path);
             }
-            else if(type=="string"&&((string)value).Length>((int?)schema["maxLength"]??int.MaxValue))throw new ArgumentException("Text too long: "+path);
+            else if(type=="string"&&(((string)value).Length>((int?)schema["maxLength"]??int.MaxValue)||((string)value).Length<((int?)schema["minLength"]??0)))throw new ArgumentException("Text length out of range: "+path);
         }
     }
 }

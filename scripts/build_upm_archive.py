@@ -89,7 +89,7 @@ def current_package():
     payloads = {}
     for path in PACKAGE.rglob("*"):
         require(not path.is_symlink(), "Symlinked package input rejected: " + str(path))
-        if path.name == ".DS_Store":
+        if path.name == ".DS_Store" or "__pycache__" in path.parts or path.suffix == ".pyc":
             continue
         if path.is_file():
             payloads[path.relative_to(PACKAGE).as_posix()] = path.read_bytes()

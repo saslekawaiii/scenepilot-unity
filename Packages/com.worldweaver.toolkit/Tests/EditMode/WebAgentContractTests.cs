@@ -1,0 +1,77 @@
+using System;
+using System.Linq;
+using Newtonsoft.Json.Linq;
+using NUnit.Framework;
+using WorldWeaver.Editor.Assistant;
+
+namespace WorldWeaver.Tests
+{
+    public sealed class WebAgentContractTests
+    {
+        [Test] public void StructuralInventoryFindsMultipleRussianNamedSurfacesAfterAnEnglishMiss()
+        {
+            var first=UnityEngine.GameObject.CreatePrimitive(UnityEngine.PrimitiveType.Plane);first.name="Серая площадка";
+            var second=UnityEngine.GameObject.CreatePrimitive(UnityEngine.PrimitiveType.Cube);second.name="Основание";
+            try
+            {
+                first.AddComponent<GeneratedSceneObject>();second.AddComponent<GeneratedSceneObject>();
+                var rows=ProjectContextIndex.ListScene(new JObject{["component"]="Renderer",["limit"]=100});
+                Assert.That(rows["objects"].Select(o=>(string)o["name"]),Does.Contain(first.name));
+                Assert.That(rows["objects"].Select(o=>(string)o["name"]),Does.Contain(second.name));
+                var miss=ProjectContextIndex.Search("missing_english_surface_2026");
+                Assert.AreEqual(0,(int)miss["sceneMatches"]);Assert.NotNull(miss["activeSceneInventory"]);
+                Assert.That((string)miss["queryHint"],Does.Contain("literal"));
+            }
+            finally{UnityEngine.Object.DestroyImmediate(first);UnityEngine.Object.DestroyImmediate(second);}
+        }
+        [TestCase("draft_script")]
+        [TestCase("attach_script")]
+        public void NativeScriptCallsRequireTheActualClassName(string tool)
+        {
+            var schema=EditorPlan.Schema(nativeFunctions:true);
+            var function=AgentFunctionProtocol.Definitions(schema).Single(t=>(string)t["function"]["name"]==tool)["function"];
+            Assert.That(function["parameters"]["required"].Values<string>(),Does.Contain("name"));
+            Assert.AreEqual(1,(int)function["parameters"]["properties"]["name"]["minLength"]);
+            var args=tool=="attach_script"?new JObject{["target"]="owned:example"}:new JObject{["code"]="public class Example:UnityEngine.MonoBehaviour{}"};
+            var message=new JObject{["tool_calls"]=new JArray(new JObject{["function"]=new JObject{["name"]=tool,["arguments"]=args}})};
+            var error=Assert.Throws<ProviderException>(()=>AgentFunctionProtocol.Normalize(message,schema));
+            Assert.That(error.Message,Does.Contain("missing required parameters: name"));
+            Assert.That(error.Message,Does.Contain("No action executed"));
+        }
+        [Test] public void InternetCapabilitiesAreDiscoverableAndNotFalselyBatchable()
+        {
+            var schema=EditorPlan.Schema(nativeFunctions:true);
+            foreach(string name in new[]{"web_search","web_read","web_research","asset_download","terrain_from_heightmap"})
+            {
+                Assert.That(AgentFunctionProtocol.Definitions(schema).Select(t=>(string)t["function"]["name"]),Does.Contain(name));
+                var branch=((JArray)schema["properties"]["actions"]["items"]["anyOf"]).OfType<JObject>().First(b=>EditorToolSchema.ToolName(b)==name);
+                Assert.IsFalse((bool)branch["x-worldweaver-read-only"],"Async worker calls are standalone, including observations: "+name);
+            }
+            Assert.IsTrue(SceneToolExecutor.IsReadOnlyTool("web_research"));
+            Assert.IsFalse(SceneToolExecutor.IsReadOnlyTool("asset_download"));
+            var result=SceneToolExecutor.Execute(new EditorPlan{actions=new System.Collections.Generic.List<EditorCommand>{new EditorCommand{tool="discover_tools",args=new JObject{["query"]="internet heightmap"}}}});
+            Assert.IsTrue(result.Success,result.Error);var discovery=JObject.Parse(result.Results[0].Summary);
+            Assert.That(discovery["enabledTools"].Values<string>(),Does.Contain("web_research"));
+            Assert.That((string)discovery["instructions"],Does.Contain("untrusted DATA"));
+        }
+        [TestCase("../.env")]
+        [TestCase("Packages/private.env")]
+        [TestCase("Assets/../.env")]
+        [TestCase("Assets/Something.cs")]
+        public void HeightmapCannotReadArbitraryLocalFiles(string path)
+        {
+            var plan=new EditorPlan();
+            plan.actions.Add(new EditorCommand{tool="terrain_from_heightmap",target="missing",args=new JObject{["path"]=path}});
+            Assert.Throws<ArgumentException>(()=>SceneToolExecutor.Validate(plan));
+        }
+#if ENABLE_INPUT_SYSTEM && !ENABLE_LEGACY_INPUT_MANAGER
+        [Test] public void LegacyInputInActiveGeneratedCodeIsRejectedBeforeItCanFailDuringPlay()
+        {
+            var command=new EditorCommand{tool="draft_script",name="InputProbe",args=new JObject{["code"]="using UnityEngine; public class InputProbe:MonoBehaviour{void Update(){var x=Input.GetAxis(\"Mouse X\");}}"}};
+            Assert.That(Assert.Throws<ArgumentException>(()=>ScriptDrafts.Validate(command)).Message,Does.Contain("new Input System"));
+            command.args["code"]="using UnityEngine; public class InputProbe:MonoBehaviour{void Update(){\n#if ENABLE_LEGACY_INPUT_MANAGER\nvar x=Input.GetAxis(\"Mouse X\");\n#endif\n}}";
+            Assert.DoesNotThrow(()=>ScriptDrafts.Validate(command));
+        }
+#endif
+    }
+}

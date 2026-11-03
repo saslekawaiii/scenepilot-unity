@@ -1,0 +1,4 @@
+smolagents[toolkit,openai]==1.26.0
+ddgs==9.16.1
+Pillow==13.0.0
+MarkupSafe==3.0.3

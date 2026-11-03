@@ -1,6 +1,6 @@
 {
   "name": "com.worldweaver.toolkit",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "displayName": "WorldWeaver Intelligent World Toolkit",
   "description": "Unity agent with native tools, persistent task evidence, whole-task review, licensed model acquisition, procedural humanoid locomotion and autonomous NPCs.",
   "unity": "6000.3",

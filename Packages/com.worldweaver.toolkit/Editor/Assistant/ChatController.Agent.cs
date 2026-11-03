@@ -160,6 +160,7 @@ namespace WorldWeaver.Editor.Assistant
             bool npc=Has(@"NPC|персонаж|страж|торгов|жител|character|guard|merchant|патрул|цель|goal");
             bool objects=Has(@"объект|куб|сфер|дом|дерев|кам[ен]|мяч|площадк|платформ|мост|\bпол\b|object|cube|sphere|house|tree|rock|ball|platform|bridge");
             if(code)Add("read_script","inspect_component","read_console");
+            if(Has(@"интернет|скача|web|internet|download|heightmap|карт\p{L}*\s+высот"))Add("web_search","web_read","web_research","asset_download","terrain_from_heightmap");
             if(Has(@"ресурс|ассет|asset|prefab|префаб|материал|material"))Add("search_project","catalog_assets");
             bool materials=Has(@"текстур|материал|texture|material|поверхност|древесин|штукатур|кирпич|брусчат|wood|plaster|brick|cobble");
             if(materials)Add("material_search");

@@ -19,7 +19,7 @@ namespace WorldWeaver.Editor.Assistant
         private const int BatchLimit = 600, SceneLimit = 2000;
         private static readonly string[] TerrainKeys = typeof(TerrainSpec).GetFields().Select(f => f.Name).ToArray();
         private static readonly string[] Kinds = { "cube", "sphere", "capsule", "cylinder", "plane", "tree", "rock", "house" };
-        public static string ToolInstructions => @"You edit only the active scene. Never say work was done before tool results. Each action is {tool,name,target,args}. All args are STRICT: unknown keys are rejected. Numbers must be finite. Use target id:<instanceId> from context; @Name refers to an earlier creation in this plan; exact unique scene names and selected also work. Use unique nonempty name on creations. New objects live under the owned WorldWeaverGenerated group. Existing objects are editable only by explicit target. Delete accepts only owned objects with no foreign children. No reflection, arbitrary code, shell commands, arbitrary URLs/downloads, or new/cleared scenes. The only network asset import is the bounded CC0 material_import tool. At most24 actions,300 scatter placements,600 actual GameObjects per batch and2000 owned objects in the scene. Trees cost4 objects,houses9,NPCs8. Batch failure rolls back scene and new assets. No scene save without explicit save_scene. Tools:
+        public static string ToolInstructions => @"You edit only the active scene. Never say work was done before tool results. Each action is {tool,name,target,args}. All args are STRICT: unknown keys are rejected. Numbers must be finite. Use target id:<instanceId> from context; @Name refers to an earlier creation in this plan; exact unique scene names and selected also work. Use unique nonempty name on creations. New objects live under the owned WorldWeaverGenerated group. Existing objects are editable only by explicit target. Delete accepts only owned objects with no foreign children. No reflection, arbitrary code, shell commands, arbitrary URLs/downloads, or new/cleared scenes. Network research and bounded data acquisition are provided by registered web/model/material tools only. At most24 actions,300 scatter placements,600 actual GameObjects per batch and2000 owned objects in the scene. Trees cost4 objects,houses9,NPCs8. Batch failure rolls back scene and new assets. No scene save without explicit save_scene. Tools:
 create_world: name; target empty. args {style?:alpine|forest|desert|moon,width?:32..2048,length?:32..2048,height?:4..512,trees?:0..300,buildings?:0..100,rocks?:0..300,seed?:integer,resolution?:33|65|129|257|513,scale?:0.1..32,octaves?:1..8,persistence?:0.1..0.9,lacunarity?:1..4,mountainStrength?:0.0..1.0,valleyDepth?:0.0..0.8,waterLevel?:0.0..0.8,southSlope?:0.0..1.0,smoothingPasses?:0..8}. Width,length,height are METRES. valleyDepth,waterLevel,mountainStrength,southSlope are NORMALIZED FRACTIONS, not metres; valleyDepth and waterLevel must not exceed 0.8. Partial TerrainSpec has consistent defaults: keep optional terrain noise/water factors at defaults unless the user asks to change them. Creates textured terrain,lake,spaced trees/rocks/houses,sun and camera. Preserves all existing scene objects. Presets alter geometry and colors; these are original low-poly primitives, not imported art.
 update_world: target owned world or terrain. args same partial TerrainSpec fields and optional style. Rebuilds heights/ground layers/water, keeps existing contents anchored to new ground. To lower mountains use mountainStrength or height. Does not add/remove decoration.
 create_npc: name; target optional owned parent world/group. args {role?:text,personality?:text,biography?:text,goals?:text,constraints?:text,knowledge?:text|array of strings,position?:[x,y,z],rotation?:[x,y,z],scale?:[x,y,z],on_terrain?:bool,inventory?:{item:integer},autonomous?:bool}. Creates visible character plus real IntelligentNPC,Inventory,WorldEntity,scoped KnowledgeBase and valid model routes; defaults are local Ollama. With on_terrain=true(default), deterministically snaps to nearby dry, clear, moderately sloped ground (up to20 radial search steps), avoiding terrain holes, cave approaches and overlapping actors/structures; x/z may shift. on_terrain=false preserves explicit xyz for special placements.
@@ -164,6 +164,12 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
                 if(command.name.Length>160||command.target.Length>200||command.args.ToString().Length>40000)throw new ArgumentException("Command too large.");
                 if(saved)throw new ArgumentException("save_scene must be the final command.");
                 var a=command.args;VirtualTarget target=null;bool creation=false;int cost=0;
+                if(WebResearchTools.Handles(command.tool))
+                {
+                    WebResearchTools.Validate(command,s=>Resolve(s,aliases).Object??throw new ArgumentException("Resource target must already exist."));
+                    if(plan.actions.Count!=1)throw new ArgumentException("Internet research/acquisition/heightmap operations are standalone async steps.");
+                    continue;
+                }
                 if(ModelAssetTools.Handles(command.tool))
                 {
                     ModelAssetTools.Validate(command,s=>Resolve(s,aliases).Object??throw new ArgumentException("Model target must already exist."));
@@ -279,18 +285,18 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
         private static void Parent(EditorCommand command,Dictionary<string,VirtualTarget> aliases)
         {if(!string.IsNullOrEmpty(command.target)&&!Resolve(command.target,aliases).Owned)throw new ArgumentException("Creation parent must be owned WorldWeaver group/world.");}
 
-        public static bool IsReadOnlyTool(string tool)=>tool=="inspect_object"||tool=="search_project"||tool=="read_script"||WorldGameplayTools.IsReadOnly(tool)||AgentProjectTools.IsReadOnly(tool)||WorldMaterialTools.IsReadOnly(tool)||ConstructiveTools.IsReadOnly(tool)||ModelAssetTools.IsReadOnly(tool);
+        public static bool IsReadOnlyTool(string tool)=>tool=="inspect_object"||tool=="search_project"||tool=="read_script"||WorldGameplayTools.IsReadOnly(tool)||AgentProjectTools.IsReadOnly(tool)||WorldMaterialTools.IsReadOnly(tool)||ConstructiveTools.IsReadOnly(tool)||ModelAssetTools.IsReadOnly(tool)||WebResearchTools.IsReadOnly(tool);
 
         public static async Task<EditorBatchResult> ExecuteAsync(EditorPlan plan,OrchestratorProfile routes=null,AgentExecutionContext executionContext=null,CancellationToken token=default,Action beforeMutation=null)
         {
             token.ThrowIfCancellationRequested();
-            if(plan?.actions?.Any(a=>a!=null&&(WorldMaterialTools.IsAsync(a.tool)||ModelAssetTools.IsAsync(a.tool)))!=true)return Execute(plan,routes,executionContext);
+            if(plan?.actions?.Any(a=>a!=null&&(WorldMaterialTools.IsAsync(a.tool)||ModelAssetTools.IsAsync(a.tool)||WebResearchTools.IsAsync(a.tool)))!=true)return Execute(plan,routes,executionContext);
             try
             {
                 Validate(plan);
                 var command=plan.actions.Single();
                 Action admit=()=>{token.ThrowIfCancellationRequested();Validate(plan);beforeMutation?.Invoke();};
-                var result=ModelAssetTools.IsAsync(command.tool)?await ModelAssetTools.ImportAsync(command,token,admit):await WorldMaterialTools.ExecuteAsync(command,token,admit);
+                var result=WebResearchTools.Handles(command.tool)?await WebResearchTools.ExecuteAsync(command,token,admit):ModelAssetTools.IsAsync(command.tool)?await ModelAssetTools.ImportAsync(command,token,admit):await WorldMaterialTools.ExecuteAsync(command,token,admit);
                 return new EditorBatchResult{Success=true,Summary="Выполнен инструмент "+command.tool,Results=new List<EditorCommandResult>{result}};
             }
             catch(OperationCanceledException){throw;}
@@ -307,7 +313,7 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
             {
                 plan=SceneCreationDefaults.Resolve(plan);
                 Validate(plan);
-                if(plan.actions.Any(a=>WorldMaterialTools.IsAsync(a.tool)||ModelAssetTools.IsAsync(a.tool)))throw new ArgumentException("Use await SceneToolExecutor.ExecuteAsync for material search/import; synchronous scene transactions never wait for network I/O.");
+                if(plan.actions.Any(a=>WorldMaterialTools.IsAsync(a.tool)||ModelAssetTools.IsAsync(a.tool)||WebResearchTools.IsAsync(a.tool)))throw new ArgumentException("Use await SceneToolExecutor.ExecuteAsync for network/resource operations; synchronous scene transactions never wait for network I/O.");
                 if(plan.actions.Count==0){result.Success=true;result.Summary="Нет редакторских действий.";return result;}
                 if(routes&&plan.actions.Any(a=>a.tool=="create_npc"||a.tool=="create_village"||a.tool=="configure_npc_ai"&&(bool?)a.args["assign_selected_model"]==true)){routes.Resolve(ModelTask.Dialogue).Validate();routes.Resolve(ModelTask.Planning).Validate();}
                 if(plan.actions.Any(a=>!IsReadOnlyTool(a.tool))){Undo.IncrementCurrentGroup();undo=Undo.GetCurrentGroup();Undo.SetCurrentGroupName("WorldWeaver assistant batch");result.UndoGroup=undo;}

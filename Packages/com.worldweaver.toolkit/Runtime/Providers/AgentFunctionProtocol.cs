@@ -109,6 +109,14 @@ namespace WorldWeaver
             if (arguments?.Type == JTokenType.String)
                 arguments = JToken.Parse((string)arguments, new JsonLoadSettings { DuplicatePropertyNameHandling = DuplicatePropertyNameHandling.Error });
             if (!(arguments is JObject args)) throw new ProviderException("FUNCTION_PROTOCOL: arguments must be a JSON object.");
+            var definition=(JObject)Definitions(schema).First(d=>(string)d["function"]["name"]==name)["function"]["parameters"];
+            // Required flat parameters must not silently turn into empty host fields.
+            // Preserve explicit nested legacy calls for the normal host validator.
+            if(!(args["args"] is JObject))
+            {
+                var missing=(definition["required"] as JArray??new JArray()).Values<string>().Where(k=>args[k]==null||args[k].Type==JTokenType.Null).ToArray();
+                if(missing.Length>0)throw new ProviderException("FUNCTION_PROTOCOL: '"+name+"' is missing required parameters: "+string.Join(", ",missing)+". No action executed. Parameter contract: "+definition.ToString(Formatting.None));
+            }
             var actions = new JArray();
             string reply = (string)message["content"] ?? "";
             if (name == "finish_task")

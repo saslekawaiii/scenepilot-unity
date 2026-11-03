@@ -59,6 +59,7 @@ namespace WorldWeaver.Editor.Assistant
             foreach (var schema in ConstructiveTools.CommandSchemas()) commands.Add(schema);
             foreach (var schema in AnimatedCharacterTools.CommandSchemas()) commands.Add(schema);
             foreach (var schema in ModelAssetTools.CommandSchemas()) commands.Add(schema);
+            foreach (var schema in WebResearchTools.CommandSchemas()) commands.Add(schema);
             foreach (var schema in WorldMaterialTools.CommandSchemas()) commands.Add(schema);
             foreach (var schema in AgentProjectTools.CommandSchemas()) commands.Add(schema);
             commands.Add(AgentSourcePatches.CommandSchema());
@@ -322,7 +323,9 @@ namespace WorldWeaver.Editor.Assistant
         {
             return new JObject
             {
-                ["type"] = "string", ["pattern"] = "^[A-Za-z_][A-Za-z0-9_]{0,79}$"
+                ["type"] = "string", ["minLength"] = 1, ["maxLength"] = 80,
+                ["pattern"] = "^[A-Za-z_][A-Za-z0-9_]{0,79}$",
+                ["description"] = "REQUIRED exact compiled/drafted C# class name, e.g. MouseLookCamera. Not a path; never omit this field."
             };
         }
         private static JObject EmptyTarget() => Enum("");

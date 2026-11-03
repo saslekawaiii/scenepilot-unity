@@ -20,15 +20,16 @@ namespace WorldWeaver.Editor.Assistant
     /// <summary>Typed project operations: no shell, arbitrary reflection invocation or credential file reader.</summary>
     internal static class AgentProjectTools
     {
-        static readonly string[] Names={"find_unity_recipes","read_unity_recipe","read_task_step","execute_editor_code","reflect_api","plan_task","discover_tools","find_scene_objects","inspect_project","inspect_component","set_component","add_component","read_console","capture_scene","run_tests","run_play_check","poll_job","set_build_scenes","build_player","remember_design","list_skills","read_skill","open_scene"};
+        static readonly string[] Names={"find_unity_recipes","read_unity_recipe","read_task_step","execute_editor_code","reflect_api","plan_task","discover_tools","list_scene_objects","find_scene_objects","inspect_project","inspect_component","set_component","add_component","read_console","capture_scene","run_tests","run_play_check","run_player_check","poll_job","set_build_scenes","build_player","remember_design","list_skills","read_skill","open_scene"};
         internal static bool Handles(string tool)=>Names.Contains(tool);
-        internal static bool IsReadOnly(string tool)=>new[]{"find_unity_recipes","read_unity_recipe","read_task_step","reflect_api","plan_task","discover_tools","find_scene_objects","inspect_project","inspect_component","read_console","capture_scene","poll_job","list_skills","read_skill"}.Contains(tool);
-        internal static bool IsDeferred(string tool)=>tool=="run_tests"||tool=="run_play_check"||tool=="build_player"||tool=="open_scene";
+        internal static bool IsReadOnly(string tool)=>new[]{"find_unity_recipes","read_unity_recipe","read_task_step","reflect_api","plan_task","discover_tools","list_scene_objects","find_scene_objects","inspect_project","inspect_component","read_console","capture_scene","poll_job","list_skills","read_skill"}.Contains(tool);
+        internal static bool IsDeferred(string tool)=>tool=="run_tests"||tool=="run_play_check"||tool=="run_player_check"||tool=="build_player"||tool=="open_scene";
         internal static bool RequiresReview(EditorCommand c)=>c.tool=="open_scene"||c.tool=="set_build_scenes"||c.tool=="add_component"&&ResolveType((string)c.args["type"]).IsSubclassOf(typeof(MonoBehaviour));
         internal const string ToolInstructions=@"PROJECT TOOLS (exact typed args):
 read_task_step: target empty,args {index:0..127,offset?:0..100000}. Retrieves a persisted earlier tool result from THIS task, including full real IDs, errors and asset paths. Use the durable index to recover evidence outside the recent context window. Paged data only; does not rerun the tool.
 plan_task: target empty,args {steps:[string...]}, 1-12 stages covering ALL parts of a compound request. Records a proposed approach only; never marks stages completed. Plan before complex creation, then use actual tools and live checks.
-find_scene_objects: target empty,args {query:string,limit?:1..50}. Addressed retrieval over all loaded scenes/assets, returns stable targets. Editing remains restricted to active scene.
+list_scene_objects: target empty,args {component?:type name,kind?:exact generated kind,parent?:actual scene target,offset?:0..20000,limit?:1..100}. Structural active-scene inventory independent of names/language. Defaults omit transform-only skeleton nodes. Use component Renderer/Terrain/WorldPlayer to find geometry; actual paths, materials and dimensions identify old surfaces. Paged read only.
+find_scene_objects: target empty,args {query:string,limit?:1..50}. Literal AND-token search; no translation or synonyms. Empty query lists objects. Addressed retrieval over all loaded scenes/assets, returns stable targets. Editing remains restricted to active scene.
 inspect_project: target empty,args {}. Actual Unity/platform/packages/build-scenes metadata, no environment files.
 inspect_component: target existing object,args {type:string}. Read actual serialized component fields; credentials are masked.
 set_component: target existing object,args {type:string,property:string,value:scalar|vector|object-reference}. Change one existing serialized field; inspect first. Does not invoke arbitrary methods. Reference value is {target:'existing scene target',component?:'UnityEngine.Transform'} or {asset:'Assets/path'} or null. Component references require component type explicitly.
@@ -36,6 +37,7 @@ add_component: target existing object,args {type:full registered Component type 
 read_console: target empty,args {limit?:1..100}. Observed console and actual compiler feedback.
 capture_scene: target empty,args {}. Real camera image saved locally and attached to vision-capable local model. Never claim a picture was inspected if no vision input was sent.
 run_tests: target empty,args {mode:edit|play,filter:explicit fixture/name regex}. Standalone plan only, starts real Unity TestRunner job. Persisted job result survives domain reload; use poll_job before claiming success. Empty/skipped tests are not a pass.
+run_player_check: target actual WorldPlayer, args {seconds?:0.5..3}. Enter real Play Mode and drive actual virtual mouse (both axes WITHOUT RMB), W movement and exposed leg pose. Measures yaw/pitch/travel/ground, then exits and returns a durable job result via poll_job. Use after changing player/camera/rig; source compilation is not runtime input verification. Does not implement missing behavior or alter source.
 run_play_check: target existing object,args {seconds:0.25..10,degrees_per_second:-360..360}. Standalone plan. Enter real Play Mode, measure LOCAL Y rotation against actual elapsed game time, verify speed and off-axis drift, then exit. Use after attaching rotation behavior; compilation alone is insufficient. Result survives domain reload.
 poll_job: target empty,args {id:job id}. Read actual job/XML/build status.
 build_player: target empty,args {}. Standalone plan; builds enabled saved Build Settings scenes to unique local Builds directory for active platform. Does not publish or install modules.
@@ -57,18 +59,20 @@ open_scene: target empty,args {path:Assets/...unity}. Standalone reviewed action
                 ["execute_editor_code"]=Obj(new JObject{["code"]=Text(20000)},"code"),
                 ["plan_task"]=Obj(new JObject{["steps"]=new JObject{["type"]="array",["minItems"]=1,["maxItems"]=12,["items"]=Text(300)}},"steps"),
                 ["discover_tools"]=Obj(new JObject{["query"]=Text(500),["names"]=new JObject{["type"]="array",["maxItems"]=16,["items"]=Text(64)}}),
+                ["list_scene_objects"]=Obj(new JObject{["component"]=Text(200),["kind"]=Text(100),["parent"]=Text(200),["offset"]=Integer(0,20000),["limit"]=Integer(1,100)}),
                 ["find_scene_objects"]=Obj(new JObject{["query"]=Text(500),["limit"]=Integer(1,50)},"query"),
                 ["inspect_project"]=Obj(new JObject()),["inspect_component"]=Obj(new JObject{["type"]=Text()},"type"),
                 ["set_component"]=Obj(new JObject{["type"]=Text(),["property"]=Text(),["value"]=new JObject{["anyOf"]=new JArray(new JObject{["type"]="string",["maxLength"]=4000},new JObject{["type"]="number"},new JObject{["type"]="boolean"},new JObject{["type"]="null"},new JObject{["type"]="array",["items"]=new JObject{["type"]="number"},["minItems"]=2,["maxItems"]=4},Obj(new JObject{["target"]=Text(),["component"]=Text()},"target"),Obj(new JObject{["asset"]=Text()},"asset"))}},"type","property","value"),
                 ["add_component"]=Obj(new JObject{["type"]=Text()},"type"),["read_console"]=Obj(new JObject{["limit"]=Integer(1,100)}),
                 ["capture_scene"]=Obj(new JObject()),["run_tests"]=Obj(new JObject{["mode"]=new JObject{["type"]="string",["enum"]=new JArray("edit","play")},["filter"]=Text(250)},"mode","filter"),
+                ["run_player_check"]=Obj(new JObject{["seconds"]=new JObject{["type"]="number",["minimum"]=.5,["maximum"]=3}}),
                 ["run_play_check"]=Obj(new JObject{["seconds"]=new JObject{["type"]="number",["minimum"]=.25,["maximum"]=10},["degrees_per_second"]=new JObject{["type"]="number",["minimum"]=-360,["maximum"]=360}},"seconds","degrees_per_second"),
                 ["poll_job"]=Obj(new JObject{["id"]=Text(32)},"id"),["build_player"]=Obj(new JObject()),
                 ["set_build_scenes"]=Obj(new JObject{["paths"]=new JObject{["type"]="array",["minItems"]=1,["maxItems"]=8,["uniqueItems"]=true,["items"]=Text(240)}},"paths"),
                 ["remember_design"]=Obj(new JObject{["key"]=Text(120),["value"]=Text(3000),["category"]=new JObject{["type"]="string",["enum"]=new JArray("constraint","decision","entity")}},"key","value"),
                 ["list_skills"]=Obj(new JObject{["query"]=Text(500),["limit"]=Integer(1,30)}),["read_skill"]=Obj(new JObject{["id"]=Text(80)},"id"),
                 ["open_scene"]=Obj(new JObject{["path"]=Text(240)},"path")};
-            foreach(var pair in schema)yield return Obj(new JObject{["tool"]=new JObject{["type"]="string",["const"]=pair.Key},["name"]=Text(160),["target"]=Text(240),["args"]=pair.Value},"tool","name","target","args");
+            foreach(var pair in schema)yield return Obj(new JObject{["tool"]=new JObject{["type"]="string",["const"]=pair.Key},["name"]=Text(160),["target"]=pair.Key=="run_player_check"?new JObject{["type"]="string",["minLength"]=1,["maxLength"]=240}:Text(240),["args"]=pair.Value},"tool","name","target","args");
         }
         static bool Sensitive(string property)=>Regex.IsMatch(property??"",@"(?i)(password|secret|credential|api[_-]?key|access[_-]?token)");
         static Type ResolveType(string name)
@@ -93,7 +97,7 @@ open_scene: target empty,args {path:Assets/...unity}. Standalone reviewed action
                 if(definition["enum"] is JArray choices&&!choices.Any(v=>JToken.DeepEquals(v,p.Value)))throw new ArgumentException("Invalid choice: "+p.Name);
             }
             if(c.tool=="execute_editor_code"){if(!string.IsNullOrEmpty(c.target))resolve(c.target);}
-            else if(new[]{"inspect_component","set_component","add_component","run_play_check"}.Contains(c.tool))resolve(c.target);else if(!string.IsNullOrEmpty(c.target))throw new ArgumentException("Project query/job requires empty target.");
+            else if(new[]{"inspect_component","set_component","add_component","run_play_check","run_player_check"}.Contains(c.tool))resolve(c.target);else if(!string.IsNullOrEmpty(c.target))throw new ArgumentException("Project query/job requires empty target.");
             if(c.tool=="inspect_component")Component(c,resolve);
             if(c.tool=="add_component")ResolveType((string)c.args["type"]);
             if(c.tool=="set_component")
@@ -194,6 +198,7 @@ open_scene: target empty,args {path:Assets/...unity}. Standalone reviewed action
                 case "reflect_api":summary=EditorCodeTools.Reflect((string)a["type"],(string)a["member"]);break;
                 case "plan_task":if(context?.Message?.Task==null)throw new InvalidOperationException("A task context is required.");context.Message.Task.Approach=a["steps"].Values<string>().ToList();summary=new JObject{["stages"]=a["steps"].DeepClone(),["status"]="proposed, not completed",["changesApplied"]=false}.ToString(Formatting.None);break;
                 case "discover_tools":summary=AgentCapabilities.Discover(a).ToString(Formatting.None);break;
+                case "list_scene_objects":summary=ProjectContextIndex.ListScene(a).ToString(Formatting.None);break;
                 case "find_scene_objects":summary=ProjectContextIndex.Search((string)a["query"],(int?)a["limit"]??20).ToString(Formatting.None);break;
                 case "inspect_project":summary=ProjectContextIndex.Summary().ToString(Formatting.None);break;
                 case "inspect_component":summary=InspectComponent(Component(c,resolve)).ToString(Formatting.None);break;
@@ -212,6 +217,7 @@ open_scene: target empty,args {path:Assets/...unity}. Standalone reviewed action
                 case "capture_scene":
                     if(context?.Message==null)throw new InvalidOperationException("Capture requires a chat task context.");var image=AgentViewCapture.Capture();context.Message.Attachments.Add(image);summary=AgentViewCapture.Describe(image).ToString(Formatting.None);break;
                 case "run_tests":var testJob=AgentEditorJobs.RunTests((string)a["mode"],(string)a["filter"]);if(context?.Message?.Task!=null)context.Message.Task.PendingJobId=testJob.Id;summary=JObject.FromObject(testJob).ToString(Formatting.None);break;
+                case "run_player_check":var playerJob=AgentEditorJobs.RunPlayerCheck(ProjectContextIndex.StableTarget(resolve(c.target)),(float?)a["seconds"]??1);if(context?.Message?.Task!=null)context.Message.Task.PendingJobId=playerJob.Id;summary=JObject.FromObject(playerJob).ToString(Formatting.None);break;
                 case "run_play_check":var playJob=AgentEditorJobs.RunRotationCheck(ProjectContextIndex.StableTarget(resolve(c.target)),(float)a["seconds"],(float)a["degrees_per_second"]);if(context?.Message?.Task!=null)context.Message.Task.PendingJobId=playJob.Id;summary=JObject.FromObject(playJob).ToString(Formatting.None);break;
                 case "poll_job":summary=AgentEditorJobs.Poll((string)a["id"]).ToString(Formatting.None);break;
                 case "build_player":var build=AgentEditorJobs.BuildPlayer();if(context?.Message?.Task!=null)context.Message.Task.PendingJobId=build.Id;summary=JObject.FromObject(build).ToString(Formatting.None);break;

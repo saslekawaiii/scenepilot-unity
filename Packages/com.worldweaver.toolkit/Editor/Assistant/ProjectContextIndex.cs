@@ -83,10 +83,30 @@ namespace WorldWeaver.Editor.Assistant
             var assets = AssetDatabase.FindAssets(query, new[]{"Assets","Packages"}).Select(AssetDatabase.GUIDToAssetPath)
                 .Where(p=>!AssetDatabase.IsValidFolder(p)).OrderBy(p=>p,StringComparer.Ordinal).Take(limit)
                 .Select(path=>new JObject{["path"]=path,["guid"]=AssetDatabase.AssetPathToGUID(path),["type"]=AssetDatabase.GetMainAssetTypeAtPath(path)?.Name});
-            return new JObject{["sceneMatches"]=rows.Count,["sceneObjects"]=new JArray(rows.Take(limit).Select(v=>Entry(v.Go))),["assets"]=new JArray(assets),["limit"]=limit};
+            var result=new JObject{["sceneMatches"]=rows.Count,["sceneObjects"]=new JArray(rows.Take(limit).Select(v=>Entry(v.Go))),["assets"]=new JArray(assets),["limit"]=limit};
+            if(rows.Count==0){result["queryHint"]="Scene search is literal AND-token matching in actual names/components; it does not translate languages. Do not repeat English synonyms for Russian names. Use list_scene_objects with component/kind, or inspect this actual active-scene inventory.";result["activeSceneInventory"]=ListScene(new JObject{["limit"]=12});}
+            return result;
+        }
+        public static JObject ListScene(JObject args)
+        {
+            string type=(string)args["component"],kind=(string)args["kind"],parent=(string)args["parent"];
+            int limit=(int?)args["limit"]??30,offset=(int?)args["offset"]??0;
+            if(limit<1||limit>100||offset<0||offset>20000)throw new ArgumentException("Scene page requires limit1..100 and offset0..20000.");
+            GameObject ancestor=string.IsNullOrEmpty(parent)?null:SceneToolExecutor.ResolveTarget(parent);
+            bool HasType(Component c){for(var t=c.GetType();t!=null;t=t.BaseType)if(string.Equals(t.Name,type,StringComparison.OrdinalIgnoreCase)||string.Equals(t.FullName,type,StringComparison.OrdinalIgnoreCase))return true;return false;}
+            var all=Objects(true).Where(g=>g.scene==SceneManager.GetActiveScene()).Where(g=>!ancestor||g==ancestor||g.transform.IsChildOf(ancestor.transform))
+                .Where(g=>string.IsNullOrEmpty(kind)||string.Equals(g.GetComponent<GeneratedSceneObject>()?.Kind,kind,StringComparison.OrdinalIgnoreCase))
+                .Where(g=>string.IsNullOrEmpty(type)?g.GetComponents<Component>().Any(c=>c&&!(c is Transform)&&!(c is GeneratedSceneObject)):g.GetComponents<Component>().Any(c=>c&&HasType(c)))
+                .OrderByDescending(g=>g.GetComponent<Terrain>()||g.GetComponent<WorldPlayer>()).ThenByDescending(g=>g.GetComponent<Renderer>()!=null).ThenBy(g=>HierarchyPath(g),StringComparer.Ordinal).ToArray();
+            return new JObject{["total"]=all.Length,["offset"]=offset,["nextOffset"]=offset+limit<all.Length?(JToken)(offset+limit):JValue.CreateNull(),["objects"]=new JArray(all.Skip(offset).Take(limit).Select(g=>{
+                var row=Entry(g);var renderer=g.GetComponent<Renderer>();
+                if(renderer){row["boundsSize"]=JArray.FromObject(new[]{renderer.bounds.size.x,renderer.bounds.size.y,renderer.bounds.size.z});row["materials"]=new JArray(renderer.sharedMaterials.Where(m=>m).Select(m=>new JObject{["name"]=m.name,["asset"]=AssetDatabase.GetAssetPath(m),["color"]=m.HasProperty("_BaseColor")?m.GetColor("_BaseColor").ToString():m.HasProperty("_Color")?m.color.ToString():null}));}
+                row["childCount"]=g.transform.childCount;return row;
+            }))};
         }
         public static JObject Summary() => new JObject {
             ["unityVersion"]=Application.unityVersion,["platform"]=EditorUserBuildSettings.activeBuildTarget.ToString(),
+            ["inputBackend"]=WorldInput.Backend,
             ["loadedScenes"]=new JArray(Enumerable.Range(0,SceneManager.sceneCount).Select(i=>SceneManager.GetSceneAt(i)).Where(s=>s.isLoaded).Select(s=>new JObject{["name"]=s.name,["path"]=s.path,["dirty"]=s.isDirty})),
             ["assetCount"]=AssetDatabase.GetAllAssetPaths().Count(p=>p.StartsWith("Assets/",StringComparison.Ordinal)),
             ["buildScenes"]=new JArray(EditorBuildSettings.scenes.Select(s=>new JObject{["path"]=s.path,["enabled"]=s.enabled})),

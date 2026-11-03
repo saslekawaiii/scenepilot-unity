@@ -21,6 +21,7 @@ namespace WorldWeaver.Editor.Assistant
         public bool PreferGeneratedScripts = true;
         public bool UseNativeFunctions = true;
         public bool AllowEditorCode;
+        public bool AllowAutonomousScripts;
         public int SkillContextBudget = 4000;
         public List<string> SkillFolders = new List<string>();
     }
@@ -96,7 +97,7 @@ namespace WorldWeaver.Editor.Assistant
             if (allowedTools != null) command = EditorToolSchema.Restrict(allowedTools, typed);
             else if (typed) command = EditorToolSchema.DecoderCommandSchema();
             if(nativeFunctions)foreach(var branch in (command["anyOf"] as JArray??new JArray()).OfType<JObject>())
-                branch["x-worldweaver-read-only"]=SceneToolExecutor.IsReadOnlyTool(EditorToolSchema.ToolName(branch))&&!WorldMaterialTools.IsAsync(EditorToolSchema.ToolName(branch));
+                branch["x-worldweaver-read-only"]=SceneToolExecutor.IsReadOnlyTool(EditorToolSchema.ToolName(branch))&&!WorldMaterialTools.IsAsync(EditorToolSchema.ToolName(branch))&&!WebResearchTools.IsAsync(EditorToolSchema.ToolName(branch));
             var schema = new JObject {
                 ["type"] = "object", ["additionalProperties"] = false,
                 ["properties"] = new JObject {

@@ -29,7 +29,7 @@ namespace WorldWeaver.Editor.Assistant
     }
     /// <summary>Actual Unity test/build jobs with durable result files. No arbitrary shell or method execution.</summary>
     [InitializeOnLoad]
-    public static class AgentEditorJobs
+    public static partial class AgentEditorJobs
     {
         const string Folder="UserSettings/WorldWeaverAgentJobs";
         const string Active="UserSettings/WorldWeaverAgentJobs/active.json";
@@ -48,6 +48,8 @@ namespace WorldWeaver.Editor.Assistant
             EditorApplication.playModeStateChanged+=RotationPlayModeChanged;
             EditorApplication.update+=TickRotation;
             EditorApplication.update+=TickTestCompletion;
+            EditorApplication.playModeStateChanged+=PlayerCheckModeChanged;
+            EditorApplication.update+=TickPlayerCheck;
             EditorApplication.delayCall+=Recover;
         }
         static void Recover()
@@ -147,6 +149,7 @@ namespace WorldWeaver.Editor.Assistant
                 job.Status="cancelled";job.Success=false;job.Error="Rotation measurement cancelled.";job.FinishedUtc=DateTime.UtcNow.ToString("o");Save(job);
                 if(EditorApplication.isPlayingOrWillChangePlaymode)EditorApplication.isPlaying=false;return;
             }
+            if(job.Kind=="player_control"){EndPlayerCheck(job,"Player input check cancelled.");return;}
             if(job.Kind.StartsWith("tests:",StringComparison.Ordinal)&&!string.IsNullOrEmpty(job.RunGuid))
             {
                 job.Status="cancelling";job.Success=false;Save(job);TestRunnerApi.CancelTestRun(job.RunGuid);return;
