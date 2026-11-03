@@ -34,7 +34,8 @@ namespace WorldWeaver.Editor.Assistant
         public string Endpoint;
         public bool Available;
         public bool SupportsVision;
-        public bool Loaded, AutoDiscovered;
+        public bool Loaded, AutoDiscovered, Remote;
+        public long SizeBytes;
         public string ConnectionId, ApiKeyEnvironmentVariable;
         public OpenAIResponseMode ResponseMode;
         public override string ToString() => Name;

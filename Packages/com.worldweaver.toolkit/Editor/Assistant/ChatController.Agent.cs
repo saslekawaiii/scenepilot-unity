@@ -282,7 +282,7 @@ User interaction mode: "+effectiveMode+". Ask never mutates or drafts code. Plan
             var latestUser=session.Messages.Take(Math.Max(0,index)).LastOrDefault(m=>m.Role=="user");if(latestUser?.Attachments!=null)images.AddRange(latestUser.Attachments.Take(answer?.Attachments?.Count>0?2:3));
             if(answer?.Attachments?.Count>0)images.Add(answer.Attachments.Last());
             bool vision=models.FirstOrDefault(m=>m.Key==Settings.ModelKey)?.SupportsVision==true;
-            if(images.Count>0&&!vision)throw new ArgumentException("Для вложенных изображений нужна локальная vision-модель. Смените модель или уберите изображения.");
+            if(images.Count>0&&!vision){if(latestUser?.Attachments?.Count>0)throw new ArgumentException("Для вложенных изображений нужна локальная vision-модель. Смените модель или уберите изображения.");images.Clear();}
             int remainingEvidence=10000;
             var evidence=new JArray();
             foreach(var step in (answer?.Steps??new List<EditorCommandResult>()).AsEnumerable().Reverse())
