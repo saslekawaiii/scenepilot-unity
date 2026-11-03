@@ -196,7 +196,7 @@ namespace WorldWeaver.Editor.Assistant
                             answer.IsError=false;answer.Status="Проверки пройдены";answer.Text="Изменения применены. "+ChatHistoryStore.Redact(completedReview.Evidence);answer.Task.ContinueAfterReload=false;Save();return;
                         }
                     }
-                    if(finalReviewOnly){answer.Task.ContinueAfterReload=false;answer.Status="Нужна проверка";Phase="Завершённая проверка учтена; предел новых продолжений задачи исчерпан: "+ContinuationLimit;Save();return;}
+                    if(finalReviewOnly){answer.Task.ContinueAfterReload=false;answer.Task.Status="partial";answer.IsError=true;answer.Status="Нужна проверка";answer.Text="Завершённая проверка учтена, но цель пока не подтверждена. Предел новых продолжений задачи исчерпан: "+ContinuationLimit;Phase=answer.Text;Save();return;}
                     var request = BuildRequest(session, text);
                     int rounds = Settings.Power == AssistantPower.Fast ? 1 : Settings.Power == AssistantPower.Deep ? 6 : 3;
                     int maximumRounds = Settings.UseNativeFunctions?(Settings.Power == AssistantPower.Fast ? 16 : Settings.Power == AssistantPower.Deep ? 64 : 32):(Settings.Power == AssistantPower.Fast ? 6 : Settings.Power == AssistantPower.Deep ? 16 : 8);

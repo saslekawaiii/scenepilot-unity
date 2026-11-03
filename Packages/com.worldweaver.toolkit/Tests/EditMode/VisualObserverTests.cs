@@ -106,13 +106,22 @@ namespace WorldWeaver.Tests
             }
             finally{UnityEngine.Object.DestroyImmediate(marker);EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
         }
+        [Test] public async Task FailedFinalReviewAtContinuationLimitNeverStartsNewPlanning()
+        {
+            EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);var provider=new ReviewOnlyProvider{Pass=false};string folder=Path.Combine("UserSettings","LimitedJob-"+Guid.NewGuid().ToString("N"));using(var controller=new ChatController(_=>provider,folder))
+            {
+                controller.Settings.Mode=AssistantMode.Execute;controller.Settings.Power=AssistantPower.Deep;controller.Settings.AutoVerify=true;controller.Settings.AllowAutonomousScripts=true;controller.Settings.UseNativeFunctions=true;
+                var answer=new AssistantMessage{Task=new AgentTaskState{OriginalRequest="Create a marker",MutationAuthorized=true,ResumeAttempts=12}};answer.Task.Approach.Add("Verify created marker");answer.Steps.Add(new EditorCommandResult{Tool="job_result",Success=true,Summary="{\"Kind\":\"tests\",\"Status\":\"completed\",\"Success\":true,\"Passed\":1,\"Failed\":0}"});controller.Current.Messages.Add(answer);await controller.ResumeAsync(answer.Id);
+                Assert.AreEqual(1,provider.Reviews);Assert.AreEqual(0,provider.Plans);Assert.AreEqual(12,answer.Task.ResumeAttempts);Assert.AreEqual("partial",answer.Task.Status);Assert.IsTrue(answer.IsError);Assert.IsFalse(answer.Task.ContinueAfterReload);
+            }
+        }
         [Test] public void CompletedJobIsReviewedOnceAndOnlyAfterTerminalState()
         {
             var method=typeof(ChatController).GetMethod("HasUnreviewedCompletedJob",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic);var answer=new AssistantMessage();var step=new EditorCommandResult{Tool="job_result",Success=true,Summary="{\"Status\":\"running\"}"};answer.Steps.Add(step);Assert.IsFalse((bool)method.Invoke(null,new object[]{answer}));step.Summary="{\"Status\":\"completed\"}";Assert.IsTrue((bool)method.Invoke(null,new object[]{answer}));answer.EditorReviews.Add(new EditorResultReview{StepCount=1});Assert.IsFalse((bool)method.Invoke(null,new object[]{answer}));
         }
         sealed class ReviewOnlyProvider:ILLMProvider
         {
-            public int Reviews,Plans;public Task<CompletionResult> CompleteAsync(CompletionRequest request,CancellationToken token){if(request.Schema?["properties"]?["passed"]!=null){Reviews++;return Task.FromResult(new CompletionResult{Text="{\"passed\":true,\"issues\":[],\"evidence\":\"Fixture verified the terminal host result\"}"});}Plans++;throw new InvalidOperationException("Planner must not run after a completed verified goal");}public Task<bool> HealthAsync(CancellationToken token)=>Task.FromResult(true);public void Dispose(){}
+            public int Reviews,Plans;public bool Pass=true;public Task<CompletionResult> CompleteAsync(CompletionRequest request,CancellationToken token){if(request.Schema?["properties"]?["passed"]!=null){Reviews++;return Task.FromResult(new CompletionResult{Text=new JObject{["passed"]=Pass,["issues"]=Pass?new JArray():new JArray("Fixture verification gap"),["evidence"]="Fixture verified the terminal host result"}.ToString()});}Plans++;throw new InvalidOperationException("Planner must not run after a completed verified goal");}public Task<bool> HealthAsync(CancellationToken token)=>Task.FromResult(true);public void Dispose(){}
         }
         [Test] public void NativeVisionPlannerActuallyReceivesItsCapturedImage()
         {
