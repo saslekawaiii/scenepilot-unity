@@ -43,6 +43,37 @@ namespace WorldWeaver.Tests
    }
    finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
   }
+  sealed class RecoveredReadReviewProvider:ILLMProvider
+  {
+   public int Calls,Reviews;
+   public System.Threading.Tasks.Task<CompletionResult> CompleteAsync(CompletionRequest request,System.Threading.CancellationToken token)
+   {
+    if(request.Schema?["properties"]?["passed"]!=null)
+    {
+     Reviews++;return System.Threading.Tasks.Task.FromResult(new CompletionResult{Text="{\"passed\":true,\"issues\":[],\"evidence\":\"Current host measurements confirm the requested cube at height two\"}",Model="fixture-review"});
+    }
+    var plan=new EditorPlan{reply="Готово"};Calls++;
+    if(Calls==1){plan.complete=false;plan.actions.Add(new EditorCommand{tool="execute_editor_code",args=new JObject{["code"]="var part=GameObject.CreatePrimitive(PrimitiveType.Cube); part.transform.SetParent(target.transform,false); part.transform.position=Vector3.up*2; return part.transform.position;"}});}
+    else if(Calls==2){plan.complete=false;plan.actions.Add(new EditorCommand{tool="read_task_step",args=new JObject{["index"]=8191}});}
+    return System.Threading.Tasks.Task.FromResult(new CompletionResult{Text=Newtonsoft.Json.JsonConvert.SerializeObject(plan),Model="fixture-main"});
+   }
+   public System.Threading.Tasks.Task<bool> HealthAsync(System.Threading.CancellationToken token)=>System.Threading.Tasks.Task.FromResult(true);
+   public void Dispose(){}
+  }
+  [Test] public async System.Threading.Tasks.Task FirstFreshWholeTaskReviewCanResolveAnEarlierFailedObservation()
+  {
+   EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);string folder=Path.Combine("UserSettings","RecoveredReadReview-"+Guid.NewGuid().ToString("N"));var provider=new RecoveredReadReviewProvider();
+   try
+   {
+    using(var controller=new ChatController(_=>provider,folder))
+    {
+     controller.Settings.AllowEditorCode=true;controller.Settings.UseNativeFunctions=true;controller.Settings.UseSkills=false;
+     await controller.SendAsync("Через C# создай объект на высоте 2 м.");var answer=controller.Current.Messages.Last();
+     Assert.AreEqual(1,provider.Reviews);Assert.IsTrue(answer.Attempts.All(a=>a.Accepted),"Exercise real execution failure, not malformed-plan repair");Assert.IsTrue(answer.Steps.Any(s=>!s.Success),"The historical execution failure remains auditable");Assert.IsTrue(answer.Task.Checks.All(c=>c.Passed));Assert.IsFalse(answer.IsError,answer.Text);Assert.AreNotEqual("Проверки не пройдены",answer.Status);Assert.IsTrue(answer.EditorReviews.Single().Passed);Assert.AreEqual(2,GameObject.Find("WorldWeaver Code Workspace").transform.GetChild(0).position.y);
+    }
+   }
+   finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
+  }
   [Test] public void InvalidOwnedReferenceReturnsActualCandidatesWithoutFuzzyResolution()
   {
    EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
@@ -218,6 +249,10 @@ namespace WorldWeaver.Tests
     var result=await SceneToolExecutor.ExecuteAsync(good,null,context,default);Assert.IsTrue(result.Success,result.Error);
     Assert.AreEqual(17,UnityEngine.Object.FindFirstObjectByType<Light>().range);
     var readback=JObject.Parse((string)JObject.Parse(result.Results.Single(s=>s.Tool=="execute_editor_code").Summary)["result"]);Assert.AreEqual(JTokenType.Array,readback["position"].Type);Assert.AreEqual(result.Results.Single(s=>s.Tool=="execute_editor_code").Target,(string)readback["owner"]["target"]);
+    Assert.IsTrue((bool)JObject.Parse(result.Results.Single(s=>s.Tool=="execute_editor_code").Summary)["sceneChanged"]);
+    var observation=new EditorPlan{actions={new EditorCommand{tool="execute_editor_code",args=new JObject{["code"]="return target.GetComponents<Component>().Length;"}}}};
+    var read=await SceneToolExecutor.ExecuteAsync(observation,null,context,default);Assert.IsTrue(read.Success,read.Error);
+    var readStep=read.Results.Single(s=>s.Tool=="execute_editor_code");Assert.IsFalse((bool)JObject.Parse(readStep.Summary)["sceneChanged"],"A successful inspection snippet must not reset implementation progress");
     session.Settings.AllowEditorCode=false;var denied=await SceneToolExecutor.ExecuteAsync(good,null,context,default);Assert.IsFalse(denied.Success);
    }
    EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);

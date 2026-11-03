@@ -18,6 +18,7 @@ namespace WorldWeaver
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
             token.ThrowIfCancellationRequested();
+            if(request.LocalKeepAliveSeconds<0||request.LocalKeepAliveSeconds>3600)throw new ArgumentException("Local keep-alive must be 0..3600 seconds.");
             var messages = new JArray();
             // Ollama's :cloud models do not support schema-constrained decoding.
             // Ground them in the exact contract, then keep the caller's unchanged
@@ -27,9 +28,13 @@ namespace WorldWeaver
             if (!request.UseToolCalls && cloud && request.Schema != null)
                 messages.Add(new JObject { ["role"] = "system", ["content"] = "Return ONLY one JSON INSTANCE matching this exact output contract, never Markdown or a schema. Every required field must be present. Contract: " + request.Schema.ToString(Newtonsoft.Json.Formatting.None) });
             int imageCount = 0, imageBytes = 0;
-            foreach (var message in request.Messages)
+            foreach (var message in request.TransportMessages())
             {
                 var item = new JObject { ["role"] = message.Role, ["content"] = message.Content };
+                if(message.Role=="assistant"&&!string.IsNullOrEmpty(message.Thinking))item["thinking"]=message.Thinking;
+                if(message.ToolCalls!=null)item["tool_calls"]=message.ToolCalls.DeepClone();
+                if(message.ToolName!=null)item["tool_name"]=message.ToolName;
+                if(message.ToolCallId!=null)item["tool_call_id"]=message.ToolCallId;
                 if (message.Images != null && message.Images.Count > 0)
                 {
                     var images = new JArray();
@@ -47,10 +52,13 @@ namespace WorldWeaver
                 }
                 messages.Add(item);
             }
-            if (request.UseToolCalls) messages.Add(new JObject { ["role"] = "system", ["content"] = AgentFunctionProtocol.Instructions });
+
             var body = new JObject { ["model"] = profile.Model, ["messages"] = messages, ["stream"] = request.Stream, ["think"] = false,
-                ["keep_alive"] = "10m",
+                ["keep_alive"] = request.LocalKeepAliveSeconds.HasValue?(JToken)new JValue(request.LocalKeepAliveSeconds.Value):new JValue("10m"),
                 ["options"] = new JObject { ["temperature"] = profile.Temperature, ["num_predict"] = profile.MaxTokens, ["num_ctx"] = profile.ContextWindow } };
+            // Cloud reasoning models use different think value types. Omitting the
+            // override allows their native default, rather than disabling reasoning.
+            if(cloud&&(request.EnableThinking??profile.EnableCloudReasoning))body.Remove("think");
             if (request.UseToolCalls) body["tools"] = AgentFunctionProtocol.Definitions(request.Schema);
             else if (!cloud) body["format"] = request.Schema != null ? (JToken)OllamaDecoderSchema.FromHost(request.Schema) : new JValue("json");
             var watch = Stopwatch.StartNew();
@@ -58,6 +66,7 @@ namespace WorldWeaver
             if (request.Stream)
             {
                 var text = new StringBuilder();
+                var thinking = new StringBuilder();
                 var calls = new JArray();
                 request.OnActivity?.Invoke("Ожидаю ответ локальной модели…");
                 for (int attempt = 0; ; attempt++)
@@ -70,6 +79,7 @@ namespace WorldWeaver
                             receivedFrame = true;
                             token.ThrowIfCancellationRequested();
                             if (frame["message"]?["tool_calls"] is JArray frameCalls) foreach (var call in frameCalls) calls.Add(call.DeepClone());
+                            if(frame["message"]?["thinking"]?.Type==JTokenType.String)thinking.Append((string)frame["message"]["thinking"]);
                             string delta = (string)frame["message"]?["content"] ?? "";
                             if (delta.Length > 0)
                             {
@@ -90,6 +100,7 @@ namespace WorldWeaver
                 if (request.UseToolCalls)
                 {
                     result["message"] = new JObject { ["role"] = "assistant", ["content"] = text.ToString(), ["tool_calls"] = calls };
+                    if(thinking.Length>0)result["message"]["thinking"]=thinking.ToString();
                     content = CompletionResult.IsOutputLimit((string)result["done_reason"]) ? text.ToString() : AgentFunctionProtocol.Normalize((JObject)result["message"], request.Schema);
                 }
                 else content = text.ToString();

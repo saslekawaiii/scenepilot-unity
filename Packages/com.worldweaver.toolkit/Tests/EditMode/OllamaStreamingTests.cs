@@ -46,6 +46,26 @@ namespace WorldWeaver.Tests
                 finally { release.TrySetResult(true); UnityEngine.Object.DestroyImmediate(profile); }
             }
         }
+        [UnityTest] public IEnumerator NativeContinuationStateIsAccumulatedWithoutBecomingVisibleReplyText()=>Await(CheckNativeState());
+        private static async Task CheckNativeState()
+        {
+            var first=new JObject{["message"]=new JObject{["role"]="assistant",["thinking"]="OPAQUE_"},["done"]=false}.ToString(Newtonsoft.Json.Formatting.None)+"\n";
+            var last=new JObject{["message"]=new JObject{["role"]="assistant",["thinking"]="STATE",["tool_calls"]=new JArray(new JObject{["function"]=new JObject{["name"]="inspect_object",["arguments"]=new JObject{["target"]="owned:fixture"}}})},["done"]=true}.ToString(Newtonsoft.Json.Formatting.None)+"\n";
+            using(var server=new NdjsonServer(first,last))
+            {
+                var profile=Profile(server.Url);var deltas=new List<string>();
+                try
+                {
+                    using(var provider=new LocalProvider(profile))
+                    {
+                        var request=new CompletionRequest{Stream=true,UseToolCalls=true,Schema=WorldWeaver.Editor.Assistant.EditorPlan.Schema(nativeFunctions:true),OnContentDelta=deltas.Add};request.Messages.Add(new ChatMessage("user","Inspect the actual target"));
+                        var result=await provider.CompleteAsync(request,CancellationToken.None);
+                        Assert.AreEqual("OPAQUE_STATE",(string)JObject.Parse(result.WireResponse)["thinking"]);Assert.IsEmpty(deltas);Assert.That(result.Text,Does.Not.Contain("OPAQUE_STATE"));Assert.That(result.Text,Does.Contain("inspect_object"));
+                    }
+                }
+                finally{UnityEngine.Object.DestroyImmediate(profile);}
+            }
+        }
         [UnityTest] public IEnumerator CancelAfterFirstDeltaPreventsLaterCallbacks() => Await(CheckCancel(false));
         [UnityTest] public IEnumerator DisposeAfterFirstDeltaPreventsLaterCallbacks() => Await(CheckCancel(true));
         private static async Task CheckCancel(bool dispose)

@@ -62,6 +62,7 @@ execute_editor_code: optional existing owned target, otherwise an owned workspac
             if(!target.GetComponent<GeneratedSceneObject>())throw new ArgumentException("Editor code target must be owned.");
             Undo.RegisterFullObjectHierarchyUndo(target,"WorldWeaver C# operation");
             var before=ProjectContextIndex.Objects().Select(g=>g.GetInstanceID()).ToHashSet();
+            string sceneBefore=SceneSignature();
             object result;
             try{result=assembly.GetType("WWEditorSnippet").GetMethod("Execute").Invoke(null,new object[]{target});}
             catch(TargetInvocationException e){throw new InvalidOperationException("C# runtime error: "+(e.InnerException??e).Message);}
@@ -73,9 +74,13 @@ execute_editor_code: optional existing owned target, otherwise an owned workspac
             }
             string data=JsonConvert.SerializeObject(result,new JsonSerializerSettings{ReferenceLoopHandling=ReferenceLoopHandling.Ignore,MaxDepth=8,Converters=new List<JsonConverter>{new UnityReadbackConverter()}});
             if(data.Length>16000)data=data.Substring(0,16000)+" [output truncated]";
-            var report=new JObject{["compiled"]=true,["executed"]=true,["sourceHash"]=hash,["result"]=data,["createdObjects"]=new JArray(created.Take(80).Select(g=>ProjectContextIndex.StableTarget(g))),["sceneReadback"]=ReadScene(target,created),["verification"]="Compilation and execution only; runtime gameplay was not tested by this command."};
+            var report=new JObject{["compiled"]=true,["executed"]=true,["sceneChanged"]=sceneBefore!=SceneSignature(),["sourceHash"]=hash,["result"]=data,["createdObjects"]=new JArray(created.Take(80).Select(g=>ProjectContextIndex.StableTarget(g))),["sceneReadback"]=ReadScene(target,created),["verification"]="Compilation and execution only; runtime gameplay was not tested by this command."};
             return new EditorCommandResult{Tool=command.tool,Success=true,Target=ProjectContextIndex.StableTarget(target),Summary=report.ToString(Formatting.None)};
         }
+        // Progress signal only, never a proof that the user's request is complete.
+        // Includes serialized component fields throughout loaded scenes; ignores the
+        // workspace creation above and does not trust a snippet's return value.
+        static string SceneSignature()=>TextChunker.Digest(string.Join("\n",ProjectContextIndex.Objects().OrderBy(g=>g.GetInstanceID()).Select(g=>g.GetInstanceID()+":"+EditorJsonUtility.ToJson(g)+":"+string.Join("|",g.GetComponents<Component>().Where(c=>c).Select(c=>c.GetType().FullName+":"+EditorJsonUtility.ToJson(c))))));
         // Host measurements, independent of the snippet's self-reported return data.
         // Spatial evidence works for any generated component composition, not a named scenario.
         internal static JArray ReadScene(GameObject target,GameObject[] created)

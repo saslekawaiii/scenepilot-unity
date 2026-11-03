@@ -114,6 +114,8 @@ namespace WorldWeaver.Editor.Assistant
                 motor.height = 1.8f; motor.radius = .3f; motor.center = new Vector3(0, .9f, 0); motor.stepOffset = .3f;
                 Undo.AddComponent<Inventory>(go);
                 player = Undo.AddComponent<WorldPlayer>(go);
+                player.AlwaysLook=true;
+                player.LastMessage="WASD — движение · Shift — бег · Space — прыжок · мышь — обзор · E — разговор";
                 var place = Undo.AddComponent<WorldPlace>(go); place.Key = "player_spawn"; place.Kind = WorldPlaceKind.Spawn;
                 var entity = Undo.AddComponent<WorldEntity>(go); entity.Id = place.PersistentId;
             }
@@ -189,7 +191,7 @@ namespace WorldWeaver.Editor.Assistant
             var report = customReport??Inspect(go); if(customReport==null)report["preset"] = Preset(command);else report["success"]=player&&player.View&&binder.Visual&&binder.Animator; report["reusedExistingPlayer"] = reused;
             report["createdPreviewFloor"] = previewFloor;
             if (previewFloor) report["previewScope"] = "A small 16 × 16 m walkable presentation stage was added because no suitable physical floor existed at the spawn. This is not a generated full game world.";
-            report["source"] = customReport==null?"Kenney Mini Characters 1 (CC0-1.0)":(string)command.args["model_path"]; report["controls"] = "WASD · Shift — бег · Space — прыжок · правая кнопка мыши — камера · E — разговор";
+            report["source"] = customReport==null?"Kenney Mini Characters 1 (CC0-1.0)":(string)command.args["model_path"]; report["controls"] = "WASD · Shift — бег · Space — прыжок · "+(player.AlwaysLook?"мышь — обзор":"правая кнопка мыши — камера")+" · E — разговор";
             if (!(bool)report["success"]) throw new InvalidOperationException("Animated character read-back failed: " + report);
             return new WorldGameplayToolResult { Target = go, Summary = report.ToString(Newtonsoft.Json.Formatting.None) };
         }

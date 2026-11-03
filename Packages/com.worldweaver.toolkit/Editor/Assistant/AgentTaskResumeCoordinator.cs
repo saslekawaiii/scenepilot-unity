@@ -25,7 +25,7 @@ namespace WorldWeaver.Editor.Assistant
             var store=new ChatHistoryStore();
             var pending=store.Load().SelectMany(s=>s.Messages.Where(m=>m.Task?.ContinueAfterReload==true&&m.PendingPlan==null).Select(m=>new{Session=s,Message=m})).OrderBy(v=>v.Message.CreatedUtc,StringComparer.Ordinal).FirstOrDefault();
             if(pending==null)return;
-            if(pending.Message.Task.ResumeAttempts>=3||pending.Message.Task.Status=="restored")
+            if(pending.Message.Task.ResumeAttempts>=ChatController.TaskContinuationLimit(pending.Session.Settings)||pending.Message.Task.Status=="restored")
             {pending.Message.Task.ContinueAfterReload=false;pending.Message.Status="Нужно продолжить вручную";store.Save(pending.Session);foreach(var c in live)c.ReloadFromDisk();return;}
             running=true;ChatController hidden=null;
             try

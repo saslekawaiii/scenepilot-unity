@@ -103,7 +103,7 @@ namespace WorldWeaver.Tests
         {
             const string raw = "{\"reply\":\"Preparing\",\"complete\":true,\"actions\":[{\"tool\":\"create_npc\",\"name\":\"RejectedPartialHero\",\"target\":\"\",\"args\":{}},{\"tool\":\"draft_script\",\"name\":\"HeroMovement.cs\",\"target\":\"invented-target\",\"args\":{\"code\":\"using UnityEngine; public class HeroMovement { void Update() { animator.Play(\\\"Walk";
             const string className = "TruncatedReviewMover";
-            const string source = "using UnityEngine; public class TruncatedReviewMover : MonoBehaviour { void Update() { if(Input.GetKeyDown(KeyCode.F)) enabled=false; } }";
+            const string source = "using UnityEngine; public class TruncatedReviewMover : MonoBehaviour { void Update() { if(UnityEngine.InputSystem.Keyboard.current!=null && UnityEngine.InputSystem.Keyboard.current.fKey.wasPressedThisFrame) enabled=false; } }";
             string path = "Assets/WorldWeaverGenerated/Scripts/" + className + ".cs"; Assert.IsFalse(File.Exists(path)); var provider = new Provider();
             provider.Reply = (round, request) =>
             {

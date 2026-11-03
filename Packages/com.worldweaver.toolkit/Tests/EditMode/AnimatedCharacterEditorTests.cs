@@ -51,6 +51,7 @@ namespace WorldWeaver.Tests
             Assert.That(hero.GetComponentsInChildren<SkinnedMeshRenderer>().Length, Is.GreaterThanOrEqualTo(2));
             Assert.That(hero.GetComponentsInChildren<MeshFilter>(), Is.Empty, "Do not silently replace the requested model with primitive mesh renderers.");
             Assert.That(hero.GetComponent<WorldPlayer>().View, Is.Not.Null);
+            Assert.IsTrue(hero.GetComponent<WorldPlayer>().AlwaysLook,"New playable characters have responsive two-axis mouse look without RMB");
             var binding = hero.GetComponent<WorldCharacterAnimation>();
             var controller = (AnimatorController)binding.Animator.runtimeAnimatorController;
             Assert.That(controller.parameters.Select(p => p.name), Does.Contain("Speed").And.Contain("Grounded"));
@@ -73,11 +74,13 @@ namespace WorldWeaver.Tests
             var first = Create("adventurer");
             var camera = first.GetComponent<WorldPlayer>().View;
             var inventory = first.GetComponent<Inventory>();
+            first.GetComponent<WorldPlayer>().AlwaysLook=false;
             var second = Create("explorer", "id:" + first.GetInstanceID());
             Assert.That(second, Is.SameAs(first));
             Assert.That(UnityEngine.Object.FindObjectsByType<WorldPlayer>(FindObjectsSortMode.None).Length, Is.EqualTo(1));
             Assert.That(first.GetComponent<WorldPlayer>().View, Is.SameAs(camera));
             Assert.That(first.GetComponent<Inventory>(), Is.SameAs(inventory));
+            Assert.IsFalse(first.GetComponent<WorldPlayer>().AlwaysLook,"Replacing appearance preserves an existing player mouse policy");
             Assert.That(first.GetComponentsInChildren<Animator>().Length, Is.EqualTo(1));
             Assert.That((bool)((JObject)Call("Inspect", first))["success"], Is.True);
         }

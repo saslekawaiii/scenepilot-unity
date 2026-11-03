@@ -83,10 +83,53 @@ namespace WorldWeaver.Editor.Assistant
             var assets = AssetDatabase.FindAssets(query, new[]{"Assets","Packages"}).Select(AssetDatabase.GUIDToAssetPath)
                 .Where(p=>!AssetDatabase.IsValidFolder(p)).OrderBy(p=>p,StringComparer.Ordinal).Take(limit)
                 .Select(path=>new JObject{["path"]=path,["guid"]=AssetDatabase.AssetPathToGUID(path),["type"]=AssetDatabase.GetMainAssetTypeAtPath(path)?.Name});
-            return new JObject{["sceneMatches"]=rows.Count,["sceneObjects"]=new JArray(rows.Take(limit).Select(v=>Entry(v.Go))),["assets"]=new JArray(assets),["limit"]=limit};
+            var result=new JObject{["sceneMatches"]=rows.Count,["sceneObjects"]=new JArray(rows.Take(limit).Select(v=>Entry(v.Go))),["assets"]=new JArray(assets),["limit"]=limit};
+            if(rows.Count==0){result["queryHint"]="Scene search is literal AND-token matching in actual names/components; it does not translate languages. Do not repeat English synonyms for Russian names. Use list_scene_objects with component/kind, or inspect this actual active-scene inventory.";result["activeSceneInventory"]=ListScene(new JObject{["limit"]=12});}
+            return result;
         }
+        public static JObject ListScene(JObject args)
+        {
+            string type=(string)args["component"],kind=(string)args["kind"],parent=(string)args["parent"];
+            int limit=(int?)args["limit"]??30,offset=(int?)args["offset"]??0;
+            if(limit<1||limit>100||offset<0||offset>20000)throw new ArgumentException("Scene page requires limit1..100 and offset0..20000.");
+            GameObject ancestor=string.IsNullOrEmpty(parent)?null:SceneToolExecutor.ResolveTarget(parent);
+            bool HasType(Component c){for(var t=c.GetType();t!=null;t=t.BaseType)if(string.Equals(t.Name,type,StringComparison.OrdinalIgnoreCase)||string.Equals(t.FullName,type,StringComparison.OrdinalIgnoreCase))return true;return false;}
+            var all=Objects(true).Where(g=>g.scene==SceneManager.GetActiveScene()).Where(g=>!ancestor||g==ancestor||g.transform.IsChildOf(ancestor.transform))
+                .Where(g=>string.IsNullOrEmpty(kind)||string.Equals(g.GetComponent<GeneratedSceneObject>()?.Kind,kind,StringComparison.OrdinalIgnoreCase))
+                .Where(g=>string.IsNullOrEmpty(type)?g.GetComponents<Component>().Any(c=>c&&!(c is Transform)&&!(c is GeneratedSceneObject)):g.GetComponents<Component>().Any(c=>c&&HasType(c)))
+                .OrderByDescending(g=>g.GetComponent<Terrain>()||g.GetComponent<WorldPlayer>()).ThenByDescending(g=>g.GetComponent<Renderer>()!=null).ThenBy(g=>HierarchyPath(g),StringComparer.Ordinal).ToArray();
+            // The cursor must cover only rows actually delivered to the model.
+            // Item-only pages could exceed the tool-context budget and silently
+            // skip most objects when a 50 KB page was clipped to 14 KB.
+            const int pageCharacters=12000;int used=0;var rows=new JArray();
+            foreach(var g in all.Skip(offset).Take(limit))
+            {
+                var row=Entry(g);var renderer=g.GetComponent<Renderer>();
+                if(renderer){row["boundsSize"]=JArray.FromObject(new[]{renderer.bounds.size.x,renderer.bounds.size.y,renderer.bounds.size.z});row["materials"]=new JArray(renderer.sharedMaterials.Where(m=>m).Select(m=>new JObject{["name"]=m.name,["asset"]=AssetDatabase.GetAssetPath(m),["color"]=m.HasProperty("_BaseColor")?m.GetColor("_BaseColor").ToString():m.HasProperty("_Color")?m.color.ToString():null}));}
+                row["childCount"]=g.transform.childCount;
+                int cost=row.ToString(Newtonsoft.Json.Formatting.None).Length+1;
+                if(cost>pageCharacters)
+                {
+                    string name=g.name;row=new JObject{["target"]=row["target"],["name"]=name.Substring(0,Math.Min(name.Length,160)),["kind"]=row["kind"],["listingDetailsOmitted"]=true,["detailHint"]="Inspect this actual target for full object details."};cost=row.ToString(Newtonsoft.Json.Formatting.None).Length+1;
+                }
+                if(rows.Count>0&&used+cost>pageCharacters)break;
+                rows.Add(row);used+=cost;
+            }
+            int next=offset+rows.Count;
+            return new JObject{["total"]=all.Length,["offset"]=offset,["returned"]=rows.Count,["nextOffset"]=next<all.Length?(JToken)next:JValue.CreateNull(),["objects"]=rows};
+        }
+        public static JObject TerrainFacts(Terrain terrain)
+        {
+            var data=terrain.terrainData;if(!data)return new JObject{["target"]=StableTarget(terrain.gameObject),["dataMissing"]=true};
+            float min=float.PositiveInfinity,max=float.NegativeInfinity;
+            for(int y=0;y<=8;y++)for(int x=0;x<=8;x++){float height=data.GetInterpolatedHeight(x/8f,y/8f);min=Mathf.Min(min,height);max=Mathf.Max(max,height);}
+            var collider=terrain.GetComponent<TerrainCollider>();var environment=terrain.GetComponent<WorldEnvironment>()??terrain.GetComponentInParent<WorldEnvironment>();
+            return new JObject{["target"]=StableTarget(terrain.gameObject),["name"]=terrain.name,["dataAsset"]=AssetDatabase.GetAssetPath(data),["position"]=JArray.FromObject(new[]{terrain.transform.position.x,terrain.transform.position.y,terrain.transform.position.z}),["size"]=JArray.FromObject(new[]{data.size.x,data.size.y,data.size.z}),["heightmapResolution"]=data.heightmapResolution,["sampledMinHeight"]=min,["sampledMaxHeight"]=max,["sampleGrid"]=9,["colliderMatches"]=collider&&collider.enabled&&collider.terrainData==data,["heightmapSource"]=environment?environment.HeightmapSource:null};
+        }
+        public static JArray TerrainFacts()=>new JArray(Objects().Select(g=>g.GetComponent<Terrain>()).Where(t=>t).Take(8).Select(TerrainFacts));
         public static JObject Summary() => new JObject {
             ["unityVersion"]=Application.unityVersion,["platform"]=EditorUserBuildSettings.activeBuildTarget.ToString(),
+            ["inputBackend"]=WorldInput.Backend,
             ["loadedScenes"]=new JArray(Enumerable.Range(0,SceneManager.sceneCount).Select(i=>SceneManager.GetSceneAt(i)).Where(s=>s.isLoaded).Select(s=>new JObject{["name"]=s.name,["path"]=s.path,["dirty"]=s.isDirty})),
             ["assetCount"]=AssetDatabase.GetAllAssetPaths().Count(p=>p.StartsWith("Assets/",StringComparison.Ordinal)),
             ["buildScenes"]=new JArray(EditorBuildSettings.scenes.Select(s=>new JObject{["path"]=s.path,["enabled"]=s.enabled})),

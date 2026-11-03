@@ -36,7 +36,7 @@ namespace WorldWeaver.Editor.Assistant
         }
 
         public static string ToolInstructions => @"CODE TOOLS (always reviewed before import):
-draft_script: name=ASCII C# MonoBehaviour class name (no extension/path), target='', args={code:'complete C# source',description:'Russian purpose'}. Code must declare that exact class deriving MonoBehaviour, use Unity APIs, have no hard-coded credentials, and avoid Editor-only APIs. Create small self-contained scripts; no shell, package downloads or changes to project settings. Existing own generated script of the same class can be revised; all other files are preserved. Do not attach a draft until it compiles. The user can apply/reject the code in chat. Real Unity compilation results are included in context; repair errors with a new draft of the same name.
+draft_script: name=ASCII C# MonoBehaviour class name (no extension/path), target='', args={code:'complete C# source',description:'Russian purpose'}. Code must declare that exact class deriving MonoBehaviour, use Unity APIs, have no hard-coded credentials, and avoid Editor-only APIs. Inspect inspect_project for active input backend. Prefer WorldWeaver.WorldInput.LookDegrees(speed,deltaTime,requireRightButton) for mouse look and WorldInput.Movement/JumpPressed for cross-backend input. Never call legacy UnityEngine.Input unconditionally in a new-Input-System-only project. When a custom camera script owns rotation, set the player ExternalCameraControl=true to prevent competing writers. Create small self-contained scripts; no shell, package downloads or changes to project settings. Existing own generated script of the same class can be revised; all other files are preserved. Do not attach a draft until it compiles. The user can apply/reject the code in chat. Real Unity compilation results are included in context; repair errors with a new draft of the same name.
 attach_script: name=class name of an ALREADY COMPILED WorldWeaver-generated script, target=existing scene object, args={}. This is also a reviewed change. Never attempt attach_script in the same plan as draft_script. Use attach_behavior for existing built-in rotation/patrol/bob without drafting code.";
 
         static ScriptDrafts()
@@ -141,19 +141,35 @@ attach_script: name=class name of an ALREADY COMPILED WorldWeaver-generated scri
                 files = latest.Files.Select(f => f.Path), imports = states.Take(12).Select(s => new { s.MessageId, s.Pending, s.Reverted, s.CompilationConfirmed, s.CompilationSucceeded, s.Outcome }) });
         }
 
+        private static void ValidateActiveInput(string code)
+        {
+#if ENABLE_INPUT_SYSTEM && !ENABLE_LEGACY_INPUT_MANAGER
+            if(!string.IsNullOrEmpty(code))
+            {
+                bool legacy=EditorSnippetCompiler.HasActiveLegacyInputCalls(code,EditorUserBuildSettings.activeScriptCompilationDefines);
+                if(legacy)throw new ArgumentException("This project enables only the new Input System. Active legacy UnityEngine.Input calls compile but fail in Play Mode. Use WorldWeaver.WorldInput.LookDegrees/Movement or UnityEngine.InputSystem devices. A #if ENABLE_LEGACY_INPUT_MANAGER fallback is allowed. No source imported.");
+            }
+#endif
+        }
+
         public static void Validate(EditorCommand action)
         {
             if (action.tool != "draft_script" && action.tool != "attach_script") throw new ArgumentException("Unknown code tool.");
-            if (!Regex.IsMatch(action.name ?? "", "^[A-Za-z_][A-Za-z0-9_]{0,79}$")) throw new ArgumentException("Имя C# класса: латинские буквы, цифры и подчёркивание, без пути.");
+            if (!Regex.IsMatch(action.name ?? "", "^[A-Za-z_][A-Za-z0-9_]{0,79}$"))
+            {
+                var available=Directory.Exists(Folder)?Directory.GetFiles(Folder,"*.cs").Where(CurrentSourceWasCompiled).Select(Path.GetFileNameWithoutExtension).Take(12).ToArray():Array.Empty<string>();
+                throw new ArgumentException("Имя C# класса: заполните обязательное поле name точным именем класса (латинские буквы, цифры и подчёркивание, без пути). Уже скомпилированные собственные классы: "+string.Join(", ",available)+". Не повторяйте вызов с пустым name.");
+            }
             if (action.tool == "attach_script")
             {
                 if (action.args.Count != 0) throw new ArgumentException("attach_script не принимает args.");
                 var path = Folder + "/" + action.name + ".cs";
                 if (!File.Exists(path) || !File.ReadAllText(path).StartsWith(Marker, StringComparison.Ordinal)) throw new ArgumentException("Можно подключать только ранее проверенный скрипт WorldWeaver.");
+                ValidateActiveInput(File.ReadAllText(path));
                 var script = AssetDatabase.LoadAssetAtPath<MonoScript>(path);
                 var type = script ? script.GetClass() : null;
                 if (type == null || !typeof(MonoBehaviour).IsAssignableFrom(type) || type.IsAbstract || !CurrentSourceWasCompiled(path))
-                    throw new ArgumentException("Подключение требует подтверждённой успешной компиляции текущего файла. Исправьте код и повторите просмотренный импорт; старый тип из прежней сборки не используется.");
+                    throw new ArgumentException("Подключение требует подтверждённой успешной компиляции текущего файла. Сначала передайте полный исходник этого класса через draft_script (name="+action.name+"), дождитесь фактического compile_scripts, затем вызывайте attach_script. Прежняя реплика о компиляции и старый тип из прежней сборки не являются доказательством текущего файла.");
                 SceneToolExecutor.ResolveTarget(action.target);
                 return;
             }
@@ -161,6 +177,7 @@ attach_script: name=class name of an ALREADY COMPILED WorldWeaver-generated scri
             var codeToken = action.args["code"];
             if (codeToken?.Type != Newtonsoft.Json.Linq.JTokenType.String) throw new ArgumentException("draft_script.code должен быть строкой C#.");
             var code = (string)codeToken;
+            ValidateActiveInput(code);
             if (string.IsNullOrWhiteSpace(code) || code.Length > 35000 || !Regex.IsMatch(code, @"\bclass\s+" + Regex.Escape(action.name) + @"\s*:\s*(?:UnityEngine\.)?MonoBehaviour\b"))
                 throw new ArgumentException("Код должен содержать полный MonoBehaviour с именем " + action.name + " (до 35 000 символов).");
             if (code.Contains("```") || code.Contains("[InitializeOnLoad") || code.Contains("UnityEditor") || ChatHistoryStore.Redact(code) != code)

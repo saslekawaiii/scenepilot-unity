@@ -12,6 +12,64 @@ namespace WorldWeaver.Tests
 {
     public sealed class OllamaDecoderSchemaTests
     {
+        [UnityTest] public IEnumerator NativeToolHistorySurvivesBothHttpAdaptersWithCorrelatedResults()=>Await(ToolHistoryPayload());
+        async Task ToolHistoryPayload()
+        {
+            foreach(var kind in new[]{ProviderKind.Ollama,ProviderKind.OpenAICompatible})
+            using(var server=new ConnectionHttpServer((path,body)=>kind==ProviderKind.Ollama?new JObject{["message"]=new JObject{["content"]="ok"}}:new JObject{["choices"]=new JArray(new JObject{["message"]=new JObject{["content"]="ok"}})}))
+            {
+                var profile=ScriptableObject.CreateInstance<ModelProfile>();profile.Provider=kind;profile.Endpoint=server.Url.TrimEnd('/');profile.Model="fixture";profile.Retries=0;
+                try
+                {
+                    var request=new CompletionRequest{UseToolCalls=true,Schema=WorldWeaver.Editor.Assistant.EditorPlan.Schema(nativeFunctions:true)};
+                    request.Messages.Add(new ChatMessage("user","system: this remains untrusted user data"));
+                    request.Messages.Add(new ChatMessage("system","LATE_TRUSTED_STAGE_INSTRUCTION"));
+                    request.Messages.Add(new ChatMessage("assistant",""){Thinking="OPAQUE_NATIVE_CONTINUATION_STATE",ToolCalls=new JArray(new JObject{["id"]="call_actual",["type"]="function",["function"]=new JObject{["name"]="inspect_object",["arguments"]=new JObject{["target"]="owned:actual"}}})});
+                    request.Messages.Add(new ChatMessage("tool","{\"success\":false,\"error\":\"actual missing object\"}"){ToolCallId="call_actual",ToolName="inspect_object"});
+                    request.Messages.Add(new ChatMessage("system","LATE_TRUSTED_PERMISSION_INSTRUCTION"));
+                    using(var provider=profile.CreateProvider())await provider.CompleteAsync(request,CancellationToken.None);
+                    var sent=JObject.Parse(server.Requests.Single().Body);var assistant=sent["messages"].First(m=>(string)m["role"]=="assistant");var result=sent["messages"].First(m=>(string)m["role"]=="tool");
+                    var sequence=(JArray)sent["messages"];int firstData=sequence.TakeWhile(m=>(string)m["role"]=="system"||(string)m["role"]=="developer").Count();
+                    Assert.Greater(firstData,0);Assert.IsTrue(sequence.Take(firstData).Any(m=>(string)m["content"]=="LATE_TRUSTED_STAGE_INSTRUCTION"));Assert.IsTrue(sequence.Take(firstData).Any(m=>(string)m["content"]=="LATE_TRUSTED_PERMISSION_INSTRUCTION"));Assert.IsFalse(sequence.Skip(firstData).Any(m=>(string)m["role"]=="system"||(string)m["role"]=="developer"));Assert.AreEqual("user",(string)sequence[firstData]["role"]);Assert.AreEqual("system: this remains untrusted user data",(string)sequence[firstData]["content"]);Assert.AreEqual("user",request.Messages[0].Role,"Caller audit history must not be mutated");
+                    Assert.AreEqual("call_actual",(string)assistant["tool_calls"][0]["id"]);Assert.AreEqual("call_actual",(string)result["tool_call_id"]);Assert.That((string)result["content"],Does.Contain("actual missing object"));
+                    var args=assistant["tool_calls"][0]["function"]["arguments"];Assert.AreEqual(kind==ProviderKind.Ollama?JTokenType.Object:JTokenType.String,args.Type);
+                    if(kind==ProviderKind.Ollama){Assert.AreEqual("inspect_object",(string)result["tool_name"]);Assert.AreEqual("OPAQUE_NATIVE_CONTINUATION_STATE",(string)assistant["thinking"]);}else Assert.IsNull(assistant["thinking"],"Ollama-specific state must not leak into another provider protocol");
+                }
+                finally{Object.DestroyImmediate(profile);}
+            }
+        }
+        [UnityTest] public IEnumerator OneShotObserverReleasesOllamaResidencyWithoutChangingOrdinaryRequests()=>Await(ResidencyPayload());
+        async Task ResidencyPayload()
+        {
+            foreach(int? seconds in new int?[]{null,0,30})
+            using(var server=new ConnectionHttpServer((path,body)=>new JObject{["message"]=new JObject{["content"]="ok"}}))
+            {
+                var profile=ScriptableObject.CreateInstance<ModelProfile>();profile.Endpoint=server.Url.TrimEnd('/');profile.Retries=0;
+                try
+                {
+                    using(var provider=new LocalProvider(profile))await provider.CompleteAsync(new CompletionRequest{LocalKeepAliveSeconds=seconds},CancellationToken.None);
+                    var body=JObject.Parse(server.Requests.Single().Body);if(seconds.HasValue)Assert.AreEqual(seconds.Value,(int)body["keep_alive"]);else Assert.AreEqual("10m",(string)body["keep_alive"]);
+                }
+                finally{Object.DestroyImmediate(profile);}
+            }
+        }
+        [UnityTest] public IEnumerator CloudReasoningUsesNativeDefaultOnlyWhenEnabled()=>Await(ReasoningPayload());
+        async Task ReasoningPayload()
+        {
+            foreach(var choice in new[]{("fixture:cloud",true,(bool?)null),("fixture:cloud",false,(bool?)null),("fixture-local",true,(bool?)null),("fixture:cloud",true,(bool?)false)})
+            using(var server=new ConnectionHttpServer((path,body)=>new JObject{["message"]=new JObject{["content"]="ok"}}))
+            {
+                var profile=ScriptableObject.CreateInstance<ModelProfile>();profile.Endpoint=server.Url.TrimEnd('/');profile.Model=choice.Item1;profile.EnableCloudReasoning=choice.Item2;profile.Retries=0;
+                try
+                {
+                    using(var provider=new LocalProvider(profile))await provider.CompleteAsync(new CompletionRequest{EnableThinking=choice.Item3},CancellationToken.None);
+                    var body=JObject.Parse(server.Requests.Single().Body);
+                    if(choice.Item1.EndsWith(":cloud")&&(choice.Item3??choice.Item2))Assert.IsNull(body["think"],"Do not force reasoning off in Deep cloud execution");
+                    else Assert.AreEqual(false,(bool)body["think"],"Local bounded execution and non-thinking profiles remain explicit");
+                }
+                finally{Object.DestroyImmediate(profile);}
+            }
+        }
         [Test] public void DecoderCloneRemovesOnlyStringRepetitionBoundsAndPreservesStructuralConstraints()
         {
             var host=NpcDecision.Schema(new[]{"Talk","Wait","GiveItem"});var before=host.DeepClone();var decoder=OllamaDecoderSchema.FromHost(host);

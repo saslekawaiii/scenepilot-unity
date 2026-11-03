@@ -9,6 +9,16 @@ namespace WorldWeaver
     /// <summary>Read the active Unity input backend without forcing a project's input settings to change.</summary>
     public static class WorldInput
     {
+        public static string Backend =>
+#if ENABLE_INPUT_SYSTEM && ENABLE_LEGACY_INPUT_MANAGER
+            "Input System and legacy Input Manager; WorldInput prefers Input System";
+#elif ENABLE_INPUT_SYSTEM
+            "Input System only; unconditional UnityEngine.Input calls fail at runtime";
+#elif ENABLE_LEGACY_INPUT_MANAGER
+            "Legacy Input Manager";
+#else
+            "No active input backend";
+#endif
 #if ENABLE_INPUT_SYSTEM
         static Keyboard imeKeyboard;
         static bool composing;
@@ -42,13 +52,15 @@ namespace WorldWeaver
             }
         }
         public static float TurnDegrees(float speed,float deltaTime)
+            =>LookDegrees(speed,deltaTime,true).x;
+        public static Vector2 LookDegrees(float speed,float deltaTime,bool requireRightButton=true)
         {
 #if ENABLE_INPUT_SYSTEM
-            var mouse=Mouse.current;return mouse!=null&&mouse.rightButton.isPressed?mouse.delta.ReadValue().x*speed*.0025f:0;
+            var mouse=Mouse.current;return mouse!=null&&(!requireRightButton||mouse.rightButton.isPressed)?mouse.delta.ReadValue()*speed*.0025f:Vector2.zero;
 #elif ENABLE_LEGACY_INPUT_MANAGER
-            return Input.GetMouseButton(1)?Input.GetAxis("Mouse X")*speed*deltaTime:0;
+            return !requireRightButton||Input.GetMouseButton(1)?new Vector2(Input.GetAxis("Mouse X"),Input.GetAxis("Mouse Y"))*speed*deltaTime:Vector2.zero;
 #else
-            return 0;
+            return Vector2.zero;
 #endif
         }
         public static bool SprintHeld

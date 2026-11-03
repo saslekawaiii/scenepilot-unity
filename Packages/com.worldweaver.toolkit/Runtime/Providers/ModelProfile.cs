@@ -18,6 +18,8 @@ namespace WorldWeaver
         [Range(64, 8192)] public int MaxTokens = 768;
         [Range(1024, 32768)] public int ContextWindow = 4096;
         public bool StrictSchema = true;
+        [Tooltip("Allow provider-default reasoning for Ollama cloud models. Local models keep the bounded non-thinking path.")]
+        public bool EnableCloudReasoning;
         public OpenAIResponseMode ResponseMode = OpenAIResponseMode.JsonObject;
 
         public void Validate()

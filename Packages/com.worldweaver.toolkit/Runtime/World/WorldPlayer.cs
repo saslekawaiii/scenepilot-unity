@@ -12,10 +12,16 @@ namespace WorldWeaver
         [Min(.1f)] public float Gravity = 9.81f;
         public bool UseLocalGravity;
         public bool MovementLocked;
+        [Tooltip("Follow mouse without holding RMB. Input uses the active Unity backend.")]
+        public bool AlwaysLook;
+        public bool InvertLookY;
+        public bool ExternalCameraControl;
+        [Range(-89,0)] public float MinPitch = -75;
+        [Range(0,89)] public float MaxPitch = 80;
         [Min(1)] public float SprintMultiplier = 1.6f;
         [Min(0)] public float JumpHeight = 1.1f;
         private CharacterController motor;
-        private float yaw, vertical;
+        private float yaw, vertical, pitch;
         private WorldConversationUI conversation;
         public WorldConversationUI Conversation => conversation;
         public string LastMessage = "WASD — движение · Shift — бег · Space — прыжок · правая кнопка мыши — поворот · E — разговор";
@@ -24,6 +30,7 @@ namespace WorldWeaver
         private void OnEnable()
         {
             motor = GetComponent<CharacterController>(); yaw = transform.eulerAngles.y; if (View) View.enabled = true;
+            pitch=View?Mathf.DeltaAngle(0,View.transform.localEulerAngles.x):0;
             // Keep submillimetre walking/gravity steps at high frame rates; dropping them also resets isGrounded.
             motor.minMoveDistance = 0;
             if (Application.isPlaying)
@@ -39,8 +46,12 @@ namespace WorldWeaver
             if (!motor || !motor.enabled) return;
             if (MovementLocked || (conversation && conversation.IsOpen)) return;
             var movement = WorldInput.Movement;
-            yaw += WorldInput.TurnDegrees(LookSpeed,Time.deltaTime);
-            transform.rotation = Quaternion.Euler(0,yaw,0);
+            var look=ExternalCameraControl?Vector2.zero:WorldInput.LookDegrees(LookSpeed,Time.deltaTime,!AlwaysLook);
+            yaw += look.x;
+            pitch=Mathf.Clamp(pitch+look.y*(InvertLookY?1:-1),MinPitch,MaxPitch);
+            if(!ExternalCameraControl)transform.rotation = Quaternion.Euler(0,yaw,0);
+            else yaw=transform.eulerAngles.y;
+            if(View&&!ExternalCameraControl)View.transform.localRotation=Quaternion.Euler(pitch,0,0);
             MoveFrame(movement,WorldInput.SprintHeld,WorldInput.JumpPressed,Time.deltaTime);
             if (WorldInput.InteractPressed)
             {var survival=GetComponent<WorldSurvival>();if(!survival||!survival.TryInteract())OpenNearestConversation();}

@@ -42,6 +42,25 @@ namespace WorldWeaver.Editor.Assistant
             _isAvailable = null;
         }
 
+        internal static bool HasActiveLegacyInputCalls(string source,IEnumerable<string> defines)
+        {
+            if(!IsAvailable)return false;
+            var withSymbols=_parseOptionsType.GetMethod("WithPreprocessorSymbols",new[]{typeof(IEnumerable<string>)});
+            var options=withSymbols.Invoke(_parseOptions,new object[]{defines});
+            var tree=_parseText.Invoke(null,new object[]{source,options,"",Encoding.UTF8,default(System.Threading.CancellationToken)});
+            var root=tree.GetType().GetMethod("GetRoot",new[]{typeof(System.Threading.CancellationToken)}).Invoke(tree,new object[]{default(System.Threading.CancellationToken)});
+            var descendants=root.GetType().GetMethods().First(m=>m.Name=="DescendantNodes"&&m.GetParameters().Length==2);
+            var nodes=(System.Collections.IEnumerable)descendants.Invoke(root,new object[]{null,false});
+            foreach(var node in nodes)
+            {
+                var type=node.GetType();if(type.Name!="MemberAccessExpressionSyntax")continue;
+                string expression=type.GetProperty("Expression").GetValue(node).ToString();
+                string member=type.GetProperty("Name").GetValue(node).ToString();
+                if((expression=="Input"||expression=="UnityEngine.Input")&&System.Text.RegularExpressions.Regex.IsMatch(member,@"^(?:GetAxis|GetAxisRaw|GetKey|GetKeyDown|GetKeyUp|GetMouseButton|GetMouseButtonDown|GetMouseButtonUp|mousePosition|mouseScrollDelta|inputString|anyKey|anyKeyDown)$"))return true;
+            }
+            return false;
+        }
+
         private static bool Initialize()
         {
             try

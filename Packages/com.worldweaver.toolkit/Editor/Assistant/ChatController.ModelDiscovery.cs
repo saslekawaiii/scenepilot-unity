@@ -75,7 +75,7 @@ namespace WorldWeaver.Editor.Assistant
                     string state = !item.CapabilitiesKnown ? "поддержка чата ещё проверяется" : item.Loaded ? "загружена в память" : result.LoadedStateKnown ? "установлена · загрузится при запросе" : "установлена · состояние памяти неизвестно";
                     found.Add(new AvailableModel { Key = "ollama:" + item.Id, Name = item.Id + (string.IsNullOrEmpty(item.Parameters) ? "" : " · " + item.Parameters),
                         Model = item.Id, Endpoint = localDiscovery.Endpoint, Provider = ProviderKind.Ollama,
-                        Available = item.CapabilitiesKnown && item.Completion, SupportsVision = item.Vision, Loaded = item.Loaded, AutoDiscovered = true,
+                        Available = item.CapabilitiesKnown && item.Completion, SupportsVision = item.Vision, Loaded = item.Loaded, AutoDiscovered = true, Remote=item.Remote, SizeBytes=item.Bytes,
                         Description = (item.Remote ? "Ollama · облачная модель, квота сервера" : "На этом компьютере · " + (item.Bytes / 1e9).ToString("F1") + " ГБ") + " · " + state });
                 }
             }

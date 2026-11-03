@@ -44,24 +44,40 @@ namespace WorldWeaver.Editor.Assistant
             if(!File.Exists(path))File.WriteAllBytes(path,bytes);
             return new ChatAttachment{Path=path,Name=name,Sha256=hash};
         }
-        public static ChatAttachment Capture(int width=960,int height=540)
+        public static ChatAttachment Capture(int width=960,int height=540,string view="overview")
         {
             if(width<320||width>1600||height<180||height>1200)throw new ArgumentException("Screenshot dimensions out of bounds.");
             if(SystemInfo.graphicsDeviceType==GraphicsDeviceType.Null)throw new InvalidOperationException("Rendering is unavailable in a -nographics editor. No screenshot was produced.");
-            Camera source=Camera.main;
+            if(!new[]{"overview","game","player"}.Contains(view))throw new ArgumentException("Unknown capture view.");
+            Camera source=view=="player"?ProjectContextIndex.Objects().Select(g=>g.GetComponent<WorldPlayer>()).Where(p=>p&&p.View).Select(p=>p.View).FirstOrDefault():Camera.main;
             if(!source)source=ProjectContextIndex.Objects().Select(go=>go.GetComponent<Camera>()).FirstOrDefault(c=>c&&c.enabled);
             if(!source&&SceneView.lastActiveSceneView)source=SceneView.lastActiveSceneView.camera;
-            if(!source)throw new ArgumentException("No scene/game camera available for capture.");
+            if(!source&&view!="overview")throw new ArgumentException("No scene/game camera available for capture.");
             var holder=new GameObject("WorldWeaver capture camera"){hideFlags=HideFlags.HideAndDontSave};
             var rt=RenderTexture.GetTemporary(width,height,24,RenderTextureFormat.ARGB32);
-            var previous=RenderTexture.active;Texture2D texture=null;
+            var previous=RenderTexture.active;Texture2D texture=null;bool fog=RenderSettings.fog;
             try
             {
-                var camera=holder.AddComponent<Camera>();camera.CopyFrom(source);holder.transform.SetPositionAndRotation(source.transform.position,source.transform.rotation);camera.enabled=false;camera.targetTexture=rt;camera.Render();
+                var camera=holder.AddComponent<Camera>();if(source){camera.CopyFrom(source);holder.transform.SetPositionAndRotation(source.transform.position,source.transform.rotation);}
+                if(view=="overview")
+                {
+                    var bounds=OverviewBounds();float span=Mathf.Max(bounds.size.x,bounds.size.z,8);camera.orthographic=true;camera.orthographicSize=span*.7f;camera.nearClipPlane=.05f;camera.farClipPlane=span*10+200;camera.clearFlags=CameraClearFlags.SolidColor;camera.backgroundColor=new Color(.08f,.09f,.11f);camera.transform.position=bounds.center+new Vector3(span*.7f,Mathf.Max(span*.8f,bounds.size.y*1.4f),span*.7f);camera.transform.LookAt(bounds.center);RenderSettings.fog=false;
+                }
+                camera.enabled=false;camera.targetTexture=rt;camera.Render();
                 RenderTexture.active=rt;texture=new Texture2D(width,height,TextureFormat.RGB24,false);texture.ReadPixels(new Rect(0,0,width,height),0,0);texture.Apply();
                 return Save(texture.EncodeToPNG(),"Сцена "+DateTime.Now.ToString("HH:mm:ss"));
             }
-            finally{RenderTexture.active=previous;if(texture)Object.DestroyImmediate(texture);RenderTexture.ReleaseTemporary(rt);Object.DestroyImmediate(holder);}
+            finally{RenderSettings.fog=fog;RenderTexture.active=previous;if(texture)Object.DestroyImmediate(texture);RenderTexture.ReleaseTemporary(rt);Object.DestroyImmediate(holder);}
+        }
+        public static Bounds OverviewBounds()
+        {
+            bool found=false;var bounds=new Bounds(Vector3.zero,Vector3.one*10);
+            foreach(var terrain in ProjectContextIndex.Objects().Select(g=>g.GetComponent<Terrain>()).Where(t=>t&&t.terrainData))
+            {var b=new Bounds(terrain.transform.position+terrain.terrainData.size*.5f,terrain.terrainData.size);if(!found){bounds=b;found=true;}else bounds.Encapsulate(b);}
+            bool landscape=found;float span=found?Mathf.Max(bounds.size.x,bounds.size.z,8):1000;
+            foreach(var renderer in ProjectContextIndex.Objects().Select(g=>g.GetComponent<Renderer>()).Where(r=>r&&r.enabled&&r.gameObject.activeInHierarchy))
+            {var b=renderer.bounds;if(landscape&&Mathf.Max(b.size.x,b.size.y,b.size.z)>span*2)continue;if(!found){bounds=b;found=true;}else bounds.Encapsulate(b);}
+            if(!found)throw new ArgumentException("No renderable scene geometry is available for an overview.");return bounds;
         }
         public static string ReadBase64(ChatAttachment attachment)
         {

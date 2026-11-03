@@ -21,6 +21,7 @@ namespace WorldWeaver.Editor.Assistant
         public bool PreferGeneratedScripts = true;
         public bool UseNativeFunctions = true;
         public bool AllowEditorCode;
+        public bool AllowAutonomousScripts;
         public int SkillContextBudget = 4000;
         public List<string> SkillFolders = new List<string>();
     }
@@ -33,7 +34,8 @@ namespace WorldWeaver.Editor.Assistant
         public string Endpoint;
         public bool Available;
         public bool SupportsVision;
-        public bool Loaded, AutoDiscovered;
+        public bool Loaded, AutoDiscovered, Remote;
+        public long SizeBytes;
         public string ConnectionId, ApiKeyEnvironmentVariable;
         public OpenAIResponseMode ResponseMode;
         public override string ToString() => Name;
@@ -95,8 +97,15 @@ namespace WorldWeaver.Editor.Assistant
             };
             if (allowedTools != null) command = EditorToolSchema.Restrict(allowedTools, typed);
             else if (typed) command = EditorToolSchema.DecoderCommandSchema();
-            if(nativeFunctions)foreach(var branch in (command["anyOf"] as JArray??new JArray()).OfType<JObject>())
-                branch["x-worldweaver-read-only"]=SceneToolExecutor.IsReadOnlyTool(EditorToolSchema.ToolName(branch))&&!WorldMaterialTools.IsAsync(EditorToolSchema.ToolName(branch));
+            if(nativeFunctions)
+            {
+                var references=string.Join("\n",new[]{SceneToolExecutor.ToolInstructions,AgentProjectTools.ToolInstructions,ConstructiveTools.Reference,AnimatedCharacterTools.ToolReference,WorldGameplayTools.ToolInstructions,WorldMaterialTools.ToolInstructions,ModelAssetTools.Reference,WebResearchTools.Reference,ScriptDrafts.ToolInstructions,EditorCodeTools.Reference,UnityRecipeCatalog.Reference}).Split('\n');
+                foreach(var branch in (command["anyOf"] as JArray??new JArray()).OfType<JObject>())
+                {
+                    string name=EditorToolSchema.ToolName(branch);branch["x-worldweaver-read-only"]=SceneToolExecutor.IsReadOnlyTool(name);
+                    string purpose=references.FirstOrDefault(line=>line.StartsWith(name+":",StringComparison.Ordinal));if(purpose!=null)branch["description"]=purpose.Substring(name.Length+1).Trim();
+                }
+            }
             var schema = new JObject {
                 ["type"] = "object", ["additionalProperties"] = false,
                 ["properties"] = new JObject {
@@ -139,6 +148,7 @@ namespace WorldWeaver.Editor.Assistant
         public long ProviderElapsedMs;
         public List<ChatMessage> Messages = new List<ChatMessage>();
         public bool Accepted, OutputTruncated;
+        public int FirstResultIndex=-1, ResultCount;
     }
 
     [Serializable]

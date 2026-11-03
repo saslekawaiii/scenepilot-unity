@@ -181,11 +181,15 @@ namespace WorldWeaver.Tests
             while(!cancellation.IsCancellationRequested)
             {
                 TcpClient client;try{client=await listener.AcceptTcpClientAsync().ConfigureAwait(false);}catch(ObjectDisposedException){return;}catch(SocketException){return;}
-                using(client)using(var stream=client.GetStream())using(var reader=new StreamReader(stream,Encoding.UTF8,false,1024,true))
+                using(client)using(var stream=client.GetStream())
                 {
-                    string first=await reader.ReadLineAsync().ConfigureAwait(false);if(string.IsNullOrEmpty(first))continue;string[] parts=first.Split(' ');int length=0;string authorization="",line;
-                    while(!string.IsNullOrEmpty(line=await reader.ReadLineAsync().ConfigureAwait(false))){int at=line.IndexOf(':');if(at<0)continue;string key=line.Substring(0,at),value=line.Substring(at+1).Trim();if(key.Equals("Content-Length",StringComparison.OrdinalIgnoreCase))int.TryParse(value,out length);if(key.Equals("Authorization",StringComparison.OrdinalIgnoreCase))authorization=value;}
-                    if(length<0||length>256*1024)return;var buffer=new char[length];int read=0;while(read<length){int n=await reader.ReadAsync(buffer,read,length-read).ConfigureAwait(false);if(n==0)break;read+=n;}string text=new string(buffer,0,read);var request=new Request{Method=parts[0],Path=parts[1],Body=text,Authorization=authorization};lock(requests)requests.Add(request);
+                    // HTTP Content-Length counts UTF-8 bytes, not StreamReader
+                    // characters. Read the headers without prefetching the body.
+                    var head=new List<byte>();var one=new byte[1];
+                    while(head.Count<16384){int n=await stream.ReadAsync(one,0,1).ConfigureAwait(false);if(n==0)break;head.Add(one[0]);int c=head.Count;if(c>=4&&head[c-4]==13&&head[c-3]==10&&head[c-2]==13&&head[c-1]==10)break;}
+                    string[] lines=Encoding.ASCII.GetString(head.ToArray()).Split(new[]{"\r\n"},StringSplitOptions.None);if(lines.Length<2||string.IsNullOrEmpty(lines[0]))continue;string[] parts=lines[0].Split(' ');int length=0;string authorization="";
+                    foreach(string line in lines.Skip(1)){int at=line.IndexOf(':');if(at<0)continue;string key=line.Substring(0,at),value=line.Substring(at+1).Trim();if(key.Equals("Content-Length",StringComparison.OrdinalIgnoreCase))int.TryParse(value,out length);if(key.Equals("Authorization",StringComparison.OrdinalIgnoreCase))authorization=value;}
+                    if(length<0||length>1024*1024)continue;var buffer=new byte[length];int read=0;while(read<length){int n=await stream.ReadAsync(buffer,read,length-read).ConfigureAwait(false);if(n==0)break;read+=n;}if(read!=length)continue;string text=Encoding.UTF8.GetString(buffer);var request=new Request{Method=parts[0],Path=parts[1],Body=text,Authorization=authorization};lock(requests)requests.Add(request);
                     byte[] payload=Encoding.UTF8.GetBytes(response(request.Path,string.IsNullOrEmpty(text)?null:JObject.Parse(text)).ToString(Newtonsoft.Json.Formatting.None));byte[] header=Encoding.ASCII.GetBytes("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\nContent-Length: "+payload.Length+"\r\n\r\n");await stream.WriteAsync(header,0,header.Length).ConfigureAwait(false);await stream.WriteAsync(payload,0,payload.Length).ConfigureAwait(false);
                 }
             }

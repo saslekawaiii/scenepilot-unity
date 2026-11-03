@@ -59,6 +59,7 @@ namespace WorldWeaver.Editor.Assistant
             foreach (var schema in ConstructiveTools.CommandSchemas()) commands.Add(schema);
             foreach (var schema in AnimatedCharacterTools.CommandSchemas()) commands.Add(schema);
             foreach (var schema in ModelAssetTools.CommandSchemas()) commands.Add(schema);
+            foreach (var schema in WebResearchTools.CommandSchemas()) commands.Add(schema);
             foreach (var schema in WorldMaterialTools.CommandSchemas()) commands.Add(schema);
             foreach (var schema in AgentProjectTools.CommandSchemas()) commands.Add(schema);
             commands.Add(AgentSourcePatches.CommandSchema());
@@ -304,9 +305,9 @@ namespace WorldWeaver.Editor.Assistant
             var result = Text(240, 1);
             result["pattern"] = generated
                 ? "^Assets/WorldWeaverGenerated/.+[.][uU][nN][iI][tT][yY]$"
-                : "^Assets/.+[.][cC][sS]$";
+                : "^(Assets|Packages)/.+[.][cC][sS]$";
             result["description"] = script
-                ? "Existing readable C# asset under Assets; no traversal, backslashes or forbidden path characters."
+                ? "Existing readable C# asset under Assets or an installed Packages folder; no traversal, backslashes or forbidden path characters. Package source is read-only."
                 : "New scene destination under Assets/WorldWeaverGenerated; never overwrites an existing scene.";
             return result;
         }
@@ -322,7 +323,9 @@ namespace WorldWeaver.Editor.Assistant
         {
             return new JObject
             {
-                ["type"] = "string", ["pattern"] = "^[A-Za-z_][A-Za-z0-9_]{0,79}$"
+                ["type"] = "string", ["minLength"] = 1, ["maxLength"] = 80,
+                ["pattern"] = "^[A-Za-z_][A-Za-z0-9_]{0,79}$",
+                ["description"] = "REQUIRED exact compiled/drafted C# class name, e.g. MouseLookCamera. Not a path; never omit this field."
             };
         }
         private static JObject EmptyTarget() => Enum("");
