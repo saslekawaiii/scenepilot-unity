@@ -1,0 +1,3 @@
+f29d07906ee829cb15df3866d132b58fc838f68cf3ad4285017f53f50df1fd2e  com.worldweaver.toolkit-1.7.0.tgz
+bd333e643782665faea3f203cee8d097cac60c4fac8fe5faac042a0bf05803a4  WorldWeaver-1.7.0-validation.json
+28999f5e6f2273a3fe636b8e709eaf34e9ad80f8e8bc36c55cef9ff0cc56067a  WorldWeaver-1.7.0-notes.md

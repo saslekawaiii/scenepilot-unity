@@ -28,6 +28,8 @@ def main():
     for name in ('proof', 'compound-proof', 'editor', 'play', 'regressions', 'compound', 'native', 'input', 'python', 'output'):
         parser.add_argument('--' + name, required=True)
     parser.add_argument("--acceptance-review")
+    parser.add_argument("--input-source-check")
+    parser.add_argument("--runtime-equivalence")
     args = parser.parse_args()
     proof = load(args.proof)
     compound_proof = load(args.compound_proof)
@@ -51,16 +53,24 @@ def main():
         'editorTests': tests(args.editor), 'playTests': tests(args.play), 'savedSceneInputTests': tests(args.input),
         'pythonTests': {**evidence(args.python), **load(args.python)},
         'liveRegressions': {**evidence(args.regressions), 'completed': regression.get('completed'), 'passed': regression.get('passed'),
+            'passedCases': sum(row.get('passed') is True for row in regression.get('cases', [])),
+            'unconfirmedChecks': [{'case': row.get('case'), 'checks': [key for key, passed in row.get('checks', {}).items() if not passed]} for row in regression.get('cases', []) if row.get('passed') is False],
             'cases': [{'name': row.get('case'), 'passed': row.get('passed'), 'checks': row.get('checks')} for row in regression.get('cases', [])]},
         'originalCompoundRequest': {**evidence(args.compound), 'completed': compound.get('completed'), 'passed': acceptance_review['passed'] if acceptance_review else compound.get('passed'), 'checks': acceptance_review['checks'] if acceptance_review else compound.get('checks'), 'originalRawPassed': compound.get('passed'), 'acceptanceReview': acceptance_review,
             'sourceCommit': compound_proof['sourceCommit'], 'releaseRuntimeAndEditorByteIdentical': True, 'onlyPackageDifferences': differences,
             'providerInjected': compound.get('providerInjected'), 'sceneRepairByHarness': compound.get('sceneRepairByHarness'), 'paidApiUsed': compound.get('paidApiUsed'),
-            'modelCalls': len(answer.get('Attempts', [])), 'toolResults': len(answer.get('Steps', [])), 'status': answer.get('Status')},
-        'nativeInstallation': {**evidence(args.native), **{k: native.get(k) for k in ('passed', 'version', 'verifiedFiles', 'differentFiles', 'skills', 'recipes', 'sceneMutations', 'uiVisuallyVerified', 'sourceCommit')}},
+            'modelCalls': len(answer.get('Attempts', [])), 'toolResults': len(answer.get('Steps', [])), 'status': answer.get('Status'),
+            'originalImplementationProof': compound.get('originalImplementationProof'), 'originalRawReportSha256': compound.get('originalRawReportSha256'),
+            'recovery': {k: compound.get(k) for k in ('additionalPlannerTurns', 'resumeAttemptsBefore', 'resumeAttemptsAfter', 'loadedProjectChats')}, 'criterionCorrection': compound.get('criterionCorrection')},
+        'nativeInstallation': {**evidence(args.native), **{k: native.get(k) for k in ('passed', 'version', 'verifiedFiles', 'differentFiles', 'skills', 'recipes', 'sceneMutations', 'uiVisuallyVerified', 'sourceCommit')}, **{k: native_outer.get(k) for k in ('status', 'originalSourceAndSceneFiles', 'originalSourcesAndScenesUnchanged', 'temporaryHelpersRemoved', 'packageManagerClientAddUsed')}},
         'limits': ['A bounded tool agent, not a trained replacement for every developer task.', 'Live services and model output are variable; free services can be unavailable.',
             'A global planetary DEM fitted to a small Unity Terrain is not a geographically scaled reconstruction.', 'Procedural humanoid locomotion is used when compatible authored clips are unavailable.',
             'This validation contains no new interactive desktop UI inspection.']
     }
+    if args.input_source_check:
+        data['savedSceneSourceCheck'] = {**evidence(args.input_source_check), **load(args.input_source_check)}
+    if args.runtime_equivalence:
+        data['runtimeEquivalence'] = {**evidence(args.runtime_equivalence), **load(args.runtime_equivalence)}
     # The raw files stay in the audit workspace. Only this compact export belongs in releases.
     output = ROOT / args.output
     output.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')

@@ -1,0 +1,273 @@
+{
+  "version": "1.7.0",
+  "status": "preview",
+  "sourceCommit": "6a935ba0762964344795cc4b1d831651906e8a28",
+  "package": {
+    "archive": "deliverables/com.worldweaver.toolkit-1.7.0.tgz",
+    "sha256": "f29d07906ee829cb15df3866d132b58fc838f68cf3ad4285017f53f50df1fd2e",
+    "fileCount": 1824,
+    "treeSha256": "6c7bc0d2171b8e1ddde789e40d428ec99979c47cff0866a09a0f4d14fd4352a2"
+  },
+  "editorTests": {
+    "path": "results/web-agent-edit-1.7.0-rc41.xml",
+    "sha256": "716de3ce4638c42b39fda03fe12066f9209bbaa3c4708db49a4979d24e962a6f",
+    "total": 767,
+    "passed": 767,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0,
+    "result": "Passed"
+  },
+  "playTests": {
+    "path": "results/web-agent-play-1.7.0-rc41.xml",
+    "sha256": "7b81d5aaf4c5c7f32e7ebf05110d6adf9425159915d5adca92d1dad95829545b",
+    "total": 29,
+    "passed": 27,
+    "failed": 0,
+    "skipped": 2,
+    "inconclusive": 0,
+    "result": "Skipped:Ignored"
+  },
+  "savedSceneInputTests": {
+    "path": "results/compound41-external-input-1.7.0.xml",
+    "sha256": "ee652770825106bec77279f5ec2caea946d487ceacf7c9718e7c88a59487ae40",
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "skipped": 0,
+    "inconclusive": 0,
+    "result": "Passed"
+  },
+  "pythonTests": {
+    "path": "results/web-agent-python-1.7.0-rc41.json",
+    "sha256": "529924ab5f5d72867e361c4097ae083d1cc7e2de141d06d2ecfd0b7cac90538f",
+    "command": "python -m unittest discover -s Packages/com.worldweaver.toolkit/Tools~/web_agent",
+    "passed": 16,
+    "failed": 0,
+    "exitCode": 0,
+    "utc": "2026-11-03T19:48:20.886574+00:00"
+  },
+  "liveRegressions": {
+    "path": "results/agent-regressions-1.7.0-rc41.json",
+    "sha256": "732142c025e302c4735c75a0b1aa39e16bd9fd3950b756357d64533517b5309c",
+    "completed": true,
+    "passed": false,
+    "passedCases": 5,
+    "unconfirmedChecks": [
+      {
+        "case": "moon",
+        "checks": [
+          "multipleCraters"
+        ]
+      },
+      {
+        "case": "open_world",
+        "checks": [
+          "largePhysicalWorld"
+        ]
+      }
+    ],
+    "cases": [
+      {
+        "name": "hero",
+        "passed": true,
+        "checks": {
+          "realModelUsed": true,
+          "noError": true,
+          "noPendingPlan": true,
+          "onePlayableHero": true,
+          "importedSkinnedModel": true,
+          "boundHumanoidOrAuthoredClips": true,
+          "characterController": true,
+          "notBlocked": true
+        }
+      },
+      {
+        "name": "moon",
+        "passed": false,
+        "checks": {
+          "realModelUsed": true,
+          "noError": true,
+          "noPendingPlan": true,
+          "terrainCollision": true,
+          "multipleCraters": false,
+          "physicalCave": true,
+          "lunarResidents": true,
+          "survivalAndHabitat": true,
+          "localLunarGravity": true,
+          "notBlocked": true
+        }
+      },
+      {
+        "name": "status",
+        "passed": true,
+        "checks": {
+          "realModelUsed": true,
+          "noError": true,
+          "noPendingPlan": true,
+          "readOnly": true,
+          "noFalseMissingTools": true,
+          "notBlocked": true
+        }
+      },
+      {
+        "name": "open_world",
+        "passed": false,
+        "checks": {
+          "realModelUsed": true,
+          "noError": true,
+          "noPendingPlan": true,
+          "largePhysicalWorld": false,
+          "realPersistentStars": true,
+          "cavesPreservedAfterResize": true,
+          "survivalPreservedAfterResize": true,
+          "nightBackground": true,
+          "groundBelowPlayer": true,
+          "notBlocked": true
+        }
+      },
+      {
+        "name": "model",
+        "passed": true,
+        "checks": {
+          "realModelUsed": true,
+          "noError": true,
+          "noPendingPlan": true,
+          "readOnly": true,
+          "noFalseMissingTools": true,
+          "actualNamedIdentity": true,
+          "notBlocked": true
+        }
+      },
+      {
+        "name": "assistant_model",
+        "passed": true,
+        "checks": {
+          "realModelUsed": true,
+          "noError": true,
+          "noPendingPlan": true,
+          "readOnly": true,
+          "noFalseMissingTools": true,
+          "actualAssistantModelNamed": true,
+          "notBlocked": true
+        }
+      },
+      {
+        "name": "general_code",
+        "passed": true,
+        "checks": {
+          "realModelUsed": true,
+          "noError": true,
+          "noPendingPlan": true,
+          "compiledAndExecuted": true,
+          "twelveMeasuredLights": true,
+          "worldAndHeroPreserved": true,
+          "notBlocked": true
+        }
+      }
+    ]
+  },
+  "originalCompoundRequest": {
+    "path": "results/web-agent-recovery-1.7.0-rc41.json",
+    "sha256": "030aad1a32fdf4569179ee97791e15bdca419ce3d923447706b44af500560e37",
+    "completed": true,
+    "passed": true,
+    "checks": {
+      "realModelUsed": true,
+      "noError": true,
+      "noPendingPlan": true,
+      "notBlocked": true,
+      "realInternetResearch": true,
+      "realDownloadedData": true,
+      "measuredHeightmapApplied": true,
+      "actualPlayerInputChecked": true,
+      "physicalTerrain": true,
+      "elevationProvenance": true,
+      "playerPreserved": true,
+      "allPlannedStagesReviewed": true,
+      "freshWholeTaskReviewPassed": true,
+      "actualRelaxedArmsChecked": true,
+      "packageUnchanged": true,
+      "priorLunarWorldAndItsBatchAbsent": true,
+      "previouslyRequestedRiverSurfacePreserved": true,
+      "noNewPlannerTurnDuringRecovery": true,
+      "noNewSceneOperationsDuringRecovery": true,
+      "continuationLimitNotRaised": true,
+      "sceneUnchangedByRecovery": true,
+      "sourcesUnchangedByRecovery": true
+    },
+    "originalRawPassed": true,
+    "acceptanceReview": null,
+    "sourceCommit": "6a935ba0762964344795cc4b1d831651906e8a28",
+    "releaseRuntimeAndEditorByteIdentical": true,
+    "onlyPackageDifferences": [],
+    "providerInjected": false,
+    "sceneRepairByHarness": false,
+    "paidApiUsed": false,
+    "modelCalls": 114,
+    "toolResults": 398,
+    "status": "Проверки пройдены",
+    "originalImplementationProof": "results/upm-package-1.7.0-rc38.json",
+    "originalRawReportSha256": "ceecb0da434b54dea53413faad71b8ddec5f2c560287c5e2380e5d74fb94b767",
+    "recovery": {
+      "additionalPlannerTurns": 0,
+      "resumeAttemptsBefore": 12,
+      "resumeAttemptsAfter": 12,
+      "loadedProjectChats": 3
+    },
+    "criterionCorrection": {
+      "invalidCriterion": "legacyFlatSurfaceRemoved",
+      "reason": "The prior Mars request explicitly required rivers; its water belongs to that Mars creation. The lunar-world root and its entire creation batch were already absent in the original scene. Deleting Mars water is not the requested lunar cleanup.",
+      "baselineLunarRootAbsent": true,
+      "baselineLunarBatchAbsent": true,
+      "sourceHistorySha256": {
+        "lunarWorldHistory": "af7d6f278c3eae49b48f08091488e6ab00425ee57ee84e7c5d2e9a355708aebf",
+        "marsWorldHistory": "a12441ef7786296d6aebd3c8256414214682d71ede4d28b9b698d71dfa9392cc"
+      },
+      "noModelTargetHintSupplied": true
+    }
+  },
+  "nativeInstallation": {
+    "path": "results/native-install-1.7.0.json",
+    "sha256": "245fdb46e0ba39ffb8cddb82f3506119224529343bb76149754f1c4baa8e852a",
+    "passed": true,
+    "version": "1.7.0",
+    "verifiedFiles": 1824,
+    "differentFiles": [],
+    "skills": 114,
+    "recipes": 466,
+    "sceneMutations": false,
+    "uiVisuallyVerified": false,
+    "sourceCommit": "6a935ba0762964344795cc4b1d831651906e8a28",
+    "status": "installed-and-sha256-verified",
+    "originalSourceAndSceneFiles": 6,
+    "originalSourcesAndScenesUnchanged": true,
+    "temporaryHelpersRemoved": true,
+    "packageManagerClientAddUsed": true
+  },
+  "limits": [
+    "A bounded tool agent, not a trained replacement for every developer task.",
+    "Live services and model output are variable; free services can be unavailable.",
+    "A global planetary DEM fitted to a small Unity Terrain is not a geographically scaled reconstruction.",
+    "Procedural humanoid locomotion is used when compatible authored clips are unavailable.",
+    "This validation contains no new interactive desktop UI inspection."
+  ],
+  "savedSceneSourceCheck": {
+    "path": "results/compound41-external-input-source-check.json",
+    "sha256": "c81a09e95c2f0765cb92c1c9a6882de2714708874251e3cd2c4ffc700ed36dfc",
+    "sceneUnchanged": true,
+    "sourcesUnchanged": {
+      "Assets/WorldWeaverGenerated/Scripts/MouseLookCamera.cs": true
+    },
+    "sceneRepairByHarness": false,
+    "passed": true
+  },
+  "runtimeEquivalence": {
+    "path": "results/runtime-equivalence-1.7.0-rc38-rc41.json",
+    "sha256": "2957989a7120ee4c247e8b0d8fe8de5402ac0c3da02fa6c42f230ea4d960b976",
+    "runtimeFilesByteIdentical": true,
+    "files": 208,
+    "originalImplementationSource": "70f6d39c96bcb4004acc5bd9cc49180a65c3cf24",
+    "recoverySource": "6a935ba0762964344795cc4b1d831651906e8a28"
+  }
+}

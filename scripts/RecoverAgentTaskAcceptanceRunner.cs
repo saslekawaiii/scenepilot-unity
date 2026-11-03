@@ -23,6 +23,8 @@ public static class RecoverAgentTaskAcceptanceRunner
             string scene=(string)original["resultScene"],sceneBefore=Hash(scene);var sources=Directory.GetFiles("Assets","*.cs",SearchOption.AllDirectories).ToDictionary(p=>p,Hash);EditorSceneManager.OpenScene(scene);
             string history=(string)original["history"];using(var controller=new ChatController(historyFolder:history,modelConnectionsFolder:Path.Combine(history,"models")))
             {
+                string answerId=(string)((JArray)original["messages"]).OfType<JObject>().Last(m=>(string)m["Role"]=="assistant"&&m["Task"] is JObject)["Id"];
+                var sourceSession=controller.Sessions.Single(s=>s.Messages.Any(m=>m.Id==answerId));controller.OpenChat(sourceSession.Id);report["loadedProjectChats"]=controller.Sessions.Count;
                 controller.Settings.ModelKey=(string)original["modelKey"];controller.Settings.Mode=AssistantMode.Execute;controller.Settings.Power=AssistantPower.Deep;controller.Settings.AutoVerify=true;controller.Settings.AllowAutonomousScripts=true;controller.Settings.UseNativeFunctions=true;
                 var answer=controller.Current.Messages.Last(m=>m.Role=="assistant"&&m.Task!=null);if(answer.Task.OriginalRequest!=(string)original["prompt"])throw new InvalidOperationException("Original task differs.");
                 int plans=answer.Attempts.Count,steps=answer.Steps.Count,resumes=answer.Task.ResumeAttempts;report["resumeAttemptsBefore"]=resumes;report["originalRawReportSha256"]=Hash(rawPath);report["originalImplementationProof"]=config["originalProof"];
