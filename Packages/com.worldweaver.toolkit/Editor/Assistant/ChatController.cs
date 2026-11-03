@@ -342,7 +342,9 @@ namespace WorldWeaver.Editor.Assistant
                             if(plan.complete&&Settings.AutoVerify&&Settings.UseNativeFunctions&&!readOnlyRequest&&answer.Steps.Any(s=>s.Success&&(s.Tool=="execute_editor_code"||Settings.Power==AssistantPower.Deep&&!SceneToolExecutor.IsReadOnlyTool(s.Tool)&&s.Tool!="remember_design")))
                             {
                                 var review=await ReviewEditorResultAsync(answer,provider,operation.Token);
-                                if(review.Passed&&answer.EditorReviews.Count>1)unresolvedFailure=false;
+                                // A fresh whole-task review can resolve an earlier failed observation.
+                                // Deterministic checks below can still reject the current result.
+                                if(review.Passed)unresolvedFailure=false;
                                 if(!review.Passed)
                                 {
                                     unresolvedFailure=true;answer.Status="Исправляю несоответствия результата";VerifyTask(answer);
