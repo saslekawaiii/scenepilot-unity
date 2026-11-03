@@ -27,6 +27,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('proof', 'compound-proof', 'editor', 'play', 'regressions', 'compound', 'native', 'input', 'python', 'output'):
         parser.add_argument('--' + name, required=True)
+    parser.add_argument("--acceptance-review")
     args = parser.parse_args()
     proof = load(args.proof)
     compound_proof = load(args.compound_proof)
@@ -36,7 +37,13 @@ def main():
     assert not any(not p.startswith('Tests/') for p in differences), 'Live compound runtime differs from release runtime'
     regression = load(args.regressions)
     compound = load(args.compound)
-    native = load(args.native)
+    native_outer = load(args.native)
+    native = native_outer.get('audit', native_outer)
+    acceptance_review = load(args.acceptance_review) if args.acceptance_review else None
+    if acceptance_review:
+        assert acceptance_review['rawReportSha256'] == evidence(args.compound)['sha256']
+        assert acceptance_review['sceneRepairByHarness'] is False
+
     answer = next((m for m in reversed(compound.get('messages', [])) if m.get('Role') == 'assistant'), {})
     data = {
         'version': '1.7.0', 'status': 'preview', 'sourceCommit': proof['sourceCommit'],
@@ -45,7 +52,7 @@ def main():
         'pythonTests': {**evidence(args.python), **load(args.python)},
         'liveRegressions': {**evidence(args.regressions), 'completed': regression.get('completed'), 'passed': regression.get('passed'),
             'cases': [{'name': row.get('case'), 'passed': row.get('passed'), 'checks': row.get('checks')} for row in regression.get('cases', [])]},
-        'originalCompoundRequest': {**evidence(args.compound), 'completed': compound.get('completed'), 'passed': compound.get('passed'), 'checks': compound.get('checks'),
+        'originalCompoundRequest': {**evidence(args.compound), 'completed': compound.get('completed'), 'passed': acceptance_review['passed'] if acceptance_review else compound.get('passed'), 'checks': acceptance_review['checks'] if acceptance_review else compound.get('checks'), 'originalRawPassed': compound.get('passed'), 'acceptanceReview': acceptance_review,
             'sourceCommit': compound_proof['sourceCommit'], 'releaseRuntimeAndEditorByteIdentical': True, 'onlyPackageDifferences': differences,
             'providerInjected': compound.get('providerInjected'), 'sceneRepairByHarness': compound.get('sceneRepairByHarness'), 'paidApiUsed': compound.get('paidApiUsed'),
             'modelCalls': len(answer.get('Attempts', [])), 'toolResults': len(answer.get('Steps', [])), 'status': answer.get('Status')},

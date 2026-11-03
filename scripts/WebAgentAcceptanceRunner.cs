@@ -69,10 +69,11 @@ public static class WebAgentAcceptanceRunner
             checks["allPlannedStagesReviewed"]=answer.Task!=null&&answer.Task.ActiveApproachStage>=answer.Task.Approach.Count;
             checks["freshWholeTaskReviewPassed"]=answer.EditorReviews.LastOrDefault(r=>r.ApproachStage<0&&r.StepCount==answer.Steps.Count)?.Passed==true;
             checks["actualRelaxedArmsChecked"]=answer.Steps.Where(s=>s.Success&&s.Tool=="job_result").Any(s=>{try{var j=JObject.Parse(s.Summary);var m=JObject.Parse((string)j["Measurement"]??"{}");return (string)j["Kind"]=="player_control"&&(bool?)m["bothArmsMeasured"]==true&&(bool?)m["relaxedWalkingArms"]==true;}catch(JsonException){return false;}});
-            // Scenario assertion only: the original saved scene's broad Water mesh
-            // is the visible legacy sheet identified in the read-only source audit.
-            // The harness never tells the model which object to delete.
-            checks["legacyFlatSurfaceRemoved"]=!ProjectContextIndex.Objects().Any(g=>g.name=="Water"&&g.GetComponent<MeshRenderer>()&&g.GetComponent<MeshRenderer>().bounds.size.x>=500);
+            // Expectations come from pre-existing project history. They are fixture
+            // assertions only and are never exposed to the model as a supplied plan.
+            string expectations=Environment.GetEnvironmentVariable("WW_WEB_SCENE_EXPECTATIONS");
+            if(string.IsNullOrWhiteSpace(expectations))throw new InvalidOperationException("Historical scene expectations are required for this reproduction.");
+            var historical=HistoricalSceneAssertions.Evaluate((JObject)JObject.Parse(File.ReadAllText(expectations))["expectations"]);foreach(var check in historical.Properties())checks[check.Name]=check.Value.DeepClone();
             checks["packageUnchanged"]=(string)report["packageDigest"]==PackageDigest();report["checks"]=checks;report["passed"]=checks.Properties().All(p=>(bool)p.Value);report["completed"]=true;report["finishedUtc"]=DateTime.UtcNow.ToString("O");
             Directory.CreateDirectory("Assets/AgentReproduction");string scene="Assets/AgentReproduction/"+Path.GetFileNameWithoutExtension(Output)+"-result.unity";EditorSceneManager.SaveScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene(),scene);report["resultScene"]=scene;Save();controller.Dispose();EditorApplication.Exit((bool)report["passed"]?0:1);
         }
