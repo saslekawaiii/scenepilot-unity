@@ -143,7 +143,8 @@ namespace WorldWeaver.Editor.Assistant
             if(Busy||disposed||EditorApplication.isCompiling||EditorApplication.isPlayingOrWillChangePlaymode||ScriptDrafts.Pending||AgentSourcePatches.Pending||AgentEditorJobs.Busy)return;
             var answer=Current.Messages.FirstOrDefault(m=>m.Id==messageId);
             if(answer?.Task==null||answer.PendingPlan!=null)return;
-            if(answer.Task.ResumeAttempts>=ContinuationLimit){answer.Task.ContinueAfterReload=false;answer.Status="Нужна проверка";Phase="Исчерпан предел продолжений задачи: "+ContinuationLimit;Save();return;}
+            bool finalReviewOnly=answer.Task.ResumeAttempts>=ContinuationLimit;
+            if(finalReviewOnly&&string.IsNullOrEmpty(answer.Task.PendingJobId)&&!HasUnreviewedCompletedJob(answer)){answer.Task.ContinueAfterReload=false;answer.Status="Нужна проверка";Phase="Исчерпан предел продолжений задачи: "+ContinuationLimit;Save();return;}
             if(!string.IsNullOrEmpty(answer.Task.PendingJobId))
             {
                 var job=AgentEditorJobs.Load(answer.Task.PendingJobId);
@@ -151,11 +152,11 @@ namespace WorldWeaver.Editor.Assistant
                 if(new[]{"queued","running","entering_play","exiting_play","cancelling"}.Contains(job.Status))return;
                 answer.Steps.Add(new EditorCommandResult{Tool="job_result",Success=job.Success,Target=job.Id,Summary=JObject.FromObject(job).ToString(Formatting.None),Error=job.Success?null:job.Error});answer.Task.Evidence.Add("job:"+job.Id);answer.Task.Evidence.Add(job.ResultPath??job.Id);answer.Task.PendingJobId=null;
             }
-            answer.Task.ResumeAttempts++;answer.Task.ContinueAfterReload=false;answer.IsError=false;Save();
-            await RunTaskAsync(Current,answer,answer.Task.OriginalRequest);
+            if(!finalReviewOnly)answer.Task.ResumeAttempts++;answer.Task.ContinueAfterReload=false;answer.IsError=false;Save();
+            await RunTaskAsync(Current,answer,answer.Task.OriginalRequest,finalReviewOnly);
         }
 
-        private async Task RunTaskAsync(ChatSession session,AssistantMessage answer,string text)
+        private async Task RunTaskAsync(ChatSession session,AssistantMessage answer,string text,bool finalReviewOnly=false)
         {
             bool readOnlyRequest=Settings.Mode==AssistantMode.Ask||ExplicitReadOnlyRequest(text)||answer.Task?.MutationAuthorized==false&&Settings.Mode!=AssistantMode.Plan;
             executingMessage=answer;
@@ -195,6 +196,7 @@ namespace WorldWeaver.Editor.Assistant
                             answer.IsError=false;answer.Status="Проверки пройдены";answer.Text="Изменения применены. "+ChatHistoryStore.Redact(completedReview.Evidence);answer.Task.ContinueAfterReload=false;Save();return;
                         }
                     }
+                    if(finalReviewOnly){answer.Task.ContinueAfterReload=false;answer.Status="Нужна проверка";Phase="Завершённая проверка учтена; предел новых продолжений задачи исчерпан: "+ContinuationLimit;Save();return;}
                     var request = BuildRequest(session, text);
                     int rounds = Settings.Power == AssistantPower.Fast ? 1 : Settings.Power == AssistantPower.Deep ? 6 : 3;
                     int maximumRounds = Settings.UseNativeFunctions?(Settings.Power == AssistantPower.Fast ? 16 : Settings.Power == AssistantPower.Deep ? 64 : 32):(Settings.Power == AssistantPower.Fast ? 6 : Settings.Power == AssistantPower.Deep ? 16 : 8);

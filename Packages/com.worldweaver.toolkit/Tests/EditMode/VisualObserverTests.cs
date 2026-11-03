@@ -94,11 +94,14 @@ namespace WorldWeaver.Tests
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);var marker=new GameObject("Verified marker");marker.AddComponent<WorldWeaver.GeneratedSceneObject>().Kind="node";
             try
             {
+                foreach(int priorContinuations in new[]{0,12})
+                {
                 var provider=new ReviewOnlyProvider();string folder=Path.Combine("UserSettings","CompletedJob-"+Guid.NewGuid().ToString("N"));using(var controller=new ChatController(_=>provider,folder))
                 {
                     controller.Settings.Mode=AssistantMode.Execute;controller.Settings.Power=AssistantPower.Deep;controller.Settings.AutoVerify=true;controller.Settings.AllowAutonomousScripts=true;controller.Settings.UseNativeFunctions=true;
-                    var answer=new AssistantMessage{Task=new AgentTaskState{OriginalRequest="Create a marker",MutationAuthorized=true}};answer.Task.Approach.Add("Verify created marker");answer.Steps.Add(new EditorCommandResult{Tool="create_node",Target=ProjectContextIndex.StableTarget(marker),Success=true});answer.Steps.Add(new EditorCommandResult{Tool="job_result",Success=true,Summary="{\"Id\":\"fixture-job\",\"Kind\":\"tests\",\"Status\":\"completed\",\"Success\":true,\"Passed\":1,\"Failed\":0}"});answer.EditorReviews.Add(new EditorResultReview{ApproachStage=0,StepCount=1,Passed=false,Issues=new System.Collections.Generic.List<string>{"Missing the test result"}});controller.Current.Messages.Add(answer);
-                    await controller.ResumeAsync(answer.Id);Assert.AreEqual(2,provider.Reviews);Assert.AreEqual(0,provider.Plans);Assert.AreEqual(1,answer.Task.ActiveApproachStage);Assert.AreEqual("Проверки пройдены",answer.Status);Assert.IsFalse(answer.IsError);Assert.IsFalse(answer.Task.ContinueAfterReload);
+                    var answer=new AssistantMessage{Task=new AgentTaskState{OriginalRequest="Create a marker",MutationAuthorized=true,ResumeAttempts=priorContinuations}};answer.Task.Approach.Add("Verify created marker");answer.Steps.Add(new EditorCommandResult{Tool="create_node",Target=ProjectContextIndex.StableTarget(marker),Success=true});answer.Steps.Add(new EditorCommandResult{Tool="job_result",Success=true,Summary="{\"Id\":\"fixture-job\",\"Kind\":\"tests\",\"Status\":\"completed\",\"Success\":true,\"Passed\":1,\"Failed\":0}"});answer.EditorReviews.Add(new EditorResultReview{ApproachStage=0,StepCount=1,Passed=false,Issues=new System.Collections.Generic.List<string>{"Missing the test result"}});controller.Current.Messages.Add(answer);
+                    await controller.ResumeAsync(answer.Id);Assert.AreEqual(2,provider.Reviews);Assert.AreEqual(0,provider.Plans);Assert.AreEqual(1,answer.Task.ActiveApproachStage);Assert.AreEqual("Проверки пройдены",answer.Status);Assert.IsFalse(answer.IsError);Assert.IsFalse(answer.Task.ContinueAfterReload);Assert.AreEqual(priorContinuations==12?12:1,answer.Task.ResumeAttempts);
+                }
                 }
             }
             finally{UnityEngine.Object.DestroyImmediate(marker);EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
