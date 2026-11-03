@@ -105,7 +105,12 @@ open_scene: target empty,args {path:Assets/...unity}. Standalone reviewed action
                 string property=(string)c.args["property"];
                 if(Sensitive(property)||property=="m_Script"||property=="m_ObjectHideFlags")throw new ArgumentException("Protected serialized property.");
                 var serialized=new SerializedObject(Component(c,resolve));var field=serialized.FindProperty(property)??throw new ArgumentException("Serialized property not found. Inspect the component first.");
-                if(!field.editable)throw new ArgumentException("Serialized property is read-only.");ValidateProperty(field,c.args["value"],resolve);
+                if(!field.editable)throw new ArgumentException("Serialized property is read-only.");
+                // Some compatible function-call providers encode union values as
+                // strings. Only an unambiguous literal for an inspected bool field
+                // can be normalized; arbitrary truthy strings remain invalid.
+                if(field.propertyType==SerializedPropertyType.Boolean&&c.args["value"]?.Type==JTokenType.String&&bool.TryParse((string)c.args["value"],out bool literal))c.args["value"]=literal;
+                ValidateProperty(field,c.args["value"],resolve);
             }
             if(c.tool=="plan_task" && (!(c.args["steps"] is JArray stages)||stages.Count<1||stages.Count>12||stages.Any(n=>n.Type!=JTokenType.String||string.IsNullOrWhiteSpace((string)n)||((string)n).Length>300)))throw new ArgumentException("A task plan needs 1-12 bounded steps.");
             if(c.tool=="discover_tools" && c.args["names"]!=null && (!(c.args["names"] is JArray names)||names.Count>16||names.Any(n=>n.Type!=JTokenType.String||((string)n).Length>64)))throw new ArgumentException("Invalid discovery tool names.");
@@ -126,7 +131,7 @@ open_scene: target empty,args {path:Assets/...unity}. Standalone reviewed action
             {
                 case SerializedPropertyType.Integer:case SerializedPropertyType.Enum:if(value.Type!=JTokenType.Integer||(long)value<int.MinValue||(long)value>int.MaxValue)throw new ArgumentException("Expected 32-bit integer.");break;
                 case SerializedPropertyType.Float:if((value.Type!=JTokenType.Integer&&value.Type!=JTokenType.Float)||double.IsInfinity((double)value)||double.IsNaN((double)value)||Math.Abs((double)value)>1e8)throw new ArgumentException("Expected finite bounded number.");break;
-                case SerializedPropertyType.Boolean:if(value.Type!=JTokenType.Boolean)throw new ArgumentException("Expected boolean.");break;
+                case SerializedPropertyType.Boolean:if(value.Type!=JTokenType.Boolean)throw new ArgumentException("Expected JSON boolean true/false, not an arbitrary string or number.");break;
                 case SerializedPropertyType.String:if(value.Type!=JTokenType.String||((string)value).Length>4000)throw new ArgumentException("Expected bounded string.");break;
                 case SerializedPropertyType.Vector2:case SerializedPropertyType.Vector3:case SerializedPropertyType.Vector4:case SerializedPropertyType.Color:
                     int length=field.propertyType==SerializedPropertyType.Vector2?2:field.propertyType==SerializedPropertyType.Vector3?3:4;

@@ -51,6 +51,9 @@ namespace WorldWeaver
             var body = new JObject { ["model"] = profile.Model, ["messages"] = messages, ["stream"] = request.Stream, ["think"] = false,
                 ["keep_alive"] = "10m",
                 ["options"] = new JObject { ["temperature"] = profile.Temperature, ["num_predict"] = profile.MaxTokens, ["num_ctx"] = profile.ContextWindow } };
+            // Cloud reasoning models use different think value types. Omitting the
+            // override allows their native default, rather than disabling reasoning.
+            if(cloud&&profile.EnableCloudReasoning)body.Remove("think");
             if (request.UseToolCalls) body["tools"] = AgentFunctionProtocol.Definitions(request.Schema);
             else if (!cloud) body["format"] = request.Schema != null ? (JToken)OllamaDecoderSchema.FromHost(request.Schema) : new JValue("json");
             var watch = Stopwatch.StartNew();

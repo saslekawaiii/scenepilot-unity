@@ -8,6 +8,20 @@ namespace WorldWeaver.Tests
 {
     public sealed class WebAgentContractTests
     {
+        [TestCase("true",true)]
+        [TestCase("false",false)]
+        public void SerializedBooleanProviderLiteralsAreNormalizedAgainstTheActualField(string literal,bool expected)
+        {
+            var root=new UnityEngine.GameObject("Boolean field fixture");root.AddComponent<GeneratedSceneObject>();var player=root.AddComponent<WorldPlayer>();player.AlwaysLook=!expected;
+            try
+            {
+                var command=new EditorCommand{tool="set_component",target=ProjectContextIndex.StableTarget(root),args=new JObject{["type"]="WorldWeaver.WorldPlayer",["property"]="AlwaysLook",["value"]=literal}};
+                var result=SceneToolExecutor.Execute(new EditorPlan{actions=new System.Collections.Generic.List<EditorCommand>{command}});
+                Assert.IsTrue(result.Success,result.Error);Assert.AreEqual(expected,player.AlwaysLook);Assert.AreEqual(JTokenType.Boolean,command.args["value"].Type);
+                command.args["value"]="yes";Assert.Throws<ArgumentException>(()=>SceneToolExecutor.Validate(new EditorPlan{actions=new System.Collections.Generic.List<EditorCommand>{command}}));Assert.AreEqual(expected,player.AlwaysLook);
+            }
+            finally{UnityEngine.Object.DestroyImmediate(root);}
+        }
         [Test] public void StructuralInventoryFindsMultipleRussianNamedSurfacesAfterAnEnglishMiss()
         {
             var first=UnityEngine.GameObject.CreatePrimitive(UnityEngine.PrimitiveType.Plane);first.name="Серая площадка";

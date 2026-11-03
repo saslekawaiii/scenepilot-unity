@@ -45,7 +45,10 @@ namespace WorldWeaver.Editor.Assistant
                     try{foreach(string name in JObject.Parse(step.Summary)["enabledTools"]??new JArray())tools.Add(name);}catch(JsonException){}
             if(mode==AssistantMode.Ask)tools.RemoveWhere(t=>!SceneToolExecutor.IsReadOnlyTool(t));
             if(!Settings.AllowEditorCode)tools.Remove("execute_editor_code");
+            bool needsApproach=Settings.UseNativeFunctions&&Settings.AllowAutonomousScripts&&mode==AssistantMode.Execute&&input.Length>160&&answer?.Task!=null&&answer.Task.Approach.Count==0&&!answer.Steps.Any(s=>s.Success&&!SceneToolExecutor.IsReadOnlyTool(s.Tool));
+            if(needsApproach){tools.Clear();tools.Add("plan_task");}
             var request=new CompletionRequest{Schema=EditorPlan.Schema(local,tools,Settings.UseNativeFunctions)};AgentTaskSchema.Bind(request.Schema,answer?.Task);
+            if(needsApproach)request.Messages.Add(new ChatMessage("system","First use plan_task to decompose ALL requested results into a concise checklist of independent stages and their observable acceptance checks. Choose the approach yourself from the original request. A recorded plan is not execution or success; subsequent turns expose the real tools for implementation. No prewritten solution is supplied."));
             // One observable operation per inference avoids speculative references to
             // objects that have not been created. The model chooses every operation.
             request.Schema["properties"]["actions"]["maxItems"]=Settings.UseNativeFunctions?8:1;

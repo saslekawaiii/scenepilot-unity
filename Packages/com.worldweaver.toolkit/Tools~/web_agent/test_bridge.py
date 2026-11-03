@@ -12,6 +12,12 @@ from ollama_model import OllamaToolModel
 
 
 class BridgeContracts(unittest.TestCase):
+    def test_data_index_preserves_alternatives_outside_the_last_large_tile_group(self):
+        sources = {"https://example.com/small/global.img": {"observedUtc": 1}}
+        sources.update({f"https://example.com/large/tile{i}.img": {"observedUtc": i + 2} for i in range(100)})
+        variants = bridge.data_variants(sources)
+        self.assertEqual(24, len(variants)); self.assertIn("https://example.com/small/global.img", [v["url"] for v in variants])
+
     def test_public_network_boundaries(self):
         for value in ["file:///etc/passwd", "http://example.com", "https://localhost/x", "https://127.0.0.1/x", "https://[::1]/x", "https://169.254.169.254/latest/meta-data", "https://user:pass@example.com", "https://example.com:11434/"]:
             with self.subTest(url=value), self.assertRaises(ValueError):
@@ -72,12 +78,13 @@ class BridgeContracts(unittest.TestCase):
             self.assertEqual(4, bridge.decode_heightmap(request)["sourceWidth"])
 
     def test_native_model_preserves_structured_calls_and_omits_text_stop_markers(self):
-        model = OllamaToolModel("local-test")
+        model = OllamaToolModel("test:cloud")
         with patch.object(model.session, "post") as post:
             post.return_value.json.return_value = {"message": {"content": "", "tool_calls": [{"function": {"name": "web_read", "arguments": {"url": "https://example.com/"}}}]}, "prompt_eval_count": 7, "eval_count": 3}
             response = model.generate([{"role": "user", "content": [{"type": "text", "text": "Find a source"}]}], stop_sequences=["Calling tools:", "Observation:"])
         body = post.call_args.kwargs["json"]
         self.assertNotIn("stop", body); self.assertNotIn("stop", body["options"])
+        self.assertNotIn("think", body, "Cloud research must not forcibly disable native reasoning")
         self.assertEqual("web_read", response.tool_calls[0].function.name)
         self.assertEqual({"url": "https://example.com/"}, response.tool_calls[0].function.arguments)
 

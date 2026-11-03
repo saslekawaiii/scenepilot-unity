@@ -12,6 +12,23 @@ namespace WorldWeaver.Tests
 {
     public sealed class OllamaDecoderSchemaTests
     {
+        [UnityTest] public IEnumerator CloudReasoningUsesNativeDefaultOnlyWhenEnabled()=>Await(ReasoningPayload());
+        async Task ReasoningPayload()
+        {
+            foreach(var choice in new[]{("fixture:cloud",true),("fixture:cloud",false),("fixture-local",true)})
+            using(var server=new ConnectionHttpServer((path,body)=>new JObject{["message"]=new JObject{["content"]="ok"}}))
+            {
+                var profile=ScriptableObject.CreateInstance<ModelProfile>();profile.Endpoint=server.Url.TrimEnd('/');profile.Model=choice.Item1;profile.EnableCloudReasoning=choice.Item2;profile.Retries=0;
+                try
+                {
+                    using(var provider=new LocalProvider(profile))await provider.CompleteAsync(new CompletionRequest(),CancellationToken.None);
+                    var body=JObject.Parse(server.Requests.Single().Body);
+                    if(choice.Item1.EndsWith(":cloud")&&choice.Item2)Assert.IsNull(body["think"],"Do not force reasoning off in Deep cloud execution");
+                    else Assert.AreEqual(false,(bool)body["think"],"Local bounded execution and non-thinking profiles remain explicit");
+                }
+                finally{Object.DestroyImmediate(profile);}
+            }
+        }
         [Test] public void DecoderCloneRemovesOnlyStringRepetitionBoundsAndPreservesStructuralConstraints()
         {
             var host=NpcDecision.Schema(new[]{"Talk","Wait","GiveItem"});var before=host.DeepClone();var decoder=OllamaDecoderSchema.FromHost(host);

@@ -681,6 +681,7 @@ namespace WorldWeaver.Editor.Assistant
             profile.MaxTokens = Settings.Power == AssistantPower.Fast ? 1800 : Settings.Power == AssistantPower.Deep ? 6000 : 3500;
             if (choice.Provider == ProviderKind.Pollinations) profile.MaxTokens = Math.Min(profile.MaxTokens, 1500);
             profile.ContextWindow = Settings.Power == AssistantPower.Fast ? 8192 : Settings.Power == AssistantPower.Deep ? 32768 : 16384;
+            profile.EnableCloudReasoning=Settings.Power==AssistantPower.Deep;
             profile.StrictSchema = choice.Provider == ProviderKind.Ollama||!string.IsNullOrEmpty(choice.ConnectionId)&&choice.ResponseMode==OpenAIResponseMode.JsonSchema; profile.Validate(); return profile;
         }
         private static OrchestratorProfile PersistentRoutes(ModelProfile source, List<string> created)

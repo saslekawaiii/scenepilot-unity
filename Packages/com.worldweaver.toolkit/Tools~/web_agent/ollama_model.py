@@ -18,8 +18,10 @@ class OllamaToolModel(Model):
 
     def generate(self, messages, stop_sequences=None, tools_to_call_from=None, **kwargs):
         prepared = self._prepare_completion_kwargs(messages=messages, tools_to_call_from=tools_to_call_from, stop_sequences=None)
-        body = {"model": self.model_id, "messages": prepared["messages"], "stream": False, "think": False,
+        body = {"model": self.model_id, "messages": prepared["messages"], "stream": False,
                 "options": {"temperature": 0.1, "num_predict": 3000, "num_ctx": 32768}}
+        if not self.model_id.endswith(":cloud"):
+            body["think"] = False
         if tools_to_call_from:
             body["tools"] = prepared["tools"]
         response = self.session.post("http://127.0.0.1:11434/api/chat", json=body, timeout=90)
