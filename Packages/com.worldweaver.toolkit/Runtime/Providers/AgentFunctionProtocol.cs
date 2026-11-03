@@ -46,7 +46,11 @@ namespace WorldWeaver
                 if((int?)properties["target"]?["minLength"]>0)required.Add("target");
                 argumentContract["required"]=required;
                 var contract=argumentContract;
-                tools.Add(Function(group.Key, "Unity command " + group.Key + ". "+(group.All(b=>(bool?)b["x-worldweaver-read-only"]==true)?"Read-only observation; may be batched with independent read-only functions. ":"Standalone operation; do not batch. ")+"Follow the flat parameter contract. Tool reference uses args only as documentation; send its fields directly in this function. Use real scene targets, empty name/target when inapplicable.", contract));
+                string purpose=(string)branch["description"]??("Unity command "+group.Key+".");
+                int sentence=purpose.IndexOf(". ",StringComparison.Ordinal);
+                if(sentence>=0&&(purpose.StartsWith("target",StringComparison.OrdinalIgnoreCase)||purpose.StartsWith("empty target",StringComparison.OrdinalIgnoreCase)||purpose.StartsWith("name=",StringComparison.OrdinalIgnoreCase)))purpose=purpose.Substring(sentence+2)+" Parameter context: "+purpose.Substring(0,sentence);
+                if(purpose.Length>700)purpose=purpose.Substring(0,700);
+                tools.Add(Function(group.Key, purpose+" "+(group.All(b=>(bool?)b["x-worldweaver-read-only"]==true)?"Read-only observation; may be batched with independent reads. ":"Standalone operation; do not batch. ")+"Use FLAT parameters directly, without an args wrapper. Use observed targets and paths.", contract));
             }
             // A schema narrowed for an implementation phase must never trap the model
             // in a function-protocol loop when it finds a genuine capability gap.

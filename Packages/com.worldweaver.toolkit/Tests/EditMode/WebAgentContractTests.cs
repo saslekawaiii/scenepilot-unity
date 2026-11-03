@@ -8,6 +8,12 @@ namespace WorldWeaver.Tests
 {
     public sealed class WebAgentContractTests
     {
+        [Test] public void NativeDefinitionsExplainActualToolPurposeRatherThanOnlyProtocolRules()
+        {
+            var functions=AgentFunctionProtocol.Definitions(EditorPlan.Schema(nativeFunctions:true));
+            string Description(string name)=>(string)functions.Single(f=>(string)f["function"]["name"]==name)["function"]["description"];
+            Assert.That(Description("run_player_check"),Does.Contain("Play Mode"));Assert.That(Description("run_player_check"),Does.Contain("arm"));Assert.That(Description("terrain_from_heightmap"),Does.Contain("scalar elevation"));Assert.That(Description("web_research"),Does.Contain("smolagents"));Assert.That(Description("replace_model"),Does.Contain("preserving"));
+        }
         sealed class ReadBudgetProvider:ILLMProvider
         {
             public int Calls;

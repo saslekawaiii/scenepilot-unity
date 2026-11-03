@@ -96,8 +96,15 @@ namespace WorldWeaver.Editor.Assistant
             };
             if (allowedTools != null) command = EditorToolSchema.Restrict(allowedTools, typed);
             else if (typed) command = EditorToolSchema.DecoderCommandSchema();
-            if(nativeFunctions)foreach(var branch in (command["anyOf"] as JArray??new JArray()).OfType<JObject>())
-                branch["x-worldweaver-read-only"]=SceneToolExecutor.IsReadOnlyTool(EditorToolSchema.ToolName(branch));
+            if(nativeFunctions)
+            {
+                var references=string.Join("\n",new[]{SceneToolExecutor.ToolInstructions,AgentProjectTools.ToolInstructions,ConstructiveTools.Reference,AnimatedCharacterTools.ToolReference,WorldGameplayTools.ToolInstructions,WorldMaterialTools.ToolInstructions,ModelAssetTools.Reference,WebResearchTools.Reference,ScriptDrafts.ToolInstructions,EditorCodeTools.Reference,UnityRecipeCatalog.Reference}).Split('\n');
+                foreach(var branch in (command["anyOf"] as JArray??new JArray()).OfType<JObject>())
+                {
+                    string name=EditorToolSchema.ToolName(branch);branch["x-worldweaver-read-only"]=SceneToolExecutor.IsReadOnlyTool(name);
+                    string purpose=references.FirstOrDefault(line=>line.StartsWith(name+":",StringComparison.Ordinal));if(purpose!=null)branch["description"]=purpose.Substring(name.Length+1).Trim();
+                }
+            }
             var schema = new JObject {
                 ["type"] = "object", ["additionalProperties"] = false,
                 ["properties"] = new JObject {

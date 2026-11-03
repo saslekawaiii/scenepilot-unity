@@ -34,14 +34,15 @@ public sealed class AgentSceneInteractionTests
         InputSystem.settings.backgroundBehavior=background;InputSystem.settings.editorInputBehaviorInPlayMode=routing;
         yield return new ExitPlayMode();
     }
-    [UnityTest] public IEnumerator AgentCameraRespondsOnBothAxesWithoutRmbAndPoseSurvivesFourDirections()
+    [UnityTest] public IEnumerator AgentCameraAndPoseSurviveRealMouseAndFourDirections()
     {
         Assert.IsTrue(player.View);var view=player.View.transform;
+        ushort held=Environment.GetEnvironmentVariable("WW_FREE_LOOK_REQUIRED")=="0"?(ushort)2:(ushort)0;
         Vector3 original=view.eulerAngles;
-        InputSystem.QueueStateEvent(mouse,new MouseState{delta=new Vector2(80,60)});yield return null;
+        InputSystem.QueueStateEvent(mouse,new MouseState{buttons=held,delta=new Vector2(80,60)});yield return null;
         Vector3 changed=view.eulerAngles;float yaw=Mathf.DeltaAngle(original.y,changed.y),pitch=Mathf.DeltaAngle(original.x,changed.x);
-        Assert.Greater(Mathf.Abs(yaw),.02f,"Camera did not respond horizontally without RMB");Assert.Greater(Mathf.Abs(pitch),.02f,"Camera did not respond vertically without RMB");
-        InputSystem.QueueStateEvent(mouse,new MouseState{delta=new Vector2(-80,-60)});yield return null;
+        Assert.Greater(Mathf.Abs(yaw),.02f,"Camera did not respond horizontally under the requested mouse policy");Assert.Greater(Mathf.Abs(pitch),.02f,"Camera did not respond vertically under the requested mouse policy");
+        InputSystem.QueueStateEvent(mouse,new MouseState{buttons=held,delta=new Vector2(-80,-60)});yield return null;
         Assert.Less(Mathf.Abs(Mathf.DeltaAngle(original.y,view.eulerAngles.y)),1,"Reverse mouse yaw");
         Assert.Less(Mathf.Abs(Mathf.DeltaAngle(original.x,view.eulerAngles.x)),1,"Reverse mouse pitch");
         InputSystem.QueueStateEvent(mouse,new MouseState());yield return null;
@@ -66,7 +67,7 @@ public sealed class AgentSceneInteractionTests
         }
         Assert.Greater(totalTravel,2,"Actual saved player cannot move on the resulting world");Assert.Greater(maxLegMotion,3,"No leg animation");
         Assert.IsTrue(Physics.Raycast(player.transform.position+Vector3.up*.5f,Vector3.down,3),"No physical ground under player");
-        Debug.Log("AGENT_SCENE_INPUT yaw="+yaw+" pitch="+pitch+" travel="+totalTravel+" elbowMax="+maxElbow+" legMotion="+maxLegMotion);
+        Debug.Log("AGENT_SCENE_INPUT freeLookRequired="+(held==0)+" yaw="+yaw+" pitch="+pitch+" travel="+totalTravel+" elbowMax="+maxElbow+" legMotion="+maxLegMotion);
         string output=Environment.GetEnvironmentVariable("WW_MODEL_CAPTURE");
         if(!string.IsNullOrEmpty(output)&&SystemInfo.graphicsDeviceType!=UnityEngine.Rendering.GraphicsDeviceType.Null)
         {
