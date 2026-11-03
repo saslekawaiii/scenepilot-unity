@@ -131,6 +131,13 @@ namespace WorldWeaver.Editor.Assistant
 
         internal static int TaskContinuationLimit(ChatSettings settings)=>settings.AllowAutonomousScripts&&settings.UseNativeFunctions?12:3;
         int ContinuationLimit=>TaskContinuationLimit(Settings);
+        internal static bool HasUnreviewedCompletedJob(AssistantMessage answer)
+        {
+            int index=answer?.Steps.Count-1??-1;if(index<0||answer.Steps[index].Tool!="job_result")return false;
+            try{string status=(string)JObject.Parse(answer.Steps[index].Summary)["Status"];if(!new[]{"completed","failed","cancelled"}.Contains(status))return false;}catch(Newtonsoft.Json.JsonException){return false;}
+            return !answer.EditorReviews.Any(r=>r.StepCount>=index+1&&r.Error==null);
+        }
+
         public async Task ResumeAsync(string messageId)
         {
             if(Busy||disposed||EditorApplication.isCompiling||EditorApplication.isPlayingOrWillChangePlaymode||ScriptDrafts.Pending||AgentSourcePatches.Pending||AgentEditorJobs.Busy)return;
@@ -171,6 +178,23 @@ namespace WorldWeaver.Editor.Assistant
                 if (text.Length > 8000) profile.ContextWindow = 16384;
                 using (var provider = providerFactory(profile))
                 {
+                    // A domain reload resets local observation counters. Review the
+                    // terminal host result before asking the planner for more work,
+                    // so an old "missing test" finding cannot start an endless retest.
+                    if(Settings.UseNativeFunctions&&Settings.AutoVerify&&Settings.AllowAutonomousScripts&&!readOnlyRequest&&HasUnreviewedCompletedJob(answer))
+                    {
+                        int completedStage=answer.Task?.Approach.Count>0&&answer.Task.ActiveApproachStage<answer.Task.Approach.Count?answer.Task.ActiveApproachStage:-1;
+                        var completedReview=await ReviewEditorResultAsync(answer,provider,operation.Token,completedStage);
+                        if(completedStage>=0&&completedReview.Passed)
+                        {
+                            answer.Task.ActiveApproachStage++;Save();
+                            if(answer.Task.ActiveApproachStage>=answer.Task.Approach.Count){completedReview=await ReviewEditorResultAsync(answer,provider,operation.Token);completedStage=-1;}
+                        }
+                        if(completedStage<0&&completedReview.Passed&&VerifyTask(answer).All(check=>check.Passed))
+                        {
+                            answer.IsError=false;answer.Status="Проверки пройдены";answer.Text="Изменения применены. "+ChatHistoryStore.Redact(completedReview.Evidence);answer.Task.ContinueAfterReload=false;Save();return;
+                        }
+                    }
                     var request = BuildRequest(session, text);
                     int rounds = Settings.Power == AssistantPower.Fast ? 1 : Settings.Power == AssistantPower.Deep ? 6 : 3;
                     int maximumRounds = Settings.UseNativeFunctions?(Settings.Power == AssistantPower.Fast ? 16 : Settings.Power == AssistantPower.Deep ? 64 : 32):(Settings.Power == AssistantPower.Fast ? 6 : Settings.Power == AssistantPower.Deep ? 16 : 8);

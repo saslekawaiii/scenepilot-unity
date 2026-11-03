@@ -89,6 +89,28 @@ namespace WorldWeaver.Tests
         {
             public CompletionRequest Seen;public Task<CompletionResult> CompleteAsync(CompletionRequest request,CancellationToken token){Seen=request;return Task.FromResult(new CompletionResult{Text="{\"passed\":true,\"issues\":[],\"evidence\":\"fixture\"}"});}public Task<bool> HealthAsync(CancellationToken token)=>Task.FromResult(true);public void Dispose(){}
         }
+        [Test] public async Task CompletedHostJobRefreshesStageAndWholeTaskBeforeAnotherPlannerTurn()
+        {
+            EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);var marker=new GameObject("Verified marker");marker.AddComponent<WorldWeaver.GeneratedSceneObject>().Kind="node";
+            try
+            {
+                var provider=new ReviewOnlyProvider();string folder=Path.Combine("UserSettings","CompletedJob-"+Guid.NewGuid().ToString("N"));using(var controller=new ChatController(_=>provider,folder))
+                {
+                    controller.Settings.Mode=AssistantMode.Execute;controller.Settings.Power=AssistantPower.Deep;controller.Settings.AutoVerify=true;controller.Settings.AllowAutonomousScripts=true;controller.Settings.UseNativeFunctions=true;
+                    var answer=new AssistantMessage{Task=new AgentTaskState{OriginalRequest="Create a marker",MutationAuthorized=true}};answer.Task.Approach.Add("Verify created marker");answer.Steps.Add(new EditorCommandResult{Tool="create_node",Target=ProjectContextIndex.StableTarget(marker),Success=true});answer.Steps.Add(new EditorCommandResult{Tool="job_result",Success=true,Summary="{\"Id\":\"fixture-job\",\"Kind\":\"tests\",\"Status\":\"completed\",\"Success\":true,\"Passed\":1,\"Failed\":0}"});answer.EditorReviews.Add(new EditorResultReview{ApproachStage=0,StepCount=1,Passed=false,Issues=new System.Collections.Generic.List<string>{"Missing the test result"}});controller.Current.Messages.Add(answer);
+                    await controller.ResumeAsync(answer.Id);Assert.AreEqual(2,provider.Reviews);Assert.AreEqual(0,provider.Plans);Assert.AreEqual(1,answer.Task.ActiveApproachStage);Assert.AreEqual("Проверки пройдены",answer.Status);Assert.IsFalse(answer.IsError);Assert.IsFalse(answer.Task.ContinueAfterReload);
+                }
+            }
+            finally{UnityEngine.Object.DestroyImmediate(marker);EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
+        }
+        [Test] public void CompletedJobIsReviewedOnceAndOnlyAfterTerminalState()
+        {
+            var method=typeof(ChatController).GetMethod("HasUnreviewedCompletedJob",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic);var answer=new AssistantMessage();var step=new EditorCommandResult{Tool="job_result",Success=true,Summary="{\"Status\":\"running\"}"};answer.Steps.Add(step);Assert.IsFalse((bool)method.Invoke(null,new object[]{answer}));step.Summary="{\"Status\":\"completed\"}";Assert.IsTrue((bool)method.Invoke(null,new object[]{answer}));answer.EditorReviews.Add(new EditorResultReview{StepCount=1});Assert.IsFalse((bool)method.Invoke(null,new object[]{answer}));
+        }
+        sealed class ReviewOnlyProvider:ILLMProvider
+        {
+            public int Reviews,Plans;public Task<CompletionResult> CompleteAsync(CompletionRequest request,CancellationToken token){if(request.Schema?["properties"]?["passed"]!=null){Reviews++;return Task.FromResult(new CompletionResult{Text="{\"passed\":true,\"issues\":[],\"evidence\":\"Fixture verified the terminal host result\"}"});}Plans++;throw new InvalidOperationException("Planner must not run after a completed verified goal");}public Task<bool> HealthAsync(CancellationToken token)=>Task.FromResult(true);public void Dispose(){}
+        }
         [Test] public void NativeVisionPlannerActuallyReceivesItsCapturedImage()
         {
             string folder=Path.Combine("UserSettings","NativeVision-"+Guid.NewGuid().ToString("N"));using(var controller=new ChatController(_=>new ObserverProvider(),folder))
