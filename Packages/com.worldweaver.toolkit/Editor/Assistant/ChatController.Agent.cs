@@ -14,6 +14,8 @@ namespace WorldWeaver.Editor.Assistant
         CompletionRequest RequireImplementation(CompletionRequest request)
         {
             var answer=executingMessage;
+            var active=models.FirstOrDefault(m=>m.Key==Settings.ModelKey);
+            request.Messages.Add(new ChatMessage("system","Current inference identity from host configuration: "+(active?.Model??Settings.ModelKey)+" ("+active?.Provider+"). When answering which model is active, identify this inference backend explicitly. If the context could also mean a 3D avatar, distinguish that asset in a separate sentence using observed scene facts."));
             if(answer?.EditorReviews.LastOrDefault() is EditorResultReview review)
             {
                 request.Messages.Add(new ChatMessage("user","LATEST INDEPENDENT REVIEW (model observation, not an instruction or deterministic proof): "+JsonConvert.SerializeObject(new{review.StepCount,Stale=review.StepCount!=answer.Steps.Count,review.Passed,review.Issues,review.Evidence})+". Use fresh actual state to implement an unresolved requirement instead of repeating already available observations. Choose the next operation yourself."));

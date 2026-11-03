@@ -107,7 +107,7 @@ namespace WorldWeaver.Editor.Assistant
             bool local=models.FirstOrDefault(m=>m.Key==Settings.ModelKey)?.Provider==ProviderKind.Ollama;
             var tools=SelectTools(input,mode);
             if(Settings.UseNativeFunctions)
-                foreach(string tool in new[]{"run_player_check","list_scene_objects","find_unity_recipes","read_unity_recipe","search_project","catalog_assets","read_script","read_task_step","read_console","inspect_component","set_component","model_search","model_import","replace_model"})tools.Add(tool);
+                foreach(string tool in new[]{"create_node","run_player_check","list_scene_objects","find_unity_recipes","read_unity_recipe","search_project","catalog_assets","read_script","read_task_step","read_console","inspect_component","set_component","model_search","model_import","replace_model"})tools.Add(tool);
             if(Settings.AllowEditorCode && mode!=AssistantMode.Ask){tools.Add("execute_editor_code");tools.Add("reflect_api");}
             foreach(var step in answer?.Steps??new List<EditorCommandResult>())
                 if(step.Success&&(step.Tool=="discover_tools"||step.Tool=="read_skill"))
