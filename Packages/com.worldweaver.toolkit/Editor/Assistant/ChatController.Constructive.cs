@@ -59,11 +59,16 @@ namespace WorldWeaver.Editor.Assistant
                 var step=steps[i];if(!step.Success||!SceneToolExecutor.IsReadOnlyTool(step.Tool)||WebResearchTools.Handles(step.Tool)||new[]{"plan_task","review_stage","discover_tools","read_skill","list_skills","read_task_step"}.Contains(step.Tool))continue;
                 JObject data=null;try{data=JObject.Parse(step.Summary??"");}catch(JsonException){}
                 var discriminator=data?["path"]??data?["component"]??data?["type"]??data?["Id"]??data?["query"];
-                string key=step.Tool+":"+step.Target+":"+(discriminator?.ToString(Formatting.None)??"")+":"+(data?["offset"]?.ToString(Formatting.None)??"");if(!seen.Add(key))continue;
+                // Durable jobs arrive after reload, outside the original native
+                // tool exchange. Keep their latest measured result by subject,
+                // not by the unique job ID, in the planner's observation channel.
+                string observationTarget=step.Target;
+                if(step.Tool=="job_result"){observationTarget=(string)data?["StableTarget"]??(string)data?["Filter"]??"";discriminator=data?["Kind"];}
+                string key=step.Tool+":"+observationTarget+":"+(discriminator?.ToString(Formatting.None)??"")+":"+(data?["offset"]?.ToString(Formatting.None)??"");if(!seen.Add(key))continue;
                 string value=ToolEvidenceForModel(step);int cap=step.Tool=="read_script"?20000:step.Tool=="list_scene_objects"?13000:7000;cap=Math.Min(cap,budget-350);if(cap<400)break;
                 if(value.Length>cap)value=value.Substring(0,cap)+" [bounded actual observation; retrieve persisted step "+i+" for omitted detail]";
                 JToken observation;try{observation=JToken.Parse(value);}catch(JsonException){observation=new JValue(value);}
-                var row=new JObject{["index"]=i,["tool"]=step.Tool,["target"]=step.Target,["historicalBeforeLastChange"]=i<changed,["data"]=observation};int cost=row.ToString(Formatting.None).Length;if(cost>budget)continue;budget-=cost;rows.Add(row);
+                var row=new JObject{["index"]=i,["tool"]=step.Tool,["target"]=observationTarget,["historicalBeforeLastChange"]=i<changed,["data"]=observation};int cost=row.ToString(Formatting.None).Length;if(cost>budget)continue;budget-=cost;rows.Add(row);
             }
             return rows;
         }
@@ -136,7 +141,7 @@ namespace WorldWeaver.Editor.Assistant
             }
             // Recipe pages and host measurements must reach the next inference.
             // The former uniform 1100-character prefix discarded code and geometry warnings.
-            int budget=step.Tool=="read_unity_recipe"||step.Tool=="read_task_step"||step.Tool=="read_script"?20000:step.Tool=="execute_editor_code"?12000:step.Tool=="read_skill"?6000:WebResearchTools.Handles(step.Tool)?22000:new[]{"list_scene_objects","find_scene_objects","inspect_component","inspect_object","model_search","catalog_assets"}.Contains(step.Tool)?14000:1100;
+            int budget=step.Tool=="read_unity_recipe"||step.Tool=="read_task_step"||step.Tool=="read_script"?20000:step.Tool=="job_result"?6000:step.Tool=="execute_editor_code"?12000:step.Tool=="read_skill"?6000:WebResearchTools.Handles(step.Tool)?22000:new[]{"list_scene_objects","find_scene_objects","inspect_component","inspect_object","model_search","catalog_assets"}.Contains(step.Tool)?14000:1100;
             return text.Length<=budget?text:text.Substring(0,budget)+" [bounded context; inspect the omitted state separately]";
         }
         /// <summary>Progressive context for arbitrary construction domains, not a prewritten scenario or injected plan.</summary>

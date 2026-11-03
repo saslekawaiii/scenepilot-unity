@@ -207,6 +207,14 @@ namespace WorldWeaver.Tests
             Assert.AreEqual(2,rows.Count);var field=rows.Single(r=>(string)r["tool"]=="inspect_component");Assert.AreEqual(42,(int)field["data"]["observedValue"]);Assert.IsFalse((bool)field["historicalBeforeLastChange"]);
             var source=rows.Single(r=>(string)r["tool"]=="read_script");Assert.AreEqual("ACTUAL_SOURCE_END",(string)source["data"]["source"]);Assert.IsTrue((bool)source["historicalBeforeLastChange"]);
         }
+        [Test] public void CompletedReloadedJobsReachThePlannerAsLatestMeasuredObservations()
+        {
+            Assert.IsTrue(SceneToolExecutor.IsReadOnlyTool("job_result"),"A completed measurement is an observation, not a scene mutation");
+            var steps=new System.Collections.Generic.List<EditorCommandResult>();
+            for(int i=0;i<2;i++)steps.Add(new EditorCommandResult{Tool="job_result",Target="different_job_"+i,Success=i==1,Summary=new JObject{["Id"]="different_job_"+i,["Kind"]="player_control",["StableTarget"]="owned:actual-player",["Status"]="completed",["Success"]=i==1,["diagnosticHeader"]=new string('h',1600),["Measurement"]=new JObject{["yawDegrees"]=i==1?24:0,["pitchDegrees"]=i==1?-18:0,["relaxedWalkingArms"]=i==1,["tailEvidence"]="MEASURED_END"}.ToString(Newtonsoft.Json.Formatting.None)}.ToString(Newtonsoft.Json.Formatting.None)});
+            var progress=typeof(ChatController).GetMethod("IsImplementationProgress",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic);Assert.IsFalse((bool)progress.Invoke(null,new object[]{steps.Last()}));
+            var method=typeof(ChatController).GetMethod("ObservationLedger",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic);var rows=(JArray)method.Invoke(null,new object[]{steps});Assert.AreEqual(1,rows.Count,"Keep the latest result for the same measured subject, despite a new job ID");var row=rows.Single();Assert.AreEqual("owned:actual-player",(string)row["target"]);Assert.AreEqual("different_job_1",(string)row["data"]["Id"]);Assert.IsTrue((bool)row["data"]["Success"]);var measurement=JObject.Parse((string)row["data"]["Measurement"]);Assert.AreEqual(24,(int)measurement["yawDegrees"]);Assert.AreEqual(-18,(int)measurement["pitchDegrees"]);Assert.AreEqual("MEASURED_END",(string)measurement["tailEvidence"]);
+        }
         [Test] public void ObservedWebSourceSurvivesLaterReadsWithoutInventingACompletedDownload()
         {
             var steps=new System.Collections.Generic.List<EditorCommandResult>{new EditorCommandResult{Tool="web_research",Success=false,Summary="{\"completed\":false,\"observedDataFiles\":[{\"url\":\"https://data.example/elevation.img\",\"observedFrom\":\"https://data.example/index\"}]}"}};

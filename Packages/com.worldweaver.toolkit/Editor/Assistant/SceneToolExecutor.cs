@@ -297,7 +297,7 @@ read_script: target empty; args {path:Assets/.../Name.cs or installed Packages/.
         private static void Parent(EditorCommand command,Dictionary<string,VirtualTarget> aliases)
         {if(!string.IsNullOrEmpty(command.target)&&!Resolve(command.target,aliases).Owned)throw new ArgumentException("Creation parent must be owned WorldWeaver group/world.");}
 
-        public static bool IsReadOnlyTool(string tool)=>tool=="inspect_object"||tool=="search_project"||tool=="read_script"||WorldGameplayTools.IsReadOnly(tool)||AgentProjectTools.IsReadOnly(tool)||WorldMaterialTools.IsReadOnly(tool)||ConstructiveTools.IsReadOnly(tool)||ModelAssetTools.IsReadOnly(tool)||WebResearchTools.IsReadOnly(tool);
+        public static bool IsReadOnlyTool(string tool)=>tool=="job_result"||tool=="inspect_object"||tool=="search_project"||tool=="read_script"||WorldGameplayTools.IsReadOnly(tool)||AgentProjectTools.IsReadOnly(tool)||WorldMaterialTools.IsReadOnly(tool)||ConstructiveTools.IsReadOnly(tool)||ModelAssetTools.IsReadOnly(tool)||WebResearchTools.IsReadOnly(tool);
 
         public static async Task<EditorBatchResult> ExecuteAsync(EditorPlan plan,OrchestratorProfile routes=null,AgentExecutionContext executionContext=null,CancellationToken token=default,Action beforeMutation=null)
         {
