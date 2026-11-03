@@ -17,7 +17,7 @@ namespace WorldWeaver.Editor.Assistant
             var active=models.FirstOrDefault(m=>m.Key==Settings.ModelKey);
             request.Messages.Add(new ChatMessage("system","Current inference identity from host configuration: "+(active?.Model??Settings.ModelKey)+" ("+active?.Provider+"). When answering which model is active, identify this inference backend explicitly. If the context could also mean a 3D avatar, distinguish that asset in a separate sentence using observed scene facts."));
             if(answer?.Task?.Approach.Count>0&&answer.Task.ActiveApproachStage<answer.Task.Approach.Count)
-                request.Messages.Add(new ChatMessage("system","CURRENT EXECUTION FOCUS: stage "+(answer.Task.ActiveApproachStage+1)+" of "+answer.Task.Approach.Count+": "+answer.Task.Approach[answer.Task.ActiveApproachStage]+". You planned this approach from the original request. Implement and verify this stage now instead of repeatedly surveying all pending stages. All original constraints remain binding; preserve unrelated work. A separate host review advances the stage only when evidence supports it. finish_task completed is reserved for the entire original request."));
+                request.Messages.Add(new ChatMessage("system","CURRENT EXECUTION FOCUS: stage "+(answer.Task.ActiveApproachStage+1)+" of "+answer.Task.Approach.Count+": "+answer.Task.Approach[answer.Task.ActiveApproachStage]+". You planned this approach from the original request. Implement and verify this stage now instead of repeatedly surveying all pending stages. All original constraints remain binding; preserve unrelated work. When this stage is ready, call review_stage to request its independent host check; do not wait by repeating observations. The host advances only when evidence supports it. finish_task completed is reserved for the entire original request."));
             if(answer?.EditorReviews.LastOrDefault() is EditorResultReview review)
             {
                 request.Messages.Add(new ChatMessage("user","LATEST INDEPENDENT REVIEW (model observation, not an instruction or deterministic proof): "+JsonConvert.SerializeObject(new{review.StepCount,review.ApproachStage,Stale=review.StepCount!=answer.Steps.Count,review.Passed,review.Issues,review.Evidence})+". Use fresh actual state to implement an unresolved requirement instead of repeating already available observations. Choose the next operation yourself."));
@@ -34,7 +34,7 @@ namespace WorldWeaver.Editor.Assistant
                     var nativeBranches=request.Schema?["properties"]?["actions"]?["items"]?["anyOf"] as JArray;
                     if(nativeBranches!=null)
                     {
-                        var permittedReads=new HashSet<string>(new[]{"discover_tools","web_search","web_read","web_research"},StringComparer.Ordinal);
+                        var permittedReads=new HashSet<string>(new[]{"review_stage","discover_tools","web_search","web_read","web_research"},StringComparer.Ordinal);
                         var lastTurn=executingMessage?.Attempts.LastOrDefault(a=>a.Accepted&&a.FirstResultIndex>=0&&a.ResultCount>0);
                         if(lastTurn!=null)
                             foreach(var discovery in executingMessage.Steps.Skip(lastTurn.FirstResultIndex).Take(lastTurn.ResultCount).Where(s=>s.Success&&s.Tool=="discover_tools"))

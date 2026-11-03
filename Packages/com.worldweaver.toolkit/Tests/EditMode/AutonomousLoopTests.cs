@@ -91,6 +91,8 @@ namespace WorldWeaver.Tests
             var result=SceneToolExecutor.Execute(new EditorPlan{actions={command}},executionContext:new AgentExecutionContext{Message=message}).Results.Single();
             Assert.That(result.Summary,Does.Contain("ACTUAL_ASSET_AT_END"));Assert.That(result.Summary,Does.Contain("owned:preserved"));Assert.AreEqual(1,message.Steps.Count);
             command.args["index"]=1;Assert.IsFalse(SceneToolExecutor.Execute(new EditorPlan{actions={command}},executionContext:new AgentExecutionContext{Message=message}).Success);
+            for(int i=1;i<=200;i++)message.Steps.Add(new EditorCommandResult{Success=true,Tool="inspect_object",Summary="Actual observation "+i});
+            command.args["index"]=200;command.args["offset"]=0;var later=SceneToolExecutor.Execute(new EditorPlan{actions={command}},executionContext:new AgentExecutionContext{Message=message});Assert.IsTrue(later.Success,later.Error);Assert.That(later.Results.Single().Summary,Does.Contain("Actual observation 200"));
         }
         sealed class WholeTaskReviewProvider:ILLMProvider
         {

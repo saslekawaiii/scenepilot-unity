@@ -162,7 +162,7 @@ namespace WorldWeaver.Tests
                 else if(InspectionFirst&&Calls==2)plan.actions.Add(new EditorCommand{tool="find_scene_objects",args=new JObject{["query"]="AbsentStageNode"}});
                 else if(!InspectionFirst&&!UnityEngine.GameObject.Find("StageOne"))plan.actions.Add(new EditorCommand{tool="create_node",name="StageOne"});
                 else if(request.Messages.Any(m=>m.Content.Contains("CURRENT EXECUTION FOCUS: stage 2"))&&!UnityEngine.GameObject.Find("StageTwo"))plan.actions.Add(new EditorCommand{tool="create_node",name="StageTwo"});
-                else{plan.complete=true;plan.reply="Оба узла созданы";}
+                else plan.actions.Add(new EditorCommand{tool="review_stage"});
                 return System.Threading.Tasks.Task.FromResult(new CompletionResult{Text=Newtonsoft.Json.JsonConvert.SerializeObject(plan)});
             }
             public System.Threading.Tasks.Task<bool> HealthAsync(System.Threading.CancellationToken token)=>System.Threading.Tasks.Task.FromResult(true);
@@ -176,7 +176,7 @@ namespace WorldWeaver.Tests
                 controller.Settings.UseNativeFunctions=true;controller.Settings.AllowAutonomousScripts=true;controller.Settings.AutoVerify=true;controller.Settings.Power=AssistantPower.Deep;controller.Settings.UseSkills=false;
                 await controller.SendAsync(inspectionFirst?"Исследуй сцену: проверь, есть ли узел AbsentStageNode, и запиши фактический отрицательный результат, если его нет. Затем создай пустой узел StageTwo. Сохрани остальное содержимое проекта и не подменяй отрицательный результат вымышленной находкой.":"Создай два пустых узла StageOne и StageTwo. Сначала создай первый узел и проверь его существование, затем создай второй и проверь его существование. Сохрани всё остальное содержимое проекта без изменений.");
                 var answer=controller.Current.Messages.Last();Assert.IsFalse(answer.IsError,answer.Text);Assert.AreEqual(!inspectionFirst,(bool)UnityEngine.GameObject.Find("StageOne"),"An inspection stage must not force an unrelated mutation");Assert.IsTrue(UnityEngine.GameObject.Find("StageTwo"));Assert.AreEqual(2,answer.Task.ActiveApproachStage);Assert.AreEqual(2,provider.StageReviews);Assert.AreEqual(1,provider.FullReviews);
-                Assert.AreEqual(2,answer.EditorReviews.Count(r=>r.ApproachStage>=0));Assert.AreEqual(1,answer.EditorReviews.Count(r=>r.ApproachStage<0));
+                Assert.AreEqual(2,answer.Steps.Count(r=>r.Success&&r.Tool=="review_stage"));Assert.AreEqual(2,answer.EditorReviews.Count(r=>r.ApproachStage>=0));Assert.AreEqual(1,answer.EditorReviews.Count(r=>r.ApproachStage<0));
             }}finally{UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.EmptyScene,UnityEditor.SceneManagement.NewSceneMode.Single);}
         }
         [Test] public void DiscoveryWithinAReadBatchEnablesItsExactReadOnTheNextImplementationTurn()

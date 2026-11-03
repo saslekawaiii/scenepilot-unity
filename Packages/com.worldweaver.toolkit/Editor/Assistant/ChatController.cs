@@ -408,12 +408,13 @@ namespace WorldWeaver.Editor.Assistant
                         else observationRounds++;
                         bool stalledObservations=Settings.AllowAutonomousScripts&&!readOnlyRequest&&Settings.Mode==AssistantMode.Execute&&observationRounds>=6&&answer.EditorReviews.Count<12;
                         bool changedEnough=batch.Success&&hasMutations&&answer.Steps.Skip(answer.EditorReviews.LastOrDefault()?.StepCount??0).Count(s=>s.Success&&!SceneToolExecutor.IsReadOnlyTool(s.Tool)&&s.Tool!="remember_design")>=4;
-                        if(Settings.UseNativeFunctions&&Settings.AutoVerify&&Settings.Power==AssistantPower.Deep&&!WaitingForEditor(answer)&&(changedEnough||stalledObservations))
+                        bool stageCheckpoint=batch.Success&&batch.Results.Any(s=>s.Success&&s.Tool=="review_stage");
+                        if(Settings.UseNativeFunctions&&Settings.AutoVerify&&!WaitingForEditor(answer)&&(stageCheckpoint||Settings.Power==AssistantPower.Deep&&(changedEnough||stalledObservations)))
                         {
                             int stage=Settings.AllowAutonomousScripts&&answer.Task?.Approach.Count>0&&answer.Task.ActiveApproachStage<answer.Task.Approach.Count?answer.Task.ActiveApproachStage:-1;
                             var progress=await ReviewEditorResultAsync(answer,provider,operation.Token,stage);
                             observationRounds=0;var progressChecks=VerifyTask(answer);
-                            if(stalledObservations&&!progress.Passed)requireImplementationStep=true;
+                            if((stalledObservations||stageCheckpoint)&&!progress.Passed)requireImplementationStep=true;
                             if(stage>=0&&progress.Passed)
                             {
                                 answer.Task.ActiveApproachStage++;requireImplementationStep=false;Save();

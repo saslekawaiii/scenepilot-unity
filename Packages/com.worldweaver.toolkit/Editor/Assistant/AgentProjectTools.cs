@@ -20,14 +20,15 @@ namespace WorldWeaver.Editor.Assistant
     /// <summary>Typed project operations: no shell, arbitrary reflection invocation or credential file reader.</summary>
     internal static class AgentProjectTools
     {
-        static readonly string[] Names={"find_unity_recipes","read_unity_recipe","read_task_step","execute_editor_code","reflect_api","plan_task","discover_tools","list_scene_objects","find_scene_objects","inspect_project","inspect_component","set_component","add_component","read_console","capture_scene","run_tests","run_play_check","run_player_check","poll_job","set_build_scenes","build_player","remember_design","list_skills","read_skill","open_scene"};
+        static readonly string[] Names={"find_unity_recipes","read_unity_recipe","read_task_step","execute_editor_code","reflect_api","plan_task","review_stage","discover_tools","list_scene_objects","find_scene_objects","inspect_project","inspect_component","set_component","add_component","read_console","capture_scene","run_tests","run_play_check","run_player_check","poll_job","set_build_scenes","build_player","remember_design","list_skills","read_skill","open_scene"};
         internal static bool Handles(string tool)=>Names.Contains(tool);
-        internal static bool IsReadOnly(string tool)=>new[]{"find_unity_recipes","read_unity_recipe","read_task_step","reflect_api","plan_task","discover_tools","list_scene_objects","find_scene_objects","inspect_project","inspect_component","read_console","capture_scene","poll_job","list_skills","read_skill"}.Contains(tool);
+        internal static bool IsReadOnly(string tool)=>new[]{"find_unity_recipes","read_unity_recipe","read_task_step","reflect_api","plan_task","review_stage","discover_tools","list_scene_objects","find_scene_objects","inspect_project","inspect_component","read_console","capture_scene","poll_job","list_skills","read_skill"}.Contains(tool);
         internal static bool IsDeferred(string tool)=>tool=="run_tests"||tool=="run_play_check"||tool=="run_player_check"||tool=="build_player"||tool=="open_scene";
         internal static bool RequiresReview(EditorCommand c)=>c.tool=="open_scene"||c.tool=="set_build_scenes"||c.tool=="add_component"&&ResolveType((string)c.args["type"]).IsSubclassOf(typeof(MonoBehaviour));
         internal const string ToolInstructions=@"PROJECT TOOLS (exact typed args):
-read_task_step: target empty,args {index:0..127,offset?:0..100000}. Retrieves a persisted earlier tool result from THIS task, including full real IDs, errors and asset paths. Use the durable index to recover evidence outside the recent context window. Paged data only; does not rerun the tool.
+read_task_step: target empty,args {index:0..8191,offset?:0..100000}. Retrieves a persisted earlier tool result from THIS task, including full real IDs, errors and asset paths. Use the durable index to recover evidence outside the recent context window. Paged data only; does not rerun the tool.
 plan_task: target empty,args {steps:[string...]}, 1-12 stages covering ALL parts of a compound request. Records a proposed approach only; never marks stages completed. Plan before complex creation, then use actual tools and live checks.
+review_stage: target empty,args {}. Request independent verification of the CURRENT model-planned stage after its work or inspection is ready. Does not mark it passed: the controller checks actual evidence before advancing. Use this instead of repeated reads while waiting for the next stage. finish_task is for the whole user request.
 list_scene_objects: target empty,args {component?:type name,kind?:exact generated kind,parent?:actual scene target,offset?:0..20000,limit?:1..100}. Structural active-scene inventory independent of names/language. Defaults omit transform-only skeleton nodes. Use component Renderer/Terrain/WorldPlayer to find geometry; actual paths, materials and dimensions identify old surfaces. Paged read only.
 find_scene_objects: target empty,args {query:string,limit?:1..50}. Literal AND-token search; no translation or synonyms. Empty query lists objects. Addressed retrieval over all loaded scenes/assets, returns stable targets. Editing remains restricted to active scene.
 inspect_project: target empty,args {}. Actual Unity/platform/packages/build-scenes metadata, no environment files.
@@ -54,9 +55,10 @@ open_scene: target empty,args {path:Assets/...unity}. Standalone reviewed action
             var schema=new Dictionary<string,JObject>{
                 ["find_unity_recipes"]=Obj(new JObject{["query"]=Text(500),["limit"]=Integer(1,8)},"query"),
                 ["read_unity_recipe"]=Obj(new JObject{["id"]=Text(120),["offset"]=Integer(0,65536)},"id"),
-                ["read_task_step"]=Obj(new JObject{["index"]=Integer(0,127),["offset"]=Integer(0,100000)},"index"),
+                ["read_task_step"]=Obj(new JObject{["index"]=Integer(0,8191),["offset"]=Integer(0,100000)},"index"),
                 ["reflect_api"]=Obj(new JObject{["type"]=Text(240),["member"]=Text(120)},"type"),
                 ["execute_editor_code"]=Obj(new JObject{["code"]=Text(20000)},"code"),
+                ["review_stage"]=Obj(new JObject()),
                 ["plan_task"]=Obj(new JObject{["steps"]=new JObject{["type"]="array",["minItems"]=1,["maxItems"]=12,["items"]=Text(300)}},"steps"),
                 ["discover_tools"]=Obj(new JObject{["query"]=Text(500),["names"]=new JObject{["type"]="array",["maxItems"]=16,["items"]=Text(64)}}),
                 ["list_scene_objects"]=Obj(new JObject{["component"]=Text(200),["kind"]=Text(100),["parent"]=Text(200),["offset"]=Integer(0,20000),["limit"]=Integer(1,100)}),
@@ -203,6 +205,9 @@ open_scene: target empty,args {path:Assets/...unity}. Standalone reviewed action
                 case "execute_editor_code":return EditorCodeTools.Execute(c,resolve,context);
                 case "reflect_api":summary=EditorCodeTools.Reflect((string)a["type"],(string)a["member"]);break;
                 case "plan_task":if(context?.Message?.Task==null)throw new InvalidOperationException("A task context is required.");context.Message.Task.Approach=a["steps"].Values<string>().ToList();summary=new JObject{["stages"]=a["steps"].DeepClone(),["status"]="proposed, not completed",["changesApplied"]=false}.ToString(Formatting.None);break;
+                case "review_stage":
+                    var task=context?.Message?.Task;if(task==null||task.ActiveApproachStage<0||task.ActiveApproachStage>=task.Approach.Count)throw new InvalidOperationException("No active planned stage to review.");
+                    summary=new JObject{["stage"]=task.ActiveApproachStage,["description"]=task.Approach[task.ActiveApproachStage],["status"]="review requested, not passed",["changesApplied"]=false}.ToString(Formatting.None);break;
                 case "discover_tools":summary=AgentCapabilities.Discover(a).ToString(Formatting.None);break;
                 case "list_scene_objects":summary=ProjectContextIndex.ListScene(a).ToString(Formatting.None);break;
                 case "find_scene_objects":summary=ProjectContextIndex.Search((string)a["query"],(int?)a["limit"]??20).ToString(Formatting.None);break;

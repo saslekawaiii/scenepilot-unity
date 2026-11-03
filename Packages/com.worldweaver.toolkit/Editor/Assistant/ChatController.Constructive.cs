@@ -112,6 +112,7 @@ namespace WorldWeaver.Editor.Assistant
             foreach(var step in answer?.Steps??new List<EditorCommandResult>())
                 if(step.Success&&(step.Tool=="discover_tools"||step.Tool=="read_skill"))
                     try{foreach(string name in JObject.Parse(step.Summary)["enabledTools"]??new JArray())tools.Add(name);}catch(JsonException){}
+            if(Settings.UseNativeFunctions&&Settings.AllowAutonomousScripts&&Settings.AutoVerify&&answer?.Task?.Approach.Count>0&&answer.Task.ActiveApproachStage<answer.Task.Approach.Count)tools.Add("review_stage");
             if(mode==AssistantMode.Ask)tools.RemoveWhere(t=>!SceneToolExecutor.IsReadOnlyTool(t));
             if(!Settings.AllowEditorCode)tools.Remove("execute_editor_code");
             bool needsApproach=Settings.UseNativeFunctions&&Settings.AllowAutonomousScripts&&mode==AssistantMode.Execute&&input.Length>160&&answer?.Task!=null&&answer.Task.Approach.Count==0&&!answer.Steps.Any(s=>s.Success&&!SceneToolExecutor.IsReadOnlyTool(s.Tool));
