@@ -88,13 +88,14 @@ namespace WorldWeaver.Editor.Assistant
                         var args=f["arguments"];if(args?.Type==JTokenType.String)args=JObject.Parse((string)args);if(!(args is JObject))throw new JsonException("Invalid historical arguments");
                         calls.Add(new JObject{["id"]=(string)original[i]["id"]??"call_ww_"+attempt.Round+"_"+i,["type"]="function",["function"]=new JObject{["name"]=name,["arguments"]=args.DeepClone()}});
                     }
-                    int overhead=calls.ToString(Formatting.None).Length+500;if(overhead+original.Count*350>remaining)continue;
+                    string thinking=wire["thinking"]?.Type==JTokenType.String?(string)wire["thinking"]:null;
+                    int overhead=calls.ToString(Formatting.None).Length+(thinking?.Length??0)+500;if(overhead+original.Count*350>remaining)continue;
                     // Allocate by actual result size, not an equal prefix per call. A source
                     // file batched beside tiny field reads must retain its implementation.
                     var summaries=observed?Enumerable.Range(0,original.Count).Select(i=>ToolEvidenceForModel(answer.Steps[attempt.FirstResultIndex+i])).ToArray():new string[original.Count];
                     int cap=22000, available=remaining-overhead-original.Count*350;
                     if(observed)while(cap>500&&summaries.Sum(t=>Math.Min(t.Length,cap))>available)cap-=500;
-                    var group=new List<ChatMessage>{new ChatMessage("assistant",(string)wire["content"]??""){ToolCalls=calls}};
+                    var group=new List<ChatMessage>{new ChatMessage("assistant",(string)wire["content"]??""){ToolCalls=calls,Thinking=thinking}};
                     bool consistent=true;
                     for(int i=0;i<calls.Count;i++)
                     {
@@ -110,7 +111,7 @@ namespace WorldWeaver.Editor.Assistant
                         group.Add(new ChatMessage("tool",ChatHistoryStore.Redact(result.ToString(Formatting.None))){ToolCallId=(string)calls[i]["id"],ToolName=name});
                     }
                     if(!consistent)continue;
-                    int cost=group.Sum(m=>(m.Content??"").Length+(m.ToolCalls?.ToString(Formatting.None).Length??0)+100);if(cost>remaining)continue;
+                    int cost=group.Sum(m=>(m.Content??"").Length+(m.Thinking?.Length??0)+(m.ToolCalls?.ToString(Formatting.None).Length??0)+100);if(cost>remaining)continue;
                     remaining-=cost;groups.Add(group);if(remaining<1000)break;
                 }
                 catch(JsonException){} // Legacy/unparseable history remains visible in the durable index.

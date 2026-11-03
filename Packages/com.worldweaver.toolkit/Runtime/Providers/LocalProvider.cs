@@ -30,6 +30,7 @@ namespace WorldWeaver
             foreach (var message in request.TransportMessages())
             {
                 var item = new JObject { ["role"] = message.Role, ["content"] = message.Content };
+                if(message.Role=="assistant"&&!string.IsNullOrEmpty(message.Thinking))item["thinking"]=message.Thinking;
                 if(message.ToolCalls!=null)item["tool_calls"]=message.ToolCalls.DeepClone();
                 if(message.ToolName!=null)item["tool_name"]=message.ToolName;
                 if(message.ToolCallId!=null)item["tool_call_id"]=message.ToolCallId;
@@ -64,6 +65,7 @@ namespace WorldWeaver
             if (request.Stream)
             {
                 var text = new StringBuilder();
+                var thinking = new StringBuilder();
                 var calls = new JArray();
                 request.OnActivity?.Invoke("Ожидаю ответ локальной модели…");
                 for (int attempt = 0; ; attempt++)
@@ -76,6 +78,7 @@ namespace WorldWeaver
                             receivedFrame = true;
                             token.ThrowIfCancellationRequested();
                             if (frame["message"]?["tool_calls"] is JArray frameCalls) foreach (var call in frameCalls) calls.Add(call.DeepClone());
+                            if(frame["message"]?["thinking"]?.Type==JTokenType.String)thinking.Append((string)frame["message"]["thinking"]);
                             string delta = (string)frame["message"]?["content"] ?? "";
                             if (delta.Length > 0)
                             {
@@ -96,6 +99,7 @@ namespace WorldWeaver
                 if (request.UseToolCalls)
                 {
                     result["message"] = new JObject { ["role"] = "assistant", ["content"] = text.ToString(), ["tool_calls"] = calls };
+                    if(thinking.Length>0)result["message"]["thinking"]=thinking.ToString();
                     content = CompletionResult.IsOutputLimit((string)result["done_reason"]) ? text.ToString() : AgentFunctionProtocol.Normalize((JObject)result["message"], request.Schema);
                 }
                 else content = text.ToString();

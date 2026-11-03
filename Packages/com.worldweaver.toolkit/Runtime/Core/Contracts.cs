@@ -17,6 +17,8 @@ namespace WorldWeaver
         public readonly IReadOnlyList<string> Images;
         public JArray ToolCalls;
         public string ToolCallId, ToolName;
+        /// <summary>Opaque Ollama continuation state, never ordinary reply text.</summary>
+        [Newtonsoft.Json.JsonIgnore] public string Thinking;
         public ChatMessage(string role, string content, IEnumerable<string> images = null)
         { Role = role; Content = content; Images = images == null ? new List<string>() : new List<string>(images); }
     }

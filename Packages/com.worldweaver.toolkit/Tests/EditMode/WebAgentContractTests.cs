@@ -243,9 +243,10 @@ namespace WorldWeaver.Tests
         [Test] public void NativeHistoryBindsActualObservationToItsOriginalCallAndKeepsLegacyHistoryUninvented()
         {
             var answer=new AssistantMessage();answer.Attempts.Add(new EditorPlanAttempt{Round=1,Accepted=true,FirstResultIndex=0,ResultCount=1,WireResponse="{\"role\":\"assistant\",\"content\":\"\",\"tool_calls\":[{\"id\":\"call_actual\",\"function\":{\"name\":\"inspect_object\",\"arguments\":{\"target\":\"owned:original\"}}}]}"});
+            var originalWire=JObject.Parse(answer.Attempts[0].WireResponse);originalWire["thinking"]="OPAQUE_HISTORY_STATE";answer.Attempts[0].WireResponse=originalWire.ToString();
             answer.Steps.Add(new EditorCommandResult{Tool="inspect_object",Success=false,Error="Actual object missing",Summary="No object read"});
             var request=new CompletionRequest();Assert.IsTrue(NativeHistory(request,answer));Assert.AreEqual(2,request.Messages.Count);
-            Assert.AreEqual("assistant",request.Messages[0].Role);Assert.AreEqual("call_actual",(string)request.Messages[0].ToolCalls[0]["id"]);
+            Assert.AreEqual("assistant",request.Messages[0].Role);Assert.AreEqual("OPAQUE_HISTORY_STATE",request.Messages[0].Thinking);Assert.That(Newtonsoft.Json.JsonConvert.SerializeObject(request.Messages[0]),Does.Not.Contain("OPAQUE_HISTORY_STATE"));Assert.AreEqual("call_actual",(string)request.Messages[0].ToolCalls[0]["id"]);
             Assert.AreEqual("owned:original",(string)request.Messages[0].ToolCalls[0]["function"]["arguments"]["target"]);
             Assert.AreEqual("tool",request.Messages[1].Role);Assert.AreEqual("call_actual",request.Messages[1].ToolCallId);Assert.IsFalse((bool)JObject.Parse(request.Messages[1].Content)["success"]);
             answer.Steps[0].Summary="{\"observedField\":false}";var structured=new CompletionRequest();Assert.IsTrue(NativeHistory(structured,answer));Assert.IsFalse((bool)JObject.Parse(structured.Messages[1].Content)["data"]["observedField"],"Structured observations must not be multiply escaped into a text prefix");
