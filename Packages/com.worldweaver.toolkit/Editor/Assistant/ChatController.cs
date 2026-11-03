@@ -144,7 +144,6 @@ namespace WorldWeaver.Editor.Assistant
             var answer=Current.Messages.FirstOrDefault(m=>m.Id==messageId);
             if(answer?.Task==null||answer.PendingPlan!=null)return;
             bool finalReviewOnly=answer.Task.ResumeAttempts>=ContinuationLimit;
-            if(finalReviewOnly&&string.IsNullOrEmpty(answer.Task.PendingJobId)&&!HasUnreviewedCompletedJob(answer)){answer.Task.ContinueAfterReload=false;answer.Status="Нужна проверка";Phase="Исчерпан предел продолжений задачи: "+ContinuationLimit;Save();return;}
             if(!string.IsNullOrEmpty(answer.Task.PendingJobId))
             {
                 var job=AgentEditorJobs.Load(answer.Task.PendingJobId);
@@ -182,7 +181,7 @@ namespace WorldWeaver.Editor.Assistant
                     // A domain reload resets local observation counters. Review the
                     // terminal host result before asking the planner for more work,
                     // so an old "missing test" finding cannot start an endless retest.
-                    if(Settings.UseNativeFunctions&&Settings.AutoVerify&&Settings.AllowAutonomousScripts&&!readOnlyRequest&&HasUnreviewedCompletedJob(answer))
+                    if(Settings.UseNativeFunctions&&Settings.AutoVerify&&Settings.AllowAutonomousScripts&&!readOnlyRequest&&(finalReviewOnly||HasUnreviewedCompletedJob(answer)))
                     {
                         int completedStage=answer.Task?.Approach.Count>0&&answer.Task.ActiveApproachStage<answer.Task.Approach.Count?answer.Task.ActiveApproachStage:-1;
                         var completedReview=await ReviewEditorResultAsync(answer,provider,operation.Token,completedStage);

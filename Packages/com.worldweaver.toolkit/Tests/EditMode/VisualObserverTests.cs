@@ -123,6 +123,18 @@ namespace WorldWeaver.Tests
         {
             public int Reviews,Plans;public bool Pass=true;public Task<CompletionResult> CompleteAsync(CompletionRequest request,CancellationToken token){if(request.Schema?["properties"]?["passed"]!=null){Reviews++;return Task.FromResult(new CompletionResult{Text=new JObject{["passed"]=Pass,["issues"]=Pass?new JArray():new JArray("Fixture verification gap"),["evidence"]="Fixture verified the terminal host result"}.ToString()});}Plans++;throw new InvalidOperationException("Planner must not run after a completed verified goal");}public Task<bool> HealthAsync(CancellationToken token)=>Task.FromResult(true);public void Dispose(){}
         }
+        [Test] public void HistoricalCreationUsesStableIdentityAfterRenameAndRecordsActualAbsence()
+        {
+            EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);var world=new GameObject("Renamed garden");var marker=world.AddComponent<WorldWeaver.GeneratedSceneObject>();marker.Kind="world";marker.BatchId=Guid.NewGuid().ToString("N");string target=ProjectContextIndex.StableTarget(world);
+            var session=new ChatSession();session.Messages.Add(new AssistantMessage{Role="user",Text="Create a garden with a pond"});var creation=new AssistantMessage();creation.Steps.Add(new EditorCommandResult{Tool="create_world",Target=target,Success=true,Summary="{}",CreatedAssets=new System.Collections.Generic.List<string>{"Assets/WorldWeaverGenerated/Assistant/"+marker.BatchId+"/Terrain.asset"}});session.Messages.Add(creation);
+            var facts=AgentProjectHistory.Describe(new[]{session},null);Assert.AreEqual(1,facts.Count);Assert.AreEqual("Create a garden with a pond",(string)facts[0]["userRequest"]);Assert.IsTrue((bool)facts[0]["operations"][0]["existsInActiveScene"]);Assert.AreEqual("Renamed garden",(string)facts[0]["operations"][0]["currentName"]);Assert.AreEqual(1,(int)facts[0]["operations"][0]["activeSceneObjectsInAssetBatches"]);
+            UnityEngine.Object.DestroyImmediate(world);facts=AgentProjectHistory.Describe(new[]{session},null);Assert.IsFalse((bool)facts[0]["operations"][0]["existsInActiveScene"]);Assert.AreEqual(0,(int)facts[0]["operations"][0]["activeSceneObjectsInAssetBatches"]);EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
+        }
+        [Test] public void HistoricalFactsExcludeCurrentWorkFailedClaimsAndOpaqueProviderState()
+        {
+            string secret="sk-"+new string('x',30);var session=new ChatSession();session.Messages.Add(new AssistantMessage{Role="user",Text="Create a marker "+secret});var creation=new AssistantMessage();creation.Attempts.Add(new EditorPlanAttempt{WireResponse="OPAQUE_STATE_MUST_NOT_APPEAR"});creation.Steps.Add(new EditorCommandResult{Tool="create_node",Target="owned:"+Guid.NewGuid().ToString("N"),Success=false,Summary="claim"});session.Messages.Add(creation);Assert.AreEqual(0,AgentProjectHistory.Describe(new[]{session},null).Count);creation.Steps[0].Success=true;
+            string json=AgentProjectHistory.Describe(new[]{session},null).ToString();Assert.That(json,Does.Not.Contain(secret));Assert.That(json,Does.Not.Contain("OPAQUE_STATE_MUST_NOT_APPEAR"));Assert.AreEqual(0,AgentProjectHistory.Describe(new[]{session},creation.Id).Count);
+        }
         [Test] public void NativeVisionPlannerActuallyReceivesItsCapturedImage()
         {
             string folder=Path.Combine("UserSettings","NativeVision-"+Guid.NewGuid().ToString("N"));using(var controller=new ChatController(_=>new ObserverProvider(),folder))
