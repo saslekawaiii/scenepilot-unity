@@ -147,19 +147,20 @@ namespace WorldWeaver.Tests
         static bool NativeHistory(CompletionRequest request,AssistantMessage answer)=>(bool)typeof(ChatController).GetMethod("AddNativeToolHistory",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic).Invoke(null,new object[]{request,answer});
         sealed class StageProvider:ILLMProvider
         {
-            public int Calls,StageReviews,FullReviews;
+            public int Calls,StageReviews,FullReviews;public bool InspectionFirst;
             public System.Threading.Tasks.Task<CompletionResult> CompleteAsync(CompletionRequest request,System.Threading.CancellationToken token)
             {
                 if(request.Schema?["properties"]?["passed"]!=null)
                 {
                     bool stage=request.Messages.Any(m=>m.Content.Contains("checkpoint for ONE model-planned"));if(stage)StageReviews++;else FullReviews++;
                     bool first=UnityEngine.GameObject.Find("StageOne"),second=UnityEngine.GameObject.Find("StageTwo");
-                    bool passed=stage?request.Messages.Any(m=>m.Content.Contains("\"ApproachStage\":0"))?first:second:first&&second;
+                    bool passed=stage?request.Messages.Any(m=>m.Content.Contains("\"ApproachStage\":0"))?InspectionFirst?!UnityEngine.GameObject.Find("AbsentStageNode"):first:second:InspectionFirst?second:first&&second;
                     return System.Threading.Tasks.Task.FromResult(new CompletionResult{Text=new JObject{["passed"]=passed,["issues"]=passed?new JArray():new JArray("Actual required node missing"),["evidence"]="Actual scene nodes"}.ToString()});
                 }
                 Calls++;var plan=new EditorPlan{complete=false};
-                if(Calls==1)plan.actions.Add(new EditorCommand{tool="plan_task",args=new JObject{["steps"]=new JArray("Создай пустой узел StageOne","Создай пустой узел StageTwo")}});
-                else if(!UnityEngine.GameObject.Find("StageOne"))plan.actions.Add(new EditorCommand{tool="create_node",name="StageOne"});
+                if(Calls==1)plan.actions.Add(new EditorCommand{tool="plan_task",args=new JObject{["steps"]=new JArray(InspectionFirst?"Проверь наличие AbsentStageNode; отрицательный результат поиска является допустимым выводом исследования":"Создай пустой узел StageOne","Создай пустой узел StageTwo")}});
+                else if(InspectionFirst&&Calls==2)plan.actions.Add(new EditorCommand{tool="find_scene_objects",args=new JObject{["query"]="AbsentStageNode"}});
+                else if(!InspectionFirst&&!UnityEngine.GameObject.Find("StageOne"))plan.actions.Add(new EditorCommand{tool="create_node",name="StageOne"});
                 else if(request.Messages.Any(m=>m.Content.Contains("CURRENT EXECUTION FOCUS: stage 2"))&&!UnityEngine.GameObject.Find("StageTwo"))plan.actions.Add(new EditorCommand{tool="create_node",name="StageTwo"});
                 else{plan.complete=true;plan.reply="Оба узла созданы";}
                 return System.Threading.Tasks.Task.FromResult(new CompletionResult{Text=Newtonsoft.Json.JsonConvert.SerializeObject(plan)});
@@ -167,14 +168,14 @@ namespace WorldWeaver.Tests
             public System.Threading.Tasks.Task<bool> HealthAsync(System.Threading.CancellationToken token)=>System.Threading.Tasks.Task.FromResult(true);
             public void Dispose(){}
         }
-        [Test] public async System.Threading.Tasks.Task PlannedStageEvidenceNeverCompletesAnUnfinishedWholeTask()
+        [TestCase(false)][TestCase(true)] public async System.Threading.Tasks.Task PlannedStageEvidenceNeverCompletesAnUnfinishedWholeTask(bool inspectionFirst)
         {
-            UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.EmptyScene,UnityEditor.SceneManagement.NewSceneMode.Single);var provider=new StageProvider();
+            UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.EmptyScene,UnityEditor.SceneManagement.NewSceneMode.Single);var provider=new StageProvider{InspectionFirst=inspectionFirst};
             try{using(var controller=new ChatController(_=>provider,"UserSettings/Stages-"+Guid.NewGuid().ToString("N")))
             {
                 controller.Settings.UseNativeFunctions=true;controller.Settings.AllowAutonomousScripts=true;controller.Settings.AutoVerify=true;controller.Settings.Power=AssistantPower.Deep;controller.Settings.UseSkills=false;
-                await controller.SendAsync("Создай два пустых узла StageOne и StageTwo. Сначала создай первый узел и проверь его существование, затем создай второй и проверь его существование. Сохрани всё остальное содержимое проекта без изменений.");
-                var answer=controller.Current.Messages.Last();Assert.IsFalse(answer.IsError,answer.Text);Assert.IsTrue(UnityEngine.GameObject.Find("StageOne"));Assert.IsTrue(UnityEngine.GameObject.Find("StageTwo"));Assert.AreEqual(2,answer.Task.ActiveApproachStage);Assert.AreEqual(2,provider.StageReviews);Assert.AreEqual(1,provider.FullReviews);
+                await controller.SendAsync(inspectionFirst?"Исследуй сцену: проверь, есть ли узел AbsentStageNode, и запиши фактический отрицательный результат, если его нет. Затем создай пустой узел StageTwo. Сохрани остальное содержимое проекта и не подменяй отрицательный результат вымышленной находкой.":"Создай два пустых узла StageOne и StageTwo. Сначала создай первый узел и проверь его существование, затем создай второй и проверь его существование. Сохрани всё остальное содержимое проекта без изменений.");
+                var answer=controller.Current.Messages.Last();Assert.IsFalse(answer.IsError,answer.Text);Assert.AreEqual(!inspectionFirst,(bool)UnityEngine.GameObject.Find("StageOne"),"An inspection stage must not force an unrelated mutation");Assert.IsTrue(UnityEngine.GameObject.Find("StageTwo"));Assert.AreEqual(2,answer.Task.ActiveApproachStage);Assert.AreEqual(2,provider.StageReviews);Assert.AreEqual(1,provider.FullReviews);
                 Assert.AreEqual(2,answer.EditorReviews.Count(r=>r.ApproachStage>=0));Assert.AreEqual(1,answer.EditorReviews.Count(r=>r.ApproachStage<0));
             }}finally{UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.EmptyScene,UnityEditor.SceneManagement.NewSceneMode.Single);}
         }

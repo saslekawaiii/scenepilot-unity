@@ -319,14 +319,6 @@ namespace WorldWeaver.Editor.Assistant
                                 answer.Status=plan.outcome=="partial"?"Выполнено частично":"Нужен ресурс или доступ";
                                 answer.IsError=false;break;
                             }
-                            bool missingRequestedChanges=!readOnlyRequest&&answer.Task?.MutationAuthorized==true&&AgentCapabilities.IsChangeRequest(text)&&!answer.Steps.Any(s=>s.Success&&!SceneToolExecutor.IsReadOnlyTool(s.Tool)&&s.Tool!="remember_design");
-                            if(missingRequestedChanges&&!answer.Steps.Any(s=>!s.Success)&&emptyPlanRepairs++<1&&round+1<rounds)
-                            {
-                                requireImplementationStep=answer.Steps.Any(s=>s.Success&&(s.Tool=="discover_tools"||s.Tool=="plan_task"||s.Tool=="read_skill"));
-                                expandToolSelection=true;request=BuildRequest(session,text);
-                                request.Messages.Add(new ChatMessage("user","В исходном запросе требуются изменения, но ни один инструмент их не применил. Предложенное complete:true не принято как выполнение. Доступные определения уже прочитаны; выполни подходящий шаг реализации. Не повторяй ту же справку вместо действия. Если новой механике нужен код, подготовь полный reviewed draft_script. ИСХОДНАЯ ЗАДАЧА: "+text));continue;
-                            }
-                            if(!plan.complete&&!readOnlyRequest&&round+1<rounds){request=BuildRequest(session,text);request.Messages.Add(new ChatMessage("user","Задача ещё не выполнена. Используй discover_tools/read_skill для недостающих возможностей и продолжи разрешённые шаги."));continue;}
                             if(plan.complete&&Settings.UseNativeFunctions&&Settings.AutoVerify&&Settings.AllowAutonomousScripts&&answer.Task?.Approach.Count>0&&answer.Task.ActiveApproachStage<answer.Task.Approach.Count)
                             {
                                 var stageReview=await ReviewEditorResultAsync(answer,provider,operation.Token,answer.Task.ActiveApproachStage);
@@ -338,6 +330,14 @@ namespace WorldWeaver.Editor.Assistant
                                     throw new ArgumentException("Approach stages remain unverified; full task completion was not accepted.");
                                 }
                             }
+                            bool missingRequestedChanges=!readOnlyRequest&&answer.Task?.MutationAuthorized==true&&AgentCapabilities.IsChangeRequest(text)&&!answer.Steps.Any(s=>s.Success&&!SceneToolExecutor.IsReadOnlyTool(s.Tool)&&s.Tool!="remember_design");
+                            if(missingRequestedChanges&&!answer.Steps.Any(s=>!s.Success)&&emptyPlanRepairs++<1&&round+1<rounds)
+                            {
+                                requireImplementationStep=answer.Steps.Any(s=>s.Success&&(s.Tool=="discover_tools"||s.Tool=="plan_task"||s.Tool=="read_skill"));
+                                expandToolSelection=true;request=BuildRequest(session,text);
+                                request.Messages.Add(new ChatMessage("user","В исходном запросе требуются изменения, но ни один инструмент их не применил. Предложенное complete:true не принято как выполнение. Доступные определения уже прочитаны; выполни подходящий шаг реализации. Не повторяй ту же справку вместо действия. Если новой механике нужен код, подготовь полный reviewed draft_script. ИСХОДНАЯ ЗАДАЧА: "+text));continue;
+                            }
+                            if(!plan.complete&&!readOnlyRequest&&round+1<rounds){request=BuildRequest(session,text);request.Messages.Add(new ChatMessage("user","Задача ещё не выполнена. Используй discover_tools/read_skill для недостающих возможностей и продолжи разрешённые шаги."));continue;}
                             answer.Text = ChatHistoryStore.Redact(plan.reply);
                             if(plan.complete&&Settings.AutoVerify&&Settings.UseNativeFunctions&&!readOnlyRequest&&answer.Steps.Any(s=>s.Success&&(s.Tool=="execute_editor_code"||Settings.Power==AssistantPower.Deep&&!SceneToolExecutor.IsReadOnlyTool(s.Tool)&&s.Tool!="remember_design")))
                             {
