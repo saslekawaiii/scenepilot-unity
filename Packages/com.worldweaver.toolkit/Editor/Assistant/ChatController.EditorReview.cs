@@ -24,8 +24,9 @@ namespace WorldWeaver.Editor.Assistant
         // additional model check, not a replacement for deterministic Unity checks.
         async Task<EditorResultReview> ReviewEditorResultAsync(AssistantMessage answer,ILLMProvider provider,CancellationToken token,int approachStage=-1)
         {
-            JToken Observation(string text){try{return JToken.Parse(text??"null");}catch(JsonException){return new JValue(text??"");}}
-            var hostChecks=VerifyTask(answer).Where(c=>c.RequirementId.StartsWith("job:",StringComparison.Ordinal)||c.RequirementId.StartsWith("compile:",StringComparison.Ordinal)).Select(c=>new{c.RequirementId,c.Passed,c.Actual,ObservedData=Observation(c.Evidence)}).ToArray();
+            JToken Observation(string text){try{var parsed=JToken.Parse(text??"null");return parsed is JObject data&&data["Kind"]!=null?JobObservationForModel(data):parsed;}catch(JsonException){return new JValue(text??"");}}
+            int changed=LastBehaviorChange(answer.Steps);
+            var hostChecks=VerifyTask(answer).Where(c=>c.RequirementId.StartsWith("job:",StringComparison.Ordinal)||c.RequirementId.StartsWith("compile:",StringComparison.Ordinal)).Select(c=>new{c.RequirementId,c.Passed,c.Actual,ObservedStep=answer.Steps.FindLastIndex(s=>s.Summary==c.Evidence),HistoricalBeforeLastChange=answer.Steps.FindLastIndex(s=>s.Summary==c.Evidence)>=0&&answer.Steps.FindLastIndex(s=>s.Summary==c.Evidence)<changed,ObservedData=Observation(c.Evidence)}).ToArray();
             var owners=new List<GameObject>();var missing=new JArray();
             foreach(var step in answer.Steps.Where(s=>s.Success&&!SceneToolExecutor.IsReadOnlyTool(s.Tool)))
             {

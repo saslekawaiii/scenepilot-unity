@@ -124,9 +124,35 @@ namespace WorldWeaver.Editor.Assistant
             foreach(var group in groups.AsEnumerable().Reverse())request.Messages.AddRange(group);
             return groups.Count>0;
         }
+        internal static JObject JobObservationForModel(JObject data)
+        {
+            if((string)data["Kind"]!="player_control")return (JObject)data.DeepClone();
+            var result=new JObject();foreach(string key in new[]{"Id","Kind","Status","Success","StableTarget","StartedUtc","FinishedUtc","Error","ResultPath","Passed","Failed","Skipped","RequireRelaxedArms"})if(data[key]!=null)result[key]=data[key].DeepClone();
+            JToken measurement=data["Measurement"]?.DeepClone();if(measurement?.Type==JTokenType.String)try{measurement=JToken.Parse((string)measurement);}catch(JsonException){}
+            if(measurement is JObject values&&values["realInputBackend"]?.Type==JTokenType.String){values["inputBackendConfiguration"]=((string)values["realInputBackend"]).Split(';')[0];values.Remove("realInputBackend");}
+            result["Measurement"]=measurement;return result;
+        }
+        internal static int LastBehaviorChange(IReadOnlyList<EditorCommandResult> steps)
+        {
+            for(int i=steps.Count-1;i>=0;i--)if(IsImplementationProgress(steps[i])&&!new[]{"run_player_check","run_play_check","run_tests","poll_job","compile_scripts","compile_patch","build_player","set_build_scenes","open_scene"}.Contains(steps[i].Tool))return i;
+            return -1;
+        }
+        internal static JArray RequiredRuntimeRechecks(IReadOnlyList<EditorCommandResult> steps)
+        {
+            int changed=LastBehaviorChange(steps);var seen=new HashSet<string>(StringComparer.Ordinal);var rows=new JArray();
+            for(int i=steps.Count-1;i>=0;i--)
+            {
+                if(steps[i].Tool!="job_result")continue;JObject job;try{job=JObject.Parse(steps[i].Summary??"");}catch(JsonException){continue;}
+                string kind=(string)job["Kind"],target=(string)job["StableTarget"];if(string.IsNullOrEmpty(target)||!seen.Add(kind+":"+target)||i>=changed)continue;
+                if(kind=="player_control")rows.Add(new JObject{["tool"]="run_player_check",["target"]=target,["args"]=new JObject{["seconds"]=(double?)job["RequestedSeconds"]??2,["check_relaxed_arms"]=(bool?)job["RequireRelaxedArms"]??false},["previousResultStep"]=i,["changedAfterStep"]=changed});
+                if(rows.Count>=3)break;
+            }
+            return rows;
+        }
         static string ToolEvidenceForModel(EditorCommandResult step)
         {
             string text=step.Summary??"";
+            if(step.Tool=="job_result")try{text=JobObservationForModel(JObject.Parse(text)).ToString(Formatting.None);}catch(JsonException){}
             if(step.Tool=="execute_editor_code")
             {
                 try

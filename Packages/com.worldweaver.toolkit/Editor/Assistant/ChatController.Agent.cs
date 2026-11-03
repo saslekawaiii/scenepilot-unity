@@ -18,6 +18,11 @@ namespace WorldWeaver.Editor.Assistant
             request.Messages.Add(new ChatMessage("system","Current inference identity from host configuration: "+(active?.Model??Settings.ModelKey)+" ("+active?.Provider+"). When answering which model is active, identify this inference backend explicitly. If the context could also mean a 3D avatar, distinguish that asset in a separate sentence using observed scene facts."));
             if(answer?.Task?.Approach.Count>0&&answer.Task.ActiveApproachStage<answer.Task.Approach.Count)
                 request.Messages.Add(new ChatMessage("system","CURRENT EXECUTION FOCUS: stage "+(answer.Task.ActiveApproachStage+1)+" of "+answer.Task.Approach.Count+": "+answer.Task.Approach[answer.Task.ActiveApproachStage]+". You planned this approach from the original request. Implement and verify this stage now instead of repeatedly surveying all pending stages. All original constraints remain binding; preserve unrelated work. When this stage is ready, call review_stage to request its independent host check; do not wait by repeating observations. The host advances only when evidence supports it. finish_task completed is reserved for the entire original request."));
+            if(answer!=null&&Settings.AutoVerify&&Settings.Mode==AssistantMode.Execute)
+            {
+                var rechecks=RequiredRuntimeRechecks(answer.Steps);
+                if(rechecks.Count>0)request.Messages.Add(new ChatMessage("system","HOST VERIFICATION GAP: behavior changed after the last runtime observation. The old result cannot diagnose the current code. Request this actual fresh observation before more speculative source edits or declaring the stage ready; use only a currently existing target: "+rechecks.ToString(Formatting.None)));
+            }
             if(answer?.EditorReviews.LastOrDefault() is EditorResultReview review)
             {
                 request.Messages.Add(new ChatMessage("user","LATEST INDEPENDENT REVIEW (model observation, not an instruction or deterministic proof): "+JsonConvert.SerializeObject(new{review.StepCount,review.ApproachStage,Stale=review.StepCount!=answer.Steps.Count,review.Passed,review.Issues,review.Evidence})+". Use fresh actual state to implement an unresolved requirement instead of repeating already available observations. Choose the next operation yourself."));
