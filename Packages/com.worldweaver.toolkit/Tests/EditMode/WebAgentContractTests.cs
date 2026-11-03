@@ -272,6 +272,34 @@ namespace WorldWeaver.Tests
             }
             finally{UnityEngine.Object.DestroyImmediate(root);}
         }
+        [Test] public void ScenePaginationDeliversEveryRowThroughNativeAndWorkingMemoryBudgets()
+        {
+            var root=new UnityEngine.GameObject("PagedInventoryFixture");root.AddComponent<GeneratedSceneObject>();var expected=new System.Collections.Generic.HashSet<string>();
+            try
+            {
+                for(int i=0;i<45;i++){var go=UnityEngine.GameObject.CreatePrimitive(UnityEngine.PrimitiveType.Cube);go.name="Inventory_"+i.ToString("D3")+"_"+new string('x',160);go.transform.SetParent(root.transform);go.AddComponent<GeneratedSceneObject>();expected.Add(ProjectContextIndex.StableTarget(go));}
+                var seen=new System.Collections.Generic.HashSet<string>();int offset=0,pages=0;
+                while(true)
+                {
+                    var page=ProjectContextIndex.ListScene(new JObject{["parent"]=ProjectContextIndex.StableTarget(root),["component"]="Renderer",["limit"]=100,["offset"]=offset});var objects=(JArray)page["objects"];Assert.AreEqual(45,(int)page["total"]);Assert.Greater(objects.Count,0);Assert.Less(page.ToString(Newtonsoft.Json.Formatting.None).Length,13000);
+                    foreach(var row in objects)Assert.IsTrue(seen.Add((string)row["target"]),"Pagination must never repeat or skip a row");
+                    var answer=new AssistantMessage();answer.Steps.Add(new EditorCommandResult{Tool="list_scene_objects",Success=true,Summary=page.ToString(Newtonsoft.Json.Formatting.None)});answer.Attempts.Add(new EditorPlanAttempt{Accepted=true,FirstResultIndex=0,ResultCount=1,WireResponse="{\"tool_calls\":[{\"id\":\"page_call\",\"function\":{\"name\":\"list_scene_objects\",\"arguments\":{}}}]}"});var request=new CompletionRequest();Assert.IsTrue(NativeHistory(request,answer));Assert.IsTrue(JToken.DeepEquals(page,JObject.Parse(request.Messages.Single(m=>m.Role=="tool").Content)["data"]));
+                    var method=typeof(ChatController).GetMethod("ObservationLedger",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic);var memory=(JArray)method.Invoke(null,new object[]{answer.Steps});Assert.IsTrue(JToken.DeepEquals(page,memory.Single()["data"]),"The working-memory path must retain the complete delivered page too");pages++;
+                    if(page["nextOffset"].Type==JTokenType.Null)break;Assert.AreEqual(offset+objects.Count,(int)page["nextOffset"]);offset=(int)page["nextOffset"];Assert.Less(pages,45);
+                }
+                Assert.Greater(pages,1);CollectionAssert.AreEquivalent(expected,seen);
+            }
+            finally{UnityEngine.Object.DestroyImmediate(root);}
+        }
+        [Test] public void OversizedInventoryRowKeepsAnInspectableTargetWithoutBreakingThePage()
+        {
+            var go=UnityEngine.GameObject.CreatePrimitive(UnityEngine.PrimitiveType.Cube);go.AddComponent<GeneratedSceneObject>();var material=new UnityEngine.Material(UnityEngine.Shader.Find("Standard")??UnityEngine.Shader.Find("Universal Render Pipeline/Lit"));material.name=new string('m',20000);go.GetComponent<UnityEngine.Renderer>().sharedMaterial=material;
+            try
+            {
+                var page=ProjectContextIndex.ListScene(new JObject{["parent"]=ProjectContextIndex.StableTarget(go),["component"]="Renderer",["limit"]=100});Assert.Less(page.ToString(Newtonsoft.Json.Formatting.None).Length,13000);Assert.AreEqual(1,(int)page["returned"]);Assert.AreEqual(ProjectContextIndex.StableTarget(go),(string)page["objects"][0]["target"]);Assert.IsTrue((bool)page["objects"][0]["listingDetailsOmitted"]);Assert.AreEqual(JTokenType.Null,page["nextOffset"].Type);
+            }
+            finally{UnityEngine.Object.DestroyImmediate(go);UnityEngine.Object.DestroyImmediate(material);}
+        }
         [Test] public void StructuralInventoryFindsMultipleRussianNamedSurfacesAfterAnEnglishMiss()
         {
             var first=UnityEngine.GameObject.CreatePrimitive(UnityEngine.PrimitiveType.Plane);first.name="Серая площадка";

@@ -60,7 +60,7 @@ namespace WorldWeaver.Editor.Assistant
                 JObject data=null;try{data=JObject.Parse(step.Summary??"");}catch(JsonException){}
                 var discriminator=data?["path"]??data?["component"]??data?["type"]??data?["Id"]??data?["query"];
                 string key=step.Tool+":"+step.Target+":"+(discriminator?.ToString(Formatting.None)??"")+":"+(data?["offset"]?.ToString(Formatting.None)??"");if(!seen.Add(key))continue;
-                string value=ToolEvidenceForModel(step);int cap=step.Tool=="read_script"?20000:7000;cap=Math.Min(cap,budget-350);if(cap<400)break;
+                string value=ToolEvidenceForModel(step);int cap=step.Tool=="read_script"?20000:step.Tool=="list_scene_objects"?13000:7000;cap=Math.Min(cap,budget-350);if(cap<400)break;
                 if(value.Length>cap)value=value.Substring(0,cap)+" [bounded actual observation; retrieve persisted step "+i+" for omitted detail]";
                 JToken observation;try{observation=JToken.Parse(value);}catch(JsonException){observation=new JValue(value);}
                 var row=new JObject{["index"]=i,["tool"]=step.Tool,["target"]=step.Target,["historicalBeforeLastChange"]=i<changed,["data"]=observation};int cost=row.ToString(Formatting.None).Length;if(cost>budget)continue;budget-=cost;rows.Add(row);
