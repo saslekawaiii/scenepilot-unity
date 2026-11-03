@@ -401,6 +401,7 @@ namespace WorldWeaver.Editor.Assistant
                         {
                             var progress=await ReviewEditorResultAsync(answer,provider,operation.Token);
                             observationRounds=0;var progressChecks=VerifyTask(answer);
+                            if(stalledObservations&&!progress.Passed)requireImplementationStep=true;
                             if(progress.Passed&&progressChecks.All(check=>check.Passed))
                             {
                                 answer.IsError=false;answer.Status="Проверки пройдены";answer.Text="Изменения применены. "+ChatHistoryStore.Redact(progress.Evidence);answer.Task.ContinueAfterReload=false;Save();break;

@@ -18,7 +18,19 @@ namespace WorldWeaver.Editor.Assistant
             // Keep observation and truthful terminal outcomes available to native agents.
             if(Settings.UseNativeFunctions)
             {
-                request.Messages.Add(new ChatMessage("system","No requested change has been applied yet. Continue researching real assets/APIs or implement the next justified part of the ORIGINAL request. Do not create an unrelated object just to satisfy a mutation check. If actual investigation establishes a missing resource, unavailable service or unsupported operation, finish_task with outcome blocked (or partial if some requested work succeeded), explicit blockers and confirmed results. Never label that completed."));
+                request.Messages.Add(new ChatMessage("system","Requested work remains. Implement the next justified part of the ORIGINAL request using the confirmed state and artifacts. Do not create an unrelated object just to satisfy a mutation check. If actual investigation establishes a missing resource, unavailable service or unsupported operation, finish_task with outcome blocked (or partial if some requested work succeeded), explicit blockers and confirmed results. Never label that completed."));
+                if(Settings.AllowAutonomousScripts)
+                {
+                    var nativeBranches=request.Schema?["properties"]?["actions"]?["items"]?["anyOf"] as JArray;
+                    if(nativeBranches!=null)
+                    {
+                        var permittedReads=new HashSet<string>(new[]{"discover_tools","web_search","web_read","web_research"},StringComparer.Ordinal);
+                        var discovery=executingMessage?.Steps.LastOrDefault();
+                        if(discovery?.Success==true&&discovery.Tool=="discover_tools")try{foreach(string name in JObject.Parse(discovery.Summary)["enabledTools"]??new JArray())permittedReads.Add(name);}catch(JsonException){}
+                        request.Schema=(JObject)request.Schema.DeepClone();request.Schema["properties"]["actions"]["items"]["anyOf"]=new JArray(nativeBranches.OfType<JObject>().Where(b=>!SceneToolExecutor.IsReadOnlyTool(EditorToolSchema.ToolName(b))||permittedReads.Contains(EditorToolSchema.ToolName(b))).Select(b=>b.DeepClone()));
+                        request.Messages.Add(new ChatMessage("system","Observation phase has completed without the required result. Choose one concrete pending implementation or real runtime verification now, using the observed targets and persistent artifact outputs. General scene/source inspection is temporarily hidden to stop repeated reconnaissance. If a SPECIFIC new prerequisite is missing, discover its exact read tool and use it on the next turn; public resource research and truthful finish_task partial/blocked remain available. Never make unrelated changes to bypass this phase."));
+                    }
+                }
                 return request;
             }
             var actions=request.Schema?["properties"]?["actions"] as JObject;var branches=actions?["items"]?["anyOf"] as JArray;if(branches==null)return request;
