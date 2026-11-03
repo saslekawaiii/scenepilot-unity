@@ -42,7 +42,8 @@ namespace WorldWeaver.Editor.Assistant
                         {
                             var step=answer.Steps[attempt.FirstResultIndex+i];if(step.Tool!=name){consistent=false;break;}
                             string summary=ToolEvidenceForModel(step);if(summary.Length>cap)summary=summary.Substring(0,cap)+" [bounded observation; retrieve by read_task_step index "+(attempt.FirstResultIndex+i)+"]";
-                            result=new JObject{["success"]=step.Success,["target"]=step.Target,["summary"]=summary,["error"]=step.Error};
+                            result=new JObject{["success"]=step.Success,["target"]=step.Target,["error"]=step.Error};
+                            try{result["data"]=JToken.Parse(summary);}catch(JsonException){result["summary"]=summary;}
                         }
                         else result=new JObject{["success"]=false,["executed"]=false,["error"]="No action from this rejected response executed. "+attempt.Error};
                         group.Add(new ChatMessage("tool",ChatHistoryStore.Redact(result.ToString(Formatting.None))){ToolCallId=(string)calls[i]["id"],ToolName=name});

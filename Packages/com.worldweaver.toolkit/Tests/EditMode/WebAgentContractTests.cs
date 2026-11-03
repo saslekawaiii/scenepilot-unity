@@ -8,6 +8,17 @@ namespace WorldWeaver.Tests
 {
     public sealed class WebAgentContractTests
     {
+        [Test] public async System.Threading.Tasks.Task FailedWebReadDoesNotDiscardAnIndependentActualSceneObservation()
+        {
+            string previous=Environment.GetEnvironmentVariable("WORLDWEAVER_WEB_PYTHON");var root=new UnityEngine.GameObject("Independent observation fixture");root.AddComponent<GeneratedSceneObject>();
+            try
+            {
+                Environment.SetEnvironmentVariable("WORLDWEAVER_WEB_PYTHON",System.IO.Path.GetFullPath("UserSettings/MissingWorker-"+Guid.NewGuid().ToString("N")));
+                var plan=new EditorPlan{complete=false,actions=new System.Collections.Generic.List<EditorCommand>{new EditorCommand{tool="web_search",args=new JObject{["query"]="fixture never sent to network"}},new EditorCommand{tool="inspect_object",target=ProjectContextIndex.StableTarget(root)}}};
+                var batch=await SceneToolExecutor.ExecuteAsync(plan);Assert.IsFalse(batch.Success);Assert.AreEqual(2,batch.Results.Count);Assert.AreEqual("web_search",batch.Results[0].Tool);Assert.IsFalse(batch.Results[0].Success);Assert.AreEqual("inspect_object",batch.Results[1].Tool);Assert.IsTrue(batch.Results[1].Success);Assert.AreEqual(root.name,(string)JObject.Parse(batch.Results[1].Summary)["name"]);
+            }
+            finally{Environment.SetEnvironmentVariable("WORLDWEAVER_WEB_PYTHON",previous);UnityEngine.Object.DestroyImmediate(root);}
+        }
         [Test] public void NativeSchemaDeclaredArraysDecodeProviderWrappersWithoutChangingTextArguments()
         {
             var schema=EditorPlan.Schema(nativeFunctions:true);
@@ -33,6 +44,7 @@ namespace WorldWeaver.Tests
             Assert.AreEqual("assistant",request.Messages[0].Role);Assert.AreEqual("call_actual",(string)request.Messages[0].ToolCalls[0]["id"]);
             Assert.AreEqual("owned:original",(string)request.Messages[0].ToolCalls[0]["function"]["arguments"]["target"]);
             Assert.AreEqual("tool",request.Messages[1].Role);Assert.AreEqual("call_actual",request.Messages[1].ToolCallId);Assert.IsFalse((bool)JObject.Parse(request.Messages[1].Content)["success"]);
+            answer.Steps[0].Summary="{\"observedField\":false}";var structured=new CompletionRequest();Assert.IsTrue(NativeHistory(structured,answer));Assert.IsFalse((bool)JObject.Parse(structured.Messages[1].Content)["data"]["observedField"],"Structured observations must not be multiply escaped into a text prefix");
             answer.Attempts[0].FirstResultIndex=-1;Assert.IsFalse(NativeHistory(new CompletionRequest(),answer),"Legacy logs without result mapping must not fabricate a tool response");
         }
         [Test] public void RejectedNativeCallReceivesExplicitNonExecutionFeedbackInItsToolChannel()
@@ -85,14 +97,14 @@ namespace WorldWeaver.Tests
             Assert.That(error.Message,Does.Contain("missing required parameters: name"));
             Assert.That(error.Message,Does.Contain("No action executed"));
         }
-        [Test] public void InternetCapabilitiesAreDiscoverableAndNotFalselyBatchable()
+        [Test] public void InternetObservationsAreBatchableWhileAcquisitionAndTerrainMutationsRemainStandalone()
         {
             var schema=EditorPlan.Schema(nativeFunctions:true);
             foreach(string name in new[]{"web_search","web_read","web_research","asset_download","terrain_from_heightmap"})
             {
                 Assert.That(AgentFunctionProtocol.Definitions(schema).Select(t=>(string)t["function"]["name"]),Does.Contain(name));
                 var branch=((JArray)schema["properties"]["actions"]["items"]["anyOf"]).OfType<JObject>().First(b=>EditorToolSchema.ToolName(b)==name);
-                Assert.IsFalse((bool)branch["x-worldweaver-read-only"],"Async worker calls are standalone, including observations: "+name);
+                Assert.AreEqual(name=="web_search"||name=="web_read"||name=="web_research",(bool)branch["x-worldweaver-read-only"],name);
             }
             Assert.IsTrue(SceneToolExecutor.IsReadOnlyTool("web_research"));
             Assert.IsFalse(SceneToolExecutor.IsReadOnlyTool("asset_download"));

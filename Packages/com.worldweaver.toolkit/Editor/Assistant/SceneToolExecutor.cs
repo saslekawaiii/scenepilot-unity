@@ -167,7 +167,7 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
                 if(WebResearchTools.Handles(command.tool))
                 {
                     WebResearchTools.Validate(command,s=>Resolve(s,aliases).Object??throw new ArgumentException("Resource target must already exist."));
-                    if(plan.actions.Count!=1)throw new ArgumentException("Internet research/acquisition/heightmap operations are standalone async steps.");
+                    if(plan.actions.Count!=1&&!plan.actions.All(a=>IsReadOnlyTool(a.tool)))throw new ArgumentException("Internet acquisition/heightmap mutations are standalone async steps; only independent observations may batch.");
                     continue;
                 }
                 if(ModelAssetTools.Handles(command.tool))
@@ -180,7 +180,7 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
                 if(WorldMaterialTools.Handles(command.tool))
                 {
                     WorldMaterialTools.Validate(command,s=>Resolve(s,aliases).Object??throw new ArgumentException("Material target must already exist; apply in a subsequent step after creation."));
-                    if(WorldMaterialTools.IsAsync(command.tool)&&plan.actions.Count!=1)throw new ArgumentException("Material search/import require a standalone plan. Apply the returned material in a subsequent step.");
+                    if(WorldMaterialTools.IsAsync(command.tool)&&plan.actions.Count!=1&&!plan.actions.All(a=>IsReadOnlyTool(a.tool)))throw new ArgumentException("Material import requires a standalone plan. Apply the returned material in a subsequent step.");
                     continue;
                 }
                 if(AgentProjectTools.Handles(command.tool))
@@ -294,15 +294,25 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
             try
             {
                 Validate(plan);
+                if(plan.actions.Count>1&&plan.actions.All(a=>IsReadOnlyTool(a.tool)))
+                {
+                    var batch=new EditorBatchResult{Success=true,Summary="Независимые наблюдения выполнены последовательно."};
+                    foreach(var observation in plan.actions)
+                    {
+                        token.ThrowIfCancellationRequested();var part=await ExecuteAsync(new EditorPlan{complete=false,actions=new List<EditorCommand>{observation}},routes,executionContext,token,beforeMutation);
+                        batch.Results.AddRange(part.Results);if(!part.Success){batch.Success=false;batch.Error=string.Join("; ",new[]{batch.Error,part.Error}.Where(s=>!string.IsNullOrEmpty(s)));}
+                    }
+                    return batch;
+                }
                 var command=plan.actions.Single();
                 Action admit=()=>{token.ThrowIfCancellationRequested();Validate(plan);beforeMutation?.Invoke();};
                 var result=WebResearchTools.Handles(command.tool)?await WebResearchTools.ExecuteAsync(command,token,admit):ModelAssetTools.IsAsync(command.tool)?await ModelAssetTools.ImportAsync(command,token,admit):await WorldMaterialTools.ExecuteAsync(command,token,admit);
-                return new EditorBatchResult{Success=true,Summary="Выполнен инструмент "+command.tool,Results=new List<EditorCommandResult>{result}};
+                return new EditorBatchResult{Success=result.Success,Error=result.Error,Summary="Выполнен инструмент "+command.tool,Results=new List<EditorCommandResult>{result}};
             }
             catch(OperationCanceledException){throw;}
             catch(Exception error)
             {
-                return new EditorBatchResult{Success=false,Error=error.Message,Summary="Материал не изменён.",Results=new List<EditorCommandResult>{new EditorCommandResult{Success=false,Tool=plan?.actions?.FirstOrDefault()?.tool??"batch",Error=error.Message}}};
+                return new EditorBatchResult{Success=false,Error=error.Message,Summary="Инструмент не выполнен.",Results=new List<EditorCommandResult>{new EditorCommandResult{Success=false,Tool=plan?.actions?.FirstOrDefault()?.tool??"batch",Error=error.Message}}};
             }
         }
 

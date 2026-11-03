@@ -97,7 +97,7 @@ namespace WorldWeaver.Editor.Assistant
             if (allowedTools != null) command = EditorToolSchema.Restrict(allowedTools, typed);
             else if (typed) command = EditorToolSchema.DecoderCommandSchema();
             if(nativeFunctions)foreach(var branch in (command["anyOf"] as JArray??new JArray()).OfType<JObject>())
-                branch["x-worldweaver-read-only"]=SceneToolExecutor.IsReadOnlyTool(EditorToolSchema.ToolName(branch))&&!WorldMaterialTools.IsAsync(EditorToolSchema.ToolName(branch))&&!WebResearchTools.IsAsync(EditorToolSchema.ToolName(branch));
+                branch["x-worldweaver-read-only"]=SceneToolExecutor.IsReadOnlyTool(EditorToolSchema.ToolName(branch));
             var schema = new JObject {
                 ["type"] = "object", ["additionalProperties"] = false,
                 ["properties"] = new JObject {
