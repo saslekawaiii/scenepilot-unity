@@ -27,7 +27,7 @@ namespace WorldWeaver
             if (!request.UseToolCalls && cloud && request.Schema != null)
                 messages.Add(new JObject { ["role"] = "system", ["content"] = "Return ONLY one JSON INSTANCE matching this exact output contract, never Markdown or a schema. Every required field must be present. Contract: " + request.Schema.ToString(Newtonsoft.Json.Formatting.None) });
             int imageCount = 0, imageBytes = 0;
-            foreach (var message in request.Messages)
+            foreach (var message in request.TransportMessages())
             {
                 var item = new JObject { ["role"] = message.Role, ["content"] = message.Content };
                 if(message.ToolCalls!=null)item["tool_calls"]=message.ToolCalls.DeepClone();
@@ -50,7 +50,7 @@ namespace WorldWeaver
                 }
                 messages.Add(item);
             }
-            if (request.UseToolCalls) messages.Add(new JObject { ["role"] = "system", ["content"] = AgentFunctionProtocol.Instructions });
+
             var body = new JObject { ["model"] = profile.Model, ["messages"] = messages, ["stream"] = request.Stream, ["think"] = false,
                 ["keep_alive"] = "10m",
                 ["options"] = new JObject { ["temperature"] = profile.Temperature, ["num_predict"] = profile.MaxTokens, ["num_ctx"] = profile.ContextWindow } };

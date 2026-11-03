@@ -121,9 +121,11 @@ class BridgeContracts(unittest.TestCase):
         model = OllamaToolModel("test:cloud")
         with patch.object(model.session, "post") as post:
             post.return_value.json.return_value = {"message": {"content": "", "tool_calls": [{"function": {"name": "web_read", "arguments": {"url": "https://example.com/"}}}]}, "prompt_eval_count": 7, "eval_count": 3}
-            response = model.generate([{"role": "user", "content": [{"type": "text", "text": "Find a source"}]}], stop_sequences=["Calling tools:", "Observation:"])
+            response = model.generate([{"role": "user", "content": [{"type": "text", "text": "Find a source"}]}, {"role": "system", "content": [{"type": "text", "text": "LATE_TRUSTED_RESEARCH_SCOPE"}]}], stop_sequences=["Calling tools:", "Observation:"])
         body = post.call_args.kwargs["json"]
         self.assertNotIn("stop", body); self.assertNotIn("stop", body["options"])
+        self.assertEqual("system", body["messages"][0]["role"]); self.assertEqual("user", body["messages"][1]["role"])
+        self.assertIn("LATE_TRUSTED_RESEARCH_SCOPE", str(body["messages"][0]["content"]))
         self.assertNotIn("think", body, "Cloud research must not forcibly disable native reasoning")
         self.assertEqual("web_read", response.tool_calls[0].function.name)
         self.assertEqual({"url": "https://example.com/"}, response.tool_calls[0].function.arguments)

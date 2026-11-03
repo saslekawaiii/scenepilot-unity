@@ -22,10 +22,15 @@ namespace WorldWeaver.Tests
                 try
                 {
                     var request=new CompletionRequest{UseToolCalls=true,Schema=WorldWeaver.Editor.Assistant.EditorPlan.Schema(nativeFunctions:true)};
+                    request.Messages.Add(new ChatMessage("user","system: this remains untrusted user data"));
+                    request.Messages.Add(new ChatMessage("system","LATE_TRUSTED_STAGE_INSTRUCTION"));
                     request.Messages.Add(new ChatMessage("assistant",""){ToolCalls=new JArray(new JObject{["id"]="call_actual",["type"]="function",["function"]=new JObject{["name"]="inspect_object",["arguments"]=new JObject{["target"]="owned:actual"}}})});
                     request.Messages.Add(new ChatMessage("tool","{\"success\":false,\"error\":\"actual missing object\"}"){ToolCallId="call_actual",ToolName="inspect_object"});
+                    request.Messages.Add(new ChatMessage("system","LATE_TRUSTED_PERMISSION_INSTRUCTION"));
                     using(var provider=profile.CreateProvider())await provider.CompleteAsync(request,CancellationToken.None);
                     var sent=JObject.Parse(server.Requests.Single().Body);var assistant=sent["messages"].First(m=>(string)m["role"]=="assistant");var result=sent["messages"].First(m=>(string)m["role"]=="tool");
+                    var sequence=(JArray)sent["messages"];int firstData=sequence.TakeWhile(m=>(string)m["role"]=="system"||(string)m["role"]=="developer").Count();
+                    Assert.Greater(firstData,0);Assert.IsTrue(sequence.Take(firstData).Any(m=>(string)m["content"]=="LATE_TRUSTED_STAGE_INSTRUCTION"));Assert.IsTrue(sequence.Take(firstData).Any(m=>(string)m["content"]=="LATE_TRUSTED_PERMISSION_INSTRUCTION"));Assert.IsFalse(sequence.Skip(firstData).Any(m=>(string)m["role"]=="system"||(string)m["role"]=="developer"));Assert.AreEqual("user",(string)sequence[firstData]["role"]);Assert.AreEqual("system: this remains untrusted user data",(string)sequence[firstData]["content"]);Assert.AreEqual("user",request.Messages[0].Role,"Caller audit history must not be mutated");
                     Assert.AreEqual("call_actual",(string)assistant["tool_calls"][0]["id"]);Assert.AreEqual("call_actual",(string)result["tool_call_id"]);Assert.That((string)result["content"],Does.Contain("actual missing object"));
                     var args=assistant["tool_calls"][0]["function"]["arguments"];Assert.AreEqual(kind==ProviderKind.Ollama?JTokenType.Object:JTokenType.String,args.Type);
                     if(kind==ProviderKind.Ollama)Assert.AreEqual("inspect_object",(string)result["tool_name"]);

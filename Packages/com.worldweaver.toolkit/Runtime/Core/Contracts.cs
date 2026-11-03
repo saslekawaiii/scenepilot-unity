@@ -32,6 +32,14 @@ namespace WorldWeaver
         public bool? EnableThinking;
         public Action<string> OnContentDelta;
         public Action<string> OnActivity;
+        /// <summary>Some chat templates render instructions only before the first data turn.
+        /// Stable partition trusted instruction roles; never promote user/tool data.</summary>
+        internal IEnumerable<ChatMessage> TransportMessages()
+        {
+            foreach(var message in Messages)if(IsInstructionRole(message.Role))yield return message;
+            foreach(var message in Messages)if(!IsInstructionRole(message.Role))yield return message;
+        }
+        internal static bool IsInstructionRole(string role)=>role=="system"||role=="developer";
     }
 
     public sealed class CompletionResult

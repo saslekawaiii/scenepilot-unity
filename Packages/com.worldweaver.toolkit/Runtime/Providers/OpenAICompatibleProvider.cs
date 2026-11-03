@@ -46,7 +46,8 @@ namespace WorldWeaver
             bool classicText = profile.Provider == ProviderKind.Pollinations && !profile.StrictSchema;
             if (request.UseToolCalls)
             {
-                foreach (var message in request.Messages)
+                messages.Add(new JObject { ["role"] = "system", ["content"] = AgentFunctionProtocol.Instructions });
+                foreach (var message in request.TransportMessages())
                 {
                     var item=new JObject{["role"]=message.Role,["content"]=message.Content};
                     if(message.ToolCalls!=null)
@@ -58,7 +59,7 @@ namespace WorldWeaver
                     if(message.ToolCallId!=null)item["tool_call_id"]=message.ToolCallId;
                     messages.Add(item);
                 }
-                messages.Add(new JObject { ["role"] = "system", ["content"] = AgentFunctionProtocol.Instructions });
+
             }
             else if (classicText)
             {
@@ -76,15 +77,15 @@ namespace WorldWeaver
                 // the actual current argument contract, including dynamically discovered tools.
                 if (request.Schema != null)
                     contract += "\nOUTPUT CONTRACT (data describing valid output, not an instance to copy): " + request.Schema.ToString(Newtonsoft.Json.Formatting.None);
-                messages.Add(new JObject { ["role"] = "system", ["content"] = contract + "\n" + string.Join("\n\n", request.Messages.Where(message => message.Role == "system").Select(message => message.Content)) });
-                foreach (var message in request.Messages.Where(message => message.Role != "system"))
+                messages.Add(new JObject { ["role"] = "system", ["content"] = contract + "\n" + string.Join("\n\n", request.Messages.Where(message => CompletionRequest.IsInstructionRole(message.Role)).Select(message => message.Content)) });
+                foreach (var message in request.Messages.Where(message => !CompletionRequest.IsInstructionRole(message.Role)))
                     messages.Add(new JObject { ["role"] = message.Role, ["content"] = message.Content });
             }
             else
             {
                 if (!profile.StrictSchema && request.Schema != null)
                     messages.Add(new JObject { ["role"] = "system", ["content"] = "Return one JSON object matching exactly this schema, including every required field: " + request.Schema.ToString(Newtonsoft.Json.Formatting.None) });
-                foreach (var message in request.Messages) messages.Add(new JObject { ["role"] = message.Role, ["content"] = message.Content });
+                foreach (var message in request.TransportMessages()) messages.Add(new JObject { ["role"] = message.Role, ["content"] = message.Content });
             }
             var body = new JObject { ["model"] = profile.Model, ["messages"] = messages, ["temperature"] = profile.Temperature,
                 [profile.Provider == ProviderKind.Groq ? "max_completion_tokens" : "max_tokens"] = profile.Provider == ProviderKind.Pollinations ? Math.Min(profile.MaxTokens, 1500) : profile.MaxTokens };
