@@ -91,6 +91,32 @@ class BridgeContracts(unittest.TestCase):
             request = json.loads(json.dumps({"path": str(path), "resolution": 33}, ensure_ascii=True))
             self.assertEqual(4, bridge.decode_heightmap(request)["sourceWidth"])
 
+    def test_upstream_parser_recovers_only_an_advertised_complete_text_function(self):
+        from smolagents import Tool
+        class Read(Tool):
+            name = "visit_webpage"
+            description = "Read a public page."
+            inputs = {"url": {"type": "string", "description": "Public URL"}}
+            output_type = "string"
+            def forward(self, url):
+                return url
+        model = OllamaToolModel("test:cloud")
+        literal = '{"name":"visit_webpage","arguments":{"url":"https://example.com/"}}\n</rfl:parameter>'
+        raw = {"message": {"content": literal}, "done_reason": "stop"}
+        with patch.object(model.session, "post") as post:
+            post.return_value.json.return_value = raw
+            response = model.generate([{"role": "user", "content": [{"type": "text", "text": "Read a source"}]}], tools_to_call_from=[Read()])
+        self.assertEqual("visit_webpage", response.tool_calls[0].function.name)
+        self.assertEqual({"url": "https://example.com/"}, response.tool_calls[0].function.arguments)
+        self.assertEqual(raw, response.raw)
+        self.assertEqual(1, model.recovered_calls)
+        for text in ['[]', '{"name":"execute_shell","arguments":{"command":"forbidden"}}', '{"name":"visit_webpage","arguments":', '{"name":"visit_webpage","arguments":4}']:
+            with patch.object(model.session, "post") as post:
+                post.return_value.json.return_value = {"message": {"content": text}, "done_reason": "stop"}
+                response = model.generate([{"role": "user", "content": [{"type": "text", "text": "Read a source"}]}], tools_to_call_from=[Read()])
+            self.assertFalse(response.tool_calls)
+        self.assertEqual(1, model.recovered_calls)
+
     def test_native_model_preserves_structured_calls_and_omits_text_stop_markers(self):
         model = OllamaToolModel("test:cloud")
         with patch.object(model.session, "post") as post:

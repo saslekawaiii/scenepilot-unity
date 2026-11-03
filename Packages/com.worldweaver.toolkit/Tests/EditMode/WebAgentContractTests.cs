@@ -195,6 +195,14 @@ namespace WorldWeaver.Tests
                 Assert.That(AgentFunctionProtocol.Definitions(Filter().Schema).Select(t=>(string)t["function"]["name"]),Does.Not.Contain("inspect_object"),"The targeted prerequisite read expires after its observation turn");
             }
         }
+        [Test] public void ObservedWebSourceSurvivesLaterReadsWithoutInventingACompletedDownload()
+        {
+            var steps=new System.Collections.Generic.List<EditorCommandResult>{new EditorCommandResult{Tool="web_research",Success=false,Summary="{\"completed\":false,\"observedDataFiles\":[{\"url\":\"https://data.example/elevation.img\",\"observedFrom\":\"https://data.example/index\"}]}"}};
+            for(int i=0;i<40;i++)steps.Add(new EditorCommandResult{Tool="inspect_object",Success=true,Summary="{}"});
+            steps.Add(new EditorCommandResult{Tool="reply",Success=true,Summary="{\"url\":\"https://not-observed.example/imagined.img\"}"});
+            var method=typeof(ChatController).GetMethod("WebSourceLedger",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic);var rows=(JArray)method.Invoke(null,new object[]{steps});
+            Assert.AreEqual(1,rows.Count);Assert.AreEqual("https://data.example/elevation.img",(string)rows[0]["url"]);Assert.That((string)rows[0]["status"],Does.Contain("not proof of download"));Assert.AreEqual(0,(int)rows[0]["index"]);
+        }
         [Test] public void NativeHistoryKeepsALargeSourceBatchedBesideSmallObservations()
         {
             var answer=new AssistantMessage();var calls=new JArray();

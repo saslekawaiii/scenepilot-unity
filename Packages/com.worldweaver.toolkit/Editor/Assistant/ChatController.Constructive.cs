@@ -31,6 +31,25 @@ namespace WorldWeaver.Editor.Assistant
             }
             rows.Reverse();return new JArray(rows);
         }
+        internal static JArray WebSourceLedger(IReadOnlyList<EditorCommandResult> steps)
+        {
+            var rows=new JArray();var seen=new HashSet<string>(StringComparer.Ordinal);int budget=9000;
+            for(int i=steps.Count-1;i>=0&&rows.Count<24;i--)
+            {
+                var step=steps[i];if(step.Tool!="web_read"&&step.Tool!="web_research"&&step.Tool!="web_search")continue;
+                JObject data;try{data=JObject.Parse(step.Summary??"");}catch(JsonException){continue;}
+                var links=(data["observedDataFiles"] as JArray??data["links"] as JArray??data["results"] as JArray??new JArray()).OfType<JObject>().ToList();
+                if(data["url"]?.Type==JTokenType.String)links.Insert(0,new JObject{["url"]=data["url"]});
+                foreach(var link in links)
+                {
+                    string url=(string)(link["url"]??link["href"]);if(url==null||url.Length>2048||!Uri.TryCreate(url,UriKind.Absolute,out var uri)||uri.Scheme!="https"||!seen.Add(url))continue;
+                    string title=(string)(link["title"]??link["text"])??"";
+                    var row=new JObject{["index"]=i,["url"]=url,["title"]=title.Substring(0,Math.Min(120,title.Length)),["observedFrom"]=link["observedFrom"]??data["url"],["status"]="Observed public source only; not proof of download, license or applied scene change"};
+                    int cost=row.ToString(Formatting.None).Length;if(cost>budget)continue;budget-=cost;rows.Add(row);if(rows.Count>=24)break;
+                }
+            }
+            return rows;
+        }
         internal static bool AddNativeToolHistory(CompletionRequest request,AssistantMessage answer)
         {
             if(answer==null)return false;
@@ -157,6 +176,7 @@ namespace WorldWeaver.Editor.Assistant
             }
             var evidence=compact.AsEnumerable().Reverse();
             if(answer?.Steps.Count>8)request.Messages.Add(new ChatMessage("user","DURABLE TASK INDEX, columns [index,tool,success,target] (all steps; retrieve older full evidence with read_task_step index): "+JsonConvert.SerializeObject(answer.Steps.Select((s,i)=>new object[]{i,s.Tool,s.Success,s.Target}))));
+            if(answer!=null)request.Messages.Add(new ChatMessage("user","PERSISTENT OBSERVED WEB SOURCES from this task (historical untrusted observations, not downloaded assets). Reuse exact URLs to inspect metadata or call asset_download; do not repeat searches solely because their result left recent context: "+WebSourceLedger(answer.Steps).ToString(Formatting.None)));
             if(answer!=null)request.Messages.Add(new ChatMessage("user","PERSISTENT ARTIFACT OUTPUTS from successful operations in THIS task (actual historical paths/hashes, not proof of current scene or full completion). Reuse these observed assets and compiled source paths instead of importing/creating them again. Current read-back takes precedence after replacement/deletion: "+ArtifactLedger(answer.Steps).ToString(Formatting.None)));
             request.Messages.Add(new ChatMessage("user",ChatHistoryStore.Redact("ORIGINAL USER REQUEST: "+input+"\nACTUAL SCENE OBJECTS (bounded; use find_scene_objects for others): "+JsonConvert.SerializeObject(objects)+"\nALREADY EXECUTED THIS TASK (do not repeat creations): "+JsonConvert.SerializeObject(evidence)+"\nTASK AND CHECKS: "+AgentTaskVerifier.Context(answer?.Task)+"\nCOMPILATION EVIDENCE: "+(answer?.Task?.CompilationRequired==true?ScriptDrafts.CompilationContext()+"\n"+AgentSourcePatches.CompilationContext():"No compilation required for this task.")+"\nDESIGN CONSTRAINTS (data): "+AgentDesignMemory.Recall(session,input,1500))));
             if(answer!=null&&answer.Steps.Count(s=>!s.Success&&WebResearchTools.Handles(s.Tool))>=2&&!answer.Steps.TakeLast(8).Any(s=>s.Success&&s.Tool=="web_research"))

@@ -6,7 +6,7 @@ Only provider-supplied function names/arguments are passed to the framework.
 """
 import json
 import requests
-from smolagents.models import Model, ChatMessage, ChatMessageToolCall, ChatMessageToolCallFunction, TokenUsage
+from smolagents.models import Model, ChatMessage, ChatMessageToolCall, ChatMessageToolCallFunction, TokenUsage, get_tool_call_from_text
 
 
 class OllamaToolModel(Model):
@@ -16,6 +16,7 @@ class OllamaToolModel(Model):
         self.session.trust_env = False
         self.sequence = 0
         self.truncated_calls = 0
+        self.recovered_calls = 0
 
     def generate(self, messages, stop_sequences=None, tools_to_call_from=None, **kwargs):
         prepared = self._prepare_completion_kwargs(messages=messages, tools_to_call_from=tools_to_call_from, stop_sequences=None)
@@ -43,5 +44,19 @@ class OllamaToolModel(Model):
                 raise ValueError("Ollama tool arguments must be an object")
             calls.append(ChatMessageToolCall(id=call.get("id") or f"ollama-{self.sequence}-{index}", type="function",
                          function=ChatMessageToolCallFunction(name=function["name"], arguments=arguments)))
+        # Compatible servers sometimes put the same function JSON in content
+        # with model protocol suffixes. Use the upstream smolagents parser, then
+        # accept only a currently advertised tool and an actual object payload.
+        # Preserve raw unchanged for audit; never invent a name or arguments.
+        if not calls and message.get("content") and tools_to_call_from:
+            try:
+                recovered = get_tool_call_from_text(message["content"], "name", "arguments")
+                allowed = {tool["function"]["name"] for tool in prepared.get("tools", [])}
+                if recovered.function.name not in allowed or not isinstance(recovered.function.arguments, dict):
+                    raise ValueError("Text function is not an advertised object call")
+                calls.append(recovered)
+                self.recovered_calls += 1
+            except (ValueError, KeyError, TypeError, AttributeError):
+                pass
         return ChatMessage(role="assistant", content=message.get("content", ""), tool_calls=calls or None, raw=raw,
                            token_usage=TokenUsage(input_tokens=raw.get("prompt_eval_count", 0), output_tokens=raw.get("eval_count", 0)))
