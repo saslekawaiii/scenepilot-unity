@@ -701,7 +701,7 @@ namespace WorldWeaver.Editor.Assistant
             var model = AssetDatabase.LoadAssetAtPath<ModelProfile>(modelPath);
             if (!model)
             {
-                model = Object.Instantiate(source); model.hideFlags = HideFlags.None; model.MaxTokens = 1024; model.ContextWindow = 8192;
+                model = Object.Instantiate(source); model.hideFlags = HideFlags.None; model.MaxTokens = 1024; model.ContextWindow = 8192;model.EnableCloudReasoning=false;
                 AssetDatabase.CreateAsset(model, modelPath); created.Add(modelPath); AssetDatabase.SaveAssetIfDirty(model);
             }
             var routes = ScriptableObject.CreateInstance<OrchestratorProfile>(); routes.Terrain = routes.Dialogue = routes.Planning = model;

@@ -8,6 +8,16 @@ namespace WorldWeaver.Tests
 {
     public sealed class WebAgentContractTests
     {
+        [Test] public void RuntimeNpcRoutesDoNotInheritEditorReasoningBudget()
+        {
+            var source=UnityEngine.ScriptableObject.CreateInstance<ModelProfile>();source.Model="route-fixture-"+Guid.NewGuid().ToString("N");source.EnableCloudReasoning=true;var created=new System.Collections.Generic.List<string>();
+            try
+            {
+                var method=typeof(ChatController).GetMethod("PersistentRoutes",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic);var routes=(OrchestratorProfile)method.Invoke(null,new object[]{source,created});
+                Assert.IsFalse(routes.Dialogue.EnableCloudReasoning);Assert.AreEqual(1024,routes.Dialogue.MaxTokens);Assert.IsTrue(source.EnableCloudReasoning,"The temporary editor profile itself remains unchanged");
+            }
+            finally{foreach(string path in created.AsEnumerable().Reverse())UnityEditor.AssetDatabase.DeleteAsset(path);UnityEngine.Object.DestroyImmediate(source);}
+        }
         [Test] public void InstalledPackageSourceCanBeReadWithItsHashWhileTraversalStillFails()
         {
             const string path="Packages/com.worldweaver.toolkit/Runtime/World/WorldInput.cs";
