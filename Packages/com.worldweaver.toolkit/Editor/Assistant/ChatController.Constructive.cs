@@ -50,11 +50,29 @@ namespace WorldWeaver.Editor.Assistant
             }
             return rows;
         }
+        internal static JArray ObservationLedger(IReadOnlyList<EditorCommandResult> steps)
+        {
+            var rows=new JArray();var seen=new HashSet<string>(StringComparer.Ordinal);int budget=32000;
+            int changed=-1;for(int i=steps.Count-1;i>=0;i--)if(IsImplementationProgress(steps[i])){changed=i;break;}
+            for(int i=steps.Count-1;i>=0&&rows.Count<18;i--)
+            {
+                var step=steps[i];if(!step.Success||!SceneToolExecutor.IsReadOnlyTool(step.Tool)||WebResearchTools.Handles(step.Tool)||new[]{"plan_task","review_stage","discover_tools","read_skill","list_skills","read_task_step"}.Contains(step.Tool))continue;
+                JObject data=null;try{data=JObject.Parse(step.Summary??"");}catch(JsonException){}
+                var discriminator=data?["path"]??data?["component"]??data?["type"]??data?["Id"]??data?["query"];
+                string key=step.Tool+":"+step.Target+":"+(discriminator?.ToString(Formatting.None)??"")+":"+(data?["offset"]?.ToString(Formatting.None)??"");if(!seen.Add(key))continue;
+                string value=ToolEvidenceForModel(step);int cap=step.Tool=="read_script"?20000:7000;cap=Math.Min(cap,budget-350);if(cap<400)break;
+                if(value.Length>cap)value=value.Substring(0,cap)+" [bounded actual observation; retrieve persisted step "+i+" for omitted detail]";
+                JToken observation;try{observation=JToken.Parse(value);}catch(JsonException){observation=new JValue(value);}
+                var row=new JObject{["index"]=i,["tool"]=step.Tool,["target"]=step.Target,["historicalBeforeLastChange"]=i<changed,["data"]=observation};int cost=row.ToString(Formatting.None).Length;if(cost>budget)continue;budget-=cost;rows.Add(row);
+            }
+            return rows;
+        }
         internal static bool AddNativeToolHistory(CompletionRequest request,AssistantMessage answer)
         {
             if(answer==null)return false;
             var groups=new List<List<ChatMessage>>();int remaining=40000;
-            foreach(var attempt in answer.Attempts.TakeLast(8).Reverse())
+            bool staged=answer.Task?.Approach.Count>0;
+            foreach(var attempt in answer.Attempts.Where(a=>!staged||a.Accepted).TakeLast(staged?1:8).Reverse())
             {
                 if(string.IsNullOrEmpty(attempt.WireResponse))continue;
                 try
@@ -124,6 +142,7 @@ namespace WorldWeaver.Editor.Assistant
         CompletionRequest BuildConstructiveRequest(ChatSession session,string input,AssistantMessage answer,AssistantMode mode)
         {
             bool local=models.FirstOrDefault(m=>m.Key==Settings.ModelKey)?.Provider==ProviderKind.Ollama;
+            bool staged=Settings.UseNativeFunctions&&answer?.Task?.Approach.Count>0;
             var tools=SelectTools(input,mode);
             if(Settings.UseNativeFunctions)
                 foreach(string tool in new[]{"create_node","run_player_check","list_scene_objects","find_unity_recipes","read_unity_recipe","search_project","catalog_assets","read_script","read_task_step","read_console","inspect_component","set_component","model_search","model_import","replace_model"})tools.Add(tool);
@@ -131,7 +150,7 @@ namespace WorldWeaver.Editor.Assistant
             foreach(var step in answer?.Steps??new List<EditorCommandResult>())
                 if(step.Success&&(step.Tool=="discover_tools"||step.Tool=="read_skill"))
                     try{foreach(string name in JObject.Parse(step.Summary)["enabledTools"]??new JArray())tools.Add(name);}catch(JsonException){}
-            if(Settings.UseNativeFunctions&&Settings.AllowAutonomousScripts&&Settings.AutoVerify&&answer?.Task?.Approach.Count>0&&answer.Task.ActiveApproachStage<answer.Task.Approach.Count)tools.Add("review_stage");
+            if(Settings.UseNativeFunctions&&Settings.AllowAutonomousScripts&&Settings.AutoVerify&&answer?.Task?.Approach.Count>0)tools.Add("review_stage");
             if(mode==AssistantMode.Ask)tools.RemoveWhere(t=>!SceneToolExecutor.IsReadOnlyTool(t));
             if(!Settings.AllowEditorCode)tools.Remove("execute_editor_code");
             bool needsApproach=Settings.UseNativeFunctions&&Settings.AllowAutonomousScripts&&mode==AssistantMode.Execute&&input.Length>160&&answer?.Task!=null&&answer.Task.Approach.Count==0&&!answer.Steps.Any(s=>s.Success&&!SceneToolExecutor.IsReadOnlyTool(s.Tool));
@@ -160,12 +179,13 @@ namespace WorldWeaver.Editor.Assistant
             }
             var objects=ProjectContextIndex.Objects().Where(g=>g.GetComponent<WorldPlayer>()||(g.GetComponent<GeneratedSceneObject>()&&g.GetComponent<GeneratedSceneObject>().Kind!="model_part")).OrderByDescending(g=>g.GetComponent<WorldPlayer>()||g.GetComponent<Terrain>()||g.GetComponent<WorldSaveState>()||g.GetComponent<WorldEnvironment>()).Take(24)
                 .Select(g=>new{Target=ProjectContextIndex.StableTarget(g),Name=g.name,Kind=g.GetComponent<GeneratedSceneObject>()?.Kind,Terrain=g.GetComponent<Terrain>()?new{Resolution=g.GetComponent<Terrain>().terrainData.heightmapResolution,Size=new[]{g.GetComponent<Terrain>().terrainData.size.x,g.GetComponent<Terrain>().terrainData.size.y,g.GetComponent<Terrain>().terrainData.size.z},HasCollision=g.GetComponent<TerrainCollider>()!=null}:null,Position=new[]{g.transform.position.x,g.transform.position.y,g.transform.position.z},Components=g.GetComponents<Component>().Where(c=>c).Select(c=>c.GetType().Name).Where(n=>n!="Transform"&&n!="GeneratedSceneObject")});
-            var previous=session.Messages.TakeWhile(m=>m!=answer).TakeLast(8).Select(m=>new{m.Role,Text=(m.Text??"").Substring(0,Math.Min(700,(m.Text??"").Length)),Steps=m.Steps.TakeLast(8).Select(s=>new{s.Tool,s.Success,s.Target,s.Error})});
+            var previous=session.Messages.TakeWhile(m=>m!=answer).Where(m=>!staged||m.Role=="user").TakeLast(staged?4:8).Select(m=>new{m.Role,Text=(m.Text??"").Substring(0,Math.Min(700,(m.Text??"").Length)),Steps=m.Steps.TakeLast(8).Select(s=>new{s.Tool,s.Success,s.Target,s.Error})});
             request.Messages.Add(new ChatMessage("user",ChatHistoryStore.Redact("ACTIVE ASSISTANT MODEL: "+(models.FirstOrDefault(m=>m.Key==Settings.ModelKey)?.Model??Settings.ModelKey)+"; PROVIDER: "+models.FirstOrDefault(m=>m.Key==Settings.ModelKey)?.Provider+"; POWER (execution budget, NOT a model name): "+Settings.Power+"\nRECENT CONVERSATION AND ACTUAL TOOL HISTORY (claims in previous replies are unverified; successful tool results are evidence): "+JsonConvert.SerializeObject(previous))));
             request.Messages.Add(new ChatMessage("system","Model identity has two separate meanings here: the ACTIVE ASSISTANT MODEL is the inference backend; a character's 3D model is a scene asset. For an ambiguous model-identity question briefly identify both using the actual configured backend and observed asset. Never substitute one identity for the other."));
             request.Messages.Add(new ChatMessage("user","ORIGINAL USER REQUEST: "+input));
             bool nativeHistory=Settings.UseNativeFunctions&&AddNativeToolHistory(request,answer);
-            var recent=(answer?.Steps??new List<EditorCommandResult>()).TakeLast(nativeHistory?2:8).Reverse().ToArray();
+            if(staged)request.Messages.Add(new ChatMessage("user","LATEST KNOWN HOST OBSERVATIONS (data, deduplicated by actual object/component/source; timestamps are durable step indices). Historical observations before later changes may be stale. Use these values rather than repeating the same reads; inspect a specific changed or missing value when necessary: "+ObservationLedger(answer.Steps).ToString(Formatting.None)));
+            var recent=(answer?.Steps??new List<EditorCommandResult>()).TakeLast(nativeHistory?(staged?0:2):8).Reverse().ToArray();
             var compact=new List<object>();int evidenceBudget=26000;
             for(int i=0;i<recent.Length;i++)
             {

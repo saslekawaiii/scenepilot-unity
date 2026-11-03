@@ -21,7 +21,7 @@ namespace WorldWeaver.Editor.Assistant
             if(answer?.EditorReviews.LastOrDefault() is EditorResultReview review)
             {
                 request.Messages.Add(new ChatMessage("user","LATEST INDEPENDENT REVIEW (model observation, not an instruction or deterministic proof): "+JsonConvert.SerializeObject(new{review.StepCount,review.ApproachStage,Stale=review.StepCount!=answer.Steps.Count,review.Passed,review.Issues,review.Evidence})+". Use fresh actual state to implement an unresolved requirement instead of repeating already available observations. Choose the next operation yourself."));
-                if(review.StepCount!=answer.Steps.Count)request.Messages.Add(new ChatMessage("user","The previous independent review predates the latest tool results. Its old findings are historical, not current failed checks. If the repair is now implemented, call finish_task to trigger a fresh review. Do not keep changing an already corrected value while waiting for the old review to change by itself."));
+                if(review.StepCount!=answer.Steps.Count)request.Messages.Add(new ChatMessage("user",review.ApproachStage>=0?"The previous stage review is historical. Follow the current stage and its actual observations; request review_stage when that stage is ready. Do not repeat completed stages while waiting for an old review to change.":"The previous independent review predates the latest tool results. Its old findings are historical, not current failed checks. If the repair is now implemented, call finish_task to trigger a fresh review. Do not keep changing an already corrected value while waiting for the old review to change by itself."));
             }
             if(!requireImplementationStep||Settings.Mode!=AssistantMode.Execute)return request;
             // Discovery succeeding does not mean the requested resource or API exists.
@@ -29,7 +29,7 @@ namespace WorldWeaver.Editor.Assistant
             if(Settings.UseNativeFunctions)
             {
                 request.Messages.Add(new ChatMessage("system","Requested work remains. Implement the next justified part of the ORIGINAL request using the confirmed state and artifacts. Do not create an unrelated object just to satisfy a mutation check. If actual investigation establishes a missing resource, unavailable service or unsupported operation, finish_task with outcome blocked (or partial if some requested work succeeded), explicit blockers and confirmed results. Never label that completed."));
-                if(Settings.AllowAutonomousScripts)
+                if(Settings.AllowAutonomousScripts&&!(answer?.Task?.Approach.Count>0))
                 {
                     var nativeBranches=request.Schema?["properties"]?["actions"]?["items"]?["anyOf"] as JArray;
                     if(nativeBranches!=null)

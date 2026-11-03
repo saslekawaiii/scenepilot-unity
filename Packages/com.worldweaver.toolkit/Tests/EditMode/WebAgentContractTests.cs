@@ -193,7 +193,19 @@ namespace WorldWeaver.Tests
                 Assert.That(AgentFunctionProtocol.Definitions(Filter().Schema).Select(t=>(string)t["function"]["name"]),Does.Contain("inspect_object"),"Discovery before another independent read must still take effect");
                 answer.Steps.Add(new EditorCommandResult{Success=true,Tool="inspect_object",Summary="{}"});answer.Attempts.Add(new EditorPlanAttempt{Accepted=true,FirstResultIndex=2,ResultCount=1});
                 Assert.That(AgentFunctionProtocol.Definitions(Filter().Schema).Select(t=>(string)t["function"]["name"]),Does.Not.Contain("inspect_object"),"The targeted prerequisite read expires after its observation turn");
+                answer.Task=new AgentTaskState{Approach=new System.Collections.Generic.List<string>{"Implement a general stage"}};
+                Assert.That(AgentFunctionProtocol.Definitions(Filter().Schema).Select(t=>(string)t["function"]["name"]),Does.Contain("inspect_object"),"A scoped stage retains faithful read definitions instead of causing a discovery/rejection cycle");
             }
+        }
+        [Test] public void StageWorkingMemoryKeepsLatestActualFieldAndFlagsObservationsBeforeAChange()
+        {
+            var steps=new System.Collections.Generic.List<EditorCommandResult>{new EditorCommandResult{Tool="read_script",Success=true,Summary="{\"path\":\"Assets/Observed.cs\",\"source\":\"ACTUAL_SOURCE_END\"}"}};
+            for(int i=0;i<40;i++)steps.Add(new EditorCommandResult{Tool="inspect_component",Target="owned:fixture",Success=true,Summary=new JObject{["component"]="Fixture",["observedValue"]=i}.ToString()});
+            steps.Add(new EditorCommandResult{Tool="set_component",Success=true});
+            steps.Add(new EditorCommandResult{Tool="inspect_component",Target="owned:fixture",Success=true,Summary="{\"component\":\"Fixture\",\"observedValue\":42}"});
+            var method=typeof(ChatController).GetMethod("ObservationLedger",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic);var rows=(JArray)method.Invoke(null,new object[]{steps});
+            Assert.AreEqual(2,rows.Count);var field=rows.Single(r=>(string)r["tool"]=="inspect_component");Assert.AreEqual(42,(int)field["data"]["observedValue"]);Assert.IsFalse((bool)field["historicalBeforeLastChange"]);
+            var source=rows.Single(r=>(string)r["tool"]=="read_script");Assert.AreEqual("ACTUAL_SOURCE_END",(string)source["data"]["source"]);Assert.IsTrue((bool)source["historicalBeforeLastChange"]);
         }
         [Test] public void ObservedWebSourceSurvivesLaterReadsWithoutInventingACompletedDownload()
         {
@@ -202,6 +214,17 @@ namespace WorldWeaver.Tests
             steps.Add(new EditorCommandResult{Tool="reply",Success=true,Summary="{\"url\":\"https://not-observed.example/imagined.img\"}"});
             var method=typeof(ChatController).GetMethod("WebSourceLedger",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic);var rows=(JArray)method.Invoke(null,new object[]{steps});
             Assert.AreEqual(1,rows.Count);Assert.AreEqual("https://data.example/elevation.img",(string)rows[0]["url"]);Assert.That((string)rows[0]["status"],Does.Contain("not proof of download"));Assert.AreEqual(0,(int)rows[0]["index"]);
+        }
+        [Test] public void APlannedStageUsesOnlyTheLatestAcceptedNativeExchangeAndKeepsTheFullAudit()
+        {
+            var answer=new AssistantMessage{Task=new AgentTaskState{Approach=new System.Collections.Generic.List<string>{"Implement a pending stage"}}};
+            for(int i=0;i<8;i++)
+            {
+                answer.Steps.Add(new EditorCommandResult{Tool="inspect_object",Success=true,Summary=new JObject{["actualValue"]=i}.ToString()});
+                answer.Attempts.Add(new EditorPlanAttempt{Accepted=true,Round=i+1,FirstResultIndex=i,ResultCount=1,WireResponse=new JObject{["tool_calls"]=new JArray(new JObject{["id"]="actual_"+i,["function"]=new JObject{["name"]="inspect_object",["arguments"]=new JObject{["target"]="owned:fixture"}}})}.ToString()});
+            }
+            answer.Attempts.Add(new EditorPlanAttempt{Accepted=false,Error="Unknown tool",WireResponse="{\"tool_calls\":[{\"function\":{\"name\":\"not_registered\",\"arguments\":{}}}]}"});
+            var request=new CompletionRequest();Assert.IsTrue(NativeHistory(request,answer));Assert.AreEqual(2,request.Messages.Count);Assert.AreEqual("actual_7",request.Messages[1].ToolCallId);Assert.AreEqual(7,(int)JObject.Parse(request.Messages[1].Content)["data"]["actualValue"]);Assert.AreEqual(9,answer.Attempts.Count);Assert.AreEqual(8,answer.Steps.Count);
         }
         [Test] public void NativeHistoryKeepsALargeSourceBatchedBesideSmallObservations()
         {

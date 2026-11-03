@@ -40,7 +40,7 @@ namespace WorldWeaver.Editor.Assistant
             var sceneObjects=ProjectContextIndex.Objects().ToArray();
             var inventory=sceneObjects.SelectMany(go=>go.GetComponents<Component>().Where(c=>c).Select(c=>c.GetType().FullName)).GroupBy(name=>name).OrderByDescending(group=>group.Count()).Take(80).ToDictionary(group=>group.Key,group=>group.Count());
             string stage=approachStage>=0&&approachStage<answer.Task.Approach.Count?answer.Task.Approach[approachStage]:null;
-            string input=JsonConvert.SerializeObject(new{OriginalRequest=stage??answer.Task?.OriginalRequest,FullUserScope=answer.Task?.OriginalRequest,ApproachStage=approachStage,InitialHostMeasurements=answer.Task?.InitialSceneFacts,CurrentHostMeasurements=state,SceneComponentCounts=inventory,MissingFormerTargets=missing,DurableHostVerification=hostChecks,
+            string input=JsonConvert.SerializeObject(new{OriginalRequest=stage??answer.Task?.OriginalRequest,FullUserScope=answer.Task?.OriginalRequest,ApproachStage=approachStage,InitialHostMeasurements=answer.Task?.InitialSceneFacts,CurrentHostMeasurements=state,CurrentRenderableInventory=ProjectContextIndex.ListScene(new JObject{["component"]="Renderer",["limit"]=24}),SceneComponentCounts=inventory,MissingFormerTargets=missing,DurableHostVerification=hostChecks,
                 ActualToolEvidence=answer.Steps.Select((s,i)=>new{Index=i,s.Tool,s.Success,s.Target,Data=ToolEvidenceForModel(s),s.Error,HistoricalObservation=i<answer.Steps.FindLastIndex(last=>last.Success&&!SceneToolExecutor.IsReadOnlyTool(last.Tool))}).TakeLast(10)});
             string digest=TextChunker.Digest(input);
             var existing=answer.EditorReviews.LastOrDefault(r=>r.InputHash==digest&&r.Error==null);
