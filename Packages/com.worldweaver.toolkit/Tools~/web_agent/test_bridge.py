@@ -18,6 +18,20 @@ class BridgeContracts(unittest.TestCase):
         variants = bridge.data_variants(sources)
         self.assertEqual(24, len(variants)); self.assertIn("https://example.com/small/global.img", [v["url"] for v in variants])
 
+    def test_research_memory_ranks_observed_related_sources_and_excludes_private_urls(self):
+        sources = {"https://example.com/unity/shadergraph": {"title": "Unity Shader Graph manual", "observedUtc": 1}, "https://example.com/other": {"title": "Other topic", "observedUtc": 9}, "https://localhost/shadergraph": {"title": "Shader Graph", "observedUtc": 10}}
+        result = bridge.relevant_sources(sources, "Find Unity Shader Graph manual")
+        self.assertEqual(["https://example.com/unity/shadergraph"], [row["url"] for row in result])
+
+    def test_truncated_model_response_cannot_execute_a_partial_tool(self):
+        model = OllamaToolModel("test:cloud")
+        with patch.object(model.session, "post") as post:
+            post.return_value.json.return_value = {"done_reason": "length", "message": {"tool_calls": [{"function": {"name": "web_read", "arguments": {"url": "https://example.com/"}}}]}}
+            with self.assertRaisesRegex(ValueError, "No tool from this response executed"):
+                model.generate([{"role": "user", "content": [{"type": "text", "text": "Find a source"}]}])
+        self.assertEqual(1, model.truncated_calls)
+        self.assertEqual(8192, post.call_args.kwargs["json"]["options"]["num_predict"])
+
     def test_public_network_boundaries(self):
         for value in ["file:///etc/passwd", "http://example.com", "https://localhost/x", "https://127.0.0.1/x", "https://[::1]/x", "https://169.254.169.254/latest/meta-data", "https://user:pass@example.com", "https://example.com:11434/"]:
             with self.subTest(url=value), self.assertRaises(ValueError):

@@ -15,18 +15,22 @@ class OllamaToolModel(Model):
         self.session = requests.Session()
         self.session.trust_env = False
         self.sequence = 0
+        self.truncated_calls = 0
 
     def generate(self, messages, stop_sequences=None, tools_to_call_from=None, **kwargs):
         prepared = self._prepare_completion_kwargs(messages=messages, tools_to_call_from=tools_to_call_from, stop_sequences=None)
         body = {"model": self.model_id, "messages": prepared["messages"], "stream": False,
-                "options": {"temperature": 0.1, "num_predict": 3000, "num_ctx": 32768}}
+                "options": {"temperature": 0.1, "num_predict": 8192 if self.model_id.endswith(":cloud") else 3000, "num_ctx": 32768}}
         if not self.model_id.endswith(":cloud"):
             body["think"] = False
         if tools_to_call_from:
             body["tools"] = prepared["tools"]
-        response = self.session.post("http://127.0.0.1:11434/api/chat", json=body, timeout=90)
+        response = self.session.post("http://127.0.0.1:11434/api/chat", json=body, timeout=120)
         response.raise_for_status()
         raw = response.json()
+        if raw.get("done_reason") in ("length", "max_tokens", "max_output_tokens"):
+            self.truncated_calls += 1
+            raise ValueError("Inference reached its reasoning/output budget before a complete response. No tool from this response executed; narrow the next research step.")
         message = raw["message"]
         calls = []
         self.sequence += 1

@@ -23,6 +23,7 @@ public static class AgentRegressionSuiteRunner
       ("status","что ты создал а что не смог?"),
       ("open_world","ты не создал лунную поверхность. создай лунную поверхность чтобы я мог по ней ходить. большой открытый мир. добавь звездное небо и ночную атмосферу луны"),
       ("model","а какая сейчас модель?"),
+      ("assistant_model","Какая языковая модель отвечает в этом чате? Назови выбранный LLM backend, а не 3D-модель персонажа."),
       ("general_code","Через C# в редакторе создай круг из 12 точечных источников света радиусом 18 метров вокруг начала координат. Высота каждого 8 метров, дальность света 6 метров. Верни измеренные число источников и радиус. Сохрани существующий мир и героя.")};
     static AgentRegressionSuiteRunner(){EditorApplication.update+=Tick;}
     static string Package=>UnityEditor.PackageManager.PackageInfo.FindForAssembly(typeof(WorldPlayer).Assembly).resolvedPath;
@@ -78,11 +79,17 @@ public static class AgentRegressionSuiteRunner
                     checks["survivalAndHabitat"]=survival&&survival.Environment&&survival.Habitat&&survival.OxygenSeconds>0;
                     checks["localLunarGravity"]=player&&player.UseLocalGravity&&Math.Abs(player.Gravity-1.62f)<.05;
                 }
-                if(name=="status"||name=="model")
+                if(name=="status"||name=="model"||name=="assistant_model")
                 {
                     checks["readOnly"]=(string)row["beforeSceneDigest"]==SceneDigest();
                     checks["noFalseMissingTools"]=!answer.Text.Contains("инструментов нет")&&!answer.Text.Contains("отсутствует команда")&&!answer.Text.Contains("инструмента нет");
-                    if(name=="model")checks["actualAssistantModelNamed"]=answer.Text.IndexOf(((string)report["model"]).Split(':')[0],StringComparison.OrdinalIgnoreCase)>=0;
+                    bool backendNamed=answer.Text.IndexOf(((string)report["model"]).Split(':')[0],StringComparison.OrdinalIgnoreCase)>=0;
+                    if(name=="assistant_model")checks["actualAssistantModelNamed"]=backendNamed;
+                    if(name=="model")
+                    {
+                        string asset=Path.GetFileNameWithoutExtension(player?player.GetComponent<WorldModelVisual>()?.SourcePath??"":"");
+                        checks["actualNamedIdentity"]=backendNamed||!string.IsNullOrEmpty(asset)&&answer.Text.IndexOf(asset,StringComparison.OrdinalIgnoreCase)>=0;
+                    }
                 }
                 if(name=="open_world")
                 {

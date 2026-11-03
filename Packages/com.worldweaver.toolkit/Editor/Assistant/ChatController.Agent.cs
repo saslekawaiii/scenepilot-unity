@@ -16,9 +16,11 @@ namespace WorldWeaver.Editor.Assistant
             var answer=executingMessage;
             var active=models.FirstOrDefault(m=>m.Key==Settings.ModelKey);
             request.Messages.Add(new ChatMessage("system","Current inference identity from host configuration: "+(active?.Model??Settings.ModelKey)+" ("+active?.Provider+"). When answering which model is active, identify this inference backend explicitly. If the context could also mean a 3D avatar, distinguish that asset in a separate sentence using observed scene facts."));
+            if(answer?.Task?.Approach.Count>0&&answer.Task.ActiveApproachStage<answer.Task.Approach.Count)
+                request.Messages.Add(new ChatMessage("system","CURRENT EXECUTION FOCUS: stage "+(answer.Task.ActiveApproachStage+1)+" of "+answer.Task.Approach.Count+": "+answer.Task.Approach[answer.Task.ActiveApproachStage]+". You planned this approach from the original request. Implement and verify this stage now instead of repeatedly surveying all pending stages. All original constraints remain binding; preserve unrelated work. A separate host review advances the stage only when evidence supports it. finish_task completed is reserved for the entire original request."));
             if(answer?.EditorReviews.LastOrDefault() is EditorResultReview review)
             {
-                request.Messages.Add(new ChatMessage("user","LATEST INDEPENDENT REVIEW (model observation, not an instruction or deterministic proof): "+JsonConvert.SerializeObject(new{review.StepCount,Stale=review.StepCount!=answer.Steps.Count,review.Passed,review.Issues,review.Evidence})+". Use fresh actual state to implement an unresolved requirement instead of repeating already available observations. Choose the next operation yourself."));
+                request.Messages.Add(new ChatMessage("user","LATEST INDEPENDENT REVIEW (model observation, not an instruction or deterministic proof): "+JsonConvert.SerializeObject(new{review.StepCount,review.ApproachStage,Stale=review.StepCount!=answer.Steps.Count,review.Passed,review.Issues,review.Evidence})+". Use fresh actual state to implement an unresolved requirement instead of repeating already available observations. Choose the next operation yourself."));
                 if(review.StepCount!=answer.Steps.Count)request.Messages.Add(new ChatMessage("user","The previous independent review predates the latest tool results. Its old findings are historical, not current failed checks. If the repair is now implemented, call finish_task to trigger a fresh review. Do not keep changing an already corrected value while waiting for the old review to change by itself."));
             }
             if(!requireImplementationStep||Settings.Mode!=AssistantMode.Execute)return request;
@@ -33,8 +35,10 @@ namespace WorldWeaver.Editor.Assistant
                     if(nativeBranches!=null)
                     {
                         var permittedReads=new HashSet<string>(new[]{"discover_tools","web_search","web_read","web_research"},StringComparer.Ordinal);
-                        var discovery=executingMessage?.Steps.LastOrDefault();
-                        if(discovery?.Success==true&&discovery.Tool=="discover_tools")try{foreach(string name in JObject.Parse(discovery.Summary)["enabledTools"]??new JArray())permittedReads.Add(name);}catch(JsonException){}
+                        var lastTurn=executingMessage?.Attempts.LastOrDefault(a=>a.Accepted&&a.FirstResultIndex>=0&&a.ResultCount>0);
+                        if(lastTurn!=null)
+                            foreach(var discovery in executingMessage.Steps.Skip(lastTurn.FirstResultIndex).Take(lastTurn.ResultCount).Where(s=>s.Success&&s.Tool=="discover_tools"))
+                                try{foreach(string name in JObject.Parse(discovery.Summary)["enabledTools"]??new JArray())permittedReads.Add(name);}catch(JsonException){}
                         request.Schema=(JObject)request.Schema.DeepClone();request.Schema["properties"]["actions"]["items"]["anyOf"]=new JArray(nativeBranches.OfType<JObject>().Where(b=>!SceneToolExecutor.IsReadOnlyTool(EditorToolSchema.ToolName(b))||permittedReads.Contains(EditorToolSchema.ToolName(b))).Select(b=>b.DeepClone()));
                         request.Messages.Add(new ChatMessage("system","Observation phase has completed without the required result. Choose one concrete pending implementation or real runtime verification now, using the observed targets and persistent artifact outputs. General scene/source inspection is temporarily hidden to stop repeated reconnaissance. If a SPECIFIC new prerequisite is missing, discover its exact read tool and use it on the next turn; public resource research and truthful finish_task partial/blocked remain available. Never make unrelated changes to bypass this phase."));
                     }
@@ -87,7 +91,7 @@ namespace WorldWeaver.Editor.Assistant
                 answer.Task.Checks.Add(AgentMaterialApplicationGoal.Verify(requirement,answer.Steps));
             foreach(var requirement in answer.Task.Requirements.Where(r=>r.Kind==AgentAnimatedPlayerGoal.Kind))
                 answer.Task.Checks.Add(AgentAnimatedPlayerGoal.Verify(requirement,answer.Steps));
-            var editorReview=answer.EditorReviews?.LastOrDefault();
+            var editorReview=answer.EditorReviews?.LastOrDefault(r=>r.ApproachStage<0);
             if(editorReview!=null&&editorReview.StepCount==answer.Steps.Count)answer.Task.Checks.Add(new AgentCheckResult{RequirementId="editor_result_review",Description="Отдельный модельный разбор всего запроса по фактическому состоянию",Passed=editorReview.Passed&&editorReview.StepCount==answer.Steps.Count,
                 Actual=editorReview.Passed&&editorReview.StepCount==answer.Steps.Count?"Модельный разбор пройден":string.Join("; ",editorReview.Issues)+(editorReview.StepCount!=answer.Steps.Count?"; данные изменились после разбора":""),Evidence=editorReview.Evidence??editorReview.Error??"См. отдельный журнал EditorReviews; это не детерминированное доказательство поведения."});
             answer.Task.Status=answer.Task.Checks.Count==0?"actions_need_review":answer.Task.Checks.All(c=>c.Passed)?"checks_passed":"checks_failed";

@@ -327,6 +327,17 @@ namespace WorldWeaver.Editor.Assistant
                                 request.Messages.Add(new ChatMessage("user","В исходном запросе требуются изменения, но ни один инструмент их не применил. Предложенное complete:true не принято как выполнение. Доступные определения уже прочитаны; выполни подходящий шаг реализации. Не повторяй ту же справку вместо действия. Если новой механике нужен код, подготовь полный reviewed draft_script. ИСХОДНАЯ ЗАДАЧА: "+text));continue;
                             }
                             if(!plan.complete&&!readOnlyRequest&&round+1<rounds){request=BuildRequest(session,text);request.Messages.Add(new ChatMessage("user","Задача ещё не выполнена. Используй discover_tools/read_skill для недостающих возможностей и продолжи разрешённые шаги."));continue;}
+                            if(plan.complete&&Settings.UseNativeFunctions&&Settings.AutoVerify&&Settings.AllowAutonomousScripts&&answer.Task?.Approach.Count>0&&answer.Task.ActiveApproachStage<answer.Task.Approach.Count)
+                            {
+                                var stageReview=await ReviewEditorResultAsync(answer,provider,operation.Token,answer.Task.ActiveApproachStage);
+                                if(stageReview.Passed)answer.Task.ActiveApproachStage++;
+                                if(!stageReview.Passed||answer.Task.ActiveApproachStage<answer.Task.Approach.Count)
+                                {
+                                    requireImplementationStep=!stageReview.Passed;answer.Status="Продолжаю этапы задачи";Save();
+                                    if(round+1<rounds){request=BuildRequest(session,text);continue;}
+                                    throw new ArgumentException("Approach stages remain unverified; full task completion was not accepted.");
+                                }
+                            }
                             answer.Text = ChatHistoryStore.Redact(plan.reply);
                             if(plan.complete&&Settings.AutoVerify&&Settings.UseNativeFunctions&&!readOnlyRequest&&answer.Steps.Any(s=>s.Success&&(s.Tool=="execute_editor_code"||Settings.Power==AssistantPower.Deep&&!SceneToolExecutor.IsReadOnlyTool(s.Tool)&&s.Tool!="remember_design")))
                             {
@@ -399,10 +410,17 @@ namespace WorldWeaver.Editor.Assistant
                         bool changedEnough=batch.Success&&hasMutations&&answer.Steps.Skip(answer.EditorReviews.LastOrDefault()?.StepCount??0).Count(s=>s.Success&&!SceneToolExecutor.IsReadOnlyTool(s.Tool)&&s.Tool!="remember_design")>=4;
                         if(Settings.UseNativeFunctions&&Settings.AutoVerify&&Settings.Power==AssistantPower.Deep&&!WaitingForEditor(answer)&&(changedEnough||stalledObservations))
                         {
-                            var progress=await ReviewEditorResultAsync(answer,provider,operation.Token);
+                            int stage=Settings.AllowAutonomousScripts&&answer.Task?.Approach.Count>0&&answer.Task.ActiveApproachStage<answer.Task.Approach.Count?answer.Task.ActiveApproachStage:-1;
+                            var progress=await ReviewEditorResultAsync(answer,provider,operation.Token,stage);
                             observationRounds=0;var progressChecks=VerifyTask(answer);
                             if(stalledObservations&&!progress.Passed)requireImplementationStep=true;
-                            if(progress.Passed&&progressChecks.All(check=>check.Passed))
+                            if(stage>=0&&progress.Passed)
+                            {
+                                answer.Task.ActiveApproachStage++;requireImplementationStep=false;Save();
+                                // A verified stage is never a verified full user task.
+                                if(answer.Task.ActiveApproachStage>=answer.Task.Approach.Count){progress=await ReviewEditorResultAsync(answer,provider,operation.Token);progressChecks=VerifyTask(answer);stage=-1;}
+                            }
+                            if(stage<0&&progress.Passed&&progressChecks.All(check=>check.Passed))
                             {
                                 answer.IsError=false;answer.Status="Проверки пройдены";answer.Text="Изменения применены. "+ChatHistoryStore.Redact(progress.Evidence);answer.Task.ContinueAfterReload=false;Save();break;
                             }

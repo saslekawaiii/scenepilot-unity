@@ -145,6 +145,55 @@ namespace WorldWeaver.Tests
             var error=Assert.Throws<ProviderException>(()=>AgentFunctionProtocol.Normalize(new JObject{["tool_calls"]=calls},schema));Assert.That(error.Message,Does.Contain("not advertised in this turn: read_script"));Assert.That(error.Message,Does.Contain("No action executed"));
         }
         static bool NativeHistory(CompletionRequest request,AssistantMessage answer)=>(bool)typeof(ChatController).GetMethod("AddNativeToolHistory",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic).Invoke(null,new object[]{request,answer});
+        sealed class StageProvider:ILLMProvider
+        {
+            public int Calls,StageReviews,FullReviews;
+            public System.Threading.Tasks.Task<CompletionResult> CompleteAsync(CompletionRequest request,System.Threading.CancellationToken token)
+            {
+                if(request.Schema?["properties"]?["passed"]!=null)
+                {
+                    bool stage=request.Messages.Any(m=>m.Content.Contains("checkpoint for ONE model-planned"));if(stage)StageReviews++;else FullReviews++;
+                    bool first=UnityEngine.GameObject.Find("StageOne"),second=UnityEngine.GameObject.Find("StageTwo");
+                    bool passed=stage?request.Messages.Any(m=>m.Content.Contains("\"ApproachStage\":0"))?first:second:first&&second;
+                    return System.Threading.Tasks.Task.FromResult(new CompletionResult{Text=new JObject{["passed"]=passed,["issues"]=passed?new JArray():new JArray("Actual required node missing"),["evidence"]="Actual scene nodes"}.ToString()});
+                }
+                Calls++;var plan=new EditorPlan{complete=false};
+                if(Calls==1)plan.actions.Add(new EditorCommand{tool="plan_task",args=new JObject{["steps"]=new JArray("Создай пустой узел StageOne","Создай пустой узел StageTwo")}});
+                else if(!UnityEngine.GameObject.Find("StageOne"))plan.actions.Add(new EditorCommand{tool="create_node",name="StageOne"});
+                else if(request.Messages.Any(m=>m.Content.Contains("CURRENT EXECUTION FOCUS: stage 2"))&&!UnityEngine.GameObject.Find("StageTwo"))plan.actions.Add(new EditorCommand{tool="create_node",name="StageTwo"});
+                else{plan.complete=true;plan.reply="Оба узла созданы";}
+                return System.Threading.Tasks.Task.FromResult(new CompletionResult{Text=Newtonsoft.Json.JsonConvert.SerializeObject(plan)});
+            }
+            public System.Threading.Tasks.Task<bool> HealthAsync(System.Threading.CancellationToken token)=>System.Threading.Tasks.Task.FromResult(true);
+            public void Dispose(){}
+        }
+        [Test] public async System.Threading.Tasks.Task PlannedStageEvidenceNeverCompletesAnUnfinishedWholeTask()
+        {
+            UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.EmptyScene,UnityEditor.SceneManagement.NewSceneMode.Single);var provider=new StageProvider();
+            try{using(var controller=new ChatController(_=>provider,"UserSettings/Stages-"+Guid.NewGuid().ToString("N")))
+            {
+                controller.Settings.UseNativeFunctions=true;controller.Settings.AllowAutonomousScripts=true;controller.Settings.AutoVerify=true;controller.Settings.Power=AssistantPower.Deep;controller.Settings.UseSkills=false;
+                await controller.SendAsync("Создай два пустых узла StageOne и StageTwo. Сначала создай первый узел и проверь его существование, затем создай второй и проверь его существование. Сохрани всё остальное содержимое проекта без изменений.");
+                var answer=controller.Current.Messages.Last();Assert.IsFalse(answer.IsError,answer.Text);Assert.IsTrue(UnityEngine.GameObject.Find("StageOne"));Assert.IsTrue(UnityEngine.GameObject.Find("StageTwo"));Assert.AreEqual(2,answer.Task.ActiveApproachStage);Assert.AreEqual(2,provider.StageReviews);Assert.AreEqual(1,provider.FullReviews);
+                Assert.AreEqual(2,answer.EditorReviews.Count(r=>r.ApproachStage>=0));Assert.AreEqual(1,answer.EditorReviews.Count(r=>r.ApproachStage<0));
+            }}finally{UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.EmptyScene,UnityEditor.SceneManagement.NewSceneMode.Single);}
+        }
+        [Test] public void DiscoveryWithinAReadBatchEnablesItsExactReadOnTheNextImplementationTurn()
+        {
+            using(var controller=new ChatController(historyFolder:"UserSettings/DiscoveryBatch-"+Guid.NewGuid().ToString("N")))
+            {
+                controller.Settings.Mode=AssistantMode.Execute;controller.Settings.UseNativeFunctions=true;controller.Settings.AllowAutonomousScripts=true;
+                var answer=new AssistantMessage();answer.Steps.Add(new EditorCommandResult{Success=true,Tool="discover_tools",Summary="{\"enabledTools\":[\"inspect_object\"]}"});answer.Steps.Add(new EditorCommandResult{Success=true,Tool="web_search",Summary="{}"});
+                answer.Attempts.Add(new EditorPlanAttempt{Accepted=true,FirstResultIndex=0,ResultCount=2});
+                var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic;
+                typeof(ChatController).GetField("executingMessage",flags).SetValue(controller,answer);typeof(ChatController).GetField("requireImplementationStep",flags).SetValue(controller,true);
+                CompletionRequest Build()=>new CompletionRequest{Schema=EditorPlan.Schema(true,new[]{"create_node","inspect_object","discover_tools","web_search"},true)};
+                CompletionRequest Filter()=>(CompletionRequest)typeof(ChatController).GetMethod("RequireImplementation",flags).Invoke(controller,new object[]{Build()});
+                Assert.That(AgentFunctionProtocol.Definitions(Filter().Schema).Select(t=>(string)t["function"]["name"]),Does.Contain("inspect_object"),"Discovery before another independent read must still take effect");
+                answer.Steps.Add(new EditorCommandResult{Success=true,Tool="inspect_object",Summary="{}"});answer.Attempts.Add(new EditorPlanAttempt{Accepted=true,FirstResultIndex=2,ResultCount=1});
+                Assert.That(AgentFunctionProtocol.Definitions(Filter().Schema).Select(t=>(string)t["function"]["name"]),Does.Not.Contain("inspect_object"),"The targeted prerequisite read expires after its observation turn");
+            }
+        }
         [Test] public void NativeHistoryKeepsALargeSourceBatchedBesideSmallObservations()
         {
             var answer=new AssistantMessage();var calls=new JArray();
