@@ -27,12 +27,17 @@ namespace WorldWeaver.Tests
         static AvailableModel Model()=>new AvailableModel{Provider=ProviderKind.Ollama,Model="fixture-vision",Endpoint="http://127.0.0.1:11434",Available=true,AutoDiscovered=true,SupportsVision=true};
         [Test] public async Task LocalObserverReceivesActualPixelsAndRejectsInventedTargetIds()
         {
-            var image=Image();var provider=new ObserverProvider();var inventory=new JObject{["objects"]=new JArray(new JObject{["target"]="owned:actual",["name"]="Actual surface"})};var result=await AgentVisualObserver.ObserveAsync(Model(),image,"Inspect geometry",inventory,CancellationToken.None,_=>provider);
+            var image=Image();var provider=new ObserverProvider();var inventory=new JObject{["objects"]=new JArray(new JObject{["target"]="owned:actual",["name"]="Actual surface"})};var result=await AgentVisualObserver.ObserveAsync(Model(),image,inventory,CancellationToken.None,_=>provider);
             Assert.AreEqual(1,provider.Calls);Assert.AreEqual(AgentViewCapture.ReadBase64(image),provider.Seen.Messages.Single(m=>m.Images.Count>0).Images.Single());Assert.IsFalse(provider.Seen.UseToolCalls);Assert.AreEqual(false,provider.Seen.EnableThinking);Assert.AreEqual("observed",(string)result["status"]);Assert.AreEqual(image.Sha256,(string)result["imageSha256"]);Assert.AreEqual(1,((JArray)result["candidates"]).Count);Assert.AreEqual("owned:actual",(string)result["candidates"][0]["target"]);Assert.IsTrue((bool)result["advisoryOnly"]);
+        }
+        [Test] public void ObserverSelectionPrefersInstalledCapacityWithoutLoadingHugeOrRemoteModels()
+        {
+            var small=Model();small.Model="small";small.SizeBytes=2L*1024*1024*1024;var medium=Model();medium.Model="medium";medium.SizeBytes=6L*1024*1024*1024;var huge=Model();huge.Model="huge";huge.SizeBytes=40L*1024*1024*1024;var remote=Model();remote.SizeBytes=7L*1024*1024*1024;remote.Remote=true;
+            Assert.AreSame(medium,AgentVisualObserver.SelectLocalObserver(new[]{small,huge,remote,medium}));Assert.AreSame(small,AgentVisualObserver.SelectLocalObserver(new[]{huge,small}));Assert.IsNull(AgentVisualObserver.SelectLocalObserver(new[]{remote}));
         }
         [Test] public void ObserverNeverFallsBackToRemoteOrCloudModels()
         {
-            var image=Image();var provider=new ObserverProvider();var model=Model();model.Remote=true;Assert.ThrowsAsync<ArgumentException>(async()=>await AgentVisualObserver.ObserveAsync(model,image,"Inspect",new JObject(),CancellationToken.None,_=>provider));model.Remote=false;model.Endpoint="https://example.com";Assert.ThrowsAsync<ArgumentException>(async()=>await AgentVisualObserver.ObserveAsync(model,image,"Inspect",new JObject(),CancellationToken.None,_=>provider));model.Endpoint="http://127.0.0.1:11434";model.Model="fixture:cloud";Assert.ThrowsAsync<ArgumentException>(async()=>await AgentVisualObserver.ObserveAsync(model,image,"Inspect",new JObject(),CancellationToken.None,_=>provider));Assert.AreEqual(0,provider.Calls);
+            var image=Image();var provider=new ObserverProvider();var model=Model();model.Remote=true;Assert.ThrowsAsync<ArgumentException>(async()=>await AgentVisualObserver.ObserveAsync(model,image,new JObject(),CancellationToken.None,_=>provider));model.Remote=false;model.Endpoint="https://example.com";Assert.ThrowsAsync<ArgumentException>(async()=>await AgentVisualObserver.ObserveAsync(model,image,new JObject(),CancellationToken.None,_=>provider));model.Endpoint="http://127.0.0.1:11434";model.Model="fixture:cloud";Assert.ThrowsAsync<ArgumentException>(async()=>await AgentVisualObserver.ObserveAsync(model,image,new JObject(),CancellationToken.None,_=>provider));Assert.AreEqual(0,provider.Calls);
         }
         [Test] public void OverviewIncludesFlatGeometryBeyondTerrainButExcludesDistantBackgroundDomes()
         {

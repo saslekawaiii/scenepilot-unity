@@ -380,7 +380,7 @@ namespace WorldWeaver.Editor.Assistant
                         Phase = "Выполняю инструменты · " + plan.actions.Count; answer.Status = "Изменяю сцену"; Notify();
                         operation.Token.ThrowIfCancellationRequested();
                         var batch = await ExecutePlanAsync(plan, session.Id, answer.Id, profile,reviewedRepair,operation.Token);
-                        await AddVisualObservationsAsync(batch,answer,text,operation.Token);
+                        await AddVisualObservationsAsync(batch,answer,operation.Token);
                         if(batch.Success)repeatedValidationFailures.Clear();
                         if(batch.Success)foreach(var action in plan.actions)
                             if(action.tool.StartsWith("create_",StringComparison.Ordinal)&&string.IsNullOrWhiteSpace(action.name))appliedUnnamedCreations.Add(action.tool+"\n"+action.args.ToString(Formatting.None));
