@@ -35,7 +35,7 @@ delete_object: target owned object; args {}. Cannot delete unrelated or foreign 
 save_scene: target empty; args {path?:Assets/WorldWeaverGenerated/.../Name.unity}. Must be the LAST action. Always a unique destination, never overwrites a scene. Does not touch build settings.
 inspect_object: target; args {}. Read-back of transform,components,TerrainSpec,NPC and inventory.
 search_project: target empty; args {query:text,limit?:1..40}. Read-only asset search under Assets/Packages.
-read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64KiB, no traversal. Returns actual source as tool result. draft_script is handled by the controller separately.";
+read_script: target empty; args {path:Assets/.../Name.cs or installed Packages/.../Name.cs}. Read-only maximum64KiB, no traversal. Returns actual source/hash; package scripts remain read-only. draft_script is handled by the controller separately.";
 
         private sealed class VirtualTarget
         {
@@ -147,6 +147,18 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
             string path=Text(args,key,240,true);
             if(!path.StartsWith(generated?"Assets/WorldWeaverGenerated/":"Assets/",StringComparison.Ordinal)||!path.EndsWith(extension,StringComparison.OrdinalIgnoreCase)||path.Contains("..")||path.Contains('\\')||path.Contains(':')||path.Split('/').Any(s=>string.IsNullOrWhiteSpace(s))||path.IndexOfAny(new[]{'\0','\r','\n','*','?','"','<','>','|'})>=0)throw new ArgumentException("Invalid project asset path: "+key);
             return path;
+        }
+        private static string ReadableScriptPath(string path)
+        {
+            if(string.IsNullOrEmpty(path)||path.Length>240||!(path.StartsWith("Assets/",StringComparison.Ordinal)||path.StartsWith("Packages/",StringComparison.Ordinal))||!path.EndsWith(".cs",StringComparison.OrdinalIgnoreCase)||path.Contains("..")||path.Contains('\\')||path.Contains(':')||path.Split('/').Any(string.IsNullOrWhiteSpace)||path.IndexOfAny(new[]{'\0','\r','\n','*','?','"','<','>','|'})>=0)throw new ArgumentException("Read an existing Assets/...cs or installed Packages/...cs without traversal.");
+            if(!AssetDatabase.LoadAssetAtPath<MonoScript>(path))throw new ArgumentException("C# script asset not found; use the exact path returned by search_project.");
+            string physical=path;
+            if(path.StartsWith("Packages/",StringComparison.Ordinal))
+            {
+                var info=UnityEditor.PackageManager.PackageInfo.FindForAssetPath(path);if(info==null||!path.StartsWith(info.assetPath+"/",StringComparison.Ordinal))throw new ArgumentException("Script is not in an installed package.");
+                physical=Path.Combine(info.resolvedPath,path.Substring(info.assetPath.Length+1));
+            }
+            if(!File.Exists(physical)||new FileInfo(physical).Length>65536)throw new ArgumentException("Script missing or larger than 64KiB.");return physical;
         }
         public static void Validate(EditorPlan plan)
         {
@@ -268,7 +280,7 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
                     case "inspect_object":Keys(a);Resolve(command.target,aliases);break;
                     case "search_project":EmptyTarget(command);Keys(a,"query","limit");Text(a,"query",120,true);Integer(a,"limit",1,40,20);break;
                     case "read_script":
-                        EmptyTarget(command);Keys(a,"path");string path=AssetPath(a,"path",".cs",false);if(!AssetDatabase.LoadAssetAtPath<MonoScript>(path)||!File.Exists(path)||new FileInfo(path).Length>65536)throw new ArgumentException("Script missing or larger than64KiB.");break;
+                        EmptyTarget(command);Keys(a,"path");ReadableScriptPath((string)a["path"]);break;
                     default:throw new ArgumentException("Unknown editor tool: "+command.tool);
                 }
                 if(creation)
@@ -415,7 +427,9 @@ read_script: target empty; args {path:Assets/.../Name.cs}. Read-only maximum64Ki
                             if(!EditorSceneManager.SaveScene(SceneManager.GetActiveScene(),path)||!File.Exists(path)||!AssetDatabase.LoadAssetAtPath<SceneAsset>(path))throw new IOException("Scene save/read-back failed.");summary="Сцена сохранена: "+path;break;
                         case "inspect_object":go=resolve(command.target);summary=Inspect(go).ToString(Newtonsoft.Json.Formatting.None);break;
                         case "search_project":summary=new JArray(AssetDatabase.FindAssets((string)a["query"],new[]{"Assets","Packages"}).Take((int?)a["limit"]??20).Select(AssetDatabase.GUIDToAssetPath)).ToString(Newtonsoft.Json.Formatting.None);break;
-                        case "read_script":string scriptPath=(string)a["path"];summary=new JObject{["path"]=scriptPath,["sha256"]=AgentSourcePatches.SourceHash(scriptPath),["source"]=ChatHistoryStore.Redact(File.ReadAllText(scriptPath))}.ToString(Newtonsoft.Json.Formatting.None);break;
+                        case "read_script":
+                            string scriptPath=(string)a["path"],physical=ReadableScriptPath(scriptPath);byte[] bytes=File.ReadAllBytes(physical);string sourceHash;using(var sha=System.Security.Cryptography.SHA256.Create())sourceHash=BitConverter.ToString(sha.ComputeHash(bytes)).Replace("-","").ToLowerInvariant();
+                            summary=new JObject{["path"]=scriptPath,["sha256"]=sourceHash,["readOnlyPackage"]=scriptPath.StartsWith("Packages/",StringComparison.Ordinal),["source"]=ChatHistoryStore.Redact(File.ReadAllText(physical))}.ToString(Newtonsoft.Json.Formatting.None);break;
                     }
                     if(go&&new[]{"create_world","create_npc","create_object","scatter_objects","create_camera","set_lighting"}.Contains(command.tool))
                     {aliases["@"+command.name]=go;aliases[command.name]=go;}

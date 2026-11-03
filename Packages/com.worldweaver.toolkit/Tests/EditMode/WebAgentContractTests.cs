@@ -8,6 +8,44 @@ namespace WorldWeaver.Tests
 {
     public sealed class WebAgentContractTests
     {
+        [Test] public void InstalledPackageSourceCanBeReadWithItsHashWhileTraversalStillFails()
+        {
+            const string path="Packages/com.worldweaver.toolkit/Runtime/World/WorldInput.cs";
+            var command=new EditorCommand{tool="read_script",args=new JObject{["path"]=path}};var plan=new EditorPlan{actions=new System.Collections.Generic.List<EditorCommand>{command}};
+            var batch=SceneToolExecutor.Execute(plan);Assert.IsTrue(batch.Success,batch.Error);var data=JObject.Parse(batch.Results[0].Summary);Assert.IsTrue((bool)data["readOnlyPackage"]);Assert.That((string)data["source"],Does.Contain("class WorldInput"));Assert.AreEqual(64,((string)data["sha256"]).Length);
+            command.args["path"]="Packages/com.worldweaver.toolkit/../../Private.cs";Assert.Throws<ArgumentException>(()=>SceneToolExecutor.Validate(plan));
+        }
+        sealed class ObservationRecoveryProvider:ILLMProvider
+        {
+            public int Reads,Reviews;public bool FeedbackSeen;
+            public System.Threading.Tasks.Task<CompletionResult> CompleteAsync(CompletionRequest request,System.Threading.CancellationToken token)
+            {
+                if(request.Schema?["properties"]?["passed"]!=null)
+                {
+                    Reviews++;bool exists=UnityEngine.GameObject.Find("ObservedGoal");return System.Threading.Tasks.Task.FromResult(new CompletionResult{Text=new JObject{["passed"]=exists,["issues"]=exists?new JArray():new JArray("The requested node has not been created; observations alone are insufficient."),["evidence"]=exists?"Actual node exists":"Actual node is absent"}.ToString()});
+                }
+                var plan=new EditorPlan{complete=false};bool feedback=request.Messages.Any(m=>m.Content.Contains("LATEST INDEPENDENT REVIEW")&&m.Content.Contains("requested node"));FeedbackSeen|=feedback;
+                if(!feedback){Reads++;plan.actions.Add(new EditorCommand{tool="find_scene_objects",args=new JObject{["query"]="missing_observation_fixture"}});}
+                else if(!UnityEngine.GameObject.Find("ObservedGoal"))plan.actions.Add(new EditorCommand{tool="create_node",name="ObservedGoal"});
+                else{plan.complete=true;plan.reply="Готово";}
+                return System.Threading.Tasks.Task.FromResult(new CompletionResult{Text=Newtonsoft.Json.JsonConvert.SerializeObject(plan)});
+            }
+            public System.Threading.Tasks.Task<bool> HealthAsync(System.Threading.CancellationToken token)=>System.Threading.Tasks.Task.FromResult(true);
+            public void Dispose(){}
+        }
+        [Test] public async System.Threading.Tasks.Task ObservationStallGetsIndependentFeedbackAndCanContinueToARealMutation()
+        {
+            UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.EmptyScene,UnityEditor.SceneManagement.NewSceneMode.Single);var provider=new ObservationRecoveryProvider();string folder="UserSettings/ObservationRecovery-"+Guid.NewGuid().ToString("N");
+            try
+            {
+                using(var controller=new ChatController(_=>provider,folder))
+                {
+                    controller.Settings.UseNativeFunctions=true;controller.Settings.AllowAutonomousScripts=true;controller.Settings.AutoVerify=true;controller.Settings.Power=AssistantPower.Deep;controller.Settings.UseSkills=false;
+                    await controller.SendAsync("Создай пустой узел ObservedGoal.");Assert.IsTrue(provider.FeedbackSeen);Assert.AreEqual(6,provider.Reads);Assert.GreaterOrEqual(provider.Reviews,2);Assert.IsTrue(UnityEngine.GameObject.Find("ObservedGoal"));Assert.IsFalse(controller.Current.Messages.Last().IsError,controller.Current.Messages.Last().Text);
+                }
+            }
+            finally{UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.EmptyScene,UnityEditor.SceneManagement.NewSceneMode.Single);}
+        }
         [Test] public void MissingComponentObservationReturnsRealDescendantsWithoutAUnityFakeNullException()
         {
             var root=new UnityEngine.GameObject("Component root");root.AddComponent<GeneratedSceneObject>();var child=new UnityEngine.GameObject("Animated visual");child.transform.SetParent(root.transform);child.AddComponent<GeneratedSceneObject>();child.AddComponent<UnityEngine.Animator>();

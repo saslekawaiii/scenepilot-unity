@@ -182,6 +182,7 @@ namespace WorldWeaver.Editor.Assistant
                     int emptyPlanRepairs = 0;
                     int planningRepairs = 0; // One fresh format repair is available even in Fast; it never grants another execution round.
                     int inferenceRepairs=0;
+                    int observationRounds=0;
                     string lastAppliedConfiguration=null;
                     bool unresolvedFailure = false;
                     for (int round = 0; round < rounds; round++)
@@ -391,11 +392,15 @@ namespace WorldWeaver.Editor.Assistant
                         // The model need not propose completion before the host can
                         // notice that the goal is already met. Periodic independent
                         // observation prevents long runs of needless further edits.
-                        if(Settings.UseNativeFunctions&&Settings.AutoVerify&&Settings.Power==AssistantPower.Deep&&batch.Success&&hasMutations&&!WaitingForEditor(answer)&&
-                            answer.Steps.Skip(answer.EditorReviews.LastOrDefault()?.StepCount??0).Count(s=>s.Success&&!SceneToolExecutor.IsReadOnlyTool(s.Tool)&&s.Tool!="remember_design")>=4)
+                        if(batch.Results.Any(s=>s.Success&&!SceneToolExecutor.IsReadOnlyTool(s.Tool)))observationRounds=0;
+                        else if(plan.actions.All(a=>SceneToolExecutor.IsReadOnlyTool(a.tool)))observationRounds++;
+                        bool stalledObservations=Settings.AllowAutonomousScripts&&!readOnlyRequest&&Settings.Mode==AssistantMode.Execute&&observationRounds>=6&&answer.EditorReviews.Count<12;
+                        bool changedEnough=batch.Success&&hasMutations&&answer.Steps.Skip(answer.EditorReviews.LastOrDefault()?.StepCount??0).Count(s=>s.Success&&!SceneToolExecutor.IsReadOnlyTool(s.Tool)&&s.Tool!="remember_design")>=4;
+                        if(Settings.UseNativeFunctions&&Settings.AutoVerify&&Settings.Power==AssistantPower.Deep&&!WaitingForEditor(answer)&&(changedEnough||stalledObservations))
                         {
                             var progress=await ReviewEditorResultAsync(answer,provider,operation.Token);
-                            if(progress.Passed&&VerifyTask(answer).All(check=>check.Passed))
+                            observationRounds=0;var progressChecks=VerifyTask(answer);
+                            if(progress.Passed&&progressChecks.All(check=>check.Passed))
                             {
                                 answer.IsError=false;answer.Status="Проверки пройдены";answer.Text="Изменения применены. "+ChatHistoryStore.Redact(progress.Evidence);answer.Task.ContinueAfterReload=false;Save();break;
                             }

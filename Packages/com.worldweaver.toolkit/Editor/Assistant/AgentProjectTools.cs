@@ -99,7 +99,7 @@ open_scene: target empty,args {path:Assets/...unity}. Standalone reviewed action
             }
             if(c.tool=="execute_editor_code"){if(!string.IsNullOrEmpty(c.target))resolve(c.target);}
             else if(new[]{"inspect_component","set_component","add_component","run_play_check","run_player_check"}.Contains(c.tool))resolve(c.target);else if(!string.IsNullOrEmpty(c.target))throw new ArgumentException("Project query/job requires empty target.");
-            if(c.tool=="inspect_component")Component(c,resolve);
+            if(c.tool=="inspect_component")ResolveType((string)c.args["type"]);
             if(c.tool=="add_component")ResolveType((string)c.args["type"]);
             if(c.tool=="set_component")
             {

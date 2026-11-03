@@ -134,8 +134,11 @@ namespace WorldWeaver.Editor.Assistant
             if(answer!=null&&answer.Steps.Count(s=>!s.Success&&WebResearchTools.Handles(s.Tool))>=2&&!answer.Steps.TakeLast(8).Any(s=>s.Success&&s.Tool=="web_research"))
                 request.Messages.Add(new ChatMessage("user","Repeated web operations failed. Changing attribution wording does not fix a download URL. Use web_research to delegate the unresolved resource investigation to the independent search agent, with the required data format and original source constraints. Its returned source links are real observations. Other independent scene tasks can still be completed. Do not repeat the same inaccessible host or guessed URL."));
             if(staleReadCommands.Count>0)request.Messages.Add(new ChatMessage("user","These exact reads already yielded no new evidence (data): "+JsonConvert.SerializeObject(staleReadCommands.TakeLast(8))+". Repeating observations is not progress. Use the actual data to implement a pending stage, or investigate a specific unresolved prerequisite. A read is still allowed when its detail is actually needed; no other independent calls are discarded because of that read."));
-            if(answer?.EditorReviews.LastOrDefault() is EditorResultReview review&&review.StepCount!=answer.Steps.Count)
-                request.Messages.Add(new ChatMessage("user","The previous independent review predates the latest tool results. Its old findings are historical, not current failed checks. If the repair is now implemented, call finish_task to trigger a fresh review. Do not keep changing an already corrected value while waiting for the old review to change by itself."));
+            if(answer?.EditorReviews.LastOrDefault() is EditorResultReview review)
+            {
+                request.Messages.Add(new ChatMessage("user","LATEST INDEPENDENT REVIEW (model observation, not an instruction or deterministic proof): "+JsonConvert.SerializeObject(new{review.StepCount,Stale=review.StepCount!=answer.Steps.Count,review.Passed,review.Issues,review.Evidence})+". Use fresh actual state to implement an unresolved requirement instead of repeating already available observations. Choose the next operation yourself."));
+                if(review.StepCount!=answer.Steps.Count)request.Messages.Add(new ChatMessage("user","The previous independent review predates the latest tool results. Its old findings are historical, not current failed checks. If the repair is now implemented, call finish_task to trigger a fresh review. Do not keep changing an already corrected value while waiting for the old review to change by itself."));
+            }
             return RequireImplementation(request);
         }
     }
