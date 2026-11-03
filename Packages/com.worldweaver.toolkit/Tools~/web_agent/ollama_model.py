@@ -28,7 +28,7 @@ class OllamaToolModel(Model):
             body["think"] = False
         if tools_to_call_from:
             body["tools"] = prepared["tools"]
-        response = self.session.post("http://127.0.0.1:11434/api/chat", json=body, timeout=120)
+        response = self.session.post("http://127.0.0.1:11434/api/chat", json=body, timeout=(10, 240 if self.model_id.endswith(":cloud") else 120))
         response.raise_for_status()
         raw = response.json()
         if raw.get("done_reason") in ("length", "max_tokens", "max_output_tokens"):

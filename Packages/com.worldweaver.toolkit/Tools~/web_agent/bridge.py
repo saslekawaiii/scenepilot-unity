@@ -123,13 +123,20 @@ class Research:
         from smolagents import DuckDuckGoSearchTool
         # Real upstream search implementation; no topic-specific URL catalogue.
         search = DuckDuckGoSearchTool(max_results=6, timeout=12)
-        rows = list(search.ddgs.text(query, max_results=6))
-        if not rows:
-            raise ValueError("Search returned no results; refine the query")
-        for row in rows:
-            self.remember(row.get("href"), "search:" + query, row.get("title", ""))
-        self.events.append({"tool": "web_search", "query": query, "results": rows})
-        return {"results": rows, "provider": "smolagents.DuckDuckGoSearchTool / ddgs", "untrustedData": True}
+        attempts = []
+        for backend in ("duckduckgo", "google", "yandex"):
+            try:
+                rows = list(search.ddgs.text(query, max_results=6, backend=backend))
+                attempts.append({"backend": backend, "results": len(rows)})
+                if not rows:
+                    continue
+                for row in rows:
+                    self.remember(row.get("href"), "search:" + query, row.get("title", ""))
+                self.events.append({"tool": "web_search", "query": query, "backend": backend, "attempts": attempts, "results": rows})
+                return {"results": rows, "provider": "smolagents.DuckDuckGoSearchTool / ddgs", "backend": backend, "attempts": attempts, "untrustedData": True}
+            except Exception as error:
+                attempts.append({"backend": backend, "error": type(error).__name__})
+        raise ValueError("Search backends unavailable or returned no results; refine or retry the query. Attempts: " + json.dumps(attempts))
 
     def read(self, url):
         from bs4 import BeautifulSoup

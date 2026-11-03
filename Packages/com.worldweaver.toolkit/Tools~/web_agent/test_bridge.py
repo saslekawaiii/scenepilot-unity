@@ -12,6 +12,24 @@ from ollama_model import OllamaToolModel
 
 
 class BridgeContracts(unittest.TestCase):
+    def test_search_retries_independent_backends_and_records_only_real_results(self):
+        with tempfile.TemporaryDirectory() as temp, patch("smolagents.DuckDuckGoSearchTool") as search:
+            search.return_value.ddgs.text.side_effect = [TimeoutError("unavailable"), [], [{"href": "https://example.com/actual-source", "title": "Actual source", "body": "Observation"}]]
+            worker = bridge.Research(Path(temp) / "sources.json")
+            result = worker.search("arbitrary resource query")
+            self.assertEqual(["duckduckgo", "google", "yandex"], [c.kwargs["backend"] for c in search.return_value.ddgs.text.call_args_list])
+            self.assertEqual("yandex", result["backend"]); self.assertEqual(3, len(result["attempts"]))
+            self.assertEqual(["https://example.com/actual-source"], list(worker.sources)); self.assertEqual(1, len(worker.events))
+            self.assertEqual(result["results"], worker.events[0]["results"])
+
+    def test_all_failed_search_backends_do_not_invent_a_source(self):
+        with tempfile.TemporaryDirectory() as temp, patch("smolagents.DuckDuckGoSearchTool") as search:
+            search.return_value.ddgs.text.side_effect = [TimeoutError("unavailable"), [], TimeoutError("unavailable")]
+            worker = bridge.Research(Path(temp) / "sources.json")
+            with self.assertRaisesRegex(ValueError, "Search backends unavailable"):
+                worker.search("arbitrary resource query")
+            self.assertEqual({}, worker.sources); self.assertEqual([], worker.events)
+
     def test_data_index_preserves_alternatives_outside_the_last_large_tile_group(self):
         sources = {"https://example.com/small/global.img": {"observedUtc": 1}}
         sources.update({f"https://example.com/large/tile{i}.img": {"observedUtc": i + 2} for i in range(100)})
