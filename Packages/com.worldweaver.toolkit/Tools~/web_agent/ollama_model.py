@@ -17,12 +17,50 @@ class OllamaToolModel(Model):
         self.sequence = 0
         self.truncated_calls = 0
         self.recovered_calls = 0
+        self.initial_messages = None
+        self.native_turns = []
+        self.unprocessed_response = None
+
+    def record_native_turn(self, message):
+        calls = [{"id": call.id, "type": "function", "function": {
+            "name": call.function.name, "arguments": call.function.arguments}}
+                 for call in message.tool_calls]
+        native = {"role": "assistant", "content": message.content or "", "tool_calls": calls}
+        thinking = (message.raw or {}).get("message", {}).get("thinking")
+        if isinstance(thinking, str) and thinking:
+            native["thinking"] = thinking
+        self.native_turns.append([native])
+        self.unprocessed_response = None
+
+    def record_native_result(self, call_id, name, content):
+        self.native_turns[-1].append({"role": "tool", "tool_call_id": call_id,
+                                    "tool_name": name, "content": content})
+
+    def transport_messages(self, prepared):
+        instructions = [m for m in prepared if m["role"] in ("system", "developer")]
+        dialogue = [m for m in prepared if m["role"] not in ("system", "developer")]
+        if self.initial_messages is None:
+            self.initial_messages = instructions + dialogue
+        if not self.native_turns:
+            return instructions + dialogue
+        if self.unprocessed_response is not None:
+            message = self.unprocessed_response
+            native = {"role": "assistant", "content": message.content or ""}
+            thinking = (message.raw or {}).get("message", {}).get("thinking")
+            if isinstance(thinking, str) and thinking:
+                native["thinking"] = thinking
+            self.native_turns.append([native, {"role": "user", "content":
+                "The preceding response did not yield a valid executable tool call. No tool result was produced. Continue with an advertised native function."}])
+            self.unprocessed_response = None
+        # Drop whole old exchanges, never half a call/result or a prefix of its
+        # continuation state. Upstream ActionStep audit remains unchanged.
+        while len(self.native_turns) > 2 and len(json.dumps(self.native_turns)) > 90000:
+            self.native_turns.pop(0)
+        return self.initial_messages + [m for turn in self.native_turns for m in turn]
 
     def generate(self, messages, stop_sequences=None, tools_to_call_from=None, **kwargs):
         prepared = self._prepare_completion_kwargs(messages=messages, tools_to_call_from=tools_to_call_from, stop_sequences=None)
-        instructions = [m for m in prepared["messages"] if m["role"] in ("system", "developer")]
-        dialogue = [m for m in prepared["messages"] if m["role"] not in ("system", "developer")]
-        body = {"model": self.model_id, "messages": instructions + dialogue, "stream": False,
+        body = {"model": self.model_id, "messages": self.transport_messages(prepared["messages"]), "stream": False,
                 "options": {"temperature": 0.1, "num_predict": 8192 if self.model_id.endswith(":cloud") else 3000, "num_ctx": 32768}}
         if not self.model_id.endswith(":cloud"):
             body["think"] = False
@@ -60,5 +98,7 @@ class OllamaToolModel(Model):
                 self.recovered_calls += 1
             except (ValueError, KeyError, TypeError, AttributeError):
                 pass
-        return ChatMessage(role="assistant", content=message.get("content", ""), tool_calls=calls or None, raw=raw,
-                           token_usage=TokenUsage(input_tokens=raw.get("prompt_eval_count", 0), output_tokens=raw.get("eval_count", 0)))
+        result = ChatMessage(role="assistant", content=message.get("content", ""), tool_calls=calls or None, raw=raw,
+                             token_usage=TokenUsage(input_tokens=raw.get("prompt_eval_count", 0), output_tokens=raw.get("eval_count", 0)))
+        self.unprocessed_response = result
+        return result

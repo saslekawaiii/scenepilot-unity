@@ -12,6 +12,50 @@ from ollama_model import OllamaToolModel
 
 
 class BridgeContracts(unittest.TestCase):
+    def run_native_upstream_loop(self, fail_first=False):
+        from smolagents import Tool
+        from native_agent import NativeOllamaToolCallingAgent
+        class Probe(Tool):
+            name = "probe"
+            description = "Read an actual fixture observation."
+            inputs = {"query": {"type": "string", "description": "Fixture query"}}
+            output_type = "string"
+            def forward(self, query):
+                if fail_first and query == "first":
+                    raise ValueError("actual fixture tool failure")
+                return json.dumps({"observed": query})
+        def response(name, args, state):
+            return {"message": {"role": "assistant", "content": "", "thinking": state,
+                    "tool_calls": [{"function": {"name": name, "arguments": args}}]}}
+        model = OllamaToolModel("fixture:cloud")
+        with patch.object(model.session, "post") as post:
+            post.return_value.json.side_effect = [response("probe", {"query": "first"}, "OPAQUE_STATE_ONE"), response("probe", {"query": "second"}, "OPAQUE_STATE_TWO"), response("final_answer", {"answer": "done"}, "OPAQUE_STATE_THREE")]
+            agent = NativeOllamaToolCallingAgent(tools=[Probe()], model=model, max_steps=4, verbosity_level=0, max_tool_threads=1)
+            result = agent.run("Inspect two independent observations and report completion.")
+        self.assertEqual("done", result)
+        return [call.kwargs["json"] for call in post.call_args_list]
+
+    def test_upstream_agent_replays_native_calls_results_and_opaque_state(self):
+        bodies = self.run_native_upstream_loop()
+        second = bodies[1]["messages"]; third = bodies[2]["messages"]
+        assistant = next(m for m in second if m["role"] == "assistant")
+        tool = next(m for m in second if m["role"] == "tool")
+        self.assertEqual("OPAQUE_STATE_ONE", assistant["thinking"])
+        self.assertEqual(assistant["tool_calls"][0]["id"], tool["tool_call_id"])
+        self.assertEqual({"observed": "first"}, json.loads(tool["content"]))
+        self.assertEqual(["OPAQUE_STATE_ONE", "OPAQUE_STATE_TWO"], [m["thinking"] for m in third if m["role"] == "assistant"])
+        self.assertEqual(["first", "second"], [json.loads(m["content"])["observed"] for m in third if m["role"] == "tool"])
+        self.assertFalse(any("Calling tools:" in str(m.get("content", "")) for m in third))
+
+    def test_upstream_tool_failure_is_correlated_without_inventing_success(self):
+        bodies = self.run_native_upstream_loop(fail_first=True)
+        failed = next(m for m in bodies[1]["messages"] if m["role"] == "tool")
+        error = json.loads(failed["content"])
+        self.assertFalse(error["success"]); self.assertTrue(error["resultUnavailable"])
+        self.assertIn("actual fixture tool failure", error["error"])
+        tools = [m for m in bodies[2]["messages"] if m["role"] == "tool"]
+        self.assertEqual(2, len(tools)); self.assertEqual({"observed": "second"}, json.loads(tools[-1]["content"]))
+
     def test_search_retries_independent_backends_and_records_only_real_results(self):
         with tempfile.TemporaryDirectory() as temp, patch("smolagents.DuckDuckGoSearchTool") as search:
             search.return_value.ddgs.text.side_effect = [TimeoutError("unavailable"), [], [{"href": "https://example.com/actual-source", "title": "Actual source", "body": "Observation"}]]
