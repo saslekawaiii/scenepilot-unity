@@ -24,6 +24,7 @@ namespace WorldWeaver.Editor.Assistant
         public float LastRotationX,LastRotationY,LastRotationZ,LastRotationW;
         public int Samples;
         public bool MeasurementStarted;
+        public bool RequireRelaxedArms;
         public bool TestCancelled;
         public string ResultReceivedUtc, SceneScopeId;
     }

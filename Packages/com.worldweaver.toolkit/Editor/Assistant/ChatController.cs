@@ -240,14 +240,15 @@ namespace WorldWeaver.Editor.Assistant
                             plan = EditorPlan.Parse(parsedResponse);
                             if(Settings.UseNativeFunctions&&plan.actions.Count==1&&IsConfiguration(plan.actions[0].tool)&&ReadFingerprint(plan.actions[0])==lastAppliedConfiguration)
                                 throw new ArgumentException("This exact configuration already succeeded and no later mutation has intervened. Repeating it does not advance the task. Inspect the current result or call finish_task to request a FRESH review after the repair; old review failures are historical.");
-                            if(Settings.UseNativeFunctions&&plan.actions.Count>1&&(plan.actions.Count>8||plan.actions.Any(a=>!SceneToolExecutor.IsReadOnlyTool(a.tool)||WorldMaterialTools.IsAsync(a.tool))))throw new ArgumentException("Native batches require at most eight independent synchronous read-only observations; mutations are standalone.");
+                            if(Settings.UseNativeFunctions&&plan.actions.Count>1&&(plan.actions.Count>8||plan.actions.Any(a=>!SceneToolExecutor.IsReadOnlyTool(a.tool))))throw new ArgumentException("Native batches require at most eight independent read-only observations; mutations are standalone.");
                             if(!Settings.AllowEditorCode&&plan.actions.Any(a=>a.tool=="execute_editor_code"))throw new ArgumentException("Autonomous Editor C# is disabled; use reviewed script tools.");
                             ValidatePlan(plan, SceneSaveRequested(text), readOnlyRequest);if(!readOnlyRequest)AgentTaskSchema.Validate(answer.Task,plan);
                             foreach(var action in plan.actions)
                                 if(action.tool.StartsWith("create_",StringComparison.Ordinal)&&string.IsNullOrWhiteSpace(action.name)&&appliedUnnamedCreations.Contains(action.tool+"\n"+action.args.ToString(Formatting.None)))
                                     throw new ArgumentException("This identical unnamed creation already succeeded in this task. Reuse its real target from tool results and perform the missing operation. If another identical object is actually required, explicitly give it a distinct meaningful name. Do not repeat this action.");
-                            totalActions += plan.actions.Count;
-                            if (totalActions > 128) throw new ArgumentException("Достигнут лимит 128 инструментов. Выполненные этапы сохранены; можно продолжить задачу.");
+                            int plannedCost=Settings.UseNativeFunctions?plan.actions.Count(a=>!SceneToolExecutor.IsReadOnlyTool(a.tool)):plan.actions.Count;
+                            if(totalActions+plannedCost>128)throw new ArgumentException("Достигнут лимит 128 изменений. Выполненные этапы сохранены; можно продолжить задачу.");
+                            totalActions+=plannedCost;
                             attempt.Accepted = true;
                             // A valid fresh replacement resolves a format-only failure; prior failed tools/checks remain unresolved.
                             if(!answer.Steps.Any(s=>!s.Success)&&answer.Task?.Checks.Any(c=>!c.Passed)!=true)unresolvedFailure=false;

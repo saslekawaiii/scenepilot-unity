@@ -8,6 +8,40 @@ namespace WorldWeaver.Tests
 {
     public sealed class WebAgentContractTests
     {
+        sealed class ReadBudgetProvider:ILLMProvider
+        {
+            public int Calls;
+            public System.Threading.Tasks.Task<CompletionResult> CompleteAsync(CompletionRequest request,System.Threading.CancellationToken token)
+            {
+                Calls++;var plan=new EditorPlan{complete=false};
+                if(Calls<=17)for(int i=0;i<8;i++)plan.actions.Add(new EditorCommand{tool="find_scene_objects",args=new JObject{["query"]="budget_observation_"+i}});
+                else if(Calls==18)plan.actions.Add(new EditorCommand{tool="create_node",name="ReadBudgetGoal"});else{plan.complete=true;plan.reply="Готово";}
+                return System.Threading.Tasks.Task.FromResult(new CompletionResult{Text=Newtonsoft.Json.JsonConvert.SerializeObject(plan)});
+            }
+            public System.Threading.Tasks.Task<bool> HealthAsync(System.Threading.CancellationToken token)=>System.Threading.Tasks.Task.FromResult(true);
+            public void Dispose(){}
+        }
+        [Test] public async System.Threading.Tasks.Task NativeObservationsCannotExhaustTheBudgetNeededForTheActualChange()
+        {
+            UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.EmptyScene,UnityEditor.SceneManagement.NewSceneMode.Single);var provider=new ReadBudgetProvider();
+            try
+            {
+                using(var controller=new ChatController(_=>provider,"UserSettings/ReadBudget-"+Guid.NewGuid().ToString("N")))
+                {
+                    controller.Settings.UseNativeFunctions=true;controller.Settings.Power=AssistantPower.Deep;controller.Settings.AutoVerify=false;controller.Settings.UseSkills=false;
+                    await controller.SendAsync("Создай пустой узел ReadBudgetGoal.");Assert.IsTrue(UnityEngine.GameObject.Find("ReadBudgetGoal"));Assert.IsFalse(controller.Current.Messages.Last().IsError,controller.Current.Messages.Last().Text);Assert.GreaterOrEqual(controller.Current.Messages.Last().Steps.Count,137);
+                }
+            }
+            finally{UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.EmptyScene,UnityEditor.SceneManagement.NewSceneMode.Single);}
+        }
+        [Test] public void ImportedArtifactPathSurvivesManyLaterReadsWithoutInventingFailedOutputs()
+        {
+            var steps=new System.Collections.Generic.List<EditorCommandResult>{new EditorCommandResult{Tool="model_import",Success=true,Summary="{\"model_path\":\"Assets/Imported/Observed.fbx\",\"cacheHit\":true}"}};
+            for(int i=0;i<100;i++)steps.Add(new EditorCommandResult{Tool="inspect_object",Success=true,Summary="{}"});
+            steps.Add(new EditorCommandResult{Tool="asset_download",Success=false,Summary="{\"path\":\"Assets/NotActuallyDownloaded.img\"}"});
+            var method=typeof(ChatController).GetMethod("ArtifactLedger",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic);var ledger=(JArray)method.Invoke(null,new object[]{steps});
+            Assert.AreEqual(1,ledger.Count);Assert.AreEqual(0,(int)ledger[0]["index"]);Assert.AreEqual("Assets/Imported/Observed.fbx",(string)ledger[0]["observedOutput"]["model_path"]);
+        }
         [Test] public void RuntimeNpcRoutesDoNotInheritEditorReasoningBudget()
         {
             var source=UnityEngine.ScriptableObject.CreateInstance<ModelProfile>();source.Model="route-fixture-"+Guid.NewGuid().ToString("N");source.EnableCloudReasoning=true;var created=new System.Collections.Generic.List<string>();

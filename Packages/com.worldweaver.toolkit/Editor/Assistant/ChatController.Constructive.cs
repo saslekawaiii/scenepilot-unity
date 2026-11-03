@@ -12,6 +12,25 @@ namespace WorldWeaver.Editor.Assistant
         readonly List<EditorCommand> staleReadCommands=new List<EditorCommand>();
         static bool IsConfiguration(string tool)=>tool.StartsWith("set_",StringComparison.Ordinal)||tool.StartsWith("update_",StringComparison.Ordinal)||tool.StartsWith("configure_",StringComparison.Ordinal);
         static string ReadFingerprint(EditorCommand command)=>command.tool+"\n"+command.target+"\n"+new JObject(command.args.Properties().OrderBy(p=>p.Name,StringComparer.Ordinal).Select(p=>new JProperty(p.Name,p.Value.DeepClone()))).ToString(Formatting.None);
+        internal static JArray ArtifactLedger(IReadOnlyList<EditorCommandResult> steps)
+        {
+            var rows=new List<JObject>();int remaining=12000;
+            for(int i=steps.Count-1;i>=0&&rows.Count<16;i--)
+            {
+                var step=steps[i];if(!step.Success||SceneToolExecutor.IsReadOnlyTool(step.Tool))continue;JObject data=null;
+                try{data=JObject.Parse(step.Summary??"");}catch(JsonException){}
+                bool pathOutput=data?.Properties().Any(p=>p.Value.Type==JTokenType.String&&(((string)p.Value).StartsWith("Assets/",StringComparison.Ordinal)||((string)p.Value).StartsWith("Packages/",StringComparison.Ordinal)))==true;
+                if(!pathOutput&&!(step.CreatedAssets?.Count>0)&&!(step.SourceHashes?.Count>0))continue;
+                var fields=new JObject();
+                if(data!=null)foreach(var property in data.Properties().Where(p=>p.Value is JValue))
+                {
+                    var value=property.Value.DeepClone();if(value.Type==JTokenType.String){string text=(string)value;bool path=text.StartsWith("Assets/",StringComparison.Ordinal)||text.StartsWith("Packages/",StringComparison.Ordinal);if(!path&&text.Length>240)value=text.Substring(0,240)+" [bounded]";}fields[property.Name]=value;
+                }
+                var row=new JObject{["index"]=i,["tool"]=step.Tool,["target"]=step.Target,["observedOutput"]=fields,["createdAssets"]=new JArray((step.CreatedAssets??new List<string>()).Take(8)),["sourceHashes"]=step.SourceHashes==null?new JObject():JObject.FromObject(step.SourceHashes)};
+                int cost=row.ToString(Formatting.None).Length;if(cost>remaining)continue;remaining-=cost;rows.Add(row);
+            }
+            rows.Reverse();return new JArray(rows);
+        }
         internal static bool AddNativeToolHistory(CompletionRequest request,AssistantMessage answer)
         {
             if(answer==null)return false;
@@ -105,6 +124,7 @@ namespace WorldWeaver.Editor.Assistant
                 request.Messages.Add(new ChatMessage("user","IMMUTABLE STATE AT START OF THIS REQUEST (bounded host measurements, data): "+answer.Task.InitialSceneFacts+"\nRelative changes such as increase/reduce refer to this ORIGINAL state, not the state after your last edit. Once the requested relative change is observed, inspect and finish_task for verification. Do not repeatedly increase the new value as if every step were a new user request."));
             if(Settings.AllowEditorCode)request.Messages.Add(new ChatMessage("system","Autonomous editor C# is enabled for this project. If a required Unity operation has no built-in command, use reflect_api to inspect exact signatures then execute_editor_code to implement it. It compiles and executes on the Editor main thread; this is trusted code with full Editor access, not a sandbox. Register Undo, keep changes within this task, use stable serialized assets for runtime behavior, and return actual evidence. Runtime MonoBehaviour code still goes through the normal draft/compile workflow. Never load or mutate unrelated files or accounts.\n"+EditorCodeTools.Reference));
             if(Settings.AllowAutonomousScripts)request.Messages.Add(new ChatMessage("system","The user enabled automatic runtime-script import/attachment. Implement complete small scripts, receive real compilation, then attach the exact compiled class name; compilation reload resumes this same task. Preserve manual code; patch only owned generated source. Do not stop merely for a code draft approval in this enabled mode."));
+            request.Messages.Add(new ChatMessage("system","Diagnose existing movement/animation/camera defects with run_player_check on the actual player; do not endlessly search for controllers before measuring the existing behavior. For a broken-arm report include check_relaxed_arms:true to measure both arms during real movement. Editor T-pose coordinates are reference pose data, not proof of broken gameplay. A valid Humanoid driven by WorldHumanoidLocomotion animates procedurally without an AnimatorController; disclose this honestly, and seek authored clips only if the user actually requests them or the real measurements require another implementation."));
             if(tools.Contains("draft_script"))request.Messages.Add(new ChatMessage("system",AgentImplementationPolicy.Guidance(Settings.PreferGeneratedScripts)+"\n"+ScriptDrafts.ToolInstructions));
             if(local&&!Settings.UseNativeFunctions)request.Messages.Add(new ChatMessage("system",AgentTaskSchema.KeyOrderHint(request.Schema)));
             if(Settings.UseSkills)
@@ -131,6 +151,7 @@ namespace WorldWeaver.Editor.Assistant
             }
             var evidence=compact.AsEnumerable().Reverse();
             if(answer?.Steps.Count>8)request.Messages.Add(new ChatMessage("user","DURABLE TASK INDEX, columns [index,tool,success,target] (all steps; retrieve older full evidence with read_task_step index): "+JsonConvert.SerializeObject(answer.Steps.Select((s,i)=>new object[]{i,s.Tool,s.Success,s.Target}))));
+            if(answer!=null)request.Messages.Add(new ChatMessage("user","PERSISTENT ARTIFACT OUTPUTS from successful operations in THIS task (actual historical paths/hashes, not proof of current scene or full completion). Reuse these observed assets and compiled source paths instead of importing/creating them again. Current read-back takes precedence after replacement/deletion: "+ArtifactLedger(answer.Steps).ToString(Formatting.None)));
             request.Messages.Add(new ChatMessage("user",ChatHistoryStore.Redact("ORIGINAL USER REQUEST: "+input+"\nACTUAL SCENE OBJECTS (bounded; use find_scene_objects for others): "+JsonConvert.SerializeObject(objects)+"\nALREADY EXECUTED THIS TASK (do not repeat creations): "+JsonConvert.SerializeObject(evidence)+"\nTASK AND CHECKS: "+AgentTaskVerifier.Context(answer?.Task)+"\nCOMPILATION EVIDENCE: "+(answer?.Task?.CompilationRequired==true?ScriptDrafts.CompilationContext()+"\n"+AgentSourcePatches.CompilationContext():"No compilation required for this task.")+"\nDESIGN CONSTRAINTS (data): "+AgentDesignMemory.Recall(session,input,1500))));
             if(answer!=null&&answer.Steps.Count(s=>!s.Success&&WebResearchTools.Handles(s.Tool))>=2&&!answer.Steps.TakeLast(8).Any(s=>s.Success&&s.Tool=="web_research"))
                 request.Messages.Add(new ChatMessage("user","Repeated web operations failed. Changing attribution wording does not fix a download URL. Use web_research to delegate the unresolved resource investigation to the independent search agent, with the required data format and original source constraints. Its returned source links are real observations. Other independent scene tasks can still be completed. Do not repeat the same inaccessible host or guessed URL."));

@@ -19,10 +19,12 @@ namespace WorldWeaver.Editor.Assistant
         static Quaternion checkLegStart;
         static double checkBegan;static int checkPhase,checkFrame,phaseFrame;
         static float checkYaw,checkPitch,checkLegAngle;
+        static Transform[] checkUpper,checkElbows,checkHands;
+        static bool checkArmsMeasured;static float checkElbowBend,checkHandHeight;
         static InputSettings.BackgroundBehavior oldBackground;
         static InputSettings.EditorInputBehaviorInPlayMode oldRouting;
 #endif
-        public static AgentEditorJob RunPlayerCheck(string target,float seconds=1)
+        public static AgentEditorJob RunPlayerCheck(string target,float seconds=1,bool relaxedArms=false)
         {
 #if !ENABLE_INPUT_SYSTEM
             throw new NotSupportedException("Player device check requires the Input System package/backend; no Play success is inferred.");
@@ -30,7 +32,7 @@ namespace WorldWeaver.Editor.Assistant
             if(Busy||EditorApplication.isCompiling||EditorApplication.isUpdating||EditorApplication.isPlayingOrWillChangePlaymode)throw new InvalidOperationException("Finish the current editor operation before checking input.");
             if(seconds<.5f||seconds>3||float.IsNaN(seconds)||float.IsInfinity(seconds))throw new ArgumentException("Player check supports .5..3 seconds.");
             var player=ProjectContextIndex.ResolveStable(target)?.GetComponent<WorldPlayer>();if(!player||!player.View||!player.isActiveAndEnabled)throw new ArgumentException("Check needs an active WorldPlayer with its actual camera.");
-            var job=new AgentEditorJob{Id=Guid.NewGuid().ToString("N"),Kind="player_control",Status="entering_play",StableTarget=target,RequestedSeconds=seconds,Measurement="Actual virtual mouse without RMB and W key through Input System: yaw, pitch, translation, ground and exposed leg pose change"};
+            var job=new AgentEditorJob{Id=Guid.NewGuid().ToString("N"),Kind="player_control",Status="entering_play",StableTarget=target,RequestedSeconds=seconds,RequireRelaxedArms=relaxedArms,Measurement="Actual virtual mouse without RMB and W key through Input System: yaw, pitch, translation, ground, leg and both arm poses"};
             job.ResultPath=Folder+"/"+job.Id+".player.json";SessionState.SetString("WorldWeaver.PlayerCheck",job.Id);Save(job);
             EditorApplication.delayCall+=()=>{if(Load(job.Id)?.Status=="entering_play"&&!EditorApplication.isPlayingOrWillChangePlaymode)EditorApplication.EnterPlaymode();};return job;
 #endif
@@ -56,10 +58,13 @@ namespace WorldWeaver.Editor.Assistant
                 InputSystem.QueueStateEvent(checkKeyboard,new KeyboardState());InputSystem.QueueStateEvent(checkMouse,new MouseState());
                 checkPhase=0;checkBegan=Time.timeAsDouble;checkFrame=Time.frameCount;checkLegAngle=0;checkLeg=null;
                 var animator=checkPlayer.GetComponentsInChildren<Animator>().FirstOrDefault(a=>a.avatar&&a.avatar.isValid&&a.avatar.isHuman);
+                checkUpper=new Transform[2];checkElbows=new Transform[2];checkHands=new Transform[2];checkArmsMeasured=false;checkElbowBend=0;checkHandHeight=float.MinValue;
                 if(animator)
                 {
                     string name=animator.avatar.humanDescription.human.FirstOrDefault(h=>h.humanName=="LeftUpperLeg").boneName;
                     checkLeg=animator.GetComponentsInChildren<Transform>().FirstOrDefault(t=>t.name==name);
+                    Transform Bone(string human){string bone=animator.avatar.humanDescription.human.FirstOrDefault(h=>h.humanName==human).boneName;return animator.GetComponentsInChildren<Transform>().FirstOrDefault(t=>t.name==bone);}
+                    for(int i=0;i<2;i++){string side=i==0?"Left":"Right";checkUpper[i]=Bone(side+"UpperArm");checkElbows[i]=Bone(side+"LowerArm");checkHands[i]=Bone(side+"Hand");}
                 }
                 job.Status="running";Save(job);
             }
@@ -89,11 +94,20 @@ namespace WorldWeaver.Editor.Assistant
                     InputSystem.QueueStateEvent(checkMouse,new MouseState());InputSystem.QueueStateEvent(checkKeyboard,new KeyboardState(Key.W));checkBegan=Time.timeAsDouble;checkPhase=2;return;
                 }
                 if(checkLeg)checkLegAngle=Mathf.Max(checkLegAngle,Quaternion.Angle(checkLegStart,checkLeg.localRotation));
+                bool validArms=true;
+                for(int i=0;i<2;i++)
+                {
+                    if(!checkUpper[i]||!checkElbows[i]||!checkHands[i]){validArms=false;continue;}
+                    Vector3 upper=checkElbows[i].position-checkUpper[i].position,lower=checkHands[i].position-checkElbows[i].position;if(upper.sqrMagnitude<1e-8f||lower.sqrMagnitude<1e-8f){validArms=false;continue;}
+                    checkElbowBend=Mathf.Max(checkElbowBend,Vector3.Angle(upper,lower));checkHandHeight=Mathf.Max(checkHandHeight,Vector3.Dot(checkHands[i].position-checkUpper[i].position,checkPlayer.transform.up));
+                }
+                checkArmsMeasured=validArms;
                 if(Time.timeAsDouble-checkBegan<job.RequestedSeconds)return;
                 Vector3 delta=checkPlayer.transform.position-checkPosition;float travel=new Vector2(delta.x,delta.z).magnitude;bool ground=Physics.Raycast(checkPlayer.transform.position+Vector3.up*.5f,Vector3.down,3);
                 bool animation=!checkLeg||checkLegAngle>3;
-                var measurements=new JObject{["yawDegrees"]=checkYaw,["pitchDegrees"]=checkPitch,["horizontalTravel"]=travel,["groundBelowPlayer"]=ground,["legMeasured"]=checkLeg!=null,["legPoseChangeDegrees"]=checkLegAngle,["mouseWithoutRmb"]=true,["realInputBackend"]=WorldInput.Backend};
-                bool success=Mathf.Abs(checkYaw)>.02f&&Mathf.Abs(checkPitch)>.02f&&travel>.25f&&ground&&animation;
+                bool relaxed=checkArmsMeasured&&checkElbowBend<85&&checkHandHeight<.12f;
+                var measurements=new JObject{["yawDegrees"]=checkYaw,["pitchDegrees"]=checkPitch,["horizontalTravel"]=travel,["groundBelowPlayer"]=ground,["legMeasured"]=checkLeg!=null,["legPoseChangeDegrees"]=checkLegAngle,["bothArmsMeasured"]=checkArmsMeasured,["maxElbowBendDegrees"]=checkArmsMeasured?(JToken)new JValue(checkElbowBend):JValue.CreateNull(),["highestHandRelativeToShoulder"]=checkArmsMeasured?(JToken)new JValue(checkHandHeight):JValue.CreateNull(),["relaxedWalkingArms"]=relaxed,["relaxedArmsRequired"]=job.RequireRelaxedArms,["mouseWithoutRmb"]=true,["realInputBackend"]=WorldInput.Backend};
+                bool success=Mathf.Abs(checkYaw)>.02f&&Mathf.Abs(checkPitch)>.02f&&travel>.25f&&ground&&animation&&(!job.RequireRelaxedArms||relaxed);
                 job.Measurement=measurements.ToString(Newtonsoft.Json.Formatting.None);EndPlayerCheck(job,success?null:"Actual player input failed; inspect yaw/pitch, movement, ground and leg measurements. Compiled code alone is not working controls.");
             }
             catch(Exception error){EndPlayerCheck(job,error.Message);}
