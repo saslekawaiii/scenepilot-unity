@@ -29,7 +29,16 @@ public static class AgentRegressionSuiteRunner
     static string Package=>UnityEditor.PackageManager.PackageInfo.FindForAssembly(typeof(WorldPlayer).Assembly).resolvedPath;
     static string Hash(byte[] value){using(var sha=SHA256.Create())return BitConverter.ToString(sha.ComputeHash(value)).Replace("-","").ToLowerInvariant();}
     static string PackageDigest()=>Hash(System.Text.Encoding.UTF8.GetBytes(string.Join("\n",Directory.GetFiles(Package,"*",SearchOption.AllDirectories).Where(p=>!p.EndsWith(".DS_Store")&&!p.Contains("__pycache__")).OrderBy(p=>p,StringComparer.Ordinal).Select(p=>p.Substring(Package.Length+1)+":"+Hash(File.ReadAllBytes(p))))));
-    static string SceneDigest()=>Hash(System.Text.Encoding.UTF8.GetBytes(ProjectContextIndex.ListScene(new JObject{["limit"]=100}).ToString(Formatting.None)));
+    static string SceneDigest()
+    {
+        var all=new JArray();int offset=0;
+        while(true)
+        {
+            var page=ProjectContextIndex.ListScene(new JObject{["limit"]=100,["offset"]=offset});foreach(var row in (JArray)page["objects"])all.Add(row.DeepClone());
+            if(page["nextOffset"].Type==JTokenType.Null)break;int next=(int)page["nextOffset"];if(next<=offset)throw new InvalidOperationException("Scene inventory cursor did not advance");offset=next;
+        }
+        return Hash(System.Text.Encoding.UTF8.GetBytes(all.ToString(Formatting.None)));
+    }
     public static void Run()
     {
         if(!Application.isBatchMode||Environment.GetEnvironmentVariable("WW_AGENT_ACCEPTANCE")!="1"||Path.GetFullPath(Directory.GetParent(Application.dataPath).FullName)!=Path.GetFullPath(Environment.GetEnvironmentVariable("WW_AGENT_PROJECT")??""))throw new InvalidOperationException("Explicit isolated fixture required");
