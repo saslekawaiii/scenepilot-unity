@@ -72,6 +72,23 @@ namespace WorldWeaver.Tests
             foreach(string tool in new[]{"run_player_check","run_tests","run_play_check","compile_scripts","build_player"})Assert.IsFalse((bool)method.Invoke(null,new object[]{new EditorCommandResult{Tool=tool,Success=true}}),tool);
             Assert.IsTrue((bool)method.Invoke(null,new object[]{new EditorCommandResult{Tool="set_component",Success=true}}));
         }
+        [Test] public async Task StagePlanCannotGrantSceneSaveAuthorizationToItsOwnUnrequestedStep()
+        {
+            EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
+            foreach(var item in new[]{("Create lights and preserve existing content",false),("Create lights and save the scene",true)})
+            {
+                var provider=new ReviewProvider();string folder=Path.Combine("UserSettings","PolicyFixture-"+Guid.NewGuid().ToString("N"));using(var controller=new ChatController(_=>provider,folder))
+                {
+                    var answer=new AssistantMessage{Task=new AgentTaskState{OriginalRequest=item.Item1}};answer.Task.Approach.Add("Preserve content and save the scene");
+                    var method=typeof(ChatController).GetMethod("ReviewEditorResultAsync",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic);await (Task<EditorResultReview>)method.Invoke(controller,new object[]{answer,provider,CancellationToken.None,0});
+                    var payload=JObject.Parse(provider.Seen.Messages.Last().Content);Assert.AreEqual(item.Item2,(bool)payload["HostOperationPolicy"]["SceneSaveAuthorized"]);Assert.AreEqual(item.Item1,(string)payload["FullUserScope"]);Assert.IsTrue((bool)payload["HostOperationPolicy"]["StageIsTentative"]);
+                }
+            }
+        }
+        sealed class ReviewProvider:ILLMProvider
+        {
+            public CompletionRequest Seen;public Task<CompletionResult> CompleteAsync(CompletionRequest request,CancellationToken token){Seen=request;return Task.FromResult(new CompletionResult{Text="{\"passed\":true,\"issues\":[],\"evidence\":\"fixture\"}"});}public Task<bool> HealthAsync(CancellationToken token)=>Task.FromResult(true);public void Dispose(){}
+        }
         [Test] public void NativeVisionPlannerActuallyReceivesItsCapturedImage()
         {
             string folder=Path.Combine("UserSettings","NativeVision-"+Guid.NewGuid().ToString("N"));using(var controller=new ChatController(_=>new ObserverProvider(),folder))
