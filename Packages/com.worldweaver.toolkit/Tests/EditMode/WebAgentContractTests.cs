@@ -8,6 +8,22 @@ namespace WorldWeaver.Tests
 {
     public sealed class WebAgentContractTests
     {
+        [Test] public void NativeSchemaDeclaredArraysDecodeProviderWrappersWithoutChangingTextArguments()
+        {
+            var schema=EditorPlan.Schema(nativeFunctions:true);
+            JObject Call(string tool,JObject args)=>new JObject{["tool_calls"]=new JArray(new JObject{["function"]=new JObject{["name"]=tool,["arguments"]=args}})};
+            var original=new JObject{["names"]="[\"read_script\",\"set_component\"]"};
+            var plan=EditorPlan.Parse(AgentFunctionProtocol.Normalize(Call("discover_tools",original),schema));
+            Assert.AreEqual(JTokenType.Array,plan.actions[0].args["names"].Type);Assert.AreEqual("set_component",(string)plan.actions[0].args["names"][1]);Assert.AreEqual(JTokenType.String,original["names"].Type,"Raw wire data remains unchanged for audit");
+            string code="// [\"this is source text, never parsed as data\"]\npublic class Probe:UnityEngine.MonoBehaviour{}";
+            plan=EditorPlan.Parse(AgentFunctionProtocol.Normalize(Call("draft_script",new JObject{["name"]="Probe",["code"]=code}),schema));Assert.AreEqual(code,(string)plan.actions[0].args["code"]);
+        }
+        [Test] public void ReadBatchReportsTheExactUnavailableFunctionInsteadOfAnUnrelatedMutationError()
+        {
+            var schema=EditorPlan.Schema(allowedTools:new System.Collections.Generic.HashSet<string>{"inspect_object"},nativeFunctions:true);
+            var calls=new JArray(new JObject{["function"]=new JObject{["name"]="inspect_object",["arguments"]=new JObject{["target"]="owned:original"}}},new JObject{["function"]=new JObject{["name"]="read_script",["arguments"]=new JObject{["path"]="Assets/Existing.cs"}}});
+            var error=Assert.Throws<ProviderException>(()=>AgentFunctionProtocol.Normalize(new JObject{["tool_calls"]=calls},schema));Assert.That(error.Message,Does.Contain("not advertised in this turn: read_script"));Assert.That(error.Message,Does.Contain("No action executed"));
+        }
         static bool NativeHistory(CompletionRequest request,AssistantMessage answer)=>(bool)typeof(ChatController).GetMethod("AddNativeToolHistory",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic).Invoke(null,new object[]{request,answer});
         [Test] public void NativeHistoryBindsActualObservationToItsOriginalCallAndKeepsLegacyHistoryUninvented()
         {
