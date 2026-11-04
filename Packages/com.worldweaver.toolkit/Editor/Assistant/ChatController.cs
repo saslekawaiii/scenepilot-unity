@@ -427,7 +427,7 @@ namespace WorldWeaver.Editor.Assistant
                         }
                         bool hasMutations=plan.actions.Any(a=>!SceneToolExecutor.IsReadOnlyTool(a.tool));
                         bool reviewedRepair=CanRepairWithinScope(answer,plan);
-                        if (hasMutations&&(Settings.Mode==AssistantMode.Plan||!Settings.AutoApply||plan.actions.Any(a => a.tool == "draft_script" || a.tool == "attach_script" || a.tool=="patch_script")&&!reviewedRepair&&!Settings.AllowAutonomousScripts||plan.actions.Any(a=>AgentProjectTools.Handles(a.tool)&&AgentProjectTools.RequiresReview(a)||a.tool=="instantiate_prefab"&&(bool?)a.args["allow_scripts"]==true)))
+                        if (hasMutations&&(Settings.Mode==AssistantMode.Plan||!Settings.AutoApply||plan.actions.Any(a => a.tool == "draft_script" || a.tool == "attach_script" || a.tool=="patch_script")&&!reviewedRepair&&!Settings.AllowAutonomousScripts||plan.actions.Any(a=>AgentProjectTools.Handles(a.tool)&&AgentProjectTools.RequiresReview(a,Settings)||a.tool=="instantiate_prefab"&&(bool?)a.args["allow_scripts"]==true)))
                         {
                             answer.Text = ChatHistoryStore.Redact(plan.reply); answer.PendingPlan = plan; answer.Status = "План готов";
                             Phase = plan.actions.Any(a => a.tool == "draft_script") ? "Посмотрите код и нажмите «Применить», чтобы Unity проверила его компиляцию." : "Проверьте предложенные изменения и нажмите «Применить».";

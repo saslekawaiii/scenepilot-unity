@@ -84,5 +84,34 @@ namespace WorldWeaver.Tests
             }
             finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
         }
+        sealed class ComponentPermissionProvider:ILLMProvider
+        {
+            public int Calls;
+            public Task<CompletionResult> CompleteAsync(CompletionRequest request,CancellationToken token)
+            {
+                Calls++;var plan=new EditorPlan{complete=Calls>2};
+                if(Calls==1)plan.actions.Add(new EditorCommand{tool="create_node",name="PermissionComponentGoal"});
+                if(Calls==2)plan.actions.Add(new EditorCommand{tool="add_component",target="PermissionComponentGoal",args=new JObject{["type"]="WorldWeaver.WorldPlayer"}});
+                return Task.FromResult(new CompletionResult{Text=JsonConvert.SerializeObject(plan)});
+            }
+            public Task<bool> HealthAsync(CancellationToken token)=>Task.FromResult(true);
+            public void Dispose(){}
+        }
+        [TestCase(false)] [TestCase(true)]
+        public async Task AutonomousScriptPermissionAlsoControlsTypedMonoBehaviourAttachment(bool allow)
+        {
+            EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);var provider=new ComponentPermissionProvider();
+            try
+            {
+                using(var controller=new ChatController(_=>provider,"UserSettings/ComponentPermission-"+Guid.NewGuid().ToString("N")))
+                {
+                    controller.Settings.UseNativeFunctions=true;controller.Settings.AutoVerify=false;controller.Settings.UseSkills=false;controller.Settings.Power=AssistantPower.Deep;controller.Settings.AllowAutonomousScripts=allow;
+                    await controller.SendAsync("Создай пустой узел PermissionComponentGoal и добавь к нему компонент WorldWeaver.WorldPlayer.");var answer=controller.Current.Messages.Last();
+                    Assert.IsFalse(answer.IsError,answer.Text);Assert.AreEqual(allow,GameObject.Find("PermissionComponentGoal").GetComponent<WorldPlayer>()!=null);
+                    Assert.AreEqual(!allow,answer.PendingPlan!=null);Assert.AreEqual(allow?3:2,provider.Calls);
+                }
+            }
+            finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
+        }
     }
 }
