@@ -16,7 +16,24 @@ namespace WorldWeaver.Tests
             Assert.That(description,Does.Contain("Play Mode"));Assert.That(description,Does.Contain("Check"));Assert.That(description,Does.Contain("yield"));
             var oversized=new EditorCommand{tool="run_runtime_probe",args=new JObject{["code"]=new string('x',16001)}};
             Assert.Throws<ArgumentException>(()=>SceneToolExecutor.Validate(new EditorPlan{actions=new System.Collections.Generic.List<EditorCommand>{oversized}}),"Provider-specific wire relaxation must not weaken host code bounds");
-            Assert.AreEqual(15,(int)function["parameters"]["properties"]["seconds"]["maximum"]);
+            Assert.AreEqual(120,(int)function["parameters"]["properties"]["seconds"]["maximum"]);
+        }
+        [TestCase(30f)][TestCase(120f)]
+        public void LongObservationBudgetSurvivesDurableJobAndCanBeCancelledBeforePlay(float seconds)
+        {
+            var command=new EditorCommand{tool="run_runtime_probe",args=new JObject{["code"]="while(true)yield return null;",["seconds"]=seconds}};
+            SceneToolExecutor.Validate(new EditorPlan{actions=new System.Collections.Generic.List<EditorCommand>{command}});
+            var job=AgentEditorJobs.RunRuntimeProbe((string)command.args["code"],seconds);
+            Assert.AreEqual(seconds,AgentEditorJobs.Load(job.Id).RequestedSeconds);
+            AgentEditorJobs.Cancel(job.Id);var cancelled=AgentEditorJobs.Load(job.Id);
+            Assert.IsFalse(cancelled.Success);Assert.That(cancelled.Error,Does.Contain("cancelled"));Assert.IsFalse(AgentEditorJobs.Busy);Assert.IsFalse(EditorApplication.isPlayingOrWillChangePlaymode);
+        }
+        [TestCase(.24f)][TestCase(120.01f)][TestCase(float.NaN)][TestCase(float.PositiveInfinity)]
+        public void OutOfBoundObservationBudgetNeverCreatesAJobOrEntersPlay(float seconds)
+        {
+            Assert.IsFalse(AgentEditorJobs.Busy);
+            Assert.Throws<ArgumentException>(()=>AgentEditorJobs.RunRuntimeProbe("yield return null;",seconds));
+            Assert.IsFalse(AgentEditorJobs.Busy);Assert.IsFalse(EditorApplication.isPlayingOrWillChangePlaymode);
         }
         [Test] public void InvalidProbeCodeCannotEnterPlayModeOrCreateAnActiveJob()
         {
