@@ -153,6 +153,9 @@ namespace WorldWeaver.Tests
                 if(request.Schema?["properties"]?["passed"]!=null)
                 {
                     bool stage=request.Messages.Any(m=>m.Content.Contains("checkpoint for ONE model-planned"));if(stage)StageReviews++;else FullReviews++;
+                    var data=JObject.Parse(request.Messages.Last(m=>m.Role=="user").Content);
+                    Assert.AreEqual((string)data["FullUserScope"],(string)data["OriginalRequest"],"A tentative stage must never replace the original user request");
+                    if(stage)Assert.IsNotNull(data["TentativeStage"],"Stage responsibility must be separate from user authority");
                     bool first=UnityEngine.GameObject.Find("StageOne"),second=UnityEngine.GameObject.Find("StageTwo");
                     bool passed=stage?request.Messages.Any(m=>m.Content.Contains("\"ApproachStage\":0"))?InspectionFirst?!UnityEngine.GameObject.Find("AbsentStageNode"):first:second:InspectionFirst?second:first&&second;
                     return System.Threading.Tasks.Task.FromResult(new CompletionResult{Text=new JObject{["passed"]=passed,["issues"]=passed?new JArray():new JArray("Actual required node missing"),["evidence"]="Actual scene nodes"}.ToString()});
