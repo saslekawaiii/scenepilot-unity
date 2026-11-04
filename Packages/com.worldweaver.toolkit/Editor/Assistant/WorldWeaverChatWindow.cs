@@ -55,11 +55,12 @@ namespace WorldWeaver.Editor.Assistant
         double nextElapsedRefresh;
         double nextBackgroundRefresh;
 
+        [MenuItem("Tools/ScenePilot/Chat", priority = 0)]
         [MenuItem("Tools/WorldWeaver/Чат", priority = 0)]
         public static void ShowWindow()
         {
             var window = GetWindow<WorldWeaverChatWindow>();
-            window.titleContent = new GUIContent("WorldWeaver · Чат");
+            window.titleContent = new GUIContent("ScenePilot · Чат");
             window.minSize = new Vector2(420, 480);
             window.Show();
             window.Focus();
@@ -67,6 +68,7 @@ namespace WorldWeaver.Editor.Assistant
 
         void OnEnable()
         {
+            titleContent = new GUIContent("ScenePilot · Чат");
             EnsureController();
             EditorApplication.update += PumpChanges;
             ScriptDrafts.Changed += MarkChanged;
@@ -181,7 +183,7 @@ namespace WorldWeaver.Editor.Assistant
             historySignature = modelsSignature = null;
             UpdateResponsiveLayout();
             Render();
-            if (style == null) ShowNotice("Не найден файл оформления Chat.uss. Повторно импортируйте пакет WorldWeaver.", true);
+            if (style == null) ShowNotice("Не найден файл оформления Chat.uss. Повторно импортируйте пакет ScenePilot.", true);
             RefreshModels();
         }
 
@@ -191,7 +193,7 @@ namespace WorldWeaver.Editor.Assistant
             rootVisualElement.Add(sidebar);
             var brand = Element("brand-row");
             brand.Add(Text("W", "brand-mark"));
-            brand.Add(Text("WorldWeaver", "brand-name"));
+            brand.Add(Text("ScenePilot", "brand-name"));
             var closeHistory = Button("×", () => SetSidebarVisible(false), "history-close");
             closeHistory.tooltip = "Закрыть историю";
             brand.Add(closeHistory);
@@ -1077,7 +1079,7 @@ namespace WorldWeaver.Editor.Assistant
                 Root.EnableInClassList("user-message", value.Role == "user");
                 Root.EnableInClassList("assistant-message", value.Role != "user");
                 var heading = Element("message-heading");
-                heading.Add(Text(value.Role == "user" ? "Вы" : value.Role == "system" ? "Система" : "WorldWeaver", "message-author"));
+                heading.Add(Text(value.Role == "user" ? "Вы" : value.Role == "system" ? "Система" : "ScenePilot", "message-author"));
                 metadata = Text("", "message-metadata");
                 heading.Add(metadata);
                 Root.Add(heading);

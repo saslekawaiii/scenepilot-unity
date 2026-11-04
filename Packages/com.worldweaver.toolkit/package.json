@@ -1,7 +1,7 @@
 {
   "name": "com.worldweaver.toolkit",
   "version": "1.8.0",
-  "displayName": "WorldWeaver Intelligent World Toolkit",
+  "displayName": "ScenePilot — Unity AI Agent",
   "description": "Unity agent with native tools, persistent task evidence, whole-task review, licensed model acquisition, procedural humanoid locomotion and autonomous NPCs.",
   "unity": "6000.3",
   "author": {

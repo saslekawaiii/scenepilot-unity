@@ -1,100 +1,45 @@
-# WorldWeaver 1.2
+# ScenePilot
 
-WorldWeaver — чат внутри Unity для создания окружения и NPC, последовательного изменения сцены и просмотра C#. Откройте **Tools → WorldWeaver → Чат**. Версия 1.2.0 готовится к публикации; описанные функции присутствуют в рабочем коде, но итоговые протоколы новой версии ещё должны быть закреплены. Исторические результаты 1.1 не являются метриками 1.2.
+An AI agent inside the Unity Editor. Describe a change, let the agent inspect the project, and review what Unity actually applied and verified.
 
-## Локальный запуск
+## Install and open
 
-Целевая версия Unity — 6000.3; разработка ведётся в 6000.3.27f1. Пакет использует Newtonsoft JSON 3.2.1 и Unity Test Framework 1.6.0. Совместимость нового агента с Unity 2022 не заявляется.
+Use Unity 6000.3 (validated on 6000.3.27f1). In Package Manager, install from Git URL:
 
-Установите Ollama и запустите `http://127.0.0.1:11434`. Модели не включены в UPM-пакет:
-
-```sh
-ollama pull qwen3.5:9b
-ollama pull embeddinggemma
+```text
+https://github.com/saslekawaiii/scenepilot-unity.git?path=/Packages/com.worldweaver.toolkit#v1.8.0
 ```
 
-Выберите Qwen3.5 9B и «Баланс». Установленные completion-модели появляются в списке; embedding-модель используется отдельно для знаний NPC. Для локального inference ключ не нужен. На машине с 16 ГБ 9B занимает заметную память, и полный цикл может длиться несколько минут.
+Or install the UPM tarball from the GitHub release. Open **Tools → ScenePilot → Chat**, select a model and write a request. The previous **Tools → WorldWeaver → Чат** entry remains available. Package ID, C# namespaces and saved data paths retain their existing names so installed projects keep their components and chat history.
 
-До публикации устанавливайте пакет из локального `package.json`. Целевой Git URL после завершения релиза: `https://github.com/saslekawaiii/worldweaver-thesis.git?path=/Packages/com.worldweaver.toolkit#v1.2.0`. Наличие URL в инструкции не подтверждает публикацию тега или испытание установки из него. Закрытый репозиторий требует авторизованного Git; секрет не вставляется в URL.
+## Models
 
-## Три режима
+Run Ollama to discover locally installed conversational models. Embedding models are not chat agents. Another OpenAI-compatible service can be added through the model connection form: base URL, exact model ID and optional API key. Availability, speed, quality and provider pricing depend on the chosen model; ScenePilot does not provide model credits.
 
-- **Спросить / Ask** читает доступный контекст и объясняет. Изменения и новые черновики кода отклоняются.
-- **Спланировать / Plan** читает контекст и готовит изменяющий план. Для выполнения нажмите **Применить** после просмотра.
-- **Выполнить / Execute** применяет допустимые операции после валидации. Начальный C#/patch, пользовательские скрипты, открытие другой сцены и замена списка сцен сборки сохраняют отдельный шаг просмотра.
+## Workflow
 
-Начните с «Что есть в активной сцене?», затем попросите конкретное изменение. «Быстро» даёт 1 итерацию и до 2 минут на цикл, «Баланс» — до 3 и 4 минут, «Глубоко» — до 6 и 15 минут. Это верхние пределы бюджета, а не гарантия времени или правильности. Размер модели выбирается отдельно. Enter отправляет, Shift+Enter добавляет строку; **Остановить** прерывает ожидание и последующие шаги, уже исполненное сохраняется.
+**Ask** reads and explains. **Plan** proposes work. **Execute** applies authorised changes. The original request remains separate from the tentative plan. The agent discovers tools, reads real Unity state, writes C# when allowed, obtains real compilation results, and can continue after domain reload.
 
-## Мир и игровой процесс
+For APIs outside built-in tools, the agent can search Unity references, inspect actual type signatures and execute Editor C#. Repeated commands without real changes do not count as implementation progress. Failed behavioral observations remain current until the implementation changes and a fresh check is performed.
 
-Готовый пример: **Tools → WorldWeaver → Создать играбельную деревню**. Команда предлагает сохранить текущие правки, создаёт новую сцену, сохраняет её под уникальным именем в `Assets/WorldWeaverGenerated/Scenes` и добавляет enabled-запись в Build Settings, сохраняя прежний список и его флаги. Нажмите Play. Выполняется заранее заданный план без LLM; это не результат свободной модельной беседы.
+## Verification
 
-Для Terrain: «Создай лесную долину 160 на 160 метров с 12 деревьями, 3 домами и 4 камнями». Следующая реплика может изменить существующий рельеф, не создавая второй мир.
+`run_runtime_probe` executes a bounded C# iterator in real Play Mode. It records actual values, supports virtual Input System keyboard/mouse devices, and evaluates explicit assertions. Its wall budget is 0.25–120 seconds; it supports cancellation and restores the original Editor scene. Temporary test arrangements do not become the game's implementation. A successful model-authored probe confirms only the properties it exercised; independent artifact checks remain separate.
 
-Для связного игрового примера: «Создай деревню с пятью домами, площадью, северными воротами, игроком и доставкой письма». Специализированный `create_village` создаёт террасу, дороги и входы, именованные места, NPC, NavMesh, часы, ворота и необязательные Player/Quest. Это процедурная геометрия и примитивы; новый rig, skinning или анимации не генерируются.
+Compilation, a screenshot and the existence of a component are different kinds of evidence. None proves an arbitrary game request has been completed. Task status and operation results show what was applied, measured, or left unresolved.
 
-В Play Mode: **WASD** — движение, правая кнопка мыши — камера, **E** — действие возле участника квеста. Используется стандартный Unity Input Manager. Экранные кнопки позволяют выполнить действие, сменить время и сохранить/загрузить состояние. Квест выдаёт реальный предмет-письмо и однократную награду; его прохождение не требует LLM. Диалог с NPC — отдельный модельный путь, использующий индивидуальные знания и проверяемые действия.
+## Code permissions and recovery
 
-«Настрой Игнату маршрут между north_gate и square» использует именованные места и проверку полного NavMesh-пути. Расписание может менять дневную/ночную цель, а физические ворота — открываться по часам. Fallback не превращает недоступную основную цель в достигнутую. Проверка объявленных связей не доказывает проходимость любой сцены; движение и прохождение квеста проверяются отдельно в Play Mode.
+Autonomous Editor C# and autonomous script import require explicit project settings. Editor snippets run with Unity Editor permissions; they are not a sandbox. Use trusted requests and review generated code. Undo covers registered scene changes and does not undo arbitrary external side effects.
 
-Мир с `WorldSaveState` сохраняет позиции/инвентари акторов, scoped память NPC, отношения, квест, часы и события в `Application.persistentDataPath/WorldWeaver/<WorldId>.json`. Загрузка требует тот же мир и существующие идентичности. Это не полная сериализация сцены. Память NPC ограничена 32 документами; журнал событий — 128. Сохранение ожидает завершения диалогов.
+Checkpoints preserve supported scene and project changes, verify hashes, and stop automatic continuation on conflicting manual edits. Identical backup contents share SHA-256 storage. Limits are 300 MiB per snapshot, 20,000 files, one to eight loaded scenes and a 2 GiB shared pool. Library, model weights and arbitrary external code effects are outside this recovery mechanism. A single untitled scene is supported; Prefab Mode, baked lighting and symlinks have additional restrictions.
 
-Существующие `Assets/...prefab` доступны через каталог и размещение. Ничего не скачивается. Наличие пользовательских скриптов требует явного разрешения и просмотра; лицензию ассета нужно проверять отдельно. При изменении Terrain отмеченные `WorldSurfaceAnchor` объекты могут повторно привязываться к поверхности; ручные неотмеченные объекты такой гарантии не получают.
+## Local data
 
-## Код, проверки и продолжение
+- `UserSettings/WorldWeaverChat`: conversations and task state.
+- `UserSettings/WorldWeaverCheckpoints`: checkpoint journals and shared content.
+- `UserSettings/WorldWeaverAgentJobs`: compilation and Play results.
+- `UserSettings/WorldWeaverModels`: model connection metadata; keep credentials out of source control.
+- `Assets/WorldWeaverGenerated`: generated assets and runtime source.
 
-C# сначала показывается черновиком. Точечный patch существующего UTF-8 `Assets/...cs` требует предварительного чтения, текущего SHA-256 и ровно одного совпадения заменяемого текста; до 4 файлов и 96 КиБ на исходник. Перед записью хеш проверяется снова. После **Применить** Unity выполняет настоящую компиляцию; её ошибки и подтверждение текущего исходника сохраняются в истории. Начальный просмотр не является песочницей: применённый код исполняется с обычными правами Unity.
-
-Задача хранит исходные условия и результаты независимых проверок. `complete:true` модели не доказывает успех. Проверяющий код распознаёт ограниченный набор буквальных RU/EN-условий: количества объектов, размеры Terrain и отдельные компоненты/связи. Наличие Player/Quest-компонентов не означает доказанное управление или пройденный квест. При отсутствии извлечённых проверок задача требует просмотра.
-
-Продолжение после компиляции и перезагрузки домена или задания Unity ограничено тремя попытками. Автоматически разрешены только короткие exact-match патчи просмотренных файлов: CS1002 — точка с запятой, CS0103 — замена неизвестного идентификатора единственным явно указанным в запросе числом. Проверяются настоящая диагностика строки/позиции и текущий хеш исходника. Предел — два таких продолжения; остальные изменения кода требуют нового просмотра. Доступны отдельные задачи Unity: TestRunner с явным фильтром, измерение локального вращения Y в Play Mode и Development build активной платформы по enabled-сценам Build Settings. Список сцен сборки заменяется отдельным просмотренным планом с checkpoint; допускаются 1–8 существующих Assets-сцен. Пустые, skipped и inconclusive тесты не считаются успехом. Результат задания сохраняется, но гарантированный перезапуск потерянного queued test/build после рестарта не заявляется. Автопродолжение работает в GUI и не применяет имеющийся PendingPlan само.
-
-После импорта/восстановления снимок кода остаётся в истории. **Вернуть предыдущий код** относится к сохранённому импорту нового C#. Контрольная точка запроса охватывает также сцену, ассеты и патчи. **Undo Unity** остаётся отдельной командой и может отменить последнее ручное действие.
-
-## Контрольная точка и конфликты
-
-Перед первым изменением сохраняется снимок `Assets`, `ProjectSettings`, двух package manifest-файлов и рабочего состояния загруженных сцен. После шага запоминается набор изменённых файлов. Восстановление возвращает изменения этого запроса, если последующие правки не создали конфликт. Проект, изменённый между шагами, останавливает автоматическое продолжение.
-
-Ограничения: 300 МиБ, 20 000 файлов, 1–8 загруженных сцен; additive-сцены должны быть сохранены, одна untitled-сцена поддерживается. Prefab Mode, baked lighting, symlink-пути и Play Mode не поддерживаются. Library, веса моделей, UserSettings/history, прочие исходники Packages и внешние побочные эффекты кода не входят. Это не полный backup проекта или универсальная транзакция любого C#.
-
-Локальные данные:
-
-- `UserSettings/WorldWeaverChat` — беседы, задачи и design memory.
-- `UserSettings/WorldWeaverCheckpoints` — журналы контрольных точек и резервные копии файлов.
-- `UserSettings/WorldWeaverAgentJobs` — статусы, XML и измерения.
-- `UserSettings/WorldWeaverImages` — управляемые копии изображений.
-- `UserSettings/WorldWeaverModels/connections.json` — несекретные подключения своих моделей.
-- `Assets/WorldWeaverGenerated` — созданные ассеты и новые исходники.
-- `Builds/WorldWeaver/<job>` — локальный build, без публикации.
-
-Design memory содержит до 128 компактных заметок этой беседы с источником сообщения и ограниченным лексическим отбором. Это отдельный механизм от RAG/памяти игровых NPC.
-
-## Навыки и визуальный контекст
-
-Панель **Навыки** показывает 60 справочных MD-записей. Источники закреплены по commit, лицензии MIT и SHA сохранены в `Editor/Skills/THIRD-PARTY-NOTICES.md`, `LICENSES` и `catalog.json`. В текущем чате выбираются до трёх записей; начальный бюджет — 4000 символов; неизвестный запрос не загружает всю библиотеку. Пользовательские каталоги задаются явно и считаются недоверенными. Markdown не исполняется, не обучает модель и не расширяет инструменты/разрешения.
-
-Меню **+** принимает до трёх PNG/JPEG или снимок реальной камеры. Исходный файл до 8 МиБ нормализуется в отдельную управляемую копию до 1280 пикселей по стороне и 2 МиБ; исходник пользователя не меняется. Нужна локальная vision-модель; без неё запрос с изображением отклоняется. В `-nographics` снимок недоступен. Это не произвольный file ingestion, видео или доказательство качества визуального анализа.
-
-Только Ollama использует поток NDJSON: постепенно показывается текст `reply`, но инструменты ждут получения и валидации полного EditorPlan. Промежуточный текст не исполняется; прерванный поток не переигрывается скрыто.
-
-## Подключить свой API
-
-Нажмите в чате **Добавить API…** → **Подключить модель**. Выберите тип `OpenAICompatible` или `Ollama`, задайте название, URL сервера и точный ID модели. Для OpenAI-compatible доступны `JsonObject` (начальный), `JsonSchema` (если поддерживается сервером) и `Text` (без response_format, с прежней проверкой плана WorldWeaver).
-
-Если нужна авторизация, заполните один вариант: **Ключ API** (password-поле) либо **Имя переменной** — имя заранее настроенной переменной окружения. Для API без авторизации оба поля пустые; Ollama-адаптер работает без ключа. **Добавить и выбрать модель** сохраняет подключение и выбирает его в чате без сетевой генерации.
-
-**Проверить соединение** читает список моделей и capabilities. **Проверить ответ** — отдельный явный запрос до 64 выходных токенов, который может расходовать квоту. Ответ модели не доказывает выполнение Unity-задачи. Поддерживается OpenAI-compatible Chat Completions, только текст; нативные Anthropic Messages/Gemini/OpenAI Responses здесь не подключаются напрямую. Ollama vision доступно только на loopback после проверки `/api/show`.
-
-URL — HTTPS или HTTP на loopback, без userinfo/query/fragment и ключей. Корневой OpenAI-compatible URL получает `/v1`, явный custom path сохраняется. Значения берутся из настроек своего сервера; новых аккаунтов и подписок форма не создаёт.
-
-Ключ из формы хранится только в окружении текущего процесса Unity: переживает domain reload, но не восстанавливается при новом запуске Unity. Закрытие окна настройки после Add не удаляет ключ процесса. Для повторного ввода или изменения параметров удалите подключение и добавьте заново. Постоянный вариант настраивается пользователем отдельно: внешняя envvar, унаследованная Unity; сохраняется только её имя. Удаление подключения не меняет внешнюю переменную.
-
-Несекретные настройки (до 12 подключений) — `UserSettings/WorldWeaverModels/connections.json`, вне Assets и Git. Сам ключ не записывается функцией подключения в конфиг или историю. Обычный код Unity имеет доступ к окружению процесса; форма не создаёт песочницу.
-
-## Необязательное облако и ограничения
-
-Pollinations Classic передаёт запрос и отобранный контекст внешнему API. В закреплённом официальном адаптере, проверенном 31.10.2026, лимиты — 45 секунд на IP и 1500 выходных токенов; клиент выдерживает 46 секунд. Все режимы сохраняют этот предел одного ответа. Среди HTTP 402 повторяется только распознанный FREE_LIMIT, с fallback 46 секунд без Retry-After; обычные платёжные ошибки и HTTP 400 не повторяются. Покупок адаптер не выполняет. Доступность внешнего бесплатного сервиса не гарантируется.
-
-Classic использует текстовый JSON-контракт с последующей C#-валидацией. Узкая нормализация не дописывает команды или отсутствующие поля; исходный ответ хранится отдельно. Серверное enforced JSON Schema не обещается. Профили хранят имена переменных окружения, а не секреты. Для конфиденциального проекта нужен разрешённый маршрут; маскирование известных шаблонов секретов не гарантирует нахождение всех секретов.
-
-WORLD/NPC/KNOWLEDGE/MODELS/DEBUG сохранены в **Advanced Inspector**, прежний торговый пример — **Create Demo in New Scene**. Голос, PDF ingestion, произвольный shell, установка зависимостей, внешняя публикация, генерация ригов и полная замена разработчика не входят в подтверждённые функции. Итоговые 1.2 метрики добавляются только с финальными исходниками и протоколами; исторические 1.1 результаты рассматриваются отдельно.
+Full model setup, web-agent installation, licenses and measured validation are in the [project documentation](https://github.com/saslekawaiii/scenepilot-unity#documentation).
