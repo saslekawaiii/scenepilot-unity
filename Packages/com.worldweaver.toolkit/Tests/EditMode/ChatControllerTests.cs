@@ -386,7 +386,7 @@ namespace WorldWeaver.Tests
             var gate=new TaskCompletionSource<string>();var provider=new RecordingProvider{Respond=(round,request,token)=>
             {if(round==0)return Task.FromResult(Reply(false,Create("CommittedCube")));token.Register(()=>gate.TrySetCanceled());return gate.Task;}};
             var controller=Controller(provider);var task=controller.SendAsync("Создай куб и проверь результат.");Assert.That(provider.Requests.Count,Is.EqualTo(2));Assert.That(Find("CommittedCube"),Is.Not.Null);
-            controller.Cancel();yield return Finish(task);var answer=controller.Current.Messages.Last();Assert.That(answer.Status,Is.EqualTo("Остановлено"));Assert.That(answer.Steps.Any(s=>s.Success),Is.True);Assert.That(Find("CommittedCube"),Is.Not.Null);StringAssert.Contains("выполненные изменения",answer.Text);
+            controller.Cancel();yield return Finish(task);var answer=controller.Current.Messages.Last();Assert.That(answer.Status,Is.EqualTo("Остановлено"));Assert.That(answer.Steps.Any(s=>s.Success),Is.True);Assert.That(Find("CommittedCube"),Is.Not.Null);StringAssert.Contains("изменения доступны в проекте",answer.Text);
         }
         [UnityTest] public IEnumerator InvalidJsonDoesNotEditSceneAndRecordsFailure()
         {

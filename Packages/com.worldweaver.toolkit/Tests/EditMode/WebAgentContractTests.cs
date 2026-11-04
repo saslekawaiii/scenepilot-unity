@@ -92,7 +92,7 @@ namespace WorldWeaver.Tests
                 using(var controller=new ChatController(_=>provider,folder))
                 {
                     controller.Settings.UseNativeFunctions=true;controller.Settings.AllowAutonomousScripts=true;controller.Settings.AutoVerify=true;controller.Settings.Power=AssistantPower.Deep;controller.Settings.UseSkills=false;
-                    await controller.SendAsync("Создай пустой узел ObservedGoal.");Assert.IsTrue(provider.FeedbackSeen,"All request builders must return independent review feedback to the implementer");Assert.IsTrue(provider.ImplementationPhaseSeen,"A stalled read-only phase must expose implementation and discovery");Assert.IsTrue(provider.JsonRecoverySeen,"A stalled native continuation must receive actual facts through the JSON contract");Assert.AreEqual(6,provider.Reads);Assert.GreaterOrEqual(provider.Reviews,2);Assert.IsTrue(UnityEngine.GameObject.Find("ObservedGoal"));Assert.IsFalse(controller.Current.Messages.Last().IsError,controller.Current.Messages.Last().Text);
+                    await controller.SendAsync("Создай пустой узел ObservedGoal.");Assert.IsTrue(provider.FeedbackSeen,"All request builders must return independent review feedback to the implementer");Assert.IsTrue(provider.ImplementationPhaseSeen,"A stalled read-only phase must expose implementation and discovery");Assert.IsFalse(provider.JsonRecoverySeen,"Repeated valid native observations are a planning problem; they cannot disable working native encoding");Assert.AreEqual(6,provider.Reads);Assert.GreaterOrEqual(provider.Reviews,2);Assert.IsTrue(UnityEngine.GameObject.Find("ObservedGoal"));Assert.IsFalse(controller.Current.Messages.Last().IsError,controller.Current.Messages.Last().Text);
                 }
             }
             finally{UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.EmptyScene,UnityEditor.SceneManagement.NewSceneMode.Single);}
@@ -197,7 +197,9 @@ namespace WorldWeaver.Tests
                 answer.Steps.Add(new EditorCommandResult{Success=true,Tool="inspect_object",Summary="{}"});answer.Attempts.Add(new EditorPlanAttempt{Accepted=true,FirstResultIndex=2,ResultCount=1});
                 Assert.That(AgentFunctionProtocol.Definitions(Filter().Schema).Select(t=>(string)t["function"]["name"]),Does.Not.Contain("inspect_object"),"The targeted prerequisite read expires after its observation turn");
                 answer.Task=new AgentTaskState{Approach=new System.Collections.Generic.List<string>{"Implement a general stage"}};
-                Assert.That(AgentFunctionProtocol.Definitions(Filter().Schema).Select(t=>(string)t["function"]["name"]),Does.Contain("inspect_object"),"A scoped stage retains faithful read definitions instead of causing a discovery/rejection cycle");
+                Assert.That(AgentFunctionProtocol.Definitions(Filter().Schema).Select(t=>(string)t["function"]["name"]),Does.Not.Contain("inspect_object"),"Adding a proposed stage cannot bypass a stalled observation phase");
+                answer.Steps.Add(new EditorCommandResult{Success=true,Tool="discover_tools",Summary="{\"enabledTools\":[\"inspect_object\"]}"});answer.Attempts.Add(new EditorPlanAttempt{Accepted=true,FirstResultIndex=3,ResultCount=1});
+                Assert.That(AgentFunctionProtocol.Definitions(Filter().Schema).Select(t=>(string)t["function"]["name"]),Does.Contain("inspect_object"),"A planned stage can still discover a specific missing prerequisite and read it on the following turn");
             }
         }
         [Test] public void StageWorkingMemoryKeepsLatestActualFieldAndFlagsObservationsBeforeAChange()
