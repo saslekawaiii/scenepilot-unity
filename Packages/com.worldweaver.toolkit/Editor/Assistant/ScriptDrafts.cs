@@ -251,10 +251,10 @@ attach_script: name=class name of an ALREADY COMPILED WorldWeaver-generated scri
             Validate(action);
             var target = SceneToolExecutor.ResolveTarget(action.target);
             var type = AssetDatabase.LoadAssetAtPath<MonoScript>(Folder + "/" + action.name + ".cs").GetClass();
-            if (target.GetComponent(type)) return new EditorCommandResult { Success = true, Tool = action.tool, Target = target.name, Summary = "Компонент " + action.name + " уже подключён." };
+            if (target.GetComponent(type)) return new EditorCommandResult { Success = true, ChangesApplied = false, Tool = action.tool, Target = target.name, Summary = "Компонент " + action.name + " уже подключён." };
             var component = Undo.AddComponent(target, type);
             if (!component) throw new InvalidOperationException("Unity не добавила компонент.");
-            return new EditorCommandResult { Success = true, Tool = action.tool, Target = target.name, Summary = "Подключён скомпилированный " + action.name + "." };
+            return new EditorCommandResult { Success = true, Tool = action.tool, Target = target.name, ChangesApplied = true, Summary = "Подключён скомпилированный " + action.name + "." };
         }
 
         private static void Finish()

@@ -22,6 +22,9 @@ namespace WorldWeaver.Editor.Assistant
         public string StableTarget, Measurement="local Y rotation sampled in actual Play Mode";
         public double RequestedSeconds, DegreesPerSecond, StartedGameTime, LastGameTime, ActualSeconds, ActualDegrees, ExpectedDegrees, ToleranceDegrees, OffAxisDegrees;
         public float LastRotationX,LastRotationY,LastRotationZ,LastRotationW;
+        public string ProbeCode, ProbeSourceHash;
+        public JObject ProbeObservations=new JObject();
+        public JArray ProbeAssertions=new JArray();
         public int Samples;
         public bool MeasurementStarted;
         public bool RequireRelaxedArms;
@@ -51,6 +54,8 @@ namespace WorldWeaver.Editor.Assistant
             EditorApplication.update+=TickTestCompletion;
             EditorApplication.playModeStateChanged+=PlayerCheckModeChanged;
             EditorApplication.update+=TickPlayerCheck;
+            EditorApplication.playModeStateChanged+=RuntimeProbeModeChanged;
+            EditorApplication.update+=TickRuntimeProbe;
             EditorApplication.delayCall+=Recover;
         }
         static void Recover()
@@ -150,6 +155,7 @@ namespace WorldWeaver.Editor.Assistant
                 job.Status="cancelled";job.Success=false;job.Error="Rotation measurement cancelled.";job.FinishedUtc=DateTime.UtcNow.ToString("o");Save(job);
                 if(EditorApplication.isPlayingOrWillChangePlaymode)EditorApplication.isPlaying=false;return;
             }
+            if(job.Kind=="runtime_probe"){EndRuntimeProbe(job,"Runtime probe cancelled.");return;}
             if(job.Kind=="player_control"){EndPlayerCheck(job,"Player input check cancelled.");return;}
             if(job.Kind.StartsWith("tests:",StringComparison.Ordinal)&&!string.IsNullOrEmpty(job.RunGuid))
             {

@@ -159,6 +159,7 @@ namespace WorldWeaver.Editor.Assistant
         public static Assembly Compile(string source, string[] assemblyPaths, out List<string> errors)
         {
             errors = new List<string>();
+            if(!IsAvailable){errors.Add("Unity's bundled Roslyn compiler is unavailable.");return null;}
 
             try
             {

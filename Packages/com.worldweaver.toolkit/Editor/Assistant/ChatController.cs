@@ -211,7 +211,8 @@ namespace WorldWeaver.Editor.Assistant
                     int emptyPlanRepairs = 0;
                     int planningRepairs = 0; // One fresh format repair is available even in Fast; it never grants another execution round.
                     int transientInferenceRepairs=0, protocolInferenceRepairs=0;
-                    bool textToolRecovery=false;
+                    string textRecoveryKind=answer.Attempts.LastOrDefault(a=>a.RepairKind=="native-empty-to-json-contract"||a.RepairKind=="native-stall-to-json-contract")?.RepairKind;
+                    bool textToolRecovery=textRecoveryKind!=null;
                     int observationRounds=0;
                     string lastAppliedConfiguration=null;
                     bool unresolvedFailure = false;
@@ -226,7 +227,7 @@ namespace WorldWeaver.Editor.Assistant
                         answer.Attempts.Add(attempt); Save();
                         string streamBuffer="";
                         request.UseToolCalls=Settings.UseNativeFunctions&&!textToolRecovery;
-                        if(textToolRecovery){request.EnableThinking=false;attempt.RepairKind="native-empty-to-json-contract";}
+                        if(textToolRecovery){request.EnableThinking=false;attempt.RepairKind=textRecoveryKind;}
                         long lastActivityAt=-1000;
                         request.OnActivity=activity=>{if(operation==null||operation.IsCancellationRequested||disposed||clock.ElapsedMilliseconds-lastActivityAt<1000)return;lastActivityAt=clock.ElapsedMilliseconds;Phase=ChatHistoryStore.Redact(activity);Notify();};
                         request.Stream=profile.Provider==ProviderKind.Ollama;
@@ -247,7 +248,7 @@ namespace WorldWeaver.Editor.Assistant
                             attempt.Diagnostics=error.Diagnostics;
                             attempt.Error=ChatHistoryStore.Redact(error.Message);attempt.WireResponse=ChatHistoryStore.Redact(error.WireResponse);answer.Status="Восстанавливаю шаг";Save();
                             request=BuildRequest(session,text);
-                            if(error.Message.StartsWith("EMPTY_RESPONSE:",StringComparison.Ordinal)){textToolRecovery=true;request.EnableThinking=false;}
+                            if(error.Message.StartsWith("EMPTY_RESPONSE:",StringComparison.Ordinal)){textToolRecovery=true;textRecoveryKind="native-empty-to-json-contract";request.EnableThinking=false;}
                             request.Messages.Add(new ChatMessage("user","Previous inference failed before any action from that response was executed. Actual diagnostic (data): "+attempt.Error+". Continue the ORIGINAL request from successful tool results. Do not repeat existing creations. Choose one next function."));
                             continue;
                         }
@@ -283,7 +284,7 @@ namespace WorldWeaver.Editor.Assistant
                             if(Settings.UseNativeFunctions&&plan.actions.Count==1&&IsConfiguration(plan.actions[0].tool)&&ReadFingerprint(plan.actions[0])==lastAppliedConfiguration)
                                 throw new ArgumentException("This exact configuration already succeeded and no later mutation has intervened. Repeating it does not advance the task. Inspect the current result or call finish_task to request a FRESH review after the repair; old review failures are historical.");
                             if(Settings.UseNativeFunctions&&plan.actions.Count>1&&(plan.actions.Count>8||plan.actions.Any(a=>!SceneToolExecutor.IsReadOnlyTool(a.tool))))throw new ArgumentException("Native batches require at most eight independent read-only observations; mutations are standalone.");
-                            if(!Settings.AllowEditorCode&&plan.actions.Any(a=>a.tool=="execute_editor_code"))throw new ArgumentException("Autonomous Editor C# is disabled; use reviewed script tools.");
+                            if(!Settings.AllowEditorCode&&plan.actions.Any(a=>a.tool=="execute_editor_code"||a.tool=="run_runtime_probe"))throw new ArgumentException("Autonomous Editor C# is disabled; use reviewed script tools.");
                             ValidatePlan(plan, SceneSaveRequested(text), readOnlyRequest);if(!readOnlyRequest)AgentTaskSchema.Validate(answer.Task,plan);
                             foreach(var action in plan.actions)
                                 if(action.tool.StartsWith("create_",StringComparison.Ordinal)&&string.IsNullOrWhiteSpace(action.name)&&appliedUnnamedCreations.Contains(action.tool+"\n"+action.args.ToString(Formatting.None)))
@@ -380,7 +381,7 @@ namespace WorldWeaver.Editor.Assistant
                                     throw new ArgumentException("Approach stages remain unverified; full task completion was not accepted.");
                                 }
                             }
-                            bool missingRequestedChanges=!readOnlyRequest&&answer.Task?.MutationAuthorized==true&&AgentCapabilities.IsChangeRequest(text)&&!answer.Steps.Any(s=>s.Success&&!SceneToolExecutor.IsReadOnlyTool(s.Tool)&&s.Tool!="remember_design");
+                            bool missingRequestedChanges=!readOnlyRequest&&answer.Task?.MutationAuthorized==true&&AgentCapabilities.IsChangeRequest(text)&&!answer.Steps.Any(s=>s.Success&&s.ChangesApplied!=false&&!SceneToolExecutor.IsReadOnlyTool(s.Tool)&&s.Tool!="remember_design");
                             if(missingRequestedChanges&&!answer.Steps.Any(s=>!s.Success)&&emptyPlanRepairs++<1&&round+1<rounds)
                             {
                                 requireImplementationStep=answer.Steps.Any(s=>s.Success&&(s.Tool=="discover_tools"||s.Tool=="plan_task"||s.Tool=="read_skill"));
@@ -414,7 +415,7 @@ namespace WorldWeaver.Editor.Assistant
                                 }
                             }
                             answer.IsError = unresolvedFailure;
-                            answer.Status = unresolvedFailure ? "Проверки не пройдены" : plan.complete ? answer.Task?.Checks.Count>0&&answer.Task.Checks.All(c=>c.Passed)&&answer.Task.Requirements.Any(r=>r.Kind!="task_change")?"Проверки пройдены":answer.Steps.Any(s=>s.Success&&!SceneToolExecutor.IsReadOnlyTool(s.Tool))?"Изменения применены":"Готово" : "Нужно уточнение";
+                            answer.Status = unresolvedFailure ? "Проверки не пройдены" : plan.complete ? answer.Task?.Checks.Count>0&&answer.Task.Checks.All(c=>c.Passed)&&answer.Task.Requirements.Any(r=>r.Kind!="task_change")?"Проверки пройдены":answer.Steps.Any(s=>s.Success&&s.ChangesApplied!=false&&!SceneToolExecutor.IsReadOnlyTool(s.Tool))?"Изменения применены":"Готово" : "Нужно уточнение";
                             if(answer.Task!=null)answer.Task.ContinueAfterReload=false;
                             if (unresolvedFailure) Phase = answer.Text;
                             break;
@@ -428,7 +429,7 @@ namespace WorldWeaver.Editor.Assistant
                             break;
                         }
                         string executingTool=plan.actions.Count==1?plan.actions[0].tool:null;
-                        Phase=executingTool=="web_search"?"Ищу источники в интернете…":executingTool=="web_research"?"Исследую источники в интернете…":executingTool=="web_read"?"Читаю найденный источник…":executingTool=="draft_script"?"Импортирую игровой скрипт…":executingTool=="attach_script"?"Подключаю скомпилированный скрипт…":executingTool=="execute_editor_code"?"Выполняю изменения через Unity API…":executingTool=="run_player_check"||executingTool=="run_play_check"?"Запускаю проверку в Play Mode…":executingTool=="poll_job"?"Проверяю результат Unity…":plan.actions.All(c=>SceneToolExecutor.IsReadOnlyTool(c.tool))?"Читаю фактическое состояние проекта…":"Применяю изменения к проекту…";
+                        Phase=executingTool=="web_search"?"Ищу источники в интернете…":executingTool=="web_research"?"Исследую источники в интернете…":executingTool=="web_read"?"Читаю найденный источник…":executingTool=="draft_script"?"Импортирую игровой скрипт…":executingTool=="attach_script"?"Подключаю скомпилированный скрипт…":executingTool=="execute_editor_code"?"Выполняю изменения через Unity API…":executingTool=="run_player_check"||executingTool=="run_play_check"||executingTool=="run_runtime_probe"?"Запускаю проверку в Play Mode…":executingTool=="poll_job"?"Проверяю результат Unity…":plan.actions.All(c=>SceneToolExecutor.IsReadOnlyTool(c.tool))?"Читаю фактическое состояние проекта…":"Применяю изменения к проекту…";
                         answer.Status=plan.actions.All(c=>SceneToolExecutor.IsReadOnlyTool(c.tool))?"Проверяю данные":"Изменяю сцену";Notify();
                         operation.Token.ThrowIfCancellationRequested();
                         var batch = await ExecutePlanAsync(plan, session.Id, answer.Id, profile,reviewedRepair,operation.Token);
@@ -439,7 +440,7 @@ namespace WorldWeaver.Editor.Assistant
                         if(batch.Success&&batch.Results.Any(IsImplementationProgress)){requireImplementationStep=false;staleReadCommands.Clear();repeatedReadResults.Clear();}
                         if(batch.Success&&hasMutations)lastAppliedConfiguration=plan.actions.Count==1&&IsConfiguration(plan.actions[0].tool)?ReadFingerprint(plan.actions[0]):null;
                         if (!batch.Success) unresolvedFailure = true;
-                        else if (batch.Results.Any(result => result.Success && (!SceneToolExecutor.IsReadOnlyTool(result.Tool) || readOnlyRequest && !answer.Steps.Any(step => !step.Success)))) unresolvedFailure = false;
+                        else if (batch.Results.Any(result => result.Success && (IsImplementationProgress(result) || readOnlyRequest && !answer.Steps.Any(step => !step.Success)))) unresolvedFailure = false;
                         SanitizeResults(batch);attempt.FirstResultIndex=answer.Steps.Count;attempt.ResultCount=batch.Results.Count; answer.Steps.AddRange(batch.Results); answer.Text = ChatHistoryStore.Redact(plan.reply);
                         if(Settings.UseNativeFunctions&&!readOnlyRequest&&Settings.Mode==AssistantMode.Execute&&batch.Success&&!hasMutations)
                             foreach(var result in batch.Results.Where(s=>s.Success&&SceneToolExecutor.IsReadOnlyTool(s.Tool)))
@@ -462,7 +463,7 @@ namespace WorldWeaver.Editor.Assistant
                         if(batch.Results.Any(IsImplementationProgress))observationRounds=0;
                         else observationRounds++;
                         bool stalledObservations=Settings.AllowAutonomousScripts&&!readOnlyRequest&&Settings.Mode==AssistantMode.Execute&&observationRounds>=6&&answer.EditorReviews.Count<12;
-                        bool changedEnough=batch.Success&&hasMutations&&answer.Steps.Skip(answer.EditorReviews.LastOrDefault()?.StepCount??0).Count(s=>s.Success&&!SceneToolExecutor.IsReadOnlyTool(s.Tool)&&s.Tool!="remember_design")>=4;
+                        bool changedEnough=batch.Success&&hasMutations&&answer.Steps.Skip(answer.EditorReviews.LastOrDefault()?.StepCount??0).Count(IsImplementationProgress)>=4;
                         bool stageCheckpoint=batch.Success&&batch.Results.Any(s=>s.Success&&s.Tool=="review_stage");
                         if(Settings.UseNativeFunctions&&Settings.AutoVerify&&!WaitingForEditor(answer)&&(stageCheckpoint||Settings.Power==AssistantPower.Deep&&(changedEnough||stalledObservations)))
                         {
@@ -470,6 +471,9 @@ namespace WorldWeaver.Editor.Assistant
                             var progress=await ReviewEditorResultAsync(answer,provider,operation.Token,stage);
                             observationRounds=0;var progressChecks=VerifyTask(answer);
                             if((stalledObservations||stageCheckpoint)&&!progress.Passed)requireImplementationStep=true;
+                            // Break provider continuation loops without inventing a scene action.
+                            // Re-send actual tool facts through the same validated JSON contract.
+                            if(stalledObservations&&!textToolRecovery){textToolRecovery=true;textRecoveryKind="native-stall-to-json-contract";}
                             if(stage>=0&&progress.Passed)
                             {
                                 answer.Task.ActiveApproachStage++;requireImplementationStep=false;Save();
@@ -516,7 +520,7 @@ namespace WorldWeaver.Editor.Assistant
                 if(answer.Task!=null){answer.Task.ContinueAfterReload=false;answer.Task.Status=timedOut?"timed_out":"cancelled";}
                 answer.IsError = timedOut; answer.Status = timedOut ? "Лимит времени" : "Остановлено";
                 answer.Text = timedOut ? "Достигнут общий предел времени этого режима. Попробуйте меньшую задачу или другую модель." + (Settings.Power == AssistantPower.Deep ? "" : " Для длинной задачи можно выбрать режим «Глубоко».") : "Запрос остановлен.";
-                answer.Text += answer.Steps.Any(s => s.Success && !SceneToolExecutor.IsReadOnlyTool(s.Tool)) ? " Уже выполненные изменения доступны в сцене; их можно отменить."
+                answer.Text += answer.Steps.Any(s => s.Success && s.ChangesApplied!=false && !SceneToolExecutor.IsReadOnlyTool(s.Tool)) ? " Уже выполненные изменения доступны в сцене; их можно отменить."
                     : answer.Steps.Any(s => s.Success) ? " Полученные данные доступны в шагах; можно продолжить задачу следующим сообщением." : " Сцена не изменена.";
                 if (timedOut) Phase = answer.Text;
             }
@@ -528,7 +532,7 @@ namespace WorldWeaver.Editor.Assistant
                 var failedAttempt = answer.Attempts.LastOrDefault();
                 if (failedAttempt != null && string.IsNullOrEmpty(failedAttempt.Response)) failedAttempt.Error = answer.Text;
                 if(failedAttempt!=null&&error is ProviderException providerError){failedAttempt.WireResponse=ChatHistoryStore.Redact(providerError.WireResponse);failedAttempt.Diagnostics=providerError.Diagnostics;}
-                if (answer.Steps.Any(s => s.Success && !SceneToolExecutor.IsReadOnlyTool(s.Tool))) answer.Text += "\n\nЧасть задачи уже выполнена в сцене. Результаты перечислены в шагах; можно продолжить следующим сообщением.";
+                if (answer.Steps.Any(s => s.Success && s.ChangesApplied!=false && !SceneToolExecutor.IsReadOnlyTool(s.Tool))) answer.Text += "\n\nЧасть задачи уже выполнена в сцене. Результаты перечислены в шагах; можно продолжить следующим сообщением.";
                 else if (answer.Steps.Any(s => s.Success)) answer.Text += "\n\nПолученные данные доступны в шагах; можно продолжить задачу следующим сообщением.";
                 Phase = answer.Text;
             }

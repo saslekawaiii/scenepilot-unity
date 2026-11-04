@@ -301,7 +301,7 @@
     },
     {
       "id": "ww-test-runner",
-      "sha256": "311ff60d844eb01be4a11cd4d6cf931df095b6b37b4cb0ac7e33713c39e89353",
+      "sha256": "52902de969bb2fd334cd4e77ca94881b14c62f19a544ceaac5be2e1db045cb55",
       "source_repo": "Besty0728/Unity-Skills",
       "source_commit": "fb7a8d4208671bca1d1013b2776eb2e4917f4964",
       "source_path": "SkillsForUnity/unity-skills~/skills/test/SKILL.md",

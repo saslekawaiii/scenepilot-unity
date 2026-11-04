@@ -99,7 +99,7 @@ namespace WorldWeaver.Editor.Assistant
             else if (typed) command = EditorToolSchema.DecoderCommandSchema();
             if(nativeFunctions)
             {
-                var references=string.Join("\n",new[]{SceneToolExecutor.ToolInstructions,AgentProjectTools.ToolInstructions,ConstructiveTools.Reference,AnimatedCharacterTools.ToolReference,WorldGameplayTools.ToolInstructions,WorldMaterialTools.ToolInstructions,ModelAssetTools.Reference,WebResearchTools.Reference,ScriptDrafts.ToolInstructions,EditorCodeTools.Reference,UnityRecipeCatalog.Reference}).Split('\n');
+                var references=string.Join("\n",new[]{SceneToolExecutor.ToolInstructions,AgentProjectTools.ToolInstructions,ConstructiveTools.Reference,AnimatedCharacterTools.ToolReference,WorldGameplayTools.ToolInstructions,WorldMaterialTools.ToolInstructions,ModelAssetTools.Reference,WebResearchTools.Reference,ScriptDrafts.ToolInstructions,EditorCodeTools.Reference,AgentEditorJobs.RuntimeProbeReference,UnityRecipeCatalog.Reference}).Split('\n');
                 foreach(var branch in (command["anyOf"] as JArray??new JArray()).OfType<JObject>())
                 {
                     string name=EditorToolSchema.ToolName(branch);branch["x-worldweaver-read-only"]=SceneToolExecutor.IsReadOnlyTool(name);
@@ -124,6 +124,8 @@ namespace WorldWeaver.Editor.Assistant
     public sealed class EditorCommandResult
     {
         public bool Success;
+        // Null preserves legacy receipts. False means successful, but no implementation changed.
+        public bool? ChangesApplied;
         public string Tool, Summary, Target, Error;
         public List<string> CreatedAssets = new List<string>();
         public Dictionary<string,string> SourceHashes = new Dictionary<string,string>();

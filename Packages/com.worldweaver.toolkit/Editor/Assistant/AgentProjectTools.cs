@@ -20,10 +20,10 @@ namespace WorldWeaver.Editor.Assistant
     /// <summary>Typed project operations: no shell, arbitrary reflection invocation or credential file reader.</summary>
     internal static class AgentProjectTools
     {
-        static readonly string[] Names={"find_unity_recipes","read_unity_recipe","read_task_step","execute_editor_code","reflect_api","plan_task","review_stage","discover_tools","list_scene_objects","find_scene_objects","inspect_project","inspect_component","set_component","add_component","read_console","capture_scene","run_tests","run_play_check","run_player_check","poll_job","set_build_scenes","build_player","remember_design","list_skills","read_skill","open_scene"};
+        static readonly string[] Names={"find_unity_recipes","read_unity_recipe","read_task_step","execute_editor_code","reflect_api","plan_task","review_stage","discover_tools","list_scene_objects","find_scene_objects","inspect_project","inspect_component","set_component","add_component","read_console","capture_scene","run_runtime_probe","run_tests","run_play_check","run_player_check","poll_job","set_build_scenes","build_player","remember_design","list_skills","read_skill","open_scene"};
         internal static bool Handles(string tool)=>Names.Contains(tool);
         internal static bool IsReadOnly(string tool)=>new[]{"find_unity_recipes","read_unity_recipe","read_task_step","reflect_api","plan_task","review_stage","discover_tools","list_scene_objects","find_scene_objects","inspect_project","inspect_component","read_console","capture_scene","poll_job","list_skills","read_skill"}.Contains(tool);
-        internal static bool IsDeferred(string tool)=>tool=="run_tests"||tool=="run_play_check"||tool=="run_player_check"||tool=="build_player"||tool=="open_scene";
+        internal static bool IsDeferred(string tool)=>tool=="run_runtime_probe"||tool=="run_tests"||tool=="run_play_check"||tool=="run_player_check"||tool=="build_player"||tool=="open_scene";
         internal static bool RequiresReview(EditorCommand c)=>c.tool=="open_scene"||c.tool=="set_build_scenes"||c.tool=="add_component"&&ResolveType((string)c.args["type"]).IsSubclassOf(typeof(MonoBehaviour));
         internal const string ToolInstructions=@"PROJECT TOOLS (exact typed args):
 read_task_step: target empty,args {index:0..8191,offset?:0..100000}. Retrieves a persisted earlier tool result from THIS task, including full real IDs, errors and asset paths. Use the durable index to recover evidence outside the recent context window. Paged data only; does not rerun the tool.
@@ -67,6 +67,7 @@ open_scene: target empty,args {path:Assets/...unity}. Standalone reviewed action
                 ["set_component"]=Obj(new JObject{["type"]=Text(),["property"]=Text(),["value"]=new JObject{["anyOf"]=new JArray(new JObject{["type"]="string",["maxLength"]=4000},new JObject{["type"]="number"},new JObject{["type"]="boolean"},new JObject{["type"]="null"},new JObject{["type"]="array",["items"]=new JObject{["type"]="number"},["minItems"]=2,["maxItems"]=4},Obj(new JObject{["target"]=Text(),["component"]=Text()},"target"),Obj(new JObject{["asset"]=Text()},"asset"))}},"type","property","value"),
                 ["add_component"]=Obj(new JObject{["type"]=Text()},"type"),["read_console"]=Obj(new JObject{["limit"]=Integer(1,100)}),
                 ["capture_scene"]=Obj(new JObject{["view"]=new JObject{["type"]="string",["enum"]=new JArray("overview","game","player")}}),["run_tests"]=Obj(new JObject{["mode"]=new JObject{["type"]="string",["enum"]=new JArray("edit","play")},["filter"]=Text(250)},"mode","filter"),
+                ["run_runtime_probe"]=Obj(new JObject{["code"]=Text(16000),["seconds"]=new JObject{["type"]="number",["minimum"]=.25,["maximum"]=15}},"code"),
                 ["run_player_check"]=Obj(new JObject{["seconds"]=new JObject{["type"]="number",["minimum"]=.5,["maximum"]=3},["check_relaxed_arms"]=new JObject{["type"]="boolean"}}),
                 ["run_play_check"]=Obj(new JObject{["seconds"]=new JObject{["type"]="number",["minimum"]=.25,["maximum"]=10},["degrees_per_second"]=new JObject{["type"]="number",["minimum"]=-360,["maximum"]=360}},"seconds","degrees_per_second"),
                 ["poll_job"]=Obj(new JObject{["id"]=Text(32)},"id"),["build_player"]=Obj(new JObject()),
@@ -200,7 +201,7 @@ open_scene: target empty,args {path:Assets/...unity}. Standalone reviewed action
         }
         internal static EditorCommandResult Execute(EditorCommand c,Func<string,GameObject> resolve,AgentExecutionContext context)
         {
-            Validate(c,resolve);string summary;GameObject target=null;var a=c.args;
+            Validate(c,resolve);string summary;GameObject target=null;bool? changesApplied=null;var a=c.args;
             switch(c.tool)
             {
                 case "find_unity_recipes":summary=UnityRecipeCatalog.CreateDefault().Search((string)a["query"],(int?)a["limit"]??6).ToString(Formatting.None);break;
@@ -233,12 +234,15 @@ open_scene: target empty,args {path:Assets/...unity}. Standalone reviewed action
                         case SerializedPropertyType.Vector2:field.vector2Value=new Vector2((float)value[0],(float)value[1]);break;case SerializedPropertyType.Vector3:field.vector3Value=new Vector3((float)value[0],(float)value[1],(float)value[2]);break;case SerializedPropertyType.Vector4:field.vector4Value=new Vector4((float)value[0],(float)value[1],(float)value[2],(float)value[3]);break;case SerializedPropertyType.Color:field.colorValue=new Color((float)value[0],(float)value[1],(float)value[2],(float)value[3]);break;
                         case SerializedPropertyType.ObjectReference:field.objectReferenceValue=ResolveReference(value,resolve);break;
                     }
-                    serialized.ApplyModifiedProperties();EditorUtility.SetDirty(component);target=component.gameObject;summary=InspectComponent(component).ToString(Formatting.None);break;
+                    changesApplied=serialized.ApplyModifiedProperties();EditorUtility.SetDirty(component);target=component.gameObject;summary=InspectComponent(component).ToString(Formatting.None);break;
                 case "add_component":
                     if(RequiresReview(c)&&context?.Reviewed!=true)throw new InvalidOperationException("Custom component requires explicit review.");target=resolve(c.target);var type=ResolveType((string)a["type"]);var added=Undo.AddComponent(target,type);if(!added)throw new InvalidOperationException("Component creation failed.");summary=InspectComponent(added).ToString(Formatting.None);break;
                 case "read_console":summary=AgentEditorJobs.ConsoleSnapshot((int?)a["limit"]??20).ToString(Formatting.None);break;
                 case "capture_scene":
                     if(context?.Message==null)throw new InvalidOperationException("Capture requires a chat task context.");var image=AgentViewCapture.Capture(view:(string)a["view"]??"overview");context.Message.Attachments.Add(image);var capture=AgentViewCapture.Describe(image);capture["view"]=(string)a["view"]??"overview";capture["diagnosticFogSuppressed"]=(string)capture["view"]=="overview";summary=capture.ToString(Formatting.None);break;
+                case "run_runtime_probe":
+                    if(context?.Session?.Settings?.AllowEditorCode!=true||context.Session.Settings.Mode!=AssistantMode.Execute&&context.Reviewed!=true)throw new InvalidOperationException("Runtime C# probes require the project's autonomous Editor C# permission.");
+                    var probeJob=AgentEditorJobs.RunRuntimeProbe((string)a["code"],(float?)a["seconds"]??10);if(context?.Message?.Task!=null)context.Message.Task.PendingJobId=probeJob.Id;summary=JObject.FromObject(probeJob).ToString(Formatting.None);break;
                 case "run_tests":var testJob=AgentEditorJobs.RunTests((string)a["mode"],(string)a["filter"]);if(context?.Message?.Task!=null)context.Message.Task.PendingJobId=testJob.Id;summary=JObject.FromObject(testJob).ToString(Formatting.None);break;
                 case "run_player_check":var playerJob=AgentEditorJobs.RunPlayerCheck(ProjectContextIndex.StableTarget(resolve(c.target)),(float?)a["seconds"]??1,(bool?)a["check_relaxed_arms"]??false);if(context?.Message?.Task!=null)context.Message.Task.PendingJobId=playerJob.Id;summary=JObject.FromObject(playerJob).ToString(Formatting.None);break;
                 case "run_play_check":var playJob=AgentEditorJobs.RunRotationCheck(ProjectContextIndex.StableTarget(resolve(c.target)),(float)a["seconds"],(float)a["degrees_per_second"]);if(context?.Message?.Task!=null)context.Message.Task.PendingJobId=playJob.Id;summary=JObject.FromObject(playJob).ToString(Formatting.None);break;
@@ -253,7 +257,7 @@ open_scene: target empty,args {path:Assets/...unity}. Standalone reviewed action
                 case "open_scene":if(context?.Reviewed!=true)throw new InvalidOperationException("Opening another scene requires review.");EditorSceneManager.OpenScene(ScenePath((string)a["path"]));summary="Открыта сцена "+(string)a["path"];break;
                 default:throw new ArgumentException("Unknown project tool.");
             }
-            return new EditorCommandResult{Success=true,Tool=c.tool,Summary=summary,Target=target?ProjectContextIndex.StableTarget(target):c.target};
+            return new EditorCommandResult{Success=true,ChangesApplied=changesApplied,Tool=c.tool,Summary=summary,Target=target?ProjectContextIndex.StableTarget(target):c.target};
         }
     }
 }

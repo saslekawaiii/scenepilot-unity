@@ -39,7 +39,7 @@ namespace WorldWeaver.Editor.Assistant
             int changed=LastBehaviorChange(answer.Steps);
             var hostChecks=VerifyTask(answer).Where(c=>c.RequirementId.StartsWith("job:",StringComparison.Ordinal)||c.RequirementId.StartsWith("compile:",StringComparison.Ordinal)).Select(c=>new{c.RequirementId,c.Passed,c.Actual,ObservedStep=answer.Steps.FindLastIndex(s=>s.Summary==c.Evidence),HistoricalBeforeLastChange=answer.Steps.FindLastIndex(s=>s.Summary==c.Evidence)>=0&&answer.Steps.FindLastIndex(s=>s.Summary==c.Evidence)<changed,ObservedData=Observation(c.Evidence)}).ToArray();
             var owners=new List<GameObject>();var missing=new JArray();
-            foreach(var step in answer.Steps.Where(s=>s.Success&&!SceneToolExecutor.IsReadOnlyTool(s.Tool)))
+            foreach(var step in answer.Steps.Where(s=>s.Success&&s.ChangesApplied!=false&&!SceneToolExecutor.IsReadOnlyTool(s.Tool)))
             {
                 var ids=new List<string>{step.Target};
                 try{ids.AddRange((JObject.Parse(step.Summary)["createdObjects"] as JArray??new JArray()).Values<string>());}catch(JsonException){}
@@ -54,7 +54,7 @@ namespace WorldWeaver.Editor.Assistant
             string stage=approachStage>=0&&approachStage<answer.Task.Approach.Count?answer.Task.Approach[approachStage]:null;
             string input=JsonConvert.SerializeObject(new{OriginalRequest=answer.Task?.OriginalRequest,FullUserScope=answer.Task?.OriginalRequest,TentativeStage=stage,HostOperationPolicy=new{SceneSaveAuthorized=SceneSaveRequested(answer.Task?.OriginalRequest),Mode=Settings.Mode.ToString(),StageIsTentative=true},ApproachStage=approachStage,InitialHostMeasurements=answer.Task?.InitialSceneFacts,RecordedProjectHistory=AgentProjectHistory.Describe(sessions,answer.Id),CurrentHostMeasurements=state,CurrentTerrainMeasurements=ProjectContextIndex.TerrainFacts(),CurrentRenderableInventory=ProjectContextIndex.ListScene(new JObject{["component"]="Renderer",["limit"]=24}),SceneComponentCounts=inventory,MissingFormerTargets=missing,DurableHostVerification=hostChecks,
                 VisualObservations=answer.Steps.Select((s,i)=>new{Step=s,Index=i}).Where(x=>x.Step.Success&&x.Step.Tool=="capture_scene").TakeLast(2).Select(x=>new{x.Index,Data=ToolEvidenceForModel(x.Step),HistoricalBeforeLastChange=x.Index<changed}),
-                ActualToolEvidence=answer.Steps.Select((s,i)=>new{Index=i,s.Tool,s.Success,s.Target,Data=ToolEvidenceForModel(s),s.Error,HistoricalObservation=i<answer.Steps.FindLastIndex(last=>last.Success&&!SceneToolExecutor.IsReadOnlyTool(last.Tool))}).TakeLast(10)});
+                ActualToolEvidence=answer.Steps.Select((s,i)=>new{Index=i,s.Tool,s.Success,s.Target,Data=ToolEvidenceForModel(s),s.Error,HistoricalObservation=i<answer.Steps.FindLastIndex(last=>last.Success&&last.ChangesApplied!=false&&!SceneToolExecutor.IsReadOnlyTool(last.Tool))}).TakeLast(10)});
             string digest=TextChunker.Digest(input);
             var existing=answer.EditorReviews.LastOrDefault(r=>r.InputHash==digest&&r.Error==null);
             if(existing!=null)return existing;

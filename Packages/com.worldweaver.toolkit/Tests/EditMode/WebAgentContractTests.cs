@@ -67,7 +67,7 @@ namespace WorldWeaver.Tests
         }
         sealed class ObservationRecoveryProvider:ILLMProvider
         {
-            public int Reads,Reviews;public bool FeedbackSeen,ImplementationPhaseSeen;
+            public int Reads,Reviews;public bool FeedbackSeen,ImplementationPhaseSeen,JsonRecoverySeen;
             public System.Threading.Tasks.Task<CompletionResult> CompleteAsync(CompletionRequest request,System.Threading.CancellationToken token)
             {
                 if(request.Schema?["properties"]?["passed"]!=null)
@@ -75,7 +75,7 @@ namespace WorldWeaver.Tests
                     Reviews++;bool exists=UnityEngine.GameObject.Find("ObservedGoal");return System.Threading.Tasks.Task.FromResult(new CompletionResult{Text=new JObject{["passed"]=exists,["issues"]=exists?new JArray():new JArray("The requested node has not been created; observations alone are insufficient."),["evidence"]=exists?"Actual node exists":"Actual node is absent"}.ToString()});
                 }
                 var plan=new EditorPlan{complete=false};bool feedback=request.Messages.Any(m=>m.Content.Contains("LATEST INDEPENDENT REVIEW")&&m.Content.Contains("requested node"));FeedbackSeen|=feedback;
-                if(feedback){var available=((JArray)request.Schema["properties"]["actions"]["items"]["anyOf"]).OfType<JObject>().Select(EditorToolSchema.ToolName).ToArray();ImplementationPhaseSeen|=available.Contains("create_node")&&available.Contains("discover_tools")&&!available.Contains("inspect_object");}
+                if(feedback){JsonRecoverySeen|=!request.UseToolCalls;var available=((JArray)request.Schema["properties"]["actions"]["items"]["anyOf"]).OfType<JObject>().Select(EditorToolSchema.ToolName).ToArray();ImplementationPhaseSeen|=available.Contains("create_node")&&available.Contains("discover_tools")&&!available.Contains("inspect_object");}
                 if(!feedback){Reads++;plan.actions.Add(new EditorCommand{tool="find_scene_objects",args=new JObject{["query"]="missing_observation_fixture"}});}
                 else if(!UnityEngine.GameObject.Find("ObservedGoal"))plan.actions.Add(new EditorCommand{tool="create_node",name="ObservedGoal"});
                 else{plan.complete=true;plan.reply="Готово";}
@@ -92,7 +92,7 @@ namespace WorldWeaver.Tests
                 using(var controller=new ChatController(_=>provider,folder))
                 {
                     controller.Settings.UseNativeFunctions=true;controller.Settings.AllowAutonomousScripts=true;controller.Settings.AutoVerify=true;controller.Settings.Power=AssistantPower.Deep;controller.Settings.UseSkills=false;
-                    await controller.SendAsync("Создай пустой узел ObservedGoal.");Assert.IsTrue(provider.FeedbackSeen,"All request builders must return independent review feedback to the implementer");Assert.IsTrue(provider.ImplementationPhaseSeen,"A stalled read-only phase must expose implementation and discovery");Assert.AreEqual(6,provider.Reads);Assert.GreaterOrEqual(provider.Reviews,2);Assert.IsTrue(UnityEngine.GameObject.Find("ObservedGoal"));Assert.IsFalse(controller.Current.Messages.Last().IsError,controller.Current.Messages.Last().Text);
+                    await controller.SendAsync("Создай пустой узел ObservedGoal.");Assert.IsTrue(provider.FeedbackSeen,"All request builders must return independent review feedback to the implementer");Assert.IsTrue(provider.ImplementationPhaseSeen,"A stalled read-only phase must expose implementation and discovery");Assert.IsTrue(provider.JsonRecoverySeen,"A stalled native continuation must receive actual facts through the JSON contract");Assert.AreEqual(6,provider.Reads);Assert.GreaterOrEqual(provider.Reviews,2);Assert.IsTrue(UnityEngine.GameObject.Find("ObservedGoal"));Assert.IsFalse(controller.Current.Messages.Last().IsError,controller.Current.Messages.Last().Text);
                 }
             }
             finally{UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.EmptyScene,UnityEditor.SceneManagement.NewSceneMode.Single);}
@@ -298,6 +298,11 @@ namespace WorldWeaver.Tests
                 var command=new EditorCommand{tool="set_component",target=ProjectContextIndex.StableTarget(root),args=new JObject{["type"]="WorldWeaver.WorldPlayer",["property"]="AlwaysLook",["value"]=literal}};
                 var result=SceneToolExecutor.Execute(new EditorPlan{actions=new System.Collections.Generic.List<EditorCommand>{command}});
                 Assert.IsTrue(result.Success,result.Error);Assert.AreEqual(expected,player.AlwaysLook);Assert.AreEqual(JTokenType.Boolean,command.args["value"].Type);
+                Assert.AreEqual(true,result.Results[0].ChangesApplied,"A changed field needs a factual mutation receipt");
+                var unchanged=SceneToolExecutor.Execute(new EditorPlan{actions=new System.Collections.Generic.List<EditorCommand>{command}});
+                Assert.IsTrue(unchanged.Success);Assert.AreEqual(false,unchanged.Results[0].ChangesApplied,"An idempotent assignment must not refill the progress budget");
+                var progress=typeof(ChatController).GetMethod("IsImplementationProgress",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic);
+                Assert.IsFalse((bool)progress.Invoke(null,new object[]{unchanged.Results[0]}));
                 command.args["value"]="yes";Assert.Throws<ArgumentException>(()=>SceneToolExecutor.Validate(new EditorPlan{actions=new System.Collections.Generic.List<EditorCommand>{command}}));Assert.AreEqual(expected,player.AlwaysLook);
             }
             finally{UnityEngine.Object.DestroyImmediate(root);}
