@@ -207,6 +207,13 @@ namespace WorldWeaver.Editor.Assistant
         {
             var result=new List<string>();foreach(string root in new[]{"Assets","ProjectSettings"})if(Directory.Exists(root))result.AddRange(Directory.GetDirectories(root,"*",SearchOption.AllDirectories).Select(p=>p.Replace('\\','/')));return result;
         }
+        // Streaming hashes avoid allocating a full asset byte array merely to
+        // observe project state. This digest stores no additional backup copy.
+        internal static string ProjectContentSignature()=>TextChunker.Digest(string.Join("\n",Scan().Select(f=>f.Path+":"+f.Hash)));
+        private static string HashFile(string path)
+        {
+            using(var stream=File.OpenRead(path))using(var sha=SHA256.Create())return BitConverter.ToString(sha.ComputeHash(stream)).Replace("-","").ToLowerInvariant();
+        }
         private static List<FileState> Scan()
         {
             var files=new List<string>();
@@ -217,7 +224,7 @@ namespace WorldWeaver.Editor.Assistant
             foreach(string path in files.OrderBy(p=>p,StringComparer.Ordinal))
             {
                 var info=new FileInfo(path);total+=info.Length;if(total>ByteLimit)throw new InvalidOperationException("Checkpoint byte limit exceeded (300 MiB).");
-                result.Add(new FileState {Path=path.Replace('\\','/'),Hash=Hash(File.ReadAllBytes(path)),Bytes=info.Length});
+                result.Add(new FileState {Path=path.Replace('\\','/'),Hash=HashFile(path),Bytes=info.Length});
             }
             return result;
         }

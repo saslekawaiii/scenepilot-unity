@@ -162,7 +162,7 @@ namespace WorldWeaver.Editor.Assistant
                 {
                     var full=JObject.Parse(text);var rows=(full["sceneReadback"] as JArray??new JArray()).OfType<JObject>().ToArray();
                     var selected=rows.OrderByDescending(r=>(r["joints"] as JArray)?.Count??0).ThenByDescending(r=>r["body"]!=null).Take(8);
-                    text=new JObject{["compiled"]=full["compiled"],["executed"]=full["executed"],["sceneChanged"]=full["sceneChanged"],["diagnostics"]=full["diagnostics"],
+                    text=new JObject{["compiled"]=full["compiled"],["executed"]=full["executed"],["sceneChanged"]=full["sceneChanged"],["projectChanged"]=full["projectChanged"],["diagnostics"]=full["diagnostics"],
                         ["sceneReadback"]=new JArray(selected.Select(r=>r.DeepClone())),["readbackOmittedRows"]=Math.Max(0,rows.Length-8),
                         ["returnedData"]=((string)full["result"]??"").Substring(0,Math.Min(3000,((string)full["result"]??"").Length)),["verification"]=full["verification"]}.ToString(Formatting.None);
                 }

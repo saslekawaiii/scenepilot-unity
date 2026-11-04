@@ -15,7 +15,7 @@ namespace WorldWeaver.Editor.Assistant
     internal static class EditorCodeTools
     {
         internal const string Reference = @"reflect_api: empty target; args {type:string,member?:string}. Read public Unity/project C# signatures before using unfamiliar APIs. No method invocation.
-execute_editor_code: optional existing owned target; when omitted the GameObject target parameter is NULL and the host creates NO helper objects. Supply an observed target when using target members, or find the existing objects explicitly. args {code:string}. Standalone C# METHOD BODY (optional leading using directives are supported; no namespace or class declarations), at most 20000 characters, ending with return object/anonymous data. Usings System, Collections.Generic, Linq, UnityEngine, UnityEditor, WorldWeaver, Newtonsoft.Json.Linq are supplied; Object and Random default to UnityEngine aliases (an explicit leading alias can override them). Requires the project's autonomous Editor C# setting. Compiles with real Roslyn diagnostics, then executes immediately on Unity main thread with full Editor permissions. Use Undo for every edit; create scene objects only when the original request authorizes them, and persistent runtime assets only under Assets/WorldWeaverGenerated. Review the automatic sceneReadback and geometric warnings against the request before finishing. Joint.anchor and Collider.center are LOCAL coordinates; use TransformPoint/InverseTransformPoint when comparing with WORLD bounds. Return actual measured state. No infinite loops, sleeps, network, shell, secret access, unrelated deletion, scene replacement, or claims of play verification. Runtime MonoBehaviours need saved source and normal compilation; dynamic snippet types cannot be serialized as runtime scripts.";
+execute_editor_code: optional existing owned target; when omitted the GameObject target parameter is NULL and the host creates NO helper objects. Supply an observed target when using target members, or find the existing objects explicitly. Host sceneChanged/projectChanged include actual file content and dirty asset state; an identical no-change snippet is refused while that observation is current. Reuse its durable task step rather than polling through C#. args {code:string}. Standalone C# METHOD BODY (optional leading using directives are supported; no namespace or class declarations), at most 20000 characters, ending with return object/anonymous data. Usings System, Collections.Generic, Linq, UnityEngine, UnityEditor, WorldWeaver, Newtonsoft.Json.Linq are supplied; Object and Random default to UnityEngine aliases (an explicit leading alias can override them). Requires the project's autonomous Editor C# setting. Compiles with real Roslyn diagnostics, then executes immediately on Unity main thread with full Editor permissions. Use Undo for every edit; create scene objects only when the original request authorizes them, and persistent runtime assets only under Assets/WorldWeaverGenerated. Review the automatic sceneReadback and geometric warnings against the request before finishing. Joint.anchor and Collider.center are LOCAL coordinates; use TransformPoint/InverseTransformPoint when comparing with WORLD bounds. Return actual measured state. No infinite loops, sleeps, network, shell, secret access, unrelated deletion, scene replacement, or claims of play verification. Runtime MonoBehaviours need saved source and normal compilation; dynamic snippet types cannot be serialized as runtime scripts.";
         static readonly Dictionary<string,Assembly> Cache=new Dictionary<string,Assembly>();
         internal static string Reflect(string name,string member)
         {
@@ -59,7 +59,7 @@ execute_editor_code: optional existing owned target; when omitted the GameObject
             var previousObjects=ProjectContextIndex.Objects().ToArray();
             var before=previousObjects.Select(g=>g.GetInstanceID()).ToHashSet();
             var knownIds=previousObjects.Select(g=>g.GetComponent<GeneratedSceneObject>()).Where(g=>g).Select(g=>g.ObjectId).ToHashSet();
-            string sceneBefore=SceneSignature();
+            string sceneBefore=SceneSignature(),projectBefore=ProjectSignature();
             object result;
             try{result=assembly.GetType("WWEditorSnippet").GetMethod("Execute").Invoke(null,new object[]{target});}
             catch(TargetInvocationException e){throw new InvalidOperationException("C# runtime error: "+(e.InnerException??e).Message);}
@@ -74,8 +74,18 @@ execute_editor_code: optional existing owned target; when omitted the GameObject
             }
             string data=JsonConvert.SerializeObject(result,new JsonSerializerSettings{ReferenceLoopHandling=ReferenceLoopHandling.Ignore,MaxDepth=8,Converters=new List<JsonConverter>{new UnityReadbackConverter()}});
             if(data.Length>16000)data=data.Substring(0,16000)+" [output truncated]";
-            var report=new JObject{["compiled"]=true,["executed"]=true,["sceneChanged"]=sceneBefore!=SceneSignature(),["sourceHash"]=hash,["result"]=data,["createdObjects"]=new JArray(created.Take(80).Select(g=>ProjectContextIndex.StableTarget(g))),["sceneReadback"]=ReadScene(target,created),["verification"]="Compilation and execution only; runtime gameplay was not tested by this command."};
+            string sceneAfter=SceneSignature(),projectAfter=ProjectSignature();
+            var report=new JObject{["compiled"]=true,["executed"]=true,["sceneChanged"]=sceneBefore!=sceneAfter,["projectChanged"]=projectBefore!=projectAfter,["commandFingerprint"]=CommandFingerprint(command),["observationFingerprint"]=TextChunker.Digest(sceneAfter+"\n"+projectAfter),["sourceHash"]=hash,["result"]=data,["createdObjects"]=new JArray(created.Take(80).Select(g=>ProjectContextIndex.StableTarget(g))),["sceneReadback"]=ReadScene(target,created),["verification"]="Compilation and execution only; runtime gameplay was not tested by this command."};
             return new EditorCommandResult{Tool=command.tool,Success=true,Target=target?ProjectContextIndex.StableTarget(target):"",Summary=report.ToString(Formatting.None)};
+        }
+        internal static string CommandFingerprint(EditorCommand command)=>TextChunker.Digest((command.target??"")+"\n"+((string)command.args["code"]??"").Replace("\r\n","\n").Trim());
+        internal static string ObservationFingerprint()=>TextChunker.Digest(SceneSignature()+"\n"+ProjectSignature());
+        static string ProjectSignature()
+        {
+            // Include unsaved persistent asset edits as well as exact file bytes.
+            // Loading an existing clean asset for inspection is not a mutation.
+            var dirty=Resources.FindObjectsOfTypeAll<UnityEngine.Object>().Where(o=>o&&EditorUtility.IsPersistent(o)&&EditorUtility.IsDirty(o)&&AssetDatabase.GetAssetPath(o).StartsWith("Assets/",StringComparison.Ordinal)).OrderBy(o=>o.GetInstanceID());
+            return TextChunker.Digest(AgentCheckpoints.ProjectContentSignature()+"\n"+string.Join("\n",dirty.Select(o=>o.GetInstanceID()+":"+EditorJsonUtility.ToJson(o))));
         }
         // Progress signal only, never a proof that the user's request is complete.
         // Includes serialized component fields throughout loaded scenes and does

@@ -63,7 +63,23 @@ namespace WorldWeaver.Editor.Assistant
         {
             if(!step.Success||step.ChangesApplied==false||SceneToolExecutor.IsReadOnlyTool(step.Tool)||new[]{"remember_design","save_scene","run_runtime_probe","run_player_check","run_play_check","run_tests","compile_scripts","compile_patch","build_player","set_build_scenes","open_scene"}.Contains(step.Tool))return false;
             if(step.Tool!="execute_editor_code")return true;
-            try{return (bool?)JObject.Parse(step.Summary)["sceneChanged"]==true;}catch(JsonException){return false;}
+            try{var observed=JObject.Parse(step.Summary);return (bool?)observed["sceneChanged"]==true||(bool?)observed["projectChanged"]==true;}catch(JsonException){return false;}
+        }
+        internal static int StaleEditorCodeObservation(IReadOnlyList<EditorCommandResult> steps,EditorCommand command)
+        {
+            if(command.tool!="execute_editor_code")return -1;
+            string fingerprint=EditorCodeTools.CommandFingerprint(command);
+            for(int i=steps.Count-1;i>=0;i--)
+            {
+                var step=steps[i];if(step.Tool!="execute_editor_code"||!step.Success)continue;
+                JObject report;try{report=JObject.Parse(step.Summary??"");}catch(JsonException){continue;}
+                if((string)report["commandFingerprint"]!=fingerprint)continue;
+                // Legacy reports have no exact project/dirty-asset observation.
+                // They must never be treated as proven no-ops.
+                if((bool?)report["sceneChanged"]!=false||(bool?)report["projectChanged"]!=false||report["observationFingerprint"]?.Type!=JTokenType.String)return -1;
+                return (string)report["observationFingerprint"]==EditorCodeTools.ObservationFingerprint()?i:-1;
+            }
+            return -1;
         }
         internal static EditorCommandResult SuccessfulPlayCompilationEvidence(IReadOnlyList<EditorCommandResult> steps)
         {

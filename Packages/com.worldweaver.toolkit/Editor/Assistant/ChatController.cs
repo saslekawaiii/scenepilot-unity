@@ -288,6 +288,11 @@ namespace WorldWeaver.Editor.Assistant
                                 throw new ArgumentException("This exact configuration already succeeded and no later mutation has intervened. Repeating it does not advance the task. Inspect the current result or call finish_task to request a FRESH review after the repair; old review failures are historical.");
                             if(Settings.UseNativeFunctions&&plan.actions.Count>1&&(plan.actions.Count>8||plan.actions.Any(a=>!SceneToolExecutor.IsReadOnlyTool(a.tool))))throw new ArgumentException("Native batches require at most eight independent read-only observations; mutations are standalone.");
                             if(!Settings.AllowEditorCode&&plan.actions.Any(a=>a.tool=="execute_editor_code"||a.tool=="run_runtime_probe"))throw new ArgumentException("Autonomous Editor C# is disabled; use reviewed script tools.");
+                            foreach(var codeAction in plan.actions.Where(a=>a.tool=="execute_editor_code"))
+                            {
+                                int observed=StaleEditorCodeObservation(answer.Steps,codeAction);
+                                if(observed>=0)throw new ArgumentException("This exact C# snippet already executed successfully at durable task step "+observed+" and changed neither scene, project files nor dirty asset state. Its result is still current. Reuse read_task_step index "+observed+" instead of executing it again. Choose a different justified operation, a meaningful runtime check, or a truthful terminal outcome. No code executed.");
+                            }
                             ValidatePlan(plan, SceneSaveRequested(text), readOnlyRequest);if(!readOnlyRequest)AgentTaskSchema.Validate(answer.Task,plan);
                             foreach(var action in plan.actions)
                                 if(action.tool.StartsWith("create_",StringComparison.Ordinal)&&string.IsNullOrWhiteSpace(action.name)&&appliedUnnamedCreations.Contains(action.tool+"\n"+action.args.ToString(Formatting.None)))
