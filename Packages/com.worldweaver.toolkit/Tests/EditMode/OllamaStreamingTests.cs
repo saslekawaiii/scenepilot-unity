@@ -40,6 +40,7 @@ namespace WorldWeaver.Tests
                         Assert.That(result.InputTokens, Is.EqualTo(13)); Assert.That(result.OutputTokens, Is.EqualTo(2));
                         Assert.That(result.TokensPerSecond, Is.EqualTo(10).Within(.001)); Assert.That(result.FirstTokenMs, Is.GreaterThan(0));
                         Assert.That(result.FirstTokenMs, Is.LessThanOrEqualTo(result.ElapsedMs));
+                        Assert.AreEqual(2,result.Diagnostics.Frames);Assert.Greater(result.Diagnostics.FirstEventMs,0);Assert.GreaterOrEqual(result.Diagnostics.LastEventMs,result.Diagnostics.FirstEventMs);
                     }
                     Assert.That((bool)server.RequestBody["stream"], Is.True);
                 }

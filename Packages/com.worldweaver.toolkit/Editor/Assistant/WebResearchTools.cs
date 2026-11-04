@@ -86,7 +86,7 @@ terrain_from_heightmap: target existing owned Terrain/world,args {path:actual do
                 if(!File.Exists(value))throw new InvalidOperationException("Web agent is not installed. Run Tools~/web_agent/setup.py with Python 3.12, or set WORLDWEAVER_WEB_PYTHON to its interpreter. Unity scene was not changed.");return value;
             }
         }
-        internal static async Task<JObject> Worker(JObject input,CancellationToken token)
+        internal static async Task<JObject> Worker(JObject input,CancellationToken token,int maximumSeconds=360)
         {
             input["store"]=Path.GetFullPath("UserSettings/WorldWeaverWeb/sources.json");
             string script=Path.Combine(Root,"Tools~/web_agent/bridge.py");
@@ -102,7 +102,7 @@ terrain_from_heightmap: target existing owned Terrain/world,args {path:actual do
                 var timer=Stopwatch.StartNew();
                 try
                 {
-                    while(!process.HasExited){token.ThrowIfCancellationRequested();if(timer.Elapsed.TotalSeconds>360)throw new TimeoutException("Web research time budget reached; inspect recorded sources or use a narrower query.");await Task.Delay(80,token);}
+                    while(!process.HasExited){token.ThrowIfCancellationRequested();if(timer.Elapsed.TotalSeconds>maximumSeconds)throw new TimeoutException("External operation time budget reached; use observed sources or another pending part instead of repeating this call.");await Task.Delay(80,token);}
                     string raw=await output;await errors;
                     if(raw.Length>48*1024*1024)throw new InvalidDataException("Web worker output exceeds limit.");
                     var response=JObject.Parse(raw);if((bool?)response["success"]!=true)throw new InvalidOperationException("Web agent: "+(string)response["error"]);
@@ -126,15 +126,47 @@ terrain_from_heightmap: target existing owned Terrain/world,args {path:actual do
                 if(!File.Exists(receipt)){File.WriteAllText(receipt,provenance);created.Add(receipt);}
             }
         }
-        internal static async Task<EditorCommandResult> ExecuteAsync(EditorCommand c,CancellationToken token,Action beforeMutation)
+        internal static int ResearchLimitMs(AssistantPower power)=>power==AssistantPower.Fast?60000:power==AssistantPower.Deep?240000:120000;
+        internal static string ResearchFingerprint(EditorCommand c)=>TextChunker.Digest(c.tool+"\n"+new JObject(c.args.Properties().OrderBy(p=>p.Name,StringComparer.Ordinal).Select(p=>new JProperty(p.Name,p.Value.DeepClone()))).ToString(Formatting.None));
+        internal static void ValidateResearchBudget(AgentTaskState task,EditorCommand command,AssistantPower power)
         {
+            if(task==null||!IsReadOnly(command.tool))return;
+            if(task.ResearchElapsedMs>=ResearchLimitMs(power))throw new ArgumentException("External research budget exhausted for this task. Existing observed sources and artifacts remain available. Stop new searches; use a known resource, implement an independent requested part, or report the factual blocker with finish_task partial/blocked.");
+            var matching=(task.ResearchAttempts??new List<AgentResearchAttempt>()).Where(a=>a.Fingerprint==ResearchFingerprint(command)).ToArray();
+            int lastSuccess=Array.FindLastIndex(matching,a=>a.Success);
+            if(matching.Skip(lastSuccess+1).Count(a=>!a.Success)>=2)throw new ArgumentException("This exact external read failed twice. It will not be executed again unchanged in this task. Use a different actual source or query, existing observations, another independent part, or report the unresolved blocker.");
+        }
+        static JArray ObservedSince(double started)
+        {
+            try{
+                string path="UserSettings/WorldWeaverWeb/sources.json";if(!File.Exists(path)||new FileInfo(path).Length>4*1024*1024)return new JArray();
+                var sources=JObject.Parse(File.ReadAllText(path));
+                return new JArray(sources.Properties().Where(p=>p.Value is JObject&&(double?)p.Value["observedUtc"]>=started).OrderByDescending(p=>(double)p.Value["observedUtc"]).Take(12).Select(p=>new JObject{["url"]=p.Name,["observedFrom"]=p.Value["observedFrom"],["title"]=p.Value["title"],["observedUtc"]=p.Value["observedUtc"]}));
+            }catch(JsonException){return new JArray();}catch(IOException){return new JArray();}
+        }
+        internal static async Task<EditorCommandResult> ExecuteAsync(EditorCommand c,CancellationToken token,Action beforeMutation,AgentExecutionContext context=null)
+        {
+            var task=context?.Message?.Task;var power=context?.Session?.Settings?.Power??AssistantPower.Balanced;
+            ValidateResearchBudget(task,c,power);
             var request=(JObject)c.args.DeepClone();request["operation"]=c.tool;
             if(c.tool=="terrain_from_heightmap")
             {
                 request["operation"]="decode_heightmap";request["path"]=ExistingData((string)c.args["path"]);
                 if(c.args["label_path"]!=null)request["label_path"]=ExistingData((string)c.args["label_path"]);
             }
-            var data=await Worker(request,token);token.ThrowIfCancellationRequested();
+            int seconds=IsReadOnly(c.tool)?Math.Min(90,Math.Max(1,(ResearchLimitMs(power)-(int)Math.Min(int.MaxValue,task?.ResearchElapsedMs??0))/1000)):360;
+            var timer=Stopwatch.StartNew();double started=DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()/1000d;JObject data;bool completed=false;
+            try{data=await Worker(request,token,seconds);completed=c.tool!="web_research"||(bool?)data["completed"]==true;}
+            catch(TimeoutException error)when(IsReadOnly(c.tool))
+            {return new EditorCommandResult{Success=false,Tool=c.tool,Error=error.Message,Summary=new JObject{["completed"]=false,["state"]="time_budget",["observedPublicSources"]=ObservedSince(started),["elapsedMs"]=timer.ElapsedMilliseconds}.ToString(Formatting.None)};}
+            finally{
+                if(task!=null&&IsReadOnly(c.tool)){
+                    task.ResearchElapsedMs+=timer.ElapsedMilliseconds;if(task.ResearchAttempts==null)task.ResearchAttempts=new List<AgentResearchAttempt>();
+                    task.ResearchAttempts.Add(new AgentResearchAttempt{Tool=c.tool,Fingerprint=ResearchFingerprint(c),Success=completed,ElapsedMs=timer.ElapsedMilliseconds});
+                    if(task.ResearchAttempts.Count>64)task.ResearchAttempts.RemoveRange(0,task.ResearchAttempts.Count-64);
+                }
+            }
+            token.ThrowIfCancellationRequested();
             if(IsReadOnly(c.tool))return new EditorCommandResult{Success=c.tool!="web_research"||(bool?)data["completed"]==true,Tool=c.tool,Summary=data.ToString(Formatting.None),Error=c.tool=="web_research"&&(bool?)data["completed"]!=true?"Research reached its step budget; sources are observations, not a completed finding. Narrow the unresolved subgoal using those sources.":null};
             beforeMutation?.Invoke();token.ThrowIfCancellationRequested();
             if(c.tool=="asset_download")

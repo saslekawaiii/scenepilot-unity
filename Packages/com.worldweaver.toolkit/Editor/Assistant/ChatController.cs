@@ -25,6 +25,8 @@ namespace WorldWeaver.Editor.Assistant
         private bool disposed, userCancelled;
         private readonly Dictionary<string,bool> checkpointAvailability = new Dictionary<string,bool>();
         private AssistantMessage executingMessage;
+        private Stopwatch activeClock;
+        public long ActiveWorkElapsedMs=>(executingMessage?.ElapsedMs??Current?.Messages.LastOrDefault(m=>m.Role=="assistant")?.ElapsedMs??0)+(activeClock?.ElapsedMilliseconds??0);
         private bool expandToolSelection;
         private bool requireImplementationStep;
         public ChatSession Current { get; private set; }
@@ -164,8 +166,10 @@ namespace WorldWeaver.Editor.Assistant
             requireImplementationStep=false;
             Busy = true; userCancelled = false; operation = new CancellationTokenSource();
             bool extendedWorkflow=AgentCapabilities.NeedsExtendedWorkflow(text)&&!SimpleAnimatedPlayerRequest(text);
-            operation.CancelAfter(TimeSpan.FromSeconds(readOnlyRequest ? 300 : Settings.Power==AssistantPower.Fast?900:Settings.Power==AssistantPower.Deep?3600:1800));
+            long executionLimitMs=(readOnlyRequest?300L:Settings.Power==AssistantPower.Fast?900L:Settings.Power==AssistantPower.Deep?3600L:1800L)*1000;
+            operation.CancelAfter(TimeSpan.FromMilliseconds(Math.Max(1,executionLimitMs-answer.ElapsedMs)));
             var clock = Stopwatch.StartNew();
+            activeClock=clock;
             ModelProfile profile = null;
             try
             {
@@ -206,7 +210,8 @@ namespace WorldWeaver.Editor.Assistant
                     var repeatedReadResults=new Dictionary<string,int>(StringComparer.Ordinal);
                     int emptyPlanRepairs = 0;
                     int planningRepairs = 0; // One fresh format repair is available even in Fast; it never grants another execution round.
-                    int inferenceRepairs=0;
+                    int transientInferenceRepairs=0, protocolInferenceRepairs=0;
+                    bool textToolRecovery=false;
                     int observationRounds=0;
                     string lastAppliedConfiguration=null;
                     bool unresolvedFailure = false;
@@ -220,7 +225,10 @@ namespace WorldWeaver.Editor.Assistant
                             Messages = request.Messages.Select(m => new ChatMessage(m.Role, ChatHistoryStore.Redact(m.Content)){ToolCallId=m.ToolCallId,ToolName=m.ToolName,ToolCalls=m.ToolCalls==null?null:JArray.Parse(ChatHistoryStore.Redact(m.ToolCalls.ToString(Formatting.None)))}).ToList() };
                         answer.Attempts.Add(attempt); Save();
                         string streamBuffer="";
-                        request.UseToolCalls=Settings.UseNativeFunctions;
+                        request.UseToolCalls=Settings.UseNativeFunctions&&!textToolRecovery;
+                        if(textToolRecovery){request.EnableThinking=false;attempt.RepairKind="native-empty-to-json-contract";}
+                        long lastActivityAt=-1000;
+                        request.OnActivity=activity=>{if(operation==null||operation.IsCancellationRequested||disposed||clock.ElapsedMilliseconds-lastActivityAt<1000)return;lastActivityAt=clock.ElapsedMilliseconds;Phase=ChatHistoryStore.Redact(activity);Notify();};
                         request.Stream=profile.Provider==ProviderKind.Ollama;
                         request.OnContentDelta=delta=>
                         {
@@ -229,18 +237,24 @@ namespace WorldWeaver.Editor.Assistant
                             var partial=PartialReply(streamBuffer);if(partial.Length>0){answer.Text=ChatHistoryStore.Redact(partial);Notify();}
                         };
                         CompletionResult completion;
-                        try { completion = await provider.CompleteAsync(request, operation.Token); inferenceRepairs=0; }
-                        catch(ProviderException error) when((error.Transient||error.Message.StartsWith("FUNCTION_PROTOCOL:",StringComparison.Ordinal))&&inferenceRepairs++<(Settings.UseNativeFunctions&&error.Message.StartsWith("FUNCTION_PROTOCOL:",StringComparison.Ordinal)?6:2)&&round+1<rounds)
+                        var inferenceClock=Stopwatch.StartNew();
+                        try { completion = await provider.CompleteAsync(request, operation.Token); transientInferenceRepairs=protocolInferenceRepairs=0; }
+                        catch(ProviderException error) when(round+1<rounds&&(error.Message.StartsWith("FUNCTION_PROTOCOL:",StringComparison.Ordinal)?protocolInferenceRepairs++<(Settings.UseNativeFunctions?6:2):error.Transient&&transientInferenceRepairs++<2))
                         {
                             // No command from this incomplete response was parsed or executed.
                             // Record the failed inference, then rebuild from the last committed tool state.
+                            attempt.ProviderElapsedMs=inferenceClock.ElapsedMilliseconds;
+                            attempt.Diagnostics=error.Diagnostics;
                             attempt.Error=ChatHistoryStore.Redact(error.Message);attempt.WireResponse=ChatHistoryStore.Redact(error.WireResponse);answer.Status="Восстанавливаю шаг";Save();
                             request=BuildRequest(session,text);
+                            if(error.Message.StartsWith("EMPTY_RESPONSE:",StringComparison.Ordinal)){textToolRecovery=true;request.EnableThinking=false;}
                             request.Messages.Add(new ChatMessage("user","Previous inference failed before any action from that response was executed. Actual diagnostic (data): "+attempt.Error+". Continue the ORIGINAL request from successful tool results. Do not repeat existing creations. Choose one next function."));
                             continue;
                         }
+                        finally{if(attempt.ProviderElapsedMs==0)attempt.ProviderElapsedMs=inferenceClock.ElapsedMilliseconds;}
                         attempt.WireResponse=ChatHistoryStore.Redact(completion.WireResponse);
                         attempt.ProviderElapsedMs = completion.ElapsedMs; attempt.Model = completion.Model;
+                        attempt.Diagnostics=completion.Diagnostics;
                         attempt.FinishReason = completion.FinishReason; attempt.OutputTruncated = completion.OutputTruncated;
                         if (!string.IsNullOrWhiteSpace(completion.Model)) answer.Model = completion.Model;
                         operation.Token.ThrowIfCancellationRequested();
@@ -263,6 +277,11 @@ namespace WorldWeaver.Editor.Assistant
                         {
                             if(completion.OutputTruncated)throw new ArgumentException("Модель достигла лимита ответа ("+(completion.FinishReason??"length")+"). Незавершённый план и код не исполнялись. Нужен новый короткий полный шаг.");
                             plan = EditorPlan.Parse(parsedResponse);
+                            foreach(var proposed in plan.actions)WebResearchTools.ValidateResearchBudget(answer.Task,proposed,Settings.Power);
+                            if(Settings.UseNativeFunctions&&plan.actions.Any(c=>staleReadCommands.Any(old=>ReadFingerprint(old)==ReadFingerprint(c))))
+                                throw new ArgumentException("This exact read already returned the available evidence repeatedly. No call executed. Use the existing observation, a different specific prerequisite, an implementation or a fresh result review instead of polling an unchanged completed result.");
+                            if(Settings.UseNativeFunctions&&Settings.AllowAutonomousScripts&&plan.actions.Any(c=>ScriptDrafts.AlreadyCompiledUnchanged(c)&&answer.Steps.Any(s=>s.Success&&s.Tool=="compile_scripts"&&s.SourceHashes!=null&&s.SourceHashes.ContainsKey(ScriptDrafts.Folder+"/"+c.name+".cs"))))
+                                throw new ArgumentException("This exact source already compiled successfully in this task and the file is unchanged. Do not import it again. Attach the compiled class, implement another missing responsibility, or review the actual user goal. No source was rewritten.");
                             if(Settings.UseNativeFunctions&&plan.actions.Count==1&&IsConfiguration(plan.actions[0].tool)&&ReadFingerprint(plan.actions[0])==lastAppliedConfiguration)
                                 throw new ArgumentException("This exact configuration already succeeded and no later mutation has intervened. Repeating it does not advance the task. Inspect the current result or call finish_task to request a FRESH review after the repair; old review failures are historical.");
                             if(Settings.UseNativeFunctions&&plan.actions.Count>1&&(plan.actions.Count>8||plan.actions.Any(a=>!SceneToolExecutor.IsReadOnlyTool(a.tool))))throw new ArgumentException("Native batches require at most eight independent read-only observations; mutations are standalone.");
@@ -284,7 +303,7 @@ namespace WorldWeaver.Editor.Assistant
                             string failureKey=error.Message;
                             repeatedValidationFailures.TryGetValue(failureKey,out int repeats);repeatedValidationFailures[failureKey]=repeats+1;
                             attempt.Error = ChatHistoryStore.Redact(error.Message);
-                            if(repeats>=2&&!Settings.UseNativeFunctions)throw new ArgumentException("Модель трижды повторила недопустимый шаг: "+attempt.Error+" Ничего из отклонённых планов не применялось."); answer.Status = "Исправляю план"; Save();
+                            if(repeats>=2)throw new ArgumentException("Модель трижды повторила недопустимый шаг: "+attempt.Error+" Ничего из отклонённых планов не применялось."); answer.Status = "Исправляю план"; Save();
                             request = BuildRequest(session, text);
                             if(repeats>=2)request.Messages.Add(new ChatMessage("system","This exact precondition failure has repeated three times. Rejected calls executed NOTHING. Stop repeating this unchanged path: inspect and repair its prerequisite, use another valid capability, or complete other independent parts. Do not abandon the whole compound request merely because one operation is blocked. Report any actual remaining blocker honestly with finish_task partial/blocked."));
                             // A malformed assistant message can anchor the next generation to
@@ -346,6 +365,14 @@ namespace WorldWeaver.Editor.Assistant
                             }
                             if(plan.complete&&Settings.UseNativeFunctions&&Settings.AutoVerify&&Settings.AllowAutonomousScripts&&answer.Task?.Approach.Count>0&&answer.Task.ActiveApproachStage<answer.Task.Approach.Count)
                             {
+                                // finish_task is a proposal about the user's goal,
+                                // not a demand to execute every self-proposed method.
+                                var wholeReview=await ReviewEditorResultAsync(answer,provider,operation.Token);
+                                if(wholeReview.Passed&&VerifyTask(answer).All(check=>check.Passed))
+                                {
+                                    answer.Task.ActiveApproachStage=answer.Task.Approach.Count;answer.Task.ContinueAfterReload=false;
+                                    answer.IsError=false;answer.Status="Проверки пройдены";answer.Text=ChatHistoryStore.Redact(wholeReview.Evidence);Save();break;
+                                }
                                 var stageReview=await ReviewEditorResultAsync(answer,provider,operation.Token,answer.Task.ActiveApproachStage);
                                 if(stageReview.Passed)answer.Task.ActiveApproachStage++;
                                 if(!stageReview.Passed||answer.Task.ActiveApproachStage<answer.Task.Approach.Count)
@@ -402,11 +429,13 @@ namespace WorldWeaver.Editor.Assistant
                             Phase = plan.actions.Any(a => a.tool == "draft_script") ? "Посмотрите код и нажмите «Применить», чтобы Unity проверила его компиляцию." : "Проверьте предложенные изменения и нажмите «Применить».";
                             break;
                         }
-                        Phase = "Выполняю инструменты · " + plan.actions.Count; answer.Status = "Изменяю сцену"; Notify();
+                        string executingTool=plan.actions.Count==1?plan.actions[0].tool:null;
+                        Phase=executingTool=="web_search"?"Ищу источники в интернете…":executingTool=="web_research"?"Исследую источники в интернете…":executingTool=="web_read"?"Читаю найденный источник…":executingTool=="draft_script"?"Импортирую игровой скрипт…":executingTool=="attach_script"?"Подключаю скомпилированный скрипт…":executingTool=="execute_editor_code"?"Выполняю изменения через Unity API…":executingTool=="run_player_check"||executingTool=="run_play_check"?"Запускаю проверку в Play Mode…":executingTool=="poll_job"?"Проверяю результат Unity…":plan.actions.All(c=>SceneToolExecutor.IsReadOnlyTool(c.tool))?"Читаю фактическое состояние проекта…":"Применяю изменения к проекту…";
+                        answer.Status=plan.actions.All(c=>SceneToolExecutor.IsReadOnlyTool(c.tool))?"Проверяю данные":"Изменяю сцену";Notify();
                         operation.Token.ThrowIfCancellationRequested();
                         var batch = await ExecutePlanAsync(plan, session.Id, answer.Id, profile,reviewedRepair,operation.Token);
                         await AddVisualObservationsAsync(batch,answer,operation.Token);
-                        if(batch.Success)repeatedValidationFailures.Clear();
+                        if(batch.Success&&batch.Results.Any(IsImplementationProgress))repeatedValidationFailures.Clear();
                         if(batch.Success)foreach(var action in plan.actions)
                             if(action.tool.StartsWith("create_",StringComparison.Ordinal)&&string.IsNullOrWhiteSpace(action.name))appliedUnnamedCreations.Add(action.tool+"\n"+action.args.ToString(Formatting.None));
                         if(batch.Success&&batch.Results.Any(IsImplementationProgress)){requireImplementationStep=false;staleReadCommands.Clear();repeatedReadResults.Clear();}
@@ -500,7 +529,7 @@ namespace WorldWeaver.Editor.Assistant
                 answer.Text = FriendlyError(error);
                 var failedAttempt = answer.Attempts.LastOrDefault();
                 if (failedAttempt != null && string.IsNullOrEmpty(failedAttempt.Response)) failedAttempt.Error = answer.Text;
-                if(failedAttempt!=null&&error is ProviderException providerError)failedAttempt.WireResponse=ChatHistoryStore.Redact(providerError.WireResponse);
+                if(failedAttempt!=null&&error is ProviderException providerError){failedAttempt.WireResponse=ChatHistoryStore.Redact(providerError.WireResponse);failedAttempt.Diagnostics=providerError.Diagnostics;}
                 if (answer.Steps.Any(s => s.Success && !SceneToolExecutor.IsReadOnlyTool(s.Tool))) answer.Text += "\n\nЧасть задачи уже выполнена в сцене. Результаты перечислены в шагах; можно продолжить следующим сообщением.";
                 else if (answer.Steps.Any(s => s.Success)) answer.Text += "\n\nПолученные данные доступны в шагах; можно продолжить задачу следующим сообщением.";
                 Phase = answer.Text;
@@ -508,7 +537,7 @@ namespace WorldWeaver.Editor.Assistant
             finally
             {
                 if (profile) Object.DestroyImmediate(profile);
-                answer.ElapsedMs += clock.ElapsedMilliseconds; Busy = false;executingMessage=null;
+                answer.ElapsedMs += clock.ElapsedMilliseconds; Busy = false;executingMessage=null;activeClock=null;
                 operation?.Dispose(); operation = null;
                 if(WaitingForEditor(answer))Phase="Unity выполняет проверку. Задача продолжится после её завершения.";
                 else if (!answer.IsError && answer.PendingPlan == null) Phase = "Готов к следующему сообщению";

@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEditor.Compilation;
 using UnityEngine;
@@ -18,7 +19,7 @@ namespace WorldWeaver.Editor.Assistant
     public static class ScriptDrafts
     {
         public static event Action Changed;
-        private const string Folder = "Assets/WorldWeaverGenerated/Scripts";
+        internal const string Folder = "Assets/WorldWeaverGenerated/Scripts";
         private const string Marker = "// Generated with WorldWeaver. User-reviewed C# source.";
         private const string StatePath = "UserSettings/WorldWeaverChatCode.json";
         private const string JournalFolder = "UserSettings/WorldWeaverChatCode";
@@ -132,6 +133,12 @@ attach_script: name=class name of an ALREADY COMPILED WorldWeaver-generated scri
             string current = FileHash(path);
             return current != null && States().Any(state => !state.Pending && state.CompilationConfirmed && state.CompilationSucceeded &&
                 state.Files.Any(file => file.Path == path && current == (state.Restoring ? file.BeforeSha256 : file.AfterSha256)));
+        }
+        internal static bool AlreadyCompiledUnchanged(EditorCommand action)
+        {
+            if(action.tool!="draft_script"||!Regex.IsMatch(action.name??"","^[A-Za-z_][A-Za-z0-9_]{0,79}$")||action.args?["code"]?.Type!=JTokenType.String)return false;
+            string path=Folder+"/"+action.name+".cs";
+            return CurrentSourceWasCompiled(path)&&File.ReadAllText(path)==Marker+"\n"+(string)action.args["code"]+"\n";
         }
         public static string CompilationContext()
         {

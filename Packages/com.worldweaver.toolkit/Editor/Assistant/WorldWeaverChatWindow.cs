@@ -117,13 +117,8 @@ namespace WorldWeaver.Editor.Assistant
             if (controller?.Busy == true && phaseLabel != null && EditorApplication.timeSinceStartup >= nextElapsedRefresh)
             {
                 nextElapsedRefresh = EditorApplication.timeSinceStartup + 1;
-                var currentReply = controller.Current?.Messages.LastOrDefault(message => message.Role == "assistant");
-                if (currentReply != null && DateTime.TryParse(currentReply.CreatedUtc, null,
-                    System.Globalization.DateTimeStyles.RoundtripKind, out var started))
-                {
-                    long seconds = Math.Max(0, (long)(DateTime.UtcNow - started.ToUniversalTime()).TotalSeconds);
-                    phaseLabel.text = controller.Phase + " · " + (seconds / 60) + ":" + (seconds % 60).ToString("D2");
-                }
+                long seconds=Math.Max(0,controller.ActiveWorkElapsedMs/1000);
+                phaseLabel.text=controller.Phase+" · "+(seconds/60)+":"+(seconds%60).ToString("D2");
             }
         }
 
@@ -1133,6 +1128,8 @@ namespace WorldWeaver.Editor.Assistant
                 Root.EnableInClassList("error-message", value.IsError);
                 metadata.text = value.Role == "user" ? "" : string.Join(" · ", new[] { value.Model, value.ElapsedMs > 0 ? (value.ElapsedMs / 1000d).ToString("0.0") + " с" : null }.Where(s => !string.IsNullOrEmpty(s)));
                 metadata.tooltip = value.FirstTokenMs > 0 ? "Первый фрагмент ответа: " + (value.FirstTokenMs / 1000d).ToString("0.0") + " с" : "";
+                var timing=value.Attempts.LastOrDefault()?.Diagnostics;
+                if(timing!=null)metadata.tooltip+="\nПоследний запрос модели: первый фрагмент "+(timing.FirstEventMs/1000d).ToString("0.0")+" с; последний "+(timing.LastEventMs/1000d).ToString("0.0")+" с; фрагментов "+timing.Frames+"; завершение "+timing.FinishReason;
                 retry.SetEnabled(!owner.controller.HasPendingWork && !owner.backgroundBlocked && !string.IsNullOrEmpty(owner.OriginalRequest(value.Id)));
                 apply.style.display = value.PendingPlan == null ? DisplayStyle.None : DisplayStyle.Flex;
                 apply.SetEnabled(!owner.controller.HasPendingWork && !owner.backgroundBlocked && !EditorApplication.isCompiling && !EditorApplication.isPlayingOrWillChangePlaymode);

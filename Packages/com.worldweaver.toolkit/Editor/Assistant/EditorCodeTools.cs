@@ -61,7 +61,9 @@ execute_editor_code: optional existing owned target, otherwise an owned workspac
             }
             if(!target.GetComponent<GeneratedSceneObject>())throw new ArgumentException("Editor code target must be owned.");
             Undo.RegisterFullObjectHierarchyUndo(target,"WorldWeaver C# operation");
-            var before=ProjectContextIndex.Objects().Select(g=>g.GetInstanceID()).ToHashSet();
+            var previousObjects=ProjectContextIndex.Objects().ToArray();
+            var before=previousObjects.Select(g=>g.GetInstanceID()).ToHashSet();
+            var knownIds=previousObjects.Select(g=>g.GetComponent<GeneratedSceneObject>()).Where(g=>g).Select(g=>g.ObjectId).ToHashSet();
             string sceneBefore=SceneSignature();
             object result;
             try{result=assembly.GetType("WWEditorSnippet").GetMethod("Execute").Invoke(null,new object[]{target});}
@@ -71,6 +73,9 @@ execute_editor_code: optional existing owned target, otherwise an owned workspac
             {
                 Undo.RegisterCreatedObjectUndo(go,"Agent C# creation");
                 if(!go.GetComponent<GeneratedSceneObject>())Undo.AddComponent<GeneratedSceneObject>(go).Kind="code_generated";
+                var marker=go.GetComponent<GeneratedSceneObject>();
+                if(knownIds.Contains(marker.ObjectId))marker.ObjectId=Guid.NewGuid().ToString("N");
+                marker.EnsureUniqueIdentity();knownIds.Add(marker.ObjectId);
             }
             string data=JsonConvert.SerializeObject(result,new JsonSerializerSettings{ReferenceLoopHandling=ReferenceLoopHandling.Ignore,MaxDepth=8,Converters=new List<JsonConverter>{new UnityReadbackConverter()}});
             if(data.Length>16000)data=data.Substring(0,16000)+" [output truncated]";
@@ -86,11 +91,24 @@ execute_editor_code: optional existing owned target, otherwise an owned workspac
         internal static JArray ReadScene(GameObject target,GameObject[] created)
         {
             Physics.SyncTransforms();var rows=new JArray();
-            var objects=new[]{target}.Concat(created).Concat(target.GetComponentsInChildren<Transform>(true).Select(t=>t.gameObject)).Where(g=>g).Distinct().Take(32);
+            int serializedBudget=10000;
+            var objects=new[]{target}.Concat(created).Concat(target.GetComponentsInChildren<Transform>(true).Select(t=>t.gameObject)).Where(g=>g).Distinct()
+                .OrderBy(g=>g==target?0:g.GetComponents<MonoBehaviour>().Any(c=>c&&!(c is GeneratedSceneObject))?1:g.GetComponents<Component>().Any(c=>c&&!(c is Transform)&&!(c is GeneratedSceneObject))?2:3).Take(32);
             foreach(var go in objects)
             {
                 var row=new JObject{["target"]=ProjectContextIndex.StableTarget(go),["name"]=go.name,["worldPosition"]=V(go.transform.position),["localScale"]=V(go.transform.localScale)};
                 row["components"]=new JArray(go.GetComponents<Component>().Where(c=>c).Select(c=>c.GetType().Name));
+                var serializedState=new JArray();
+                foreach(var component in go.GetComponents<MonoBehaviour>().Where(c=>c&&!(c is GeneratedSceneObject)).OrderBy(c=>c is WorldPlayer||!(c.GetType().Namespace??"").StartsWith("WorldWeaver.",StringComparison.Ordinal)?0:1).Take(4))
+                {
+                    if(serializedBudget<200){row["serializedStateOmitted"]=true;break;}
+                    var observed=AgentProjectTools.InspectComponent(component);var fields=new JArray();int used=0,cap=Math.Min(1600,serializedBudget);
+                    foreach(var field in ((JArray)observed["fields"]).OfType<JObject>().Where(f=>!new[]{"m_ObjectHideFlags","m_CorrespondingSourceObject","m_PrefabInstance","m_PrefabAsset","m_GameObject","m_EditorHideFlags","m_EditorClassIdentifier"}.Contains((string)f["property"]))
+                        .OrderBy(f=>(string)f["type"]=="String"||(string)f["type"]=="ObjectReference"?0:1).Take(18))
+                    {int size=field.ToString(Formatting.None).Length;if(used+size>cap)continue;fields.Add(field.DeepClone());used+=size;}
+                    serializedBudget-=used;serializedState.Add(new JObject{["component"]=observed["component"],["fields"]=fields});
+                }
+                if(serializedState.Count>0)row["serializedState"]=serializedState;
                 var renderers=go.GetComponentsInChildren<Renderer>().Where(r=>r.enabled&&r.gameObject.activeInHierarchy).ToArray();
                 if(renderers.Length>0){var bounds=renderers[0].bounds;foreach(var r in renderers.Skip(1))bounds.Encapsulate(r.bounds);row["renderWorldBounds"]=B(bounds);}
                 row["materials"]=new JArray(renderers.SelectMany(r=>r.sharedMaterials).Where(m=>m).Distinct().Take(4).Select(m=>new JObject{["name"]=m.name,["shader"]=m.shader?m.shader.name:null,["texture"]=m.mainTexture?AssetDatabase.GetAssetPath(m.mainTexture):null,["color"]=m.HasProperty("_BaseColor")?JArray.FromObject(new[]{m.GetColor("_BaseColor").r,m.GetColor("_BaseColor").g,m.GetColor("_BaseColor").b}):m.HasProperty("_Color")?JArray.FromObject(new[]{m.color.r,m.color.g,m.color.b}):null}));

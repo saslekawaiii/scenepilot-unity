@@ -25,13 +25,37 @@ namespace WorldWeaver.Editor.Assistant.Tests
             groups.Clear();EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
             foreach(string file in assets.Distinct().Reverse())if(AssetDatabase.LoadMainAssetAtPath(file))AssetDatabase.DeleteAsset(file);assets.Clear();
         }
-        EditorBatchResult Run(string tool,string name="",string target="",JObject args=null)
+        EditorBatchResult Run(string tool,string name="",string target="",JObject args=null,bool allowEditorCode=false)
         {
-            var result=SceneToolExecutor.Execute(new EditorPlan{actions=new List<EditorCommand>{new EditorCommand{tool=tool,name=name,target=target,args=args??new JObject()}}});
+            var session=new ChatSession();session.Settings.AllowEditorCode=allowEditorCode;session.Settings.Mode=AssistantMode.Execute;
+            var result=SceneToolExecutor.Execute(new EditorPlan{actions=new List<EditorCommand>{new EditorCommand{tool=tool,name=name,target=target,args=args??new JObject()}}},executionContext:new AgentExecutionContext{Session=session});
             if(result.UndoGroup>=0)groups.Add(result.UndoGroup);foreach(var step in result.Results)assets.AddRange(step.CreatedAssets);
             return result;
         }
         GameObject Named(string name)=>scene.GetRootGameObjects().SelectMany(r=>r.GetComponentsInChildren<Transform>(true)).Single(t=>t.name==name).gameObject;
+        [Test] public void SceneReadbackKeepsUiAndTypedReferencesAheadOfTransformOnlyBones()
+        {
+            var root=new GameObject("Root");root.AddComponent<GeneratedSceneObject>();
+            for(int i=0;i<60;i++)new GameObject("Bone"+i).transform.SetParent(root.transform);
+            var label=new GameObject("RepeatedLabel",typeof(RectTransform),typeof(Text));label.transform.SetParent(root.transform);label.GetComponent<Text>().text="Collected 2/5";
+            var actor=new GameObject("Actor");actor.transform.SetParent(root.transform);var player=actor.AddComponent<WorldPlayer>();
+            var camera=new GameObject("RepeatedLabel").AddComponent<Camera>();camera.gameObject.AddComponent<GeneratedSceneObject>();camera.transform.SetParent(root.transform);player.View=camera;
+            var snapshot=Run("execute_editor_code",target:ProjectContextIndex.StableTarget(root),args:new JObject{["code"]="return 1;"},allowEditorCode:true);Assert.IsTrue(snapshot.Success,snapshot.Error);
+            var rows=(JArray)JObject.Parse(snapshot.Results.Last().Summary)["sceneReadback"];
+            var ui=rows.OfType<JObject>().Single(r=>(string)r["target"]==ProjectContextIndex.StableTarget(label));
+            Assert.That(ui["serializedState"].ToString(),Does.Contain("Collected 2/5"));
+            var actorRow=rows.OfType<JObject>().Single(r=>(string)r["target"]==ProjectContextIndex.StableTarget(actor));
+            var state=actorRow["serializedState"].First(c=>(string)c["component"]==typeof(WorldPlayer).FullName);
+            var reference=state["fields"].First(f=>(string)f["property"]=="View")["reference"];
+            Assert.AreEqual(ProjectContextIndex.StableTarget(camera.gameObject),(string)reference["target"]);Assert.AreEqual(typeof(Camera).FullName,(string)reference["component"]);
+        }
+        [Test] public void EditorCodeInactiveCloneGetsItsOwnResolvableIdentity()
+        {
+            var original=new GameObject("InactiveOriginal");original.SetActive(false);var marker=original.AddComponent<GeneratedSceneObject>();string old=marker.ObjectId;
+            var result=Run("execute_editor_code",target:ProjectContextIndex.StableTarget(original),args:new JObject{["code"]="var copy=UnityEngine.Object.Instantiate(target);copy.name=\"InactiveCopy\";return copy.name;"},allowEditorCode:true);
+            Assert.IsTrue(result.Success,result.Error);var copy=Named("InactiveCopy");
+            Assert.AreEqual(old,marker.ObjectId);Assert.AreNotEqual(old,copy.GetComponent<GeneratedSceneObject>().ObjectId);Assert.AreSame(copy,SceneToolExecutor.ResolveTarget(ProjectContextIndex.StableTarget(copy)));
+        }
         GameObject World()
         {var r=Run("create_world","World",args:new JObject{["width"]=160,["length"]=160,["height"]=32,["resolution"]=129,["trees"]=0,["rocks"]=0,["buildings"]=0,["waterLevel"]=0});Assert.That(r.Success,Is.True,r.Error);return Named("World");}
         [TestCase("карта высот с кратерами и лунными жителями","shape_terrain")]

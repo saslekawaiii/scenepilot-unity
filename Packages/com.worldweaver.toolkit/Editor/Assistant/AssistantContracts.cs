@@ -146,6 +146,7 @@ namespace WorldWeaver.Editor.Assistant
         // NormalizedResponse is recorded only for an explicit, narrowly scoped adapter repair.
         public string Response, RawResponse, WireResponse, NormalizedResponse, RepairKind, Error, SchemaHash, Model, FinishReason;
         public long ProviderElapsedMs;
+        public InferenceDiagnostics Diagnostics;
         public List<ChatMessage> Messages = new List<ChatMessage>();
         public bool Accepted, OutputTruncated;
         public int FirstResultIndex=-1, ResultCount;

@@ -45,6 +45,14 @@ namespace WorldWeaver.Editor.Assistant
         public List<string> OpenQuestions = new List<string>();
         public List<string> Approach = new List<string>();
         public int ActiveApproachStage;
+        public long ResearchElapsedMs;
+        public List<AgentResearchAttempt> ResearchAttempts = new List<AgentResearchAttempt>();
+    }
+    [Serializable] public sealed class AgentResearchAttempt
+    {
+        public string Fingerprint, Tool;
+        public bool Success;
+        public long ElapsedMs;
     }
     /// <summary>Observable literal constraints are checked by code, independently of model completion prose.</summary>
     public static class AgentTaskVerifier

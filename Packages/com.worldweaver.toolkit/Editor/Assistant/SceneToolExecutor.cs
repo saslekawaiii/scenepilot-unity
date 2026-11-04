@@ -320,7 +320,7 @@ read_script: target empty; args {path:Assets/.../Name.cs or installed Packages/.
                 Validate(plan);
                 var command=plan.actions.Single();
                 Action admit=()=>{token.ThrowIfCancellationRequested();Validate(plan);beforeMutation?.Invoke();};
-                var result=WebResearchTools.Handles(command.tool)?await WebResearchTools.ExecuteAsync(command,token,admit):ModelAssetTools.IsAsync(command.tool)?await ModelAssetTools.ImportAsync(command,token,admit):await WorldMaterialTools.ExecuteAsync(command,token,admit);
+                var result=WebResearchTools.Handles(command.tool)?await WebResearchTools.ExecuteAsync(command,token,admit,executionContext):ModelAssetTools.IsAsync(command.tool)?await ModelAssetTools.ImportAsync(command,token,admit):await WorldMaterialTools.ExecuteAsync(command,token,admit);
                 return new EditorBatchResult{Success=result.Success,Error=result.Error,Summary="Выполнен инструмент "+command.tool,Results=new List<EditorCommandResult>{result}};
             }
             catch(OperationCanceledException){throw;}

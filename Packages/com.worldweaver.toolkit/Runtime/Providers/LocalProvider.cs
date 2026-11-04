@@ -24,9 +24,6 @@ namespace WorldWeaver
             // Ground them in the exact contract, then keep the caller's unchanged
             // strict parser/validators. Never send the unsupported format object.
             bool cloud = profile.Model.EndsWith(":cloud", StringComparison.OrdinalIgnoreCase);
-            if (request.UseToolCalls) messages.Add(new JObject { ["role"] = "system", ["content"] = AgentFunctionProtocol.Instructions });
-            if (!request.UseToolCalls && cloud && request.Schema != null)
-                messages.Add(new JObject { ["role"] = "system", ["content"] = "Return ONLY one JSON INSTANCE matching this exact output contract, never Markdown or a schema. Every required field must be present. Contract: " + request.Schema.ToString(Newtonsoft.Json.Formatting.None) });
             int imageCount = 0, imageBytes = 0;
             foreach (var message in request.TransportMessages())
             {
@@ -53,6 +50,13 @@ namespace WorldWeaver
                 messages.Add(item);
             }
 
+            // Place the active wire contract after other trusted instructions,
+            // but before all data. A JSON rescue must override the earlier
+            // native-wire instruction without overriding permissions or scope.
+            string wireContract=!request.UseToolCalls&&cloud&&request.Schema!=null?
+                "The response transport for THIS request is a JSON INSTANCE, not native function calls. This replaces only earlier response-format instructions; all task permissions, scope and validations still apply. Return ONLY one JSON INSTANCE matching this exact output contract, never Markdown or a schema. Every required field must be present. Contract: "+request.Schema.ToString(Newtonsoft.Json.Formatting.None):null;
+            if(wireContract!=null){int firstData=0;while(firstData<messages.Count&&((string)messages[firstData]["role"]=="system"||(string)messages[firstData]["role"]=="developer"))firstData++;messages.Insert(firstData,new JObject{["role"]="system",["content"]=wireContract});}
+
             var body = new JObject { ["model"] = profile.Model, ["messages"] = messages, ["stream"] = request.Stream, ["think"] = false,
                 ["keep_alive"] = request.LocalKeepAliveSeconds.HasValue?(JToken)new JValue(request.LocalKeepAliveSeconds.Value):new JValue("10m"),
                 ["options"] = new JObject { ["temperature"] = profile.Temperature, ["num_predict"] = profile.MaxTokens, ["num_ctx"] = profile.ContextWindow } };
@@ -63,12 +67,14 @@ namespace WorldWeaver
             else if (!cloud) body["format"] = request.Schema != null ? (JToken)OllamaDecoderSchema.FromHost(request.Schema) : new JValue("json");
             var watch = Stopwatch.StartNew();
             JObject result; string content; long firstToken = 0;
+            var diagnostics=new InferenceDiagnostics();
+            try {
             if (request.Stream)
             {
                 var text = new StringBuilder();
                 var thinking = new StringBuilder();
                 var calls = new JArray();
-                request.OnActivity?.Invoke("Ожидаю ответ локальной модели…");
+                request.OnActivity?.Invoke(cloud?"Ожидаю ответ облачной модели…":"Ожидаю ответ локальной модели…");
                 for (int attempt = 0; ; attempt++)
                 {
                     bool receivedFrame = false;
@@ -77,6 +83,8 @@ namespace WorldWeaver
                         result = await streaming.SendAsync(profile.Endpoint.TrimEnd('/') + "/api/chat", body, profile.TimeoutSeconds, frame =>
                         {
                             receivedFrame = true;
+                            if(diagnostics.Frames++==0)diagnostics.FirstEventMs=Math.Max(1,watch.ElapsedMilliseconds);
+                            diagnostics.LastEventMs=Math.Max(1,watch.ElapsedMilliseconds);
                             token.ThrowIfCancellationRequested();
                             if (frame["message"]?["tool_calls"] is JArray frameCalls) foreach (var call in frameCalls) calls.Add(call.DeepClone());
                             if(frame["message"]?["thinking"]?.Type==JTokenType.String)thinking.Append((string)frame["message"]["thinking"]);
@@ -87,7 +95,7 @@ namespace WorldWeaver
                                 text.Append(delta); request.OnContentDelta?.Invoke(delta);
                             }
                             else if (frame["message"]?["thinking"]?.Type == JTokenType.String)
-                                request.OnActivity?.Invoke("Локальная модель обрабатывает запрос…");
+                                request.OnActivity?.Invoke(cloud?"Облачная модель обрабатывает запрос…":"Локальная модель обрабатывает запрос…");
                         }, token);
                         break;
                     }
@@ -97,31 +105,34 @@ namespace WorldWeaver
                         await Task.Delay(500 * (1 << attempt), token);
                     }
                 }
-                if (request.UseToolCalls)
-                {
-                    result["message"] = new JObject { ["role"] = "assistant", ["content"] = text.ToString(), ["tool_calls"] = calls };
-                    if(thinking.Length>0)result["message"]["thinking"]=thinking.ToString();
-                    content = CompletionResult.IsOutputLimit((string)result["done_reason"]) ? text.ToString() : AgentFunctionProtocol.Normalize((JObject)result["message"], request.Schema);
-                }
-                else content = text.ToString();
+                result["message"] = new JObject { ["role"] = "assistant", ["content"] = text.ToString(), ["tool_calls"] = calls };
+                if(thinking.Length>0)result["message"]["thinking"]=thinking.ToString();
+                content = text.ToString();
             }
             else
             {
                 result = await transport.SendAsync(profile.Endpoint.TrimEnd('/') + "/api/chat", body, "", profile.TimeoutSeconds, profile.Retries, token);
-                content = request.UseToolCalls && !CompletionResult.IsOutputLimit((string)result["done_reason"])
-                    ? AgentFunctionProtocol.Normalize((JObject)result["message"], request.Schema) : (string)result["message"]?["content"];
+                diagnostics.Frames=1;diagnostics.FirstEventMs=diagnostics.LastEventMs=Math.Max(1,watch.ElapsedMilliseconds);
+                content = (string)result["message"]?["content"];
             }
             token.ThrowIfCancellationRequested();
             string finishReason = (string)result["done_reason"];
             bool truncated = CompletionResult.IsOutputLimit(finishReason);
-            if (string.IsNullOrWhiteSpace(content) && !truncated) throw new ProviderException("Ollama returned no text.");
+            int callCount=(result["message"]?["tool_calls"] as JArray)?.Count??0;
+            diagnostics.ElapsedMs=watch.ElapsedMilliseconds;diagnostics.ContentCharacters=content?.Length??0;diagnostics.ToolCalls=callCount;diagnostics.ThinkingCharacters=((string)result["message"]?["thinking"]??"").Length;
+            diagnostics.FinishReason=CompletionResult.IsOutputLimit(finishReason)?"length":finishReason=="stop"?"stop":finishReason==null?"missing":"other";
+            if(string.IsNullOrWhiteSpace(content)&&!truncated&&(!request.UseToolCalls||callCount==0))
+                throw new ProviderException("EMPTY_RESPONSE: no usable "+(request.UseToolCalls?"native":"JSON/text")+" response; thinkingCharacters="+((string)result["message"]?["thinking"]??"").Length+"; generatedTokens="+Counter(result,"eval_count")+"; done="+(finishReason=="stop"?"stop":finishReason==null?"missing":"other")+"; elapsedMs="+watch.ElapsedMilliseconds+".",0,true);
+            if(request.UseToolCalls&&!truncated)content=AgentFunctionProtocol.Normalize((JObject)result["message"],request.Schema);
             int input = Counter(result, "prompt_eval_count"), output = Counter(result, "eval_count");
             double duration = Duration(result);
             return new CompletionResult { Text = content ?? "", Model = profile.Model, Provider = "Ollama", ElapsedMs = watch.ElapsedMilliseconds,
                 WireResponse = request.UseToolCalls ? result["message"]?.ToString(Newtonsoft.Json.Formatting.None) : null,
+                Diagnostics=diagnostics,
                 FinishReason = finishReason, OutputTruncated = truncated,
                 FirstTokenMs = firstToken, InputTokens = input, OutputTokens = output,
                 TokensPerSecond = duration > 0 ? output * 1e9 / duration : 0 };
+            }catch(ProviderException error){diagnostics.ElapsedMs=watch.ElapsedMilliseconds;error.Diagnostics=diagnostics;throw;}
         }
         private static int Counter(JObject result, string name)
         {

@@ -129,6 +129,8 @@ namespace WorldWeaver.Editor.Assistant
         public static JArray TerrainFacts()=>new JArray(Objects().Select(g=>g.GetComponent<Terrain>()).Where(t=>t).Take(8).Select(TerrainFacts));
         public static JObject Summary() => new JObject {
             ["unityVersion"]=Application.unityVersion,["platform"]=EditorUserBuildSettings.activeBuildTarget.ToString(),
+            ["renderPipeline"]=UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline?UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline.GetType().FullName:"BuiltIn",
+            ["renderPipelineAsset"]=UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline?AssetDatabase.GetAssetPath(UnityEngine.Rendering.GraphicsSettings.currentRenderPipeline):null,
             ["inputBackend"]=WorldInput.Backend,
             ["loadedScenes"]=new JArray(Enumerable.Range(0,SceneManager.sceneCount).Select(i=>SceneManager.GetSceneAt(i)).Where(s=>s.isLoaded).Select(s=>new JObject{["name"]=s.name,["path"]=s.path,["dirty"]=s.isDirty})),
             ["assetCount"]=AssetDatabase.GetAllAssetPaths().Count(p=>p.StartsWith("Assets/",StringComparison.Ordinal)),

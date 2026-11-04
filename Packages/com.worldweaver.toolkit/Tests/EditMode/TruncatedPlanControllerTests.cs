@@ -130,6 +130,46 @@ namespace WorldWeaver.Tests
             Assert.IsFalse(answer.Attempts[0].Accepted);Assert.IsTrue(answer.Attempts[1].Accepted);
             Assert.IsFalse(answer.IsError,answer.Text);Assert.IsEmpty(answer.Steps);Assert.AreEqual(0,scene.rootCount);
         }
+        [UnityTest] public IEnumerator CompletionChecksTheUserGoalBeforeUnrequestedImplementationStages()
+        {
+            const string prompt="Создай куб высотой 2 метра.";var provider=new Provider();
+            provider.Reply=(round,request)=>
+            {
+                if(request.Schema["properties"]?["passed"]!=null){
+                    var data=JObject.Parse(request.Messages.Last().Content);Assert.AreEqual(prompt,(string)data["OriginalRequest"]);
+                    Assert.AreEqual(2,Find("CubeFromOriginalGoal").transform.localScale.y);
+                    return Result("{\"passed\":true,\"issues\":[],\"evidence\":\"Actual cube height is two metres.\"}");
+                }
+                if(round==0)return Result(Plan(new EditorCommand{tool="plan_task",args=new JObject{["steps"]=new JArray("Create the requested cube.","Write an optional custom generator class.")}}).Replace("\"complete\":true","\"complete\":false"));
+                if(round==1)return Result(Plan(new EditorCommand{tool="create_object",name="CubeFromOriginalGoal",args=new JObject{["kind"]="cube",["scale"]=new JArray(1,2,1),["position"]=new JArray(0,1,0),["on_terrain"]=false}}).Replace("\"complete\":true","\"complete\":false"));
+                return Result(Plan());
+            };
+            CreateController(provider);controller.Settings.UseNativeFunctions=true;controller.Settings.AllowAutonomousScripts=true;controller.Settings.AllowEditorCode=true;controller.Settings.AutoVerify=true;controller.Settings.Power=AssistantPower.Deep;
+            yield return Finish(controller.SendAsync(prompt));var answer=controller.Current.Messages.Last();
+            Assert.IsFalse(answer.IsError,answer.Text);Assert.AreEqual("Проверки пройдены",answer.Status);Assert.AreEqual(answer.Task.Approach.Count,answer.Task.ActiveApproachStage);
+        }
+        [UnityTest] public IEnumerator MixedEmptyAndProtocolFailuresRecoverWithoutExecutingRejectedSteps()
+        {
+            var provider=new Provider();provider.Reply=(round,request)=>
+            {
+                if(round==0||round==2)throw new ProviderException("EMPTY_RESPONSE: controlled empty response",0,true);
+                if(round==1){Assert.AreEqual(false,request.EnableThinking);throw new ProviderException("FUNCTION_PROTOCOL: unadvertised function; no action executed.");}
+                if(round==3){Assert.AreEqual(false,request.EnableThinking);Assert.IsFalse(request.UseToolCalls);Assert.AreEqual(0,scene.rootCount);return Result(Plan(Cube("RecoveredAfterMixedFailures")));}
+                return Result(Plan());
+            };
+            CreateController(provider);controller.Settings.UseNativeFunctions=true;controller.Settings.AutoVerify=false;
+            yield return Finish(controller.SendAsync("Создай куб."));
+            var answer=controller.Current.Messages.Last();Assert.IsFalse(answer.IsError,answer.Text);Assert.IsNotNull(Find("RecoveredAfterMixedFailures"));
+            Assert.AreEqual(5,provider.Requests.Count);Assert.AreEqual(1,answer.Steps.Count(s=>s.Success&&s.Tool=="create_object"));
+            Assert.IsTrue(answer.Attempts.Take(3).All(a=>!a.Accepted));
+        }
+        [UnityTest] public IEnumerator RepeatedEmptyResponsesStopWithoutAnySceneChanges()
+        {
+            var provider=new Provider();provider.Reply=(round,request)=>{throw new ProviderException("EMPTY_RESPONSE: controlled unavailable backend",0,true);};
+            CreateController(provider);controller.Settings.UseNativeFunctions=true;controller.Settings.AutoVerify=false;
+            yield return Finish(controller.SendAsync("Создай куб."));var answer=controller.Current.Messages.Last();
+            Assert.IsTrue(answer.IsError);Assert.AreEqual(3,provider.Requests.Count);Assert.IsEmpty(answer.Steps);Assert.AreEqual(0,scene.rootCount);
+        }
         [UnityTest] public IEnumerator RealHeroUsesCompactContractAndAnEmptyAnswerCannotPassEvenWithoutOptionalAutoVerify()
         {
             var provider=new Provider();provider.Reply=(round,request)=>

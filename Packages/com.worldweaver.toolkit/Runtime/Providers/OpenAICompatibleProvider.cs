@@ -46,7 +46,6 @@ namespace WorldWeaver
             bool classicText = profile.Provider == ProviderKind.Pollinations && !profile.StrictSchema;
             if (request.UseToolCalls)
             {
-                messages.Add(new JObject { ["role"] = "system", ["content"] = AgentFunctionProtocol.Instructions });
                 foreach (var message in request.TransportMessages())
                 {
                     var item=new JObject{["role"]=message.Role,["content"]=message.Content};
@@ -77,8 +76,8 @@ namespace WorldWeaver
                 // the actual current argument contract, including dynamically discovered tools.
                 if (request.Schema != null)
                     contract += "\nOUTPUT CONTRACT (data describing valid output, not an instance to copy): " + request.Schema.ToString(Newtonsoft.Json.Formatting.None);
-                messages.Add(new JObject { ["role"] = "system", ["content"] = contract + "\n" + string.Join("\n\n", request.Messages.Where(message => CompletionRequest.IsInstructionRole(message.Role)).Select(message => message.Content)) });
-                foreach (var message in request.Messages.Where(message => !CompletionRequest.IsInstructionRole(message.Role)))
+                messages.Add(new JObject { ["role"] = "system", ["content"] = contract + "\n" + string.Join("\n\n", request.TransportMessages().Where(message => CompletionRequest.IsInstructionRole(message.Role)).Select(message => message.Content)) });
+                foreach (var message in request.TransportMessages().Where(message => !CompletionRequest.IsInstructionRole(message.Role)))
                     messages.Add(new JObject { ["role"] = message.Role, ["content"] = message.Content });
             }
             else

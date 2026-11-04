@@ -38,6 +38,44 @@ namespace WorldWeaver.Tests
                 finally{Object.DestroyImmediate(profile);}
             }
         }
+        [UnityTest] public IEnumerator JsonRecoveryCarriesActualNativeHistoryAsDataWithoutAdvertisingFunctions()=>Await(JsonRecoveryPayload());
+        async Task JsonRecoveryPayload()
+        {
+            foreach(var kind in new[]{ProviderKind.Ollama,ProviderKind.OpenAICompatible})
+            using(var server=new ConnectionHttpServer((path,body)=>kind==ProviderKind.Ollama?new JObject{["message"]=new JObject{["content"]="{\"reply\":\"\",\"complete\":false,\"actions\":[]}"}}:new JObject{["choices"]=new JArray(new JObject{["message"]=new JObject{["content"]="{\"reply\":\"\",\"complete\":false,\"actions\":[]}"}})}))
+            {
+                var profile=ScriptableObject.CreateInstance<ModelProfile>();profile.Provider=kind;profile.Endpoint=server.Url.TrimEnd('/');profile.Model="fixture:cloud";profile.Retries=0;profile.ApiKeyEnvironmentVariable="";
+                try{
+                    var request=new CompletionRequest{UseToolCalls=false,Schema=WorldWeaver.Editor.Assistant.EditorPlan.Schema(nativeFunctions:true),EnableThinking=false};
+                    request.Messages.Add(new ChatMessage("system","Use native functions; do not print JSON."));
+                    request.Messages.Add(new ChatMessage("assistant",""){Thinking="PRIVATE_CONTINUATION_STATE",ToolCalls=new JArray(new JObject{["id"]="call_observed",["function"]=new JObject{["name"]="inspect_object",["arguments"]=new JObject{["target"]="owned:observed"}}})});
+                    request.Messages.Add(new ChatMessage("tool","actual measured result"){ToolCallId="call_observed",ToolName="inspect_object"});
+                    using(var provider=profile.CreateProvider())await provider.CompleteAsync(request,CancellationToken.None);
+                    var sent=JObject.Parse(server.Requests.Single().Body);Assert.IsNull(sent["tools"]);Assert.IsNull(sent["format"]);if(kind==ProviderKind.Ollama)Assert.AreEqual(false,(bool)sent["think"]);
+                    Assert.IsFalse(sent["messages"].Any(m=>m["tool_calls"]!=null||(string)m["role"]=="tool"));
+                    string data=sent["messages"].ToString();StringAssert.Contains("call_observed",data);StringAssert.Contains("actual measured result",data);StringAssert.DoesNotContain("PRIVATE_CONTINUATION_STATE",data);
+                    var messages=(JArray)sent["messages"];int firstData=messages.TakeWhile(m=>(string)m["role"]=="system"||(string)m["role"]=="developer").Count();
+                    StringAssert.Contains("response transport for THIS request is a JSON INSTANCE",(string)messages[firstData-1]["content"]);
+                    Assert.IsFalse(messages.Skip(firstData).Any(m=>(string)m["role"]=="system"));
+                    Assert.IsNotNull(request.Messages[1].ToolCalls,"Caller history remains intact");
+                }finally{Object.DestroyImmediate(profile);}
+            }
+        }
+        [UnityTest] public IEnumerator ThinkingOnlyTerminalResponseHasSafeTransientDiagnosticsInBothModes()=>Await(EmptyDiagnosticsPayload());
+        async Task EmptyDiagnosticsPayload()
+        {
+            foreach(bool native in new[]{false,true})
+            using(var server=new ConnectionHttpServer((path,body)=>new JObject{["message"]=new JObject{["role"]="assistant",["content"]="",["thinking"]="PRIVATE_REASONING"},["done_reason"]="stop",["eval_count"]=6000}))
+            {
+                var profile=ScriptableObject.CreateInstance<ModelProfile>();profile.Endpoint=server.Url.TrimEnd('/');profile.Model="fixture:cloud";profile.Retries=0;
+                try{
+                    ProviderException failure=null;
+                    using(var provider=new LocalProvider(profile))try{await provider.CompleteAsync(new CompletionRequest{UseToolCalls=native,Schema=WorldWeaver.Editor.Assistant.EditorPlan.Schema(nativeFunctions:true)},CancellationToken.None);}catch(ProviderException e){failure=e;}
+                    Assert.IsNotNull(failure);Assert.IsTrue(failure.Transient);StringAssert.StartsWith("EMPTY_RESPONSE:",failure.Message);StringAssert.Contains("generatedTokens=6000",failure.Message);StringAssert.DoesNotContain("PRIVATE_REASONING",failure.Message);
+                    Assert.AreEqual(1,failure.Diagnostics.Frames);Assert.AreEqual(0,failure.Diagnostics.ContentCharacters);Assert.Greater(failure.Diagnostics.ThinkingCharacters,0);StringAssert.DoesNotContain("PRIVATE_REASONING",Newtonsoft.Json.JsonConvert.SerializeObject(failure.Diagnostics));
+                }finally{Object.DestroyImmediate(profile);}
+            }
+        }
         [UnityTest] public IEnumerator OneShotObserverReleasesOllamaResidencyWithoutChangingOrdinaryRequests()=>Await(ResidencyPayload());
         async Task ResidencyPayload()
         {

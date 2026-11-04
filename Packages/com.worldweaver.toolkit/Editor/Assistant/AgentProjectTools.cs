@@ -38,7 +38,7 @@ add_component: target existing object,args {type:full registered Component type 
 read_console: target empty,args {limit?:1..100}. Observed console and actual compiler feedback.
 capture_scene: target empty,args {view?:overview|game|player}. Real image saved locally. Overview frames actual terrain and geometry, with fog suppressed only during capture. A text-only planner receives read-only observations from an available installed local vision model. Use overview to resolve visual descriptions after literal name searches miss; absent names do not prove absent geometry. Never claim inspection when visualInspection is unavailable.
 run_tests: target empty,args {mode:edit|play,filter:explicit fixture/name regex}. Standalone plan only, starts real Unity TestRunner job. Persisted job result survives domain reload; use poll_job before claiming success. Empty/skipped tests are not a pass.
-run_player_check: target actual WorldPlayer, args {seconds?:0.5..3,check_relaxed_arms?:bool}. Enter real Play Mode and drive actual virtual mouse (both axes WITHOUT RMB), W movement, exposed leg and both arm poses. Measures yaw/pitch/travel/ground. Optional relaxed walking arm check requires measured elbows <85 degrees and hands below shoulders. Reference T-pose in Edit Mode is not an animation failure: diagnose the actual Play pose. Exits and returns a durable job result via poll_job. No source changes.
+run_player_check: target actual WorldPlayer, args {seconds?:0.5..3,check_relaxed_arms?:bool}. Enter real Play Mode and drive actual virtual mouse (both axes WITHOUT RMB), W movement, exposed leg and both arm poses. Measures yaw/pitch/travel/ground. check_relaxed_arms defaults to false. Enable it ONLY for a user-requested arm-pose repair and a confirmed Humanoid rig; it is not a general player requirement. Generic rigs may have authored animation without Humanoid bone measurements. Optional relaxed walking arm check requires measured elbows <85 degrees and hands below shoulders. Reference T-pose in Edit Mode is not an animation failure: diagnose the actual Play pose. Exits and returns a durable job result via poll_job. No source changes.
 run_play_check: target existing object,args {seconds:0.25..10,degrees_per_second:-360..360}. Standalone plan. Enter real Play Mode, measure LOCAL Y rotation against actual elapsed game time, verify speed and off-axis drift, then exit. Use after attaching rotation behavior; compilation alone is insufficient. Result survives domain reload.
 poll_job: target empty,args {id:job id}. Read actual job/XML/build status.
 build_player: target empty,args {}. Standalone plan; builds enabled saved Build Settings scenes to unique local Builds directory for active platform. Does not publish or install modules.
@@ -166,14 +166,24 @@ open_scene: target empty,args {path:Assets/...unity}. Standalone reviewed action
             if(path==null||!path.StartsWith("Assets/",StringComparison.Ordinal)||path.Contains("..")||path.Contains('\\'))throw new ArgumentException("Asset reference must stay inside Assets.");
             return AssetDatabase.LoadMainAssetAtPath(path)??throw new ArgumentException("Asset reference not found.");
         }
-        static JObject InspectComponent(Component component)
+        internal static JObject InspectComponent(Component component)
         {
             var serialized=new SerializedObject(component);var property=serialized.GetIterator();var fields=new JArray();int budget=0;
             while(property.NextVisible(true)&&fields.Count<80)
             {
                 if(property.depth>2||property.propertyPath=="m_Script")continue;
                 string value=Sensitive(property.propertyPath)?"[скрыто]":PropertyText(property);
-                if(budget+value.Length>9000)break;budget+=value.Length;fields.Add(new JObject{["property"]=property.propertyPath,["type"]=property.propertyType.ToString(),["value"]=ChatHistoryStore.Redact(value),["editable"]=property.editable&&!Sensitive(property.propertyPath)});
+                if(budget+value.Length>9000)break;budget+=value.Length;
+                var field=new JObject{["property"]=property.propertyPath,["type"]=property.propertyType.ToString(),["value"]=ChatHistoryStore.Redact(value),["editable"]=property.editable&&!Sensitive(property.propertyPath)};
+                if(property.propertyType==SerializedPropertyType.ObjectReference&&!Sensitive(property.propertyPath))
+                {
+                    var referenced=property.objectReferenceValue;var referencedComponent=referenced as Component;
+                    var sceneObject=referencedComponent?referencedComponent.gameObject:referenced as GameObject;
+                    if(sceneObject&&sceneObject.scene.IsValid())field["reference"]=new JObject{["target"]=ProjectContextIndex.StableTarget(sceneObject),["component"]=referencedComponent?referencedComponent.GetType().FullName:null};
+                    else if(referenced)field["reference"]=new JObject{["asset"]=AssetDatabase.GetAssetPath(referenced),["type"]=referenced.GetType().FullName};
+                    else field["reference"]=JValue.CreateNull();
+                }
+                fields.Add(field);
             }
             return new JObject{["component"]=component.GetType().FullName,["fields"]=fields};
         }
