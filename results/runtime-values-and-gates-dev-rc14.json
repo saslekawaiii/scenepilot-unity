@@ -1,0 +1,273 @@
+{
+  "startedUtc": "2026-11-04T16:00:24.55667Z",
+  "invalidCodeRejectedBeforePlay": true,
+  "scene": "Assets/ProbeAcceptance/fixture.unity",
+  "sceneHash": "dffd850eec8e3a7ba87238c095ea5f407e5c4bceed4272f101006958fde6e84f",
+  "devices": [],
+  "caseIndex": 10,
+  "jobId": null,
+  "cases": [
+    {
+      "case": "actual_unity_value_measurements",
+      "expectedSuccess": true,
+      "actualSuccess": true,
+      "status": "completed",
+      "error": "",
+      "passed": true,
+      "sceneRestored": true,
+      "sceneFileUnchanged": true,
+      "devicesRestored": true,
+      "compilationEvidenceMatched": true,
+      "devicesAfter": [],
+      "samples": 3,
+      "sourceHash": "bdccf25c40b31709a3f77c9e43c082a8eb353a54690a26162b43db2c8973412c",
+      "observations": {
+        "pose": {
+          "position": [
+            0.0,
+            1.07999992,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0,
+            1.0
+          ],
+          "area": {
+            "center": [
+              0.0,
+              1.07999992,
+              0.0
+            ],
+            "size": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        }
+      },
+      "assertions": [
+        {
+          "name": "actual actor grounded height",
+          "passed": true,
+          "observed": [
+            0.0,
+            1.07999992,
+            0.0
+          ]
+        }
+      ]
+    },
+    {
+      "case": "measure_after_frames",
+      "expectedSuccess": true,
+      "actualSuccess": true,
+      "status": "completed",
+      "error": "",
+      "passed": true,
+      "sceneRestored": true,
+      "sceneFileUnchanged": true,
+      "devicesRestored": true,
+      "compilationEvidenceMatched": true,
+      "devicesAfter": [],
+      "samples": 3,
+      "sourceHash": "1e244f6a56d4ef82bf45b33a1965ebf9699fa9e70e06c96d8ca27dc46d437326",
+      "observations": {
+        "before": 1.0
+      },
+      "assertions": [
+        {
+          "name": "actual light changed",
+          "passed": true,
+          "observed": 2.5
+        }
+      ]
+    },
+    {
+      "case": "actual_keyboard_and_mouse",
+      "expectedSuccess": true,
+      "actualSuccess": true,
+      "status": "completed",
+      "error": "",
+      "passed": true,
+      "sceneRestored": true,
+      "sceneFileUnchanged": true,
+      "devicesRestored": true,
+      "compilationEvidenceMatched": true,
+      "devicesAfter": [],
+      "samples": 272,
+      "sourceHash": "f75320e8c9447bb68e9d7bd55f6d303e05140b72eec824fe521a1bc7b82ba7ad",
+      "observations": {},
+      "assertions": [
+        {
+          "name": "real W translation",
+          "passed": true,
+          "observed": 1.500129
+        },
+        {
+          "name": "real mouse yaw",
+          "passed": true,
+          "observed": 17.9999981
+        }
+      ]
+    },
+    {
+      "case": "actual_interact_edge",
+      "expectedSuccess": true,
+      "actualSuccess": true,
+      "status": "completed",
+      "error": "",
+      "passed": true,
+      "sceneRestored": true,
+      "sceneFileUnchanged": true,
+      "devicesRestored": true,
+      "compilationEvidenceMatched": true,
+      "devicesAfter": [],
+      "samples": 4,
+      "sourceHash": "ee49553dc24b8c1a4688a82fdbfc9a34eb0d58528073ec58e1f4f4f8dc8aa0b1",
+      "observations": {},
+      "assertions": [
+        {
+          "name": "E edge reached actual gameplay Update",
+          "passed": true,
+          "observed": {
+            "before": "WASD — движение · Shift — бег · Space — прыжок · правая кнопка мыши — поворот · E — разговор",
+            "after": "Подойдите ближе к персонажу, чтобы поговорить."
+          }
+        }
+      ]
+    },
+    {
+      "case": "current_keyboard_interact_edge",
+      "expectedSuccess": true,
+      "actualSuccess": true,
+      "status": "completed",
+      "error": "",
+      "passed": true,
+      "sceneRestored": true,
+      "sceneFileUnchanged": true,
+      "devicesRestored": true,
+      "compilationEvidenceMatched": true,
+      "devicesAfter": [],
+      "samples": 4,
+      "sourceHash": "45f9e03313b1cd459c8fccd44178024c1624bd53ed549e11e58ee692a8c6fd60",
+      "observations": {},
+      "assertions": [
+        {
+          "name": "standard current devices installed",
+          "passed": true,
+          "observed": null
+        },
+        {
+          "name": "Keyboard.current E reached gameplay Update",
+          "passed": true,
+          "observed": {
+            "before": "WASD — движение · Shift — бег · Space — прыжок · правая кнопка мыши — поворот · E — разговор",
+            "after": "Подойдите ближе к персонажу, чтобы поговорить."
+          }
+        }
+      ]
+    },
+    {
+      "case": "failed_assertion",
+      "expectedSuccess": false,
+      "actualSuccess": false,
+      "status": "failed",
+      "error": "One or more actual runtime assertions failed.",
+      "passed": true,
+      "sceneRestored": true,
+      "sceneFileUnchanged": true,
+      "devicesRestored": true,
+      "compilationEvidenceMatched": true,
+      "devicesAfter": [],
+      "samples": 3,
+      "sourceHash": "7d92c61ed1aeb723f02985d52c848b9a217445bb75dafc73dc00719a6517dc61",
+      "observations": {},
+      "assertions": [
+        {
+          "name": "intentional failing measurement",
+          "passed": false,
+          "observed": {
+            "actual": 1,
+            "expected": 2
+          }
+        }
+      ]
+    },
+    {
+      "case": "missing_assertion",
+      "expectedSuccess": false,
+      "actualSuccess": false,
+      "status": "failed",
+      "error": "No runtime assertion executed.",
+      "passed": true,
+      "sceneRestored": true,
+      "sceneFileUnchanged": true,
+      "devicesRestored": true,
+      "compilationEvidenceMatched": true,
+      "devicesAfter": [],
+      "samples": 3,
+      "sourceHash": "ed24a392cd563bc4382982eb432d20f8c635b930265bd7636879dcc88c12bb54",
+      "observations": {
+        "measuredOnly": 3
+      },
+      "assertions": []
+    },
+    {
+      "case": "yielded_timeout",
+      "expectedSuccess": false,
+      "actualSuccess": false,
+      "status": "failed",
+      "error": "Runtime probe exceeded its yielded wall-time budget.",
+      "passed": true,
+      "sceneRestored": true,
+      "sceneFileUnchanged": true,
+      "devicesRestored": true,
+      "compilationEvidenceMatched": true,
+      "devicesAfter": [],
+      "samples": 370,
+      "sourceHash": "aae32754b935e45088cf310f001c6a90da64a8a4b92c68ca7da323ba177efca4",
+      "observations": {},
+      "assertions": []
+    },
+    {
+      "case": "actual_exception",
+      "expectedSuccess": false,
+      "actualSuccess": false,
+      "status": "failed",
+      "error": "intentional probe exception",
+      "passed": true,
+      "sceneRestored": true,
+      "sceneFileUnchanged": true,
+      "devicesRestored": true,
+      "compilationEvidenceMatched": true,
+      "devicesAfter": [],
+      "samples": 3,
+      "sourceHash": "de15df00f7b6e084641d8e642db490a3a9445953acf9fa7d443f78f41dfc3bed",
+      "observations": {},
+      "assertions": []
+    },
+    {
+      "case": "cancel",
+      "expectedSuccess": false,
+      "actualSuccess": false,
+      "status": "failed",
+      "error": "Runtime probe cancelled.",
+      "passed": true,
+      "sceneRestored": true,
+      "sceneFileUnchanged": true,
+      "devicesRestored": true,
+      "compilationEvidenceMatched": true,
+      "devicesAfter": [],
+      "samples": 1,
+      "sourceHash": "aae32754b935e45088cf310f001c6a90da64a8a4b92c68ca7da323ba177efca4",
+      "observations": {},
+      "assertions": []
+    }
+  ],
+  "completed": true,
+  "passed": true,
+  "finishedUtc": "2026-11-04T16:00:56.7110990Z"
+}

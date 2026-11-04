@@ -36,7 +36,7 @@ namespace WorldWeaver.Editor.Assistant
             if(Settings.UseNativeFunctions)
             {
                 request.Messages.Add(new ChatMessage("system","Requested work remains. Implement the next justified part of the ORIGINAL request using the confirmed state and artifacts. Do not create an unrelated object just to satisfy a mutation check. If actual investigation establishes a missing resource, unavailable service or unsupported operation, finish_task with outcome blocked (or partial if some requested work succeeded), explicit blockers and confirmed results. Never label that completed."));
-                if(Settings.AllowAutonomousScripts&&!(answer?.Task?.Approach.Count>0))
+                if(Settings.AllowAutonomousScripts)
                 {
                     var nativeBranches=request.Schema?["properties"]?["actions"]?["items"]?["anyOf"] as JArray;
                     if(nativeBranches!=null)
@@ -65,6 +65,24 @@ namespace WorldWeaver.Editor.Assistant
             if(step.Tool!="execute_editor_code")return true;
             try{return (bool?)JObject.Parse(step.Summary)["sceneChanged"]==true;}catch(JsonException){return false;}
         }
+        internal static EditorCommandResult SuccessfulPlayCompilationEvidence(IReadOnlyList<EditorCommandResult> steps)
+        {
+            for(int i=steps.Count-1;i>=0;i--)
+            {
+                var step=steps[i];
+                // A measurement of older loaded code cannot validate a later edit.
+                if(step.Success&&step.ChangesApplied!=false&&(step.Tool=="draft_script"||step.Tool=="patch_script"))return null;
+                if(step.Tool!="job_result"||!step.Success)continue;
+                try
+                {
+                    var job=JObject.Parse(step.Summary);string kind=(string)job["Kind"];
+                    if((string)job["Id"]==step.Target&&(bool?)job["Success"]==true&&(string)job["Status"]=="completed"&&(int?)job["Passed"]>0&&
+                        (kind=="runtime_probe"&&(int?)job["Samples"]>0||kind=="player_control"||kind=="rotation"))return step;
+                }
+                catch(JsonException){}
+            }
+            return null;
+        }
         internal static IReadOnlyList<AgentCheckResult> VerifyTask(AssistantMessage answer)
         {
             if(answer.Task==null)return Array.Empty<AgentCheckResult>();
@@ -86,7 +104,14 @@ namespace WorldWeaver.Editor.Assistant
                     latest[key]=step;
                 }
             }
-            if(answer.Task.CompilationRequired&&!latest.Keys.Any(k=>k.StartsWith("compile:",StringComparison.Ordinal))&&!answer.Steps.Any(s=>s.Tool=="execute_editor_code"&&s.Success))answer.Task.Checks.Add(new AgentCheckResult{RequirementId="required_compilation",Description="Запрошенный новый/изменённый код прошёл настоящую компиляцию",Passed=false,Actual="Нет результата компиляции текущей задачи",Evidence="Unity CompilationPipeline"});
+            if(answer.Task.CompilationRequired&&!latest.Keys.Any(k=>k.StartsWith("compile:",StringComparison.Ordinal))&&!answer.Steps.Any(s=>s.Tool=="execute_editor_code"&&s.Success))
+            {
+                // Unity cannot run actual Play frames with outstanding compiler
+                // errors. Reusing unchanged game code needs this current evidence,
+                // not a redundant re-import solely to manufacture a compile event.
+                var play=SuccessfulPlayCompilationEvidence(answer.Steps);
+                answer.Task.Checks.Add(new AgentCheckResult{RequirementId="required_compilation",Description=play==null?"Запрошенный новый/изменённый код прошёл настоящую компиляцию":"Компиляция проекта позволила фактическую проверку в Play Mode",Passed=play!=null,Actual=play==null?"Нет результата компиляции текущей задачи":"Unity вошла в Play Mode и выполнила проверку текущего кода",Evidence=play==null?"Unity CompilationPipeline":"Успешное завершённое Play-задание "+play.Target+"; более поздняя правка исходника требует новой компиляции/проверки. Это не новый импорт исходника."});
+            }
             foreach(var pair in latest)answer.Task.Checks.Add(new AgentCheckResult{RequirementId=pair.Key,Description=pair.Key.StartsWith("compile:",StringComparison.Ordinal)?"Компиляция "+pair.Key.Substring(8):"Фактическая проверка Unity",Passed=pair.Value.Success,Actual=pair.Value.Success?"PASS":pair.Value.Error??"FAIL",Evidence=pair.Value.Summary});
             foreach(var requirement in answer.Task.Requirements.Where(r=>r.Kind=="rotation_speed"))
             {

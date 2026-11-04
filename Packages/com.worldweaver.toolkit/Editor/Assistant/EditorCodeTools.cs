@@ -139,7 +139,7 @@ execute_editor_code: optional existing owned target, otherwise an owned workspac
         }
         static JArray V(Vector3 value)=>new JArray(value.x,value.y,value.z);
         static JObject B(Bounds value)=>new JObject{["min"]=V(value.min),["max"]=V(value.max),["size"]=V(value.size)};
-        sealed class UnityReadbackConverter:JsonConverter
+        internal sealed class UnityReadbackConverter:JsonConverter
         {
             public override bool CanRead=>false;
             public override bool CanConvert(Type type)=>typeof(UnityEngine.Object).IsAssignableFrom(type)||type==typeof(Vector2)||type==typeof(Vector3)||type==typeof(Vector4)||type==typeof(Quaternion)||type==typeof(Color)||type==typeof(Bounds);

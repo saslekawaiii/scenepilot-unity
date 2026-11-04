@@ -49,6 +49,47 @@ namespace WorldWeaver.Tests
             var method=typeof(ChatController).GetMethod("JobObservationForModel",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic);
             var projected=(JObject)method.Invoke(null,new object[]{raw});Assert.IsNull(projected["ProbeCode"]);Assert.IsNotNull(raw["ProbeCode"]);Assert.AreEqual("actual-hash",(string)projected["ProbeSourceHash"]);Assert.IsFalse((bool)projected["ProbeAssertions"][0]["passed"]);
         }
+        [Test] public void ActualUnityValueObservationsAndNestedAssertionsSerializeWithoutFollowingComputedProperties()
+        {
+            using(var probe=new RuntimeProbeContext())
+            {
+                var position=new UnityEngine.Vector3(2,3,4);
+                probe.Record("pose",new{position,rotation=UnityEngine.Quaternion.identity,color=UnityEngine.Color.red,bounds=new UnityEngine.Bounds(position,UnityEngine.Vector3.one),path=new[]{position,UnityEngine.Vector3.zero}});
+                var observed=probe.Measurements["pose"];
+                CollectionAssert.AreEqual(new[]{2f,3f,4f},observed["position"].Values<float>());CollectionAssert.AreEqual(new[]{0f,0f,0f,1f},observed["rotation"].Values<float>());
+                CollectionAssert.AreEqual(new[]{1f,0f,0f,1f},observed["color"].Values<float>());Assert.AreEqual(2,observed["path"].Count());Assert.AreEqual(3,(float)observed["bounds"]["center"][1]);
+                probe.Check(position.y==3,"measured height",position);Assert.IsTrue((bool)probe.Assertions[0]["passed"]);Assert.AreEqual(3,(float)probe.Assertions[0]["observed"][1]);
+                Assert.That(observed.ToString(),Does.Not.Contain("normalized"));
+            }
+        }
+        [Test] public void UnityObjectObservationIsAnIdentityReadbackRatherThanARecursiveSceneSerialization()
+        {
+            var actor=new UnityEngine.GameObject("ProbeObservedActor");
+            try
+            {
+                using(var probe=new RuntimeProbeContext())
+                {
+                    probe.Record("actor",new{actor=actor.transform});var observed=probe.Measurements["actor"]["actor"];
+                    Assert.AreEqual(actor.name,(string)observed["name"]);Assert.AreEqual("UnityEngine.Transform",(string)observed["type"]);Assert.IsNull(observed["position"]);Assert.IsNull(observed["gameObject"]);
+                    Assert.Less(observed.ToString().Length,1000);
+                }
+            }
+            finally{UnityEngine.Object.DestroyImmediate(actor);}
+        }
+        [Test] public void SuccessfulActualPlayCanConfirmUnchangedProjectCompilationButNeverALaterSourceEdit()
+        {
+            var method=typeof(ChatController).GetMethod("SuccessfulPlayCompilationEvidence",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Public);
+            var steps=new System.Collections.Generic.List<EditorCommandResult>();
+            var job=new JObject{["Id"]="play-job",["Kind"]="runtime_probe",["Status"]="completed",["Success"]=true,["Passed"]=2,["Samples"]=10};
+            var result=new EditorCommandResult{Tool="job_result",Target="play-job",Success=true,Summary=job.ToString()};steps.Add(result);
+            Assert.AreSame(result,method.Invoke(null,new object[]{steps}));
+            steps.Add(new EditorCommandResult{Tool="read_script",Success=true});Assert.AreSame(result,method.Invoke(null,new object[]{steps}));
+            steps.Add(new EditorCommandResult{Tool="draft_script",Success=true,ChangesApplied=true});Assert.IsNull(method.Invoke(null,new object[]{steps}));
+            steps.Add(result);Assert.AreSame(result,method.Invoke(null,new object[]{steps}));
+            steps.Clear();job["Status"]="running";result.Summary=job.ToString();steps.Add(result);Assert.IsNull(method.Invoke(null,new object[]{steps}));
+            job["Status"]="completed";job["Kind"]="tests";result.Summary=job.ToString();Assert.IsNull(method.Invoke(null,new object[]{steps}),"EditMode tests do not prove a Play transition");
+            job["Kind"]="runtime_probe";job["Samples"]=0;result.Summary=job.ToString();Assert.IsNull(method.Invoke(null,new object[]{steps}),"No actual frame measured");
+        }
         [Test] public void FailedGenericProbeRemainsVisibleAndNeedsFreshMeasurementAfterSourceRepair()
         {
             var flags=System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic;

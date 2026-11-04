@@ -26,7 +26,12 @@ namespace WorldWeaver.Editor.Assistant
 #endif
         static JToken Value(object value)
         {
-            var result=value==null?JValue.CreateNull():JToken.FromObject(value);
+            // Unity vectors expose normalized/other computed vectors. Default
+            // reflection follows those properties recursively, losing even an
+            // ordinary measured position. Use the same bounded value/read-back
+            // representation as Editor snippets, including nested values.
+            var serializer=JsonSerializer.Create(new JsonSerializerSettings{TypeNameHandling=TypeNameHandling.None,ReferenceLoopHandling=ReferenceLoopHandling.Error,MaxDepth=8,Converters=new System.Collections.Generic.List<JsonConverter>{new EditorCodeTools.UnityReadbackConverter()}});
+            var result=value==null?JValue.CreateNull():JToken.FromObject(value,serializer);
             if(result.ToString(Formatting.None).Length>6000)throw new ArgumentException("One runtime observation exceeds 6000 characters; return bounded measured primitives.");
             return result;
         }

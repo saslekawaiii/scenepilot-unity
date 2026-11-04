@@ -21,7 +21,7 @@ def main():
                       'operationResults':[{'index':i,'tool':x.get('Tool'),'success':x.get('Success'),'changesApplied':x.get('ChangesApplied')} for i,x in enumerate(steps)],
                       'reviewResults':[{'stage':r.get('ApproachStage'),'passed':r.get('Passed'),'atStep':r.get('StepCount')} for r in answer.get('EditorReviews',[])],
                       'finalReply':answer.get('Text')})
-    result={k:raw.get(k) for k in ['startedUtc','finishedUtc','completed','passed','packageDigest','packageUnchanged','sceneRepairByHarness','providerInjected','paidApiUsed','stoppedByHarness','stopReason'] if k in raw}
+    result={k:raw.get(k) for k in ['startedUtc','finishedUtc','completed','passed','packageDigest','packageUnchanged','sceneRepairByHarness','providerInjected','paidApiUsed','stoppedByHarness','stopReason','continuationFromSavedArtifact','initialScene','packageSourceCommit','packageArchiveSha256','observerSnapshotIntervalSeconds'] if k in raw}
     result.update({'rawModelInternalsOmitted':True,'cases':cases})
     if a.output.exists():raise FileExistsError('Preserve historical evidence: '+str(a.output))
     a.output.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')

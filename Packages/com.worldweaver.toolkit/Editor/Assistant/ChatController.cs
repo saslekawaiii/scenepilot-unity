@@ -471,18 +471,22 @@ namespace WorldWeaver.Editor.Assistant
                         // observation prevents long runs of needless further edits.
                         if(batch.Results.Any(IsImplementationProgress))observationRounds=0;
                         else observationRounds++;
-                        bool stalledObservations=Settings.AllowAutonomousScripts&&!readOnlyRequest&&Settings.Mode==AssistantMode.Execute&&observationRounds>=6&&answer.EditorReviews.Count<12;
+                        bool stalledObservations=Settings.AllowAutonomousScripts&&!readOnlyRequest&&Settings.Mode==AssistantMode.Execute&&observationRounds>=6;
+                        // A proposed plan and the review-call cap cannot exempt a
+                        // task from the bounded observation phase. Real verification,
+                        // specific prerequisite discovery and truthful partial results
+                        // remain available; unrelated mutations are never required.
+                        if(stalledObservations)requireImplementationStep=true;
                         bool changedEnough=batch.Success&&hasMutations&&answer.Steps.Skip(answer.EditorReviews.LastOrDefault()?.StepCount??0).Count(IsImplementationProgress)>=4;
                         bool stageCheckpoint=batch.Success&&batch.Results.Any(s=>s.Success&&s.Tool=="review_stage");
-                        if(Settings.UseNativeFunctions&&Settings.AutoVerify&&!WaitingForEditor(answer)&&(stageCheckpoint||Settings.Power==AssistantPower.Deep&&(changedEnough||stalledObservations)))
+                        if(Settings.UseNativeFunctions&&Settings.AutoVerify&&!WaitingForEditor(answer)&&(stageCheckpoint||Settings.Power==AssistantPower.Deep&&(changedEnough||stalledObservations&&answer.EditorReviews.Count<12)))
                         {
                             int stage=Settings.AllowAutonomousScripts&&answer.Task?.Approach.Count>0&&answer.Task.ActiveApproachStage<answer.Task.Approach.Count?answer.Task.ActiveApproachStage:-1;
                             var progress=await ReviewEditorResultAsync(answer,provider,operation.Token,stage);
                             observationRounds=0;var progressChecks=VerifyTask(answer);
                             if((stalledObservations||stageCheckpoint)&&!progress.Passed)requireImplementationStep=true;
-                            // Break provider continuation loops without inventing a scene action.
-                            // Re-send actual tool facts through the same validated JSON contract.
-                            if(stalledObservations&&!textToolRecovery){textToolRecovery=true;textRecoveryKind="native-stall-to-json-contract";}
+                            // Repeated valid observations are a planning problem,
+                            // not evidence that native function encoding is broken.
                             if(stage>=0&&progress.Passed)
                             {
                                 answer.Task.ActiveApproachStage++;requireImplementationStep=false;Save();
@@ -529,7 +533,7 @@ namespace WorldWeaver.Editor.Assistant
                 if(answer.Task!=null){answer.Task.ContinueAfterReload=false;answer.Task.Status=timedOut?"timed_out":"cancelled";}
                 answer.IsError = timedOut; answer.Status = timedOut ? "Лимит времени" : "Остановлено";
                 answer.Text = timedOut ? "Достигнут общий предел времени этого режима. Попробуйте меньшую задачу или другую модель." + (Settings.Power == AssistantPower.Deep ? "" : " Для длинной задачи можно выбрать режим «Глубоко».") : "Запрос остановлен.";
-                answer.Text += answer.Steps.Any(s => s.Success && s.ChangesApplied!=false && !SceneToolExecutor.IsReadOnlyTool(s.Tool)) ? " Уже выполненные изменения доступны в сцене; их можно отменить."
+                answer.Text += answer.Steps.Any(IsImplementationProgress) ? " Применённые изменения доступны в проекте; их можно отменить."
                     : answer.Steps.Any(s => s.Success) ? " Полученные данные доступны в шагах; можно продолжить задачу следующим сообщением." : " Сцена не изменена.";
                 if (timedOut) Phase = answer.Text;
             }
@@ -541,7 +545,7 @@ namespace WorldWeaver.Editor.Assistant
                 var failedAttempt = answer.Attempts.LastOrDefault();
                 if (failedAttempt != null && string.IsNullOrEmpty(failedAttempt.Response)) failedAttempt.Error = answer.Text;
                 if(failedAttempt!=null&&error is ProviderException providerError){failedAttempt.WireResponse=ChatHistoryStore.Redact(providerError.WireResponse);failedAttempt.Diagnostics=providerError.Diagnostics;}
-                if (answer.Steps.Any(s => s.Success && s.ChangesApplied!=false && !SceneToolExecutor.IsReadOnlyTool(s.Tool))) answer.Text += "\n\nЧасть задачи уже выполнена в сцене. Результаты перечислены в шагах; можно продолжить следующим сообщением.";
+                if (answer.Steps.Any(IsImplementationProgress)) answer.Text += "\n\nИнструменты успели применить изменения в проекте. Это не подтверждает выполнение всей задачи; результаты перечислены в шагах.";
                 else if (answer.Steps.Any(s => s.Success)) answer.Text += "\n\nПолученные данные доступны в шагах; можно продолжить задачу следующим сообщением.";
                 Phase = answer.Text;
             }

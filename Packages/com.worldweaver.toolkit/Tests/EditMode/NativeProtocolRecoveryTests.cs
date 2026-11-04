@@ -182,5 +182,41 @@ namespace WorldWeaver.Tests
             Assert.That(error.Message,Does.Contain("Complete the required plan_task step first"));Assert.That(error.Message,Does.Contain("Discovery is not enabled"));Assert.That(error.Message,Does.Not.Contain("Discover the exact missing function"));
             Assert.IsTrue(AgentFunctionProtocol.IsToolAvailabilityError(error.Message));
         }
+        sealed class PlannedReadLoopProvider:ILLMProvider
+        {
+            public int Calls;public bool Narrowed;
+            public Task<CompletionResult> CompleteAsync(CompletionRequest request,CancellationToken token)
+            {
+                Calls++;Assert.IsTrue(request.UseToolCalls,"Valid read calls cannot disable native encoding");
+                var plan=new EditorPlan{complete=Calls>7};
+                if(Calls==1)plan.actions.Add(new EditorCommand{tool="plan_task",args=new JObject{["steps"]=new JArray("Inspect the current scene","Create the requested node","Verify the original request")}});
+                else if(Calls<=6)plan.actions.Add(new EditorCommand{tool="list_scene_objects"});
+                else if(Calls==7)
+                {
+                    var tools=AgentFunctionProtocol.Definitions(request.Schema).Select(d=>(string)d["function"]["name"]).ToArray();
+                    Narrowed=!tools.Contains("list_scene_objects")&&tools.Contains("discover_tools")&&tools.Contains("finish_task");
+                    Assert.IsTrue(Narrowed,"A planned task must leave repeated general inspection after six observation rounds");
+                    plan.actions.Add(new EditorCommand{tool="create_node",name="PlannedReadLoopGoal"});
+                }
+                return Task.FromResult(new CompletionResult{Text=JsonConvert.SerializeObject(plan)});
+            }
+            public Task<bool> HealthAsync(CancellationToken token)=>Task.FromResult(true);
+            public void Dispose(){}
+        }
+        [Test] public async Task ProposedStagesCannotBypassObservationBoundsOrTriggerAnUnneededProtocolSwitch()
+        {
+            EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);var provider=new PlannedReadLoopProvider();
+            try
+            {
+                using(var controller=new ChatController(_=>provider,"UserSettings/PlannedReadLoop-"+Guid.NewGuid().ToString("N")))
+                {
+                    controller.Settings.UseNativeFunctions=true;controller.Settings.AutoVerify=false;controller.Settings.UseSkills=false;controller.Settings.Power=AssistantPower.Deep;controller.Settings.AllowAutonomousScripts=true;
+                    await controller.SendAsync("Создай пустой узел PlannedReadLoopGoal.");var answer=controller.Current.Messages.Last();
+                    Assert.IsFalse(answer.IsError,answer.Text);Assert.IsTrue(provider.Narrowed);Assert.AreEqual(8,provider.Calls);Assert.IsTrue(GameObject.Find("PlannedReadLoopGoal"));
+                    Assert.AreEqual(1,answer.Steps.Count(s=>s.Tool=="create_node"));
+                }
+            }
+            finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
+        }
     }
 }
