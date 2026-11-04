@@ -22,7 +22,7 @@ namespace WorldWeaver.Tests
      return System.Threading.Tasks.Task.FromResult(new CompletionResult{Text=Reviews==1?"{\"passed\":false,\"issues\":[\"Высота объекта 0 вместо 2 м\"],\"evidence\":\"Свежие bounds\"}":"{\"passed\":true,\"issues\":[],\"evidence\":\"Высота 2 м\"}",Model="fixture-review"});
     }
     MainCalls++;var plan=new EditorPlan{reply="Готово"};
-    if(MainCalls==1||MainCalls==3){plan.complete=false;plan.actions.Add(new EditorCommand{tool="execute_editor_code",args=new JObject{["code"]=MainCalls==1?"var part=GameObject.CreatePrimitive(PrimitiveType.Cube); part.transform.SetParent(target.transform,false); return part.transform.position;":"target.transform.GetChild(0).position=Vector3.up*2; return target.transform.GetChild(0).position;"}});}
+    if(MainCalls==1||MainCalls==3){plan.complete=false;plan.actions.Add(new EditorCommand{tool="execute_editor_code",args=new JObject{["code"]=MainCalls==1?"var part=GameObject.CreatePrimitive(PrimitiveType.Cube); part.name=\"ReviewedSnippetCube\"; return part.transform.position;":"var part=GameObject.Find(\"ReviewedSnippetCube\"); Undo.RecordObject(part.transform,\"Move reviewed cube\"); part.transform.position=Vector3.up*2; return part.transform.position;"}});}
     return System.Threading.Tasks.Task.FromResult(new CompletionResult{Text=Newtonsoft.Json.JsonConvert.SerializeObject(plan),Model="fixture-main"});
    }
    public System.Threading.Tasks.Task<bool> HealthAsync(System.Threading.CancellationToken token)=>System.Threading.Tasks.Task.FromResult(true);
@@ -38,7 +38,7 @@ namespace WorldWeaver.Tests
      controller.Settings.AllowEditorCode=true;controller.Settings.UseNativeFunctions=true;controller.Settings.UseSkills=false;
      await controller.SendAsync("Через C# создай объект на высоте 2 м.");var answer=controller.Current.Messages.Last();
      Assert.IsFalse(answer.IsError,answer.Text);Assert.AreEqual(2,provider.Reviews);Assert.AreEqual(4,provider.MainCalls);Assert.IsTrue(provider.Independent);
-     Assert.IsFalse(answer.EditorReviews[0].Passed);Assert.IsTrue(answer.EditorReviews[1].Passed);Assert.AreEqual(2,GameObject.Find("WorldWeaver Code Workspace").transform.GetChild(0).position.y);
+     Assert.IsFalse(answer.EditorReviews[0].Passed);Assert.IsTrue(answer.EditorReviews[1].Passed);Assert.AreEqual(2,GameObject.Find("ReviewedSnippetCube").transform.position.y);
     }
    }
    finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
@@ -53,7 +53,7 @@ namespace WorldWeaver.Tests
      Reviews++;return System.Threading.Tasks.Task.FromResult(new CompletionResult{Text="{\"passed\":true,\"issues\":[],\"evidence\":\"Current host measurements confirm the requested cube at height two\"}",Model="fixture-review"});
     }
     var plan=new EditorPlan{reply="Готово"};Calls++;
-    if(Calls==1){plan.complete=false;plan.actions.Add(new EditorCommand{tool="execute_editor_code",args=new JObject{["code"]="var part=GameObject.CreatePrimitive(PrimitiveType.Cube); part.transform.SetParent(target.transform,false); part.transform.position=Vector3.up*2; return part.transform.position;"}});}
+    if(Calls==1){plan.complete=false;plan.actions.Add(new EditorCommand{tool="execute_editor_code",args=new JObject{["code"]="var part=GameObject.CreatePrimitive(PrimitiveType.Cube); part.name=\"RecoveredSnippetCube\"; part.transform.position=Vector3.up*2; return part.transform.position;"}});}
     else if(Calls==2){plan.complete=false;plan.actions.Add(new EditorCommand{tool="read_task_step",args=new JObject{["index"]=8191}});}
     return System.Threading.Tasks.Task.FromResult(new CompletionResult{Text=Newtonsoft.Json.JsonConvert.SerializeObject(plan),Model="fixture-main"});
    }
@@ -69,7 +69,7 @@ namespace WorldWeaver.Tests
     {
      controller.Settings.AllowEditorCode=true;controller.Settings.UseNativeFunctions=true;controller.Settings.UseSkills=false;
      await controller.SendAsync("Через C# создай объект на высоте 2 м.");var answer=controller.Current.Messages.Last();
-     Assert.AreEqual(1,provider.Reviews);Assert.IsTrue(answer.Attempts.All(a=>a.Accepted),"Exercise real execution failure, not malformed-plan repair");Assert.IsTrue(answer.Steps.Any(s=>!s.Success),"The historical execution failure remains auditable");Assert.IsTrue(answer.Task.Checks.All(c=>c.Passed));Assert.IsFalse(answer.IsError,answer.Text);Assert.AreNotEqual("Проверки не пройдены",answer.Status);Assert.IsTrue(answer.EditorReviews.Single().Passed);Assert.AreEqual(2,GameObject.Find("WorldWeaver Code Workspace").transform.GetChild(0).position.y);
+     Assert.AreEqual(1,provider.Reviews);Assert.IsTrue(answer.Attempts.All(a=>a.Accepted),"Exercise real execution failure, not malformed-plan repair");Assert.IsTrue(answer.Steps.Any(s=>!s.Success),"The historical execution failure remains auditable");Assert.IsTrue(answer.Task.Checks.All(c=>c.Passed));Assert.IsFalse(answer.IsError,answer.Text);Assert.AreNotEqual("Проверки не пройдены",answer.Status);Assert.IsTrue(answer.EditorReviews.Single().Passed);Assert.AreEqual(2,GameObject.Find("RecoveredSnippetCube").transform.position.y);
     }
    }
    finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
@@ -225,12 +225,43 @@ namespace WorldWeaver.Tests
     {
      controller.Settings.AllowEditorCode=true;controller.Settings.Mode=AssistantMode.Execute;
      var context=new AgentExecutionContext{Session=controller.Current,Message=new AssistantMessage()};
-     var plan=new EditorPlan{actions={new EditorCommand{tool="execute_editor_code",args=new JObject{["code"]="using UnityEngine; using UnityEditor; var part=GameObject.CreatePrimitive(PrimitiveType.Cube); part.transform.SetParent(target.transform,false); part.transform.localScale=new Vector3(2,3,.1f); var body=Undo.AddComponent<Rigidbody>(part); var joint=Undo.AddComponent<HingeJoint>(part); joint.anchor=Vector3.left; return new { claimedCorrect=true };"}}}};
+     var root=new GameObject("GeometryReadbackRoot");root.AddComponent<GeneratedSceneObject>();
+     var plan=new EditorPlan{actions={new EditorCommand{tool="execute_editor_code",target=ProjectContextIndex.StableTarget(root),args=new JObject{["code"]="using UnityEngine; using UnityEditor; var part=GameObject.CreatePrimitive(PrimitiveType.Cube); part.transform.SetParent(target.transform,false); part.transform.localScale=new Vector3(2,3,.1f); var body=Undo.AddComponent<Rigidbody>(part); var joint=Undo.AddComponent<HingeJoint>(part); joint.anchor=Vector3.left; return new { claimedCorrect=true };"}}}};
      var batch=await SceneToolExecutor.ExecuteAsync(plan,null,context,default);Assert.IsTrue(batch.Success,batch.Error);
      var report=JObject.Parse(batch.Results.Single(s=>s.Tool=="execute_editor_code").Summary);
      var observed=((JArray)report["sceneReadback"]).Single(r=>((JArray)r["joints"]).Count>0);var joint=observed["joints"][0];
      Assert.AreEqual(-2f,(float)joint["worldAnchor"][0]);Assert.AreEqual(-1f,(float)observed["renderWorldBounds"]["min"][0]);
      Assert.AreEqual(1f,(float)joint["distanceOutsideOwnColliderBounds"]);Assert.NotNull(joint["geometryWarning"]);
+    }
+   }
+   finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
+  }
+  [Test] public async System.Threading.Tasks.Task TargetlessEditorCodePreservesObjectSetAndReportsExistingEdits()
+  {
+   EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
+   string folder=Path.Combine("UserSettings","TargetlessCode-"+Guid.NewGuid().ToString("N"));
+   try
+   {
+    var root=new GameObject("ExistingCodeSubject");root.AddComponent<GeneratedSceneObject>();
+    var untouched=new GameObject("UnchangedCodeSubject");untouched.AddComponent<GeneratedSceneObject>();
+    var ids=ProjectContextIndex.Objects().Select(g=>g.GetInstanceID()).OrderBy(id=>id).ToArray();
+    using(var controller=new ChatController(historyFolder:folder))
+    {
+     controller.Settings.AllowEditorCode=true;controller.Settings.Mode=AssistantMode.Execute;
+     var context=new AgentExecutionContext{Session=controller.Current,Message=new AssistantMessage()};
+     var edit=new EditorPlan{actions={new EditorCommand{tool="execute_editor_code",args=new JObject{["code"]="if(target!=null)throw new System.Exception(\"Unexpected implicit target\"); var item=GameObject.Find(\"ExistingCodeSubject\"); Undo.RecordObject(item.transform,\"Edit existing\"); item.transform.position=Vector3.up*3; return item.transform.position;"}}}};
+     var batch=await SceneToolExecutor.ExecuteAsync(edit,null,context,default);Assert.IsTrue(batch.Success,batch.Error);
+     var step=batch.Results.Single(r=>r.Tool=="execute_editor_code");var report=JObject.Parse(step.Summary);
+     Assert.IsEmpty(step.Target);Assert.IsTrue((bool)report["sceneChanged"]);Assert.IsEmpty((JArray)report["createdObjects"]);
+     Assert.AreEqual(3,root.transform.position.y);Assert.AreEqual(Vector3.zero,untouched.transform.position);
+     Assert.That(((JArray)report["sceneReadback"]).Any(r=>(string)r["name"]==root.name&&(float)r["worldPosition"][1]==3));
+     CollectionAssert.AreEqual(ids,ProjectContextIndex.Objects().Select(g=>g.GetInstanceID()).OrderBy(id=>id).ToArray());
+     var read=new EditorPlan{actions={new EditorCommand{tool="execute_editor_code",args=new JObject{["code"]="return new { targetIsNull=target==null, count=UnityEngine.Object.FindObjectsByType<GameObject>(FindObjectsSortMode.None).Length };"}}}};
+     var inspected=await SceneToolExecutor.ExecuteAsync(read,null,context,default);Assert.IsTrue(inspected.Success,inspected.Error);
+     var observation=JObject.Parse(inspected.Results.Single(r=>r.Tool=="execute_editor_code").Summary);
+     Assert.IsFalse((bool)observation["sceneChanged"]);Assert.IsTrue((bool)JObject.Parse((string)observation["result"])["targetIsNull"]);
+     CollectionAssert.AreEqual(ids,ProjectContextIndex.Objects().Select(g=>g.GetInstanceID()).OrderBy(id=>id).ToArray());
+     Assert.IsNull(GameObject.Find("WorldWeaver Code Workspace"));
     }
    }
    finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
@@ -245,12 +276,13 @@ namespace WorldWeaver.Tests
     var context=new AgentExecutionContext{Session=session,Message=new AssistantMessage()};
     var bad=new EditorPlan{actions={new EditorCommand{tool="execute_editor_code",args=new JObject{["code"]="return missingSymbol;"}}}};
     var failed=await SceneToolExecutor.ExecuteAsync(bad,null,context,default);Assert.IsFalse(failed.Success);Assert.That(failed.Results.Last().Error,Does.Contain("missingSymbol"));
-    var good=new EditorPlan{actions={new EditorCommand{tool="execute_editor_code",args=new JObject{["code"]="var light=Undo.AddComponent<Light>(target); light.type=LightType.Point; light.range=17f; return new { range=light.range, position=target.transform.position, owner=target };"}}}};
+    var root=new GameObject("ExplicitCodeTarget");root.AddComponent<GeneratedSceneObject>();
+    var good=new EditorPlan{actions={new EditorCommand{tool="execute_editor_code",target=ProjectContextIndex.StableTarget(root),args=new JObject{["code"]="var light=Undo.AddComponent<Light>(target); light.type=LightType.Point; light.range=17f; return new { range=light.range, position=target.transform.position, owner=target };"}}}};
     var result=await SceneToolExecutor.ExecuteAsync(good,null,context,default);Assert.IsTrue(result.Success,result.Error);
     Assert.AreEqual(17,UnityEngine.Object.FindFirstObjectByType<Light>().range);
     var readback=JObject.Parse((string)JObject.Parse(result.Results.Single(s=>s.Tool=="execute_editor_code").Summary)["result"]);Assert.AreEqual(JTokenType.Array,readback["position"].Type);Assert.AreEqual(result.Results.Single(s=>s.Tool=="execute_editor_code").Target,(string)readback["owner"]["target"]);
     Assert.IsTrue((bool)JObject.Parse(result.Results.Single(s=>s.Tool=="execute_editor_code").Summary)["sceneChanged"]);
-    var observation=new EditorPlan{actions={new EditorCommand{tool="execute_editor_code",args=new JObject{["code"]="return target.GetComponents<Component>().Length;"}}}};
+    var observation=new EditorPlan{actions={new EditorCommand{tool="execute_editor_code",target=ProjectContextIndex.StableTarget(root),args=new JObject{["code"]="return target.GetComponents<Component>().Length;"}}}};
     var read=await SceneToolExecutor.ExecuteAsync(observation,null,context,default);Assert.IsTrue(read.Success,read.Error);
     var readStep=read.Results.Single(s=>s.Tool=="execute_editor_code");Assert.IsFalse((bool)JObject.Parse(readStep.Summary)["sceneChanged"],"A successful inspection snippet must not reset implementation progress");
     session.Settings.AllowEditorCode=false;var denied=await SceneToolExecutor.ExecuteAsync(good,null,context,default);Assert.IsFalse(denied.Success);
