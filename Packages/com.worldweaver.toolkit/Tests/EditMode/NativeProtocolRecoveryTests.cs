@@ -60,7 +60,7 @@ namespace WorldWeaver.Tests
                     plan.actions.Add(new EditorCommand{tool="create_node",name="RejectedA"});
                     plan.actions.Add(new EditorCommand{tool="create_node",name="RejectedB"});
                 }
-                else if(Calls<(Consecutive?3:6))plan.actions.Add(new EditorCommand{tool="read_scene"});
+                else if(Calls<(Consecutive?3:6))plan.actions.Add(new EditorCommand{tool="list_scene_objects"});
                 else if(!plan.complete)plan.actions.Add(new EditorCommand{tool="create_node",name="HostRecoveredGoal"});
                 return Task.FromResult(new CompletionResult{Text=JsonConvert.SerializeObject(plan)});
             }

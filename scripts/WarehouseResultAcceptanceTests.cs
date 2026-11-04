@@ -47,7 +47,7 @@ public sealed class WarehouseResultAcceptanceTests
     void Place(Vector3 point){motor.enabled=false;player.transform.position=point;motor.enabled=true;Physics.SyncTransforms();}
     Vector3 ClearInputSite()
     {
-        var floor=UnityEngine.Object.FindObjectsByType<BoxCollider>(FindObjectsSortMode.None).Where(c=>!c.isTrigger&&c.bounds.size.x>=20&&c.bounds.size.z>=12&&c.bounds.size.y<1).First();var b=floor.bounds;
+        var floor=UnityEngine.Object.FindObjectsByType<Collider>(FindObjectsSortMode.None).Where(c=>!c.isTrigger&&c!=motor&&c.bounds.size.x>=20&&c.bounds.size.z>=12&&c.bounds.size.y<1).First();var b=floor.bounds;
         bool Other(Collider c)=>c!=floor&&c!=motor&&!c.transform.IsChildOf(player.transform);
         for(float z=b.min.z+1.5f;z<b.max.z-1.5f;z+=.5f)for(float x=b.min.x+1.5f;x<b.max.x-1.5f;x+=.5f)
         {
