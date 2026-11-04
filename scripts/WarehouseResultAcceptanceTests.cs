@@ -45,9 +45,22 @@ public sealed class WarehouseResultAcceptanceTests
         Assert.GreaterOrEqual(Time.time,until-.05f,"Play Mode did not advance");
     }
     void Place(Vector3 point){motor.enabled=false;player.transform.position=point;motor.enabled=true;Physics.SyncTransforms();}
+    Vector3 ClearInputSite()
+    {
+        var floor=UnityEngine.Object.FindObjectsByType<BoxCollider>(FindObjectsSortMode.None).Where(c=>!c.isTrigger&&c.bounds.size.x>=20&&c.bounds.size.z>=12&&c.bounds.size.y<1).First();var b=floor.bounds;
+        bool Other(Collider c)=>c!=floor&&c!=motor&&!c.transform.IsChildOf(player.transform);
+        for(float z=b.min.z+1.5f;z<b.max.z-1.5f;z+=.5f)for(float x=b.min.x+1.5f;x<b.max.x-1.5f;x+=.5f)
+        {
+            Vector3 ground=new Vector3(x,b.max.y+.08f,z),bottom=ground+Vector3.up*motor.radius,top=ground+Vector3.up*Mathf.Max(motor.height-motor.radius,motor.radius);float radius=motor.radius*.95f;
+            if(Physics.OverlapCapsule(bottom,top,radius,~0,QueryTriggerInteraction.Ignore).Any(Other))continue;
+            if(new[]{player.transform.forward,-player.transform.forward,player.transform.right,-player.transform.right}.Any(d=>Physics.CapsuleCastAll(bottom,top,radius,d,1.4f,~0,QueryTriggerInteraction.Ignore).Any(h=>Other(h.collider))))continue;
+            return ground+Vector3.up*(motor.height*.5f-motor.center.y);
+        }
+        Assert.Fail("No clear floor location for independent movement measurements");return Vector3.zero;
+    }
     [UnityTest] public IEnumerator RealKeyboardMovementSprintJumpCameraAndSolidObstacles()
     {
-        Assert.IsTrue(player.View);Vector3 home=player.transform.position;
+        Assert.IsTrue(player.View);Vector3 originalSpawn=player.transform.position;Vector3 home=ClearInputSite();Place(home);yield return Wait(.2f);Debug.Log("WAREHOUSE_INPUT_SETUP originalSpawn="+originalSpawn+" clear measurement site="+home+"; geometry is not changed");
         InputSystem.QueueStateEvent(keyboard,new KeyboardState(Key.W));Vector3 start=player.transform.position;yield return Wait(.14f);
         float walk=Vector3.ProjectOnPlane(player.transform.position-start,Vector3.up).magnitude;
         InputSystem.QueueStateEvent(keyboard,new KeyboardState());yield return null;Place(home);yield return Wait(.1f);

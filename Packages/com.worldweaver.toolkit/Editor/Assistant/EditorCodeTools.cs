@@ -85,7 +85,7 @@ execute_editor_code: optional existing owned target, otherwise an owned workspac
         // Progress signal only, never a proof that the user's request is complete.
         // Includes serialized component fields throughout loaded scenes; ignores the
         // workspace creation above and does not trust a snippet's return value.
-        static string SceneSignature()=>TextChunker.Digest(string.Join("\n",ProjectContextIndex.Objects().OrderBy(g=>g.GetInstanceID()).Select(g=>g.GetInstanceID()+":"+EditorJsonUtility.ToJson(g)+":"+string.Join("|",g.GetComponents<Component>().Where(c=>c).Select(c=>c.GetType().FullName+":"+EditorJsonUtility.ToJson(c))))));
+        static string SceneSignature()=>TextChunker.Digest(string.Join("\n",RenderMaterialInitialization.Capture().OrderBy(p=>p.Key).Select(p=>p.Key+":"+p.Value))+"\n"+string.Join("\n",ProjectContextIndex.Objects().OrderBy(g=>g.GetInstanceID()).Select(g=>g.GetInstanceID()+":"+EditorJsonUtility.ToJson(g)+":"+string.Join("|",g.GetComponents<Component>().Where(c=>c).Select(c=>c.GetType().FullName+":"+EditorJsonUtility.ToJson(c))))));
         // Host measurements, independent of the snippet's self-reported return data.
         // Spatial evidence works for any generated component composition, not a named scenario.
         internal static JArray ReadScene(GameObject target,GameObject[] created)

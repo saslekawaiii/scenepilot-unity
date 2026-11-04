@@ -698,7 +698,7 @@ namespace WorldWeaver.Editor.Assistant
             // Unity importing is a transient state, not evidence of a manual edit.
             if(mutating)while(EditorApplication.isUpdating||EditorApplication.isCompiling)
             { token.ThrowIfCancellationRequested();Phase="Ожидаю завершения импорта Unity…";await Task.Delay(100,token); }
-            bool checkpointAdmitted=false;
+            bool checkpointAdmitted=false;Dictionary<int,string> materialStateBefore=null;
             void EnsureCheckpoint()
             {
                 if(!mutating)return;
@@ -710,12 +710,14 @@ namespace WorldWeaver.Editor.Assistant
                     var state=AgentCheckpoints.ExtensionStatus(task.CheckpointId);
                     if((bool)state["canExtend"]!=true)throw new InvalidOperationException("Проект изменён между шагами: контрольная точка не совпадает. Применение остановлено; уже выполненные действия сохранены. Конкретные различия: "+string.Join("; ",state["conflicts"].Values<string>()));
                 }
+                if(!checkpointAdmitted)materialStateBefore=RenderMaterialInitialization.Capture();
                 checkpointAdmitted=true;
             }
             bool deferredImport=plan.actions.Count==1&&(plan.actions[0].tool=="material_import"||plan.actions[0].tool=="model_import"||WebResearchTools.IsAsync(plan.actions[0].tool));
             if(!deferredImport)EnsureCheckpoint();
             EditorBatchResult Finish(EditorBatchResult batch)
             {
+                if(checkpointAdmitted&&materialStateBefore!=null)RenderMaterialInitialization.InitializeChanged(materialStateBefore);
                 if(task!=null)
                 {
                     var world=batch.Results.LastOrDefault(r=>r.Success&&(r.Tool=="create_world"||r.Tool=="create_village"));if(world!=null)task.ScopeTarget=world.Target;
