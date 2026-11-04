@@ -316,6 +316,8 @@ namespace WorldWeaver.Editor.Assistant
                             {textToolRecovery=true;textRecoveryKind="native-protocol-to-json-contract";}
                             repeatedValidationFailures.TryGetValue(failureKey,out int repeats);repeatedValidationFailures[failureKey]=repeats+1;
                             attempt.Error = ChatHistoryStore.Redact(error.Message);
+                            if(Settings.UseNativeFunctions&&!textToolRecovery&&!wireShapeFailure&&repeats==1&&!answer.Attempts.Any(a=>a.RepairKind=="native-fresh-plan"))
+                                attempt.RepairKind="native-fresh-plan"; // Once per task, without changing wire protocol or dropping actual observations.
                             if(repeats>=2)throw new ArgumentException("Модель трижды повторила недопустимый шаг: "+attempt.Error+" Ничего из отклонённых планов не применялось."); answer.Status = "Исправляю план"; Save();
                             request = BuildRequest(session, text);
 

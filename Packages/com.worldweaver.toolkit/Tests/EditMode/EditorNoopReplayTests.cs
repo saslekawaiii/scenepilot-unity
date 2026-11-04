@@ -18,6 +18,7 @@ namespace WorldWeaver.Tests
     public class EditorNoopReplayTests
     {
         static int Stale(IReadOnlyList<EditorCommandResult> steps,EditorCommand command)=>(int)typeof(ChatController).GetMethod("StaleEditorCodeObservation",BindingFlags.Static|BindingFlags.NonPublic).Invoke(null,new object[]{steps,command});
+        static bool NativeHistory(CompletionRequest request,AssistantMessage answer)=>(bool)typeof(ChatController).GetMethod("AddNativeToolHistory",BindingFlags.Static|BindingFlags.NonPublic).Invoke(null,new object[]{request,answer});
         static bool Progress(EditorCommandResult step)=>(bool)typeof(ChatController).GetMethod("IsImplementationProgress",BindingFlags.Static|BindingFlags.NonPublic).Invoke(null,new object[]{step});
         static EditorCommand Code(string body)=>new EditorCommand{tool="execute_editor_code",args=new JObject{["code"]=body}};
         static AgentExecutionContext Context(ChatController controller)
@@ -70,6 +71,46 @@ namespace WorldWeaver.Tests
                 }
             }
             finally{AssetDatabase.DeleteAsset(folder);EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
+        }
+        [Test] public void FreshNativeEpochSurvivesSerializationAndDoesNotReintroduceRejectedOpaqueState()
+        {
+            EditorPlanAttempt Attempt(int round,string state,string id)=>new EditorPlanAttempt{Round=round,Accepted=true,FirstResultIndex=round-1,ResultCount=1,WireResponse=new JObject{["content"]="",["thinking"]=state,["tool_calls"]=new JArray(new JObject{["id"]=id,["function"]=new JObject{["name"]="inspect_object",["arguments"]=new JObject{["target"]="owned:fixture"}}})}.ToString()};
+            var answer=new AssistantMessage();answer.Attempts.Add(Attempt(1,"OLD_ACCEPTED_STATE","old-call"));answer.Steps.Add(new EditorCommandResult{Tool="inspect_object",Success=true,Summary="{\"observed\":1}"});
+            answer.Attempts.Add(new EditorPlanAttempt{Round=2,Accepted=false,RepairKind="native-fresh-plan",Error="Semantic rejection",WireResponse=Attempt(2,"OLD_REJECTED_STATE","rejected-call").WireResponse});
+            var fresh=new CompletionRequest();Assert.IsFalse(NativeHistory(fresh,answer));Assert.IsTrue(fresh.Messages.Any(m=>m.Content.Contains("Fresh native planning epoch")));Assert.IsFalse(fresh.Messages.Any(m=>m.Thinking!=null));
+            answer.Steps.Add(new EditorCommandResult{Tool="inspect_object",Success=true,Summary="{\"observed\":2}"});var next=Attempt(3,"NEW_EPOCH_STATE","new-call");next.FirstResultIndex=1;answer.Attempts.Add(next);
+            var restored=JsonConvert.DeserializeObject<AssistantMessage>(JsonConvert.SerializeObject(answer));var replay=new CompletionRequest();Assert.IsTrue(NativeHistory(replay,restored));
+            Assert.AreEqual(1,replay.Messages.Count(m=>m.Role=="assistant"));Assert.IsTrue(replay.Messages.Any(m=>m.Thinking=="NEW_EPOCH_STATE"));Assert.IsFalse(replay.Messages.Any(m=>(m.Thinking??"").Contains("OLD_")));
+            Assert.AreEqual("new-call",replay.Messages.Single(m=>m.Role=="tool").ToolCallId);Assert.AreEqual(2,restored.Steps.Count,"Actual observations remain durable across replanning");
+        }
+        sealed class FreshPlanningProvider:ILLMProvider
+        {
+            public int Calls;public bool FreshEpochSeen,NativePreserved=true,OriginalScopeSeen,ActualObservationSeen;
+            public Task<CompletionResult> CompleteAsync(CompletionRequest request,CancellationToken token)
+            {
+                Calls++;NativePreserved&=request.UseToolCalls;
+                if(Calls==4){FreshEpochSeen=request.Messages.Any(m=>m.Content.Contains("Fresh native planning epoch"));OriginalScopeSeen=request.Messages.Any(m=>m.Content.Contains("Через C# создай один объект."));ActualObservationSeen=request.Messages.Any(m=>m.Content.Contains("execute_editor_code")&&m.Content.Contains("returnedData"));}
+                var plan=new EditorPlan{reply="Продолжаю",complete=Calls>=5};
+                if(Calls<=3)plan.actions.Add(Code("return target==null;"));else if(Calls==4)plan.actions.Add(Code("return new GameObject(\"FreshPlanResult\");"));
+                var calls=new JArray(plan.actions.Select((c,i)=>new JObject{["id"]="fixture_"+Calls+"_"+i,["function"]=new JObject{["name"]=c.tool,["arguments"]=new JObject{["code"]=c.args["code"]}}}));
+                return Task.FromResult(new CompletionResult{Text=JsonConvert.SerializeObject(plan),WireResponse=new JObject{["content"]="",["thinking"]="OPAQUE_FIXTURE_"+Calls,["tool_calls"]=calls}.ToString(),Model="controlled-fresh-plan-fixture"});
+            }
+            public Task<bool> HealthAsync(CancellationToken token)=>Task.FromResult(true);public void Dispose(){}
+        }
+        [Test] public async Task RepeatedSemanticRejectionGetsOneFreshNativePlanWithoutLosingTheTask()
+        {
+            EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);var provider=new FreshPlanningProvider();
+            try
+            {
+                using(var controller=new ChatController(_=>provider,Path.Combine("UserSettings","FreshNativePlan-"+Guid.NewGuid().ToString("N"))))
+                {
+                    controller.Settings.AllowEditorCode=true;controller.Settings.UseNativeFunctions=true;controller.Settings.UseSkills=false;controller.Settings.AutoVerify=false;controller.Settings.Power=AssistantPower.Deep;
+                    await controller.SendAsync("Через C# создай один объект.");var answer=controller.Current.Messages.Last();
+                    Assert.IsFalse(answer.IsError,answer.Text);Assert.AreEqual(5,provider.Calls);Assert.IsTrue(provider.FreshEpochSeen);Assert.IsTrue(provider.NativePreserved);Assert.IsTrue(provider.OriginalScopeSeen);Assert.IsTrue(provider.ActualObservationSeen);
+                    Assert.AreEqual(1,answer.Attempts.Count(a=>a.RepairKind=="native-fresh-plan"));Assert.AreEqual(2,answer.Steps.Count(s=>s.Tool=="execute_editor_code"));Assert.IsTrue(GameObject.Find("FreshPlanResult"));
+                }
+            }
+            finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
         }
         sealed class RepeatingProvider:ILLMProvider
         {

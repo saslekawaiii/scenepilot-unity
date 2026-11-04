@@ -77,7 +77,13 @@ namespace WorldWeaver.Editor.Assistant
             if(answer==null)return false;
             var groups=new List<List<ChatMessage>>();int remaining=40000;
             bool staged=answer.Task?.Approach.Count>0;
-            foreach(var attempt in answer.Attempts.TakeLast(staged?4:8).Reverse())
+            // A bounded fresh planning epoch drops the failed opaque continuation,
+            // while the constructive request still supplies original scope, durable
+            // observations, artifacts and host state. Later turns stay in this epoch.
+            int epoch=answer.Attempts.FindLastIndex(a=>a.RepairKind=="native-fresh-plan");
+            var epochAttempts=answer.Attempts.Skip(epoch+1).ToArray();
+            if(epoch>=0&&epochAttempts.Length==0)request.Messages.Add(new ChatMessage("system","Fresh native planning epoch after repeated semantic rejection. Re-plan the ORIGINAL request from current host state and durable observations. Prior successful work remains applied. Do not repeat the rejected operation or duplicate existing objects. Choose the next justified tool yourself; no new permissions are granted."));
+            foreach(var attempt in epochAttempts.TakeLast(staged?4:8).Reverse())
             {
                 if(string.IsNullOrEmpty(attempt.WireResponse))continue;
                 try
