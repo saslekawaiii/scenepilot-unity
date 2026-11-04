@@ -100,10 +100,13 @@ public sealed class WarehouseResultAcceptanceTests
         Vector3 approach=face+normal*(motor.radius+.3f);approach.y=home.y;
         Assert.IsTrue(floorBounds.Contains(new Vector3(approach.x,floorBounds.center.y,approach.z)),"Collision approach must be on the floor");
         Place(approach);yield return Wait(.15f);
+        Vector3 collisionStart=player.transform.position;
         Vector3 local=player.transform.InverseTransformDirection(toward);Key key=Mathf.Abs(local.x)>Mathf.Abs(local.z)?(local.x>0?Key.D:Key.A):(local.z>0?Key.W:Key.S);
         InputSystem.QueueStateEvent(keyboard,new KeyboardState(key));yield return Wait(.8f);InputSystem.QueueStateEvent(keyboard,new KeyboardState());yield return null;
         Assert.Greater(Vector3.Dot(player.transform.position-face,normal),-motor.radius,"Character crossed an interior solid shelf");
-        Debug.Log($"WAREHOUSE_INPUT walk={walk:F3} sprint={sprint:F3} jump={maxY-initialY:F3} yaw={yaw:F2} pitch={pitch:F2} obstacle={obstacle.name}");
+        float collisionApproach=Vector3.Dot(player.transform.position-collisionStart,toward);
+        Assert.Greater(collisionApproach,.12f,"The collision assertion must exercise actual movement toward the shelf");
+        Debug.Log($"WAREHOUSE_INPUT walk={walk:F3} sprint={sprint:F3} jump={maxY-initialY:F3} yaw={yaw:F2} pitch={pitch:F2} obstacle={obstacle.name} collisionApproach={collisionApproach:F3}");
     }
     void AssertParcelsReachable(GameObject[] parcels)
     {
@@ -134,7 +137,13 @@ public sealed class WarehouseResultAcceptanceTests
         var directions=new[]{Vector2Int.left,Vector2Int.right,Vector2Int.up,Vector2Int.down};
         while(queue.Count>0)
         {
-            var current=queue.Dequeue();foreach(var d in directions){var next=current+d;if(next.x<0||next.x>nx||next.y<0||next.y>nz||reachable.Contains(next)||!Free(next))continue;reachable.Add(next);queue.Enqueue(next);}
+            var current=queue.Dequeue();foreach(var d in directions)
+            {
+                var next=current+d;if(next.x<0||next.x>nx||next.y<0||next.y>nz||reachable.Contains(next)||!Free(next))continue;
+                Vector3 delta=Point(next)-Point(current);
+                if(Physics.CapsuleCastAll(Bottom(Point(current)),Top(Point(current)),radius,delta.normalized,delta.magnitude,~0,QueryTriggerInteraction.Ignore).Any(h=>Other(h.collider)))continue;
+                reachable.Add(next);queue.Enqueue(next);
+            }
         }
         foreach(var parcel in parcels)Assert.IsTrue(reachable.Any(p=>Vector2.Distance(new Vector2(Point(p).x,Point(p).z),new Vector2(parcel.transform.position.x,parcel.transform.position.z))<1.5f),"No floor path within interaction distance of "+parcel.name);
         Debug.Log("WAREHOUSE_REACHABILITY half-metre capsule grid connected to actual Play starting pose, reachable cells="+reachable.Count+"; effective radius="+radius+"; input arrangements do not change geometry");

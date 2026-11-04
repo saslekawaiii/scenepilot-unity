@@ -34,8 +34,8 @@ attach_behavior: target; args {behavior:rotate|bob|patrol|followplayer,speed?:.0
 delete_object: target owned object; args {}. Cannot delete unrelated or foreign descendants.
 save_scene: target empty; args {path?:Assets/WorldWeaverGenerated/.../Name.unity}. Must be the LAST action. Always a unique destination, never overwrites a scene. Does not touch build settings.
 inspect_object: target; args {}. Read-back of transform,components,TerrainSpec,NPC and inventory.
-search_project: target empty; args {query:text,limit?:1..40}. Read-only asset search under Assets/Packages.
-read_script: target empty; args {path:Assets/.../Name.cs or installed Packages/.../Name.cs}. Read-only maximum64KiB, no traversal. Returns actual source/hash; package scripts remain read-only. draft_script is handled by the controller separately.";
+search_project: target empty; args {query:text,limit?:1..40}. Read-only asset search under Assets/Packages. Returns query and typed asset records; use t:Prefab, t:Material or t:Script when appropriate. A matching icon is not a playable prefab. Search never creates a proposed asset.
+read_script: target empty; args {path:Assets/.../Name.cs or installed Packages/.../Name.cs}. Read-only maximum64KiB, no traversal. Returns exists and actual source/hash. A missing permitted path returns exists:false and available source paths; a planned class name is not an existing file. Package scripts remain read-only. draft_script is handled by the controller separately.";
 
         private sealed class VirtualTarget
         {
@@ -152,14 +152,38 @@ read_script: target empty; args {path:Assets/.../Name.cs or installed Packages/.
         private static string ReadableScriptPath(string path)
         {
             if(string.IsNullOrEmpty(path)||path.Length>240||!(path.StartsWith("Assets/",StringComparison.Ordinal)||path.StartsWith("Packages/",StringComparison.Ordinal))||!path.EndsWith(".cs",StringComparison.OrdinalIgnoreCase)||path.Contains("..")||path.Contains('\\')||path.Contains(':')||path.Split('/').Any(string.IsNullOrWhiteSpace)||path.IndexOfAny(new[]{'\0','\r','\n','*','?','"','<','>','|'})>=0)throw new ArgumentException("Read an existing Assets/...cs or installed Packages/...cs without traversal.");
-            if(!AssetDatabase.LoadAssetAtPath<MonoScript>(path))throw new ArgumentException("C# script asset not found; use the exact path returned by search_project.");
             string physical=path;
             if(path.StartsWith("Packages/",StringComparison.Ordinal))
             {
                 var info=UnityEditor.PackageManager.PackageInfo.FindForAssetPath(path);if(info==null||!path.StartsWith(info.assetPath+"/",StringComparison.Ordinal))throw new ArgumentException("Script is not in an installed package.");
                 physical=Path.Combine(info.resolvedPath,path.Substring(info.assetPath.Length+1));
             }
-            if(!File.Exists(physical)||new FileInfo(physical).Length>65536)throw new ArgumentException("Script missing or larger than 64KiB.");return physical;
+            // Missing data inside an allowed boundary is an observation, not an
+            // invalid plan. Retain all existing-script type and size checks.
+            if(!File.Exists(physical))return physical;
+            if(!AssetDatabase.LoadAssetAtPath<MonoScript>(path))throw new ArgumentException("Path is not a registered C# script asset; use an actual source path.");
+            if(new FileInfo(physical).Length>65536)throw new ArgumentException("Script larger than 64KiB.");return physical;
+        }
+        static JObject ReadScriptObservation(string path)
+        {
+            string physical=ReadableScriptPath(path);
+            if(!File.Exists(physical))
+            {
+                string parent=Path.GetDirectoryName(path)?.Replace('\\','/');
+                var available=AssetDatabase.FindAssets("t:MonoScript",new[]{"Assets"}).Select(AssetDatabase.GUIDToAssetPath).Where(File.Exists)
+                    .OrderByDescending(p=>Path.GetDirectoryName(p)?.Replace('\\','/')==parent).ThenBy(p=>p.Contains("/Editor/")).ThenBy(p=>p,StringComparer.Ordinal).Take(12);
+                return new JObject{["path"]=path,["exists"]=false,["readOnlyPackage"]=path.StartsWith("Packages/",StringComparison.Ordinal),["source"]=null,["sha256"]=null,["availableScripts"]=new JArray(available),
+                    ["note"]="The requested source file is not currently present at this path. A class name in a proposed plan is not an existing asset. Use actual observed paths; implement a required new class through the permitted source workflow instead of repeatedly reading this absent path."};
+            }
+            byte[] bytes=File.ReadAllBytes(physical);string hash;using(var sha=System.Security.Cryptography.SHA256.Create())hash=BitConverter.ToString(sha.ComputeHash(bytes)).Replace("-","").ToLowerInvariant();
+            return new JObject{["path"]=path,["exists"]=true,["sha256"]=hash,["readOnlyPackage"]=path.StartsWith("Packages/",StringComparison.Ordinal),["source"]=ChatHistoryStore.Redact(File.ReadAllText(physical))};
+        }
+        static JObject SearchProjectObservation(JObject args)
+        {
+            string query=(string)args["query"];int limit=(int?)args["limit"]??20;
+            var matches=AssetDatabase.FindAssets(query,new[]{"Assets","Packages"});
+            var assets=new JArray(matches.Take(limit).Select(AssetDatabase.GUIDToAssetPath).Select(path=>new JObject{["path"]=path,["mainAssetType"]=AssetDatabase.GetMainAssetTypeAtPath(path)?.Name??"unknown",["isFolder"]=AssetDatabase.IsValidFolder(path),["readOnlyPackage"]=path.StartsWith("Packages/",StringComparison.Ordinal)}));
+            return new JObject{["query"]=query,["assets"]=assets,["count"]=assets.Count,["truncated"]=matches.Length>limit,["note"]="Observed matches, not created assets. Queries may match subassets; mainAssetType describes the path's main asset. Use a type filter when looking for runtime prefabs, materials or scripts."};
         }
         public static void Validate(EditorPlan plan)
         {
@@ -427,10 +451,9 @@ read_script: target empty; args {path:Assets/.../Name.cs or installed Packages/.
                             InitializeNpcContexts(createdNpcs);ValidateNpcDependencies(changedNpcs);SaveNewAssets(tx);
                             if(!EditorSceneManager.SaveScene(SceneManager.GetActiveScene(),path)||!File.Exists(path)||!AssetDatabase.LoadAssetAtPath<SceneAsset>(path))throw new IOException("Scene save/read-back failed.");summary="Сцена сохранена: "+path;break;
                         case "inspect_object":go=resolve(command.target);summary=Inspect(go).ToString(Newtonsoft.Json.Formatting.None);break;
-                        case "search_project":summary=new JArray(AssetDatabase.FindAssets((string)a["query"],new[]{"Assets","Packages"}).Take((int?)a["limit"]??20).Select(AssetDatabase.GUIDToAssetPath)).ToString(Newtonsoft.Json.Formatting.None);break;
+                        case "search_project":summary=SearchProjectObservation(a).ToString(Newtonsoft.Json.Formatting.None);break;
                         case "read_script":
-                            string scriptPath=(string)a["path"],physical=ReadableScriptPath(scriptPath);byte[] bytes=File.ReadAllBytes(physical);string sourceHash;using(var sha=System.Security.Cryptography.SHA256.Create())sourceHash=BitConverter.ToString(sha.ComputeHash(bytes)).Replace("-","").ToLowerInvariant();
-                            summary=new JObject{["path"]=scriptPath,["sha256"]=sourceHash,["readOnlyPackage"]=scriptPath.StartsWith("Packages/",StringComparison.Ordinal),["source"]=ChatHistoryStore.Redact(File.ReadAllText(physical))}.ToString(Newtonsoft.Json.Formatting.None);break;
+                            summary=ReadScriptObservation((string)a["path"]).ToString(Newtonsoft.Json.Formatting.None);break;
                     }
                     if(go&&new[]{"create_world","create_npc","create_object","scatter_objects","create_camera","set_lighting"}.Contains(command.tool))
                     {aliases["@"+command.name]=go;aliases[command.name]=go;}

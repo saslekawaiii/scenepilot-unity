@@ -65,6 +65,63 @@ namespace WorldWeaver.Tests
             var batch=SceneToolExecutor.Execute(plan);Assert.IsTrue(batch.Success,batch.Error);var data=JObject.Parse(batch.Results[0].Summary);Assert.IsTrue((bool)data["readOnlyPackage"]);Assert.That((string)data["source"],Does.Contain("class WorldInput"));Assert.AreEqual(64,((string)data["sha256"]).Length);
             command.args["path"]="Packages/com.worldweaver.toolkit/../../Private.cs";Assert.Throws<ArgumentException>(()=>SceneToolExecutor.Validate(plan));
         }
+        [Test] public void MissingPermittedSourceIsAnActualNegativeObservationWithoutCreatingAFileOrDroppingAnotherRead()
+        {
+            string path="Assets/WorldWeaverGenerated/Scripts/Absent_"+Guid.NewGuid().ToString("N")+".cs";
+            var root=new UnityEngine.GameObject("Independent source-miss observation");root.AddComponent<GeneratedSceneObject>();
+            try
+            {
+                var plan=new EditorPlan{actions=new System.Collections.Generic.List<EditorCommand>{new EditorCommand{tool="read_script",args=new JObject{["path"]=path}},new EditorCommand{tool="inspect_object",target=ProjectContextIndex.StableTarget(root)}}};
+                var result=SceneToolExecutor.Execute(plan);Assert.IsTrue(result.Success,result.Error);Assert.AreEqual(2,result.Results.Count);
+                var read=JObject.Parse(result.Results[0].Summary);Assert.AreEqual(path,(string)read["path"]);Assert.IsFalse((bool)read["exists"]);Assert.AreEqual(JTokenType.Null,read["source"].Type);Assert.AreEqual(JTokenType.Null,read["sha256"].Type);
+                Assert.IsTrue(((JArray)read["availableScripts"]).Values<string>().All(System.IO.File.Exists));Assert.IsFalse(System.IO.File.Exists(path));
+                Assert.AreEqual(root.name,(string)JObject.Parse(result.Results[1].Summary)["name"]);
+                plan.actions[0].args["path"]="Packages/com.not-installed-worldweaver/missing.cs";Assert.Throws<ArgumentException>(()=>SceneToolExecutor.Validate(plan));
+            }
+            finally{UnityEngine.Object.DestroyImmediate(root);}
+        }
+        [Test] public void AssetSearchKeepsItsQueryTypesAndIndependentResultsInDurableMemory()
+        {
+            var command=new EditorCommand{tool="search_project",args=new JObject{["query"]="t:Script",["limit"]=2}};
+            var result=SceneToolExecutor.Execute(new EditorPlan{actions=new System.Collections.Generic.List<EditorCommand>{command}});Assert.IsTrue(result.Success,result.Error);
+            var actual=JObject.Parse(result.Results.Single().Summary);Assert.AreEqual("t:Script",(string)actual["query"]);Assert.LessOrEqual((int)actual["count"],2);
+            foreach(var asset in actual["assets"]){Assert.IsNotEmpty((string)asset["path"]);Assert.IsNotNull(asset["mainAssetType"]);}
+            var steps=new System.Collections.Generic.List<EditorCommandResult>{result.Results.Single(),new EditorCommandResult{Tool="search_project",Success=true,Summary=new JObject{["query"]="DifferentMissingAsset",["assets"]=new JArray(),["count"]=0}.ToString()}};
+            var ledger=typeof(ChatController).GetMethod("ObservationLedger",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic);
+            var rows=(JArray)ledger.Invoke(null,new object[]{steps});Assert.AreEqual(2,rows.Count,"Unrelated asset searches must not overwrite one another in working memory");
+            Assert.IsTrue(rows.Any(r=>(string)r["data"]["query"]=="DifferentMissingAsset"&&(int)r["data"]["count"]==0));Assert.IsTrue(rows.Any(r=>(string)r["data"]["query"]=="t:Script"));
+        }
+        sealed class MissingSourceRecoveryProvider:ILLMProvider
+        {
+            public int Calls;public bool ActualMissSeen;
+            public System.Threading.Tasks.Task<CompletionResult> CompleteAsync(CompletionRequest request,System.Threading.CancellationToken token)
+            {
+                Calls++;Assert.IsTrue(request.UseToolCalls);var plan=new EditorPlan{complete=Calls>2};
+                if(Calls==1)plan.actions.Add(new EditorCommand{tool="read_script",args=new JObject{["path"]="Assets/WorldWeaverGenerated/Scripts/AbsentSourceFixture.cs"}});
+                if(Calls==2)
+                {
+                    ActualMissSeen=request.Messages.Any(m=>m.Content.Contains("A class name in a proposed plan is not an existing asset"));Assert.IsTrue(ActualMissSeen);
+                    plan.actions.Add(new EditorCommand{tool="create_node",name="MissingSourceRecoveredGoal"});
+                }
+                return System.Threading.Tasks.Task.FromResult(new CompletionResult{Text=Newtonsoft.Json.JsonConvert.SerializeObject(plan)});
+            }
+            public System.Threading.Tasks.Task<bool> HealthAsync(System.Threading.CancellationToken token)=>System.Threading.Tasks.Task.FromResult(true);
+            public void Dispose(){}
+        }
+        [Test] public async System.Threading.Tasks.Task ASourceMissCanReachTheNextJustifiedOperationInsteadOfRepeatingFatalPlanRejections()
+        {
+            UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.EmptyScene,UnityEditor.SceneManagement.NewSceneMode.Single);var provider=new MissingSourceRecoveryProvider();
+            try
+            {
+                using(var controller=new ChatController(_=>provider,"UserSettings/MissingSourceRecovery-"+Guid.NewGuid().ToString("N")))
+                {
+                    controller.Settings.UseNativeFunctions=true;controller.Settings.Power=AssistantPower.Deep;controller.Settings.AutoVerify=false;controller.Settings.UseSkills=false;
+                    await controller.SendAsync("Проверь путь Assets/WorldWeaverGenerated/Scripts/AbsentSourceFixture.cs и создай пустой узел MissingSourceRecoveredGoal.");var answer=controller.Current.Messages.Last();
+                    Assert.IsFalse(answer.IsError,answer.Text);Assert.IsTrue(provider.ActualMissSeen);Assert.AreEqual(3,provider.Calls);Assert.IsTrue(UnityEngine.GameObject.Find("MissingSourceRecoveredGoal"));Assert.AreEqual(1,answer.Steps.Count(s=>s.Tool=="read_script"));
+                }
+            }
+            finally{UnityEditor.SceneManagement.EditorSceneManager.NewScene(UnityEditor.SceneManagement.NewSceneSetup.EmptyScene,UnityEditor.SceneManagement.NewSceneMode.Single);}
+        }
         sealed class ObservationRecoveryProvider:ILLMProvider
         {
             public int Reads,Reviews;public bool FeedbackSeen,ImplementationPhaseSeen,JsonRecoverySeen;

@@ -1,0 +1,21 @@
+{
+  "archive": "deliverables/com.worldweaver.toolkit-1.8.0-rc15.tgz",
+  "archiveSha256": "277abe33ce3b06f7ef8341b663aa608087e9f06f210d20d4abae5179e4853d20",
+  "extractedOnlyFromFrozenArchive": true,
+  "testsPassed": 16,
+  "testsFailed": 0,
+  "exitCode": 0,
+  "log": ".private/web-agent-research/python-1.8-rc15.log",
+  "isolatedPythonModuleFiles": [
+    "bridge.py",
+    "native_agent.py",
+    "ollama_model.py",
+    "requirements.lock",
+    "requirements.txt",
+    "setup.py",
+    "test_bridge.py"
+  ],
+  "newUnityProjectCreated": false,
+  "newPythonEnvironmentCreated": false,
+  "realExternalModelNotPartOfTheseTests": true
+}

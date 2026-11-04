@@ -24,6 +24,26 @@ public static class SingleRequestAcceptanceRunner
     static string Package=>UnityEditor.PackageManager.PackageInfo.FindForAssembly(typeof(WorldPlayer).Assembly).resolvedPath;
     static string Hash(byte[] value){using(var sha=SHA256.Create())return BitConverter.ToString(sha.ComputeHash(value)).Replace("-","").ToLowerInvariant();}
     static string PackageDigest()=>Hash(System.Text.Encoding.UTF8.GetBytes(string.Join("\n",Directory.GetFiles(Package,"*",SearchOption.AllDirectories).Where(p=>!p.EndsWith(".DS_Store")&&!p.Contains("__pycache__")).OrderBy(p=>p,StringComparer.Ordinal).Select(p=>p.Substring(Package.Length+1)+":"+Hash(File.ReadAllBytes(p))))));
+    static bool VerifyInstalledPackage(JObject proof,string repositoryRoot)
+    {
+        var expected=((JArray)proof["files"]).ToDictionary(r=>(string)r["path"],r=>(string)r["sha256"]);
+        var files=Directory.GetFiles(Package,"*",SearchOption.AllDirectories).Where(p=>!p.EndsWith(".DS_Store")&&!p.Contains("__pycache__")).ToDictionary(p=>p.Substring(Package.Length+1).Replace('\\','/'));
+        if(files.Count!=expected.Count||files.Keys.Any(n=>!expected.ContainsKey(n)))throw new InvalidOperationException("Installed package file set differs from frozen archive");
+        bool fingerprint=false;
+        foreach(var item in expected)
+        {
+            if(Hash(File.ReadAllBytes(files[item.Key]))==item.Value)continue;
+            if(item.Key!="package.json")throw new InvalidOperationException("Installed package bytes differ: "+item.Key);
+            string original=Path.Combine(repositoryRoot,"Packages/com.worldweaver.toolkit/package.json");
+            if(Hash(File.ReadAllBytes(original))!=item.Value)throw new InvalidOperationException("Source manifest no longer matches frozen proof");
+            var source=JObject.Parse(File.ReadAllText(original));var installed=JObject.Parse(File.ReadAllText(files[item.Key]));
+            if(source["_fingerprint"]!=null||installed["_fingerprint"]?.Type!=JTokenType.String)throw new InvalidOperationException("Unexpected installed manifest difference");
+            installed.Remove("_fingerprint");
+            if(!JToken.DeepEquals(source,installed))throw new InvalidOperationException("Original package manifest fields differ");
+            fingerprint=true;
+        }
+        return fingerprint;
+    }
     static string SceneDigest()
     {
         var all=new JArray();int offset=0;
@@ -42,10 +62,11 @@ public static class SingleRequestAcceptanceRunner
         if(string.IsNullOrEmpty(initial))EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);else EditorSceneManager.OpenScene(initial);
         string proofPath=Environment.GetEnvironmentVariable("WW_AGENT_PACKAGE_PROOF");var proof=JObject.Parse(File.ReadAllText(proofPath));
         string archive=Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(proofPath)),(string)proof["archive"]);
-        if(Hash(File.ReadAllBytes(archive))!=(string)proof["sha256"]||PackageDigest()!=(string)proof["treeSha256"])throw new InvalidOperationException("Installed package and frozen archive proof differ");
+        if(Hash(File.ReadAllBytes(archive))!=(string)proof["sha256"])throw new InvalidOperationException("Frozen archive checksum differs");
+        bool installedFingerprint=VerifyInstalledPackage(proof,Path.GetDirectoryName(Path.GetDirectoryName(proofPath)));
         var connection=JsonConvert.DeserializeObject<ChatModelConnection>(File.ReadAllText(Environment.GetEnvironmentVariable("WW_AGENT_CONNECTION")));
         string history="UserSettings/RegressionAcceptance/"+Guid.NewGuid().ToString("N"),key=new ChatModelConnections(Path.Combine(history,"models")).Add(connection).ModelKey;
-        report=new JObject{["packageSourceCommit"]=proof["sourceCommit"].DeepClone(),["packageArchiveSha256"]=proof["sha256"].DeepClone(),["initialScene"]=initial,["continuationFromSavedArtifact"]=!string.IsNullOrEmpty(initial),["observerSnapshotIntervalSeconds"]=1,["startedUtc"]=DateTime.UtcNow.ToString("O"),["history"]=history,["modelKey"]=key,["model"]=connection.Model,["providerInjected"]=false,["sceneRepairByHarness"]=false,["paidApiUsed"]=false,["packageDigest"]=PackageDigest(),["caseIndex"]=0,["startedCase"]=false,["completed"]=false,["cases"]=new JArray()};Save();Tick();
+        report=new JObject{["installedManifestFingerprintAdded"]=installedFingerprint,["installedOriginalManifestFieldsUnchanged"]=true,["installedPayloadMatchesFrozenProof"]=true,["frozenSourceTreeSha256"]=proof["treeSha256"].DeepClone(),["packageSourceCommit"]=proof["sourceCommit"].DeepClone(),["packageArchiveSha256"]=proof["sha256"].DeepClone(),["initialScene"]=initial,["continuationFromSavedArtifact"]=!string.IsNullOrEmpty(initial),["observerSnapshotIntervalSeconds"]=1,["startedUtc"]=DateTime.UtcNow.ToString("O"),["history"]=history,["modelKey"]=key,["model"]=connection.Model,["providerInjected"]=false,["sceneRepairByHarness"]=false,["paidApiUsed"]=false,["packageDigest"]=PackageDigest(),["caseIndex"]=0,["startedCase"]=false,["completed"]=false,["cases"]=new JArray()};Save();Tick();
     }
     static async void Tick()
     {
