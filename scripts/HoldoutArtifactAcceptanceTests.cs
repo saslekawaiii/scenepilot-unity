@@ -56,17 +56,52 @@ public sealed class HoldoutArtifactAcceptanceTests
     }
     [UnityTest] public IEnumerator ActualGravityDropsThreeDifferentMassesOntoSolidSurfaces()
     {
+        var staticSurfaces=UnityEngine.Object.FindObjectsByType<Collider>(FindObjectsSortMode.None).Where(c=>c.enabled&&!c.isTrigger&&!c.attachedRigidbody).ToArray();
+        var upwardNormals=new System.Collections.Generic.List<Vector3>();
+        foreach(var surface in staticSurfaces)
+        {
+            var bounds=surface.bounds;
+            foreach(float x in new[]{.25f,.5f,.75f})foreach(float z in new[]{.25f,.5f,.75f})
+            {
+                var origin=new Vector3(Mathf.Lerp(bounds.min.x,bounds.max.x,x),bounds.max.y+1,Mathf.Lerp(bounds.min.z,bounds.max.z,z));
+                if(surface.Raycast(new Ray(origin,Vector3.down),out var hit,bounds.size.y+2))upwardNormals.Add(hit.normal);
+            }
+            Debug.Log($"PHYSICS_STATIC_SURFACE {surface.name} actual collider bounds={bounds}");
+        }
+        Assert.IsTrue(upwardNormals.Any(n=>Vector3.Dot(n,Vector3.up)>.999f),"No actual flat physical surface observed");
+        Assert.IsTrue(upwardNormals.Any(n=>Vector3.Dot(n,Vector3.up)>.15f&&Vector3.Dot(n,Vector3.up)<.999f),"No actual inclined physical ramp surface observed");
         var bodies=UnityEngine.Object.FindObjectsByType<Rigidbody>(FindObjectsSortMode.None);Assert.AreEqual(3,bodies.Length);
         CollectionAssert.AreEquivalent(new[]{1f,2f,4f},bodies.Select(b=>b.mass).ToArray());Assert.IsTrue(bodies.All(b=>b.useGravity&&!b.isKinematic));
         var colors=bodies.Select(b=>b.GetComponent<Renderer>().sharedMaterial.color).ToArray();Assert.AreEqual(3,colors.Distinct().Count());
         foreach(var body in bodies){var col=body.GetComponent<Collider>();Assert.IsTrue(col&&!col.isTrigger);Assert.AreEqual(0,col.sharedMaterial?col.sharedMaterial.bounciness:0,.01f);}
         var before=bodies.Select(b=>b.position).ToArray();yield return Wait(.6f);
-        Assert.IsTrue(bodies.Select((b,i)=>before[i].y-b.position.y).Any(d=>d>.15f),"No actual gravitational fall observed");yield return Wait(4f);
+        Assert.IsTrue(bodies.Select((b,i)=>before[i].y-b.position.y).Any(d=>d>.15f),"No actual gravitational fall observed");
+        // Observe beyond the previously missed 4.6-second edge failure. A short
+        // landing snapshot does not establish continued support.
+        float duration=30;float observationStart=Time.time,until=Time.time+duration;double wall=EditorApplication.timeSinceStartup+duration+20;
+        while(Time.time<until&&EditorApplication.timeSinceStartup<wall)
+        {
+            yield return null;
+            foreach(var body in bodies)
+            {
+                var col=body.GetComponent<Collider>();var support=Physics.RaycastAll(col.bounds.center+Vector3.up*.05f,Vector3.down,100,~0,QueryTriggerInteraction.Ignore).Where(h=>h.collider!=col).OrderBy(h=>h.distance).ToArray();
+                Assert.IsNotEmpty(support,$"No ground under {body.name} at {body.position} after {Time.time-observationStart+.6f:F2} seconds");
+                if(Physics.ComputePenetration(col,col.transform.position,col.transform.rotation,support[0].collider,support[0].collider.transform.position,support[0].collider.transform.rotation,out var direction,out float distance))Assert.LessOrEqual(distance,.12f,"Ball penetrated the actual support collider");
+            }
+        }
+        Assert.GreaterOrEqual(Time.time,until-.05f,"Continuous support observation did not reach its requested duration");
+        foreach(var body in bodies)Debug.Log($"PHYSICS_OBSERVATION name={body.name} position={body.position} velocity={body.linearVelocity} bounds={body.GetComponent<Collider>().bounds}");
+        foreach(var col in UnityEngine.Object.FindObjectsByType<Collider>(FindObjectsSortMode.None).Where(c=>!c.attachedRigidbody))Debug.Log($"PHYSICS_SUPPORT name={col.name} enabled={col.enabled} trigger={col.isTrigger} bounds={col.bounds}");
         foreach(var body in bodies)
         {
-            var col=body.GetComponent<Collider>();var hits=Physics.RaycastAll(col.bounds.center+Vector3.up*.05f,Vector3.down,20).Where(h=>h.collider!=col).OrderBy(h=>h.distance).ToArray();Assert.IsNotEmpty(hits,"No ground under rigidbody");
-            Assert.GreaterOrEqual(col.bounds.min.y,hits[0].point.y-.12f,"Ball passed through the floor");Assert.Less(body.linearVelocity.magnitude,1.2f,"Body never settled after the drop");
+            var col=body.GetComponent<Collider>();var hits=Physics.RaycastAll(col.bounds.center+Vector3.up*.05f,Vector3.down,20,~0,QueryTriggerInteraction.Ignore).Where(h=>h.collider!=col).OrderBy(h=>h.distance).ToArray();Assert.IsNotEmpty(hits,"No ground under rigidbody "+body.name+" at "+body.position);
+            var surfacePoint=hits[0].collider.ClosestPoint(col.bounds.center);Assert.LessOrEqual(Vector3.Distance(col.ClosestPoint(surfacePoint),surfacePoint),.12f,"Final ball pose is above ground but has not actually landed on it");
+            if(Physics.ComputePenetration(col,col.transform.position,col.transform.rotation,hits[0].collider,hits[0].collider.transform.position,hits[0].collider.transform.rotation,out var direction,out float distance))Assert.LessOrEqual(distance,.12f,"Ball penetrated the actual support collider");
+            var velocity=body.linearVelocity;Assert.IsFalse(float.IsNaN(velocity.x)||float.IsNaN(velocity.y)||float.IsNaN(velocity.z)||float.IsInfinity(velocity.x)||float.IsInfinity(velocity.y)||float.IsInfinity(velocity.z),"Non-finite simulated velocity");
+            // The request requires remaining on a physical surface, not coming
+            // to rest. Rolling along a ramp or a flat floor is valid behavior.
+            Debug.Log($"PHYSICS_BODY {body.name}: mass={body.mass} height={body.position.y:F3} velocity={velocity.magnitude:F3} support={hits[0].collider.name}");
         }
-        Debug.Log("PHYSICS actual gravity, masses 1/2/4, distinct colors, zero bounce and solid support passed");
+        Debug.Log("PHYSICS actual gravity, masses 1/2/4, distinct colors, zero bounce and continuously observed solid support for 30 seconds after initial fall passed; complete rest was not a user requirement");
     }
 }

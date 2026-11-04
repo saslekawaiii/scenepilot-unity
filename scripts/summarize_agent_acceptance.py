@@ -10,12 +10,12 @@ def main():
     p.add_argument('input',type=Path);p.add_argument('output',type=Path)
     a=p.parse_args();raw=json.loads(a.input.read_text());cases=[]
     for row in raw.get('cases',[]):
-        answer=row.get('answer') or {};attempts=answer.get('Attempts',[]);steps=answer.get('Steps',[])
+        answer=row.get('answer') or {};attempts=answer.get('Attempts',[]);steps=answer.get('Steps',[]);reviews=answer.get('EditorReviews',[]);review_inferences=[r['Inference'] for r in reviews if isinstance(r.get('Inference'),dict)]
         cases.append({'case':row.get('case'),'request':row.get('prompt'),'controllerPassed':row.get('passed'),
                       'independentBehaviorVerificationPending':row.get('behaviorNotYetIndependentlyVerified',True),
                       'controllerChecks':row.get('checks'), 'status':answer.get('Status'),'isError':answer.get('IsError'),
                       'taskStatus':(answer.get('Task')or{}).get('Status'),
-                      'inferenceCalls':len(attempts),'providerElapsedMs':sum(x.get('ProviderElapsedMs',0) for x in attempts),
+                      'inferenceCalls':len(attempts),'reviewInferenceCalls':len(review_inferences),'recordedInferenceCallsIncludingReviews':len(attempts)+len(review_inferences),'controllerElapsedMs':answer.get('ElapsedMs'),'reviewProviderElapsedMs':sum(r.get('ProviderElapsedMs',0) for r in review_inferences),'providerElapsedScope':'implementation attempts only','providerElapsedMs':sum(x.get('ProviderElapsedMs',0) for x in attempts),
                       'recoveryKinds':dict(collections.Counter(x['RepairKind'] for x in attempts if x.get('RepairKind'))),
                       'operations':dict(collections.Counter(x['Tool'] for x in steps)),
                       'operationResults':[{'index':i,'tool':x.get('Tool'),'success':x.get('Success'),'changesApplied':x.get('ChangesApplied')} for i,x in enumerate(steps)],

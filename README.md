@@ -1,139 +1,97 @@
-<div align="center">
+<p align="center">
+  <img src="docs/assets/brand/hero.svg" alt="ScenePilot — AI agent for Unity" width="100%" />
+</p>
 
-# WorldWeaver
+<p align="center">
+  <a href="https://github.com/saslekawaiii/scenepilot-unity/releases"><img src="https://img.shields.io/badge/release-1.8_preview-7c8cff" alt="Preview release" /></a>
+  <a href="https://unity.com/releases/editor/whats-new/6000.3.27"><img src="https://img.shields.io/badge/Unity-6000.3-222c37?logo=unity&amp;logoColor=white" alt="Unity 6" /></a>
+  <a href="https://ollama.com"><img src="https://img.shields.io/badge/models-Ollama_%2B_OpenAI_compatible-46bdb4" alt="Model connections" /></a>
+  <a href="https://github.com/saslekawaiii/scenepilot-unity/actions/workflows/repository-checks.yml"><img src="https://github.com/saslekawaiii/scenepilot-unity/actions/workflows/repository-checks.yml/badge.svg" alt="Repository checks" /></a>
+</p>
 
-**Unity-разработка через чат: от запроса до проверяемых изменений сцены.**
+<p align="center"><b>English</b> · <a href="README.ru.md">Русский</a><br />
+<a href="#quickstart">Quickstart</a> · <a href="#what-it-does">Features</a> · <a href="docs/validation/1.8.0/README.md">Validation</a> · <a href="#documentation">Docs</a> · <a href="https://github.com/saslekawaiii/scenepilot-unity/issues">Issues</a></p>
 
-[![Unity](https://img.shields.io/badge/Unity-6000.3-222C37?logo=unity&logoColor=white)](Packages/com.worldweaver.toolkit/package.json)
-[![UPM](https://img.shields.io/badge/UPM-1.7.0_preview-47876A)](https://github.com/saslekawaiii/worldweaver-thesis/releases/tag/v1.7.0)
-[![Skills](https://img.shields.io/badge/MD_skills-114-536DFE)](docs/unity-recipes.md)
-[![Recipes](https://img.shields.io/badge/Unity_API_references-466-586373)](Packages/com.worldweaver.toolkit/Editor/RecipeLibrary/catalog.json)
-[![Validation](https://img.shields.io/badge/Unity-validation_protocol-47876A)](deliverables/WorldWeaver-1.7.0-validation.json)
+**ScenePilot turns natural-language requests into editable Unity scenes, assets and C# code, with feedback from the actual Editor and Play Mode.** Bring a local Ollama model or connect an OpenAI-compatible API. The agent can inspect the project, discover tools, apply changes, compile scripts and check the resulting behavior.
 
-[Установка](#установка) · [Модели](#модели) · [Проверки](#проверки) · [Документация](#документация)
+> **Preview:** capability and speed depend on the model, project and task. A compiled script or a successful tool call is only part of the evidence for completion.
 
-</div>
+## Quickstart
 
-WorldWeaver — исследовательский Unity-пакет с агентом в редакторе. Помощник читает проект, обнаруживает инструменты, применяет изменения и получает фактические результаты Unity. Для операций за пределами встроенных команд он может найти API-рецепт, проверить сигнатуры и скомпилировать собственный Editor C#.
+**Requirements:** Unity 6000.3; validated on **6000.3.27f1**, including URP and Input System.
 
-**1.7.0 — предварительный выпуск.** Подключён настоящий открытый интернет-исследователь `smolagents`, добавлены загрузка измеренных карт высот с происхождением и SHA-256, проверки мыши и позы в Play Mode, осмотр снимков локальной моделью зрения. Исправлены порядок инструкций модели, память нативных вызовов, пагинация сцены и получение результатов после перезагрузки Unity. [Общий цикл](docs/agent-loop-1.7.md) · [Интернет-агент и установка](docs/web-agent.md).
+**1. Install the package.** In Unity Package Manager, choose **Install package from Git URL**:
 
-![Настоящий чат WorldWeaver в Unity, снимок версии 1.3 R11](results/screenshots-1.3/chat-wide-r11.png)
+```text
+https://github.com/saslekawaiii/scenepilot-unity.git?path=/Packages/com.worldweaver.toolkit#v1.8.0
+```
 
-Снимок интерфейса относится к версии 1.3 R11. В [нативном осмотре установленной версии 1.6.0](results/native-ui-1.6.0.json) подтверждены центровка широкого окна, новый чат, 114 навыков и подключённая модель. Отправка запроса в этой проверке интерфейса не выполнялась; живые запросы запускались отдельно через контроллер чата.
+A UPM tarball is also available under [Releases](https://github.com/saslekawaiii/scenepilot-unity/releases). Existing Git/TGZ installations need an explicit package update; a GitHub push does not update them automatically.
 
-![Сохранённый результат настоящего агента в Play Mode, проверенный пакетом 1.7.0](results/screenshots-1.7/actual-agent-result.png)
+**2. Connect a model.** Start Ollama; installed conversational models appear in the model list. To use another service, add its base URL, exact model ID and optional API key in the connection form. Provider accounts, model downloads and inference credits are separate from this package. [Model setup →](docs/local-models.md) · [Custom API →](docs/custom-api.md)
 
-Диагностический кадр сохранённого результата агента: импортированная модель Rocketbox на Terrain с высотами MOLA. Проверка ввода подтверждает мышь, WASD и движение костей без изменения исходников; при отсутствии совместимых клипов используется процедурная локомоция. Это проверка работоспособности, не образец окончательного художественного качества.
+**3. Open `Tools → ScenePilot → Chat`.** The current chat UI is in Russian: choose **Спросить** (Ask), **Спланировать** (Plan) or **Выполнить** (Execute). Describe the desired result, then inspect the operation results and verification evidence. Complex tasks benefit from the deeper reasoning budget.
 
-## Как выполняется запрос
+For operations requiring generated Editor C# or autonomous script import, enable the corresponding project permissions. This code runs with Unity Editor access; use it with trusted projects and review generated source.
+
+<details>
+<summary>Compatibility with existing installations</summary>
+
+The package ID remains `com.worldweaver.toolkit`; C# namespaces, generated asset paths and saved conversation locations retain their previous names. Existing scenes keep their script references. The previous `Tools → WorldWeaver → Чат` menu also remains available.
+
+</details>
+
+## What it does
+
+| Capability | In the Editor |
+| --- | --- |
+| **Scene authoring** | Terrain, meshes, objects, materials, lights, colliders and references in the current project. |
+| **C# workflow** | Inspect actual Unity APIs, generate source, compile, attach components and continue after domain reload. |
+| **Asset research** | Search and read sources through a real `smolagents` tool loop; acquire supported models, materials and heightmaps with provenance. |
+| **Behavior checks** | Bounded Play Mode probes with measured assertions and virtual keyboard/mouse input; observations up to two minutes. |
+| **Task recovery** | Persistent task state, conflicting-edit detection, shared checkpoint storage and bounded recovery from invalid or repetitive model steps. |
+| **Game systems** | Player/camera tools, NPC profiles and memory, free-form dialogue, navigation and runtime actions. |
+
+The reference library includes **114 MD skills** and **466 Unity API recipes**. They help the model find useful APIs; task success is measured separately.
+
+## How it works
 
 ```mermaid
 flowchart LR
-    U[Запрос] --> A[Планирование и поиск инструментов]
-    A --> T[Встроенные операции Unity]
-    A --> W[smolagents: поиск и первоисточники]
-    W --> H[Загрузка и измеренные данные]
-    H --> T
-    A --> R[Рецепт и реальные сигнатуры API]
-    R --> C[Компиляция Editor C#]
-    T --> S[Фактическое состояние Unity]
-    C --> S
-    S --> V[Измерения, Play Mode и осмотр снимка]
-    V -->|Есть несоответствия| A
-    V -->|Подтверждён результат| D[Ответ с доказательствами]
+    Request[Your request] --> Agent[Model + project context]
+    Agent --> Tools[Unity tools / C# / web research]
+    Tools --> State[Actual scene and assets]
+    State --> Check[Compile + Play Mode checks]
+    Check -->|Measured gaps| Agent
+    Check --> Evidence[Results and remaining work]
 ```
 
-В режиме «Глубоко» выполняется отдельный модельный разбор всего запроса по свежим измерениям без прежнего ответа исполнителя. После нескольких изменений промежуточная проверка может остановить дальнейшее редактирование, если цель уже достигнута. Рецепты и результаты инструментов передаются с подходящими лимитами контекста. [Подробный процесс](docs/unity-recipes.md).
+The original request stays separate from the model's tentative plan. Identical reads of unchanged state and repeated plans do not count as implementation progress. Failed behavioral evidence remains current until the implementation changes and a fresh check is performed.
 
-## Возможности
+## Measured validation
 
-| Область | Возможности |
-| --- | --- |
-| Агент | Чат с историей, режимы «Спросить», «Спланировать», «Выполнить», выбор модели и бюджета; обнаружение новых инструментов по ходу задачи. |
-| Расширение через C# | Поиск 466 API-рецептов, отражение реальных типов проекта, компиляция и выполнение Editor C#, диагностика для следующего шага агента. Игровые MonoBehaviour проходят сохранение исходника и обычную компиляцию Unity. |
-| Мир | Terrain, кратеры, повышение разрешения сетки, пещеры с коллайдерами и отверстиями, сохранение связанных объектов при изменении размеров мира, звёздное небо и свет. |
-| Объекты и физика | Собственные меши, prefabs проекта, компоненты, материалы, Rigidbody, коллайдеры, физические материалы, UI и привязка действий кнопок. |
-| Интернет | Открытый `smolagents.ToolCallingAgent`: поиск через DDGS, чтение первоисточников, ограниченная загрузка и происхождение файлов. Настоящие grayscale/raw16/PDS3 карты высот с проверкой измерений. |
-| Ресурсы | 13 встроенных CC0-материалов, поиск и импорт PBR-наборов Poly Haven, каталог ассетов проекта. Встроенные модели Kenney CC0; поиск и загрузка 115 моделей людей Rocketbox MIT, замена облика и создание героя из выбранного FBX/prefab. |
-| Персонажи | Анимированный управляемый герой, камера, старый и новый Input System, игровые системы кислорода и восстановления на базе. |
-| NPC | Свободный ввод реплики игрока, отдельные профили моделей, личность, цели и память; ограниченный обмен репликами между NPC, маршруты по NavMesh. |
-| Контроль результата | Чтение настоящего состояния, буквальные условия, диагностика компиляции, Unity jobs, контрольные точки и журнал действий. Неудачный ответ модели не объявляется выполненной задачей. |
+The release protocol distinguishes software tests, real model requests and independent artifact checks. It includes successful warehouse interaction, UI/light control, precise edits to existing geometry, a moving platform with pointer-driven pause/resume, and a repaired physics scene observed continuously for more than 30 seconds. Earlier failures are retained in the local evidence record and described in the public summary.
 
-## Установка
+**824 Editor checks · 27 Play checks · 16 Python checks · 11 runtime-probe checks.** Two external Play tests are explicitly skipped. See the [versioned validation report](docs/validation/1.8.0/README.md) for package hashes, test scope, model outcomes and limitations.
 
-Целевая версия — **Unity 6000.3**; испытания выполняются на **6000.3.27f1**, в том числе в URP 17.3 с новым Input System.
+A new hollow-mesh request on this release still failed its independent collision check and required a harness stop after repetitive steps. [Known failure and next work →](docs/validation/1.8.0/README.md#unseen-rc23-case-that-still-fails)
 
-В Package Manager выберите **Install package from Git URL**:
+These results cover specific requests. They do not establish a general task-success rate, artistic quality or replacement of a developer.
 
-```text
-https://github.com/saslekawaiii/worldweaver-thesis.git?path=/Packages/com.worldweaver.toolkit#v1.7.0
-```
+## Documentation
 
-Либо установите TGZ из [выпуска 1.7.0](https://github.com/saslekawaiii/worldweaver-thesis/releases/tag/v1.7.0) через **Install package from tarball**. Для локальной разработки используйте `Packages/com.worldweaver.toolkit/package.json` или проект `UnityProject`.
+- [Agent architecture and verification](docs/architecture.md)
+- [Connecting local models](docs/local-models.md)
+- [Adding another API](docs/custom-api.md)
+- [Web research agent](docs/web-agent.md)
+- [Unity skills and API recipes](docs/unity-recipes.md)
+- [Materials and asset sources](docs/material-library.md)
+- [NPCs and dialogue](docs/npc-ai.md)
+- [Updating an installed package](docs/updating.md)
+- [Licensing and third-party credits](docs/LICENSING.md)
 
-Уже установленный TGZ или Git-пакет сам не обновляется вслед за GitHub. [Как обновить установленный аддон](docs/updating.md).
+## Development
 
-Откройте **Tools → WorldWeaver → Чат**, выберите модель и напишите задачу. Например:
+[Contributing](CONTRIBUTING.md) · [Roadmap](ROADMAP.md) · [Report a bug](https://github.com/saslekawaiii/scenepilot-unity/issues/new/choose)
 
-```text
-Построй мост длиной 8 метров и шириной 3 метра из собственного меша с коллайдером.
-```
-
-```text
-Создай экранное меню с панелью и кнопкой, которая переключает её видимость.
-```
-
-```text
-Найди подходящий Unity API-рецепт и создай физический объект с шарниром.
-Проверь компоненты и размеры по фактическому состоянию.
-```
-
-Для новых операций через API включите в настройках чата **«Автономный C# с доступом Unity Editor»**. Это доверенный код с полномочиями редактора, не песочница. Он выполняется синхронно; Undo восстанавливает зарегистрированные изменения сцены, но не произвольные записи файлов. Для игровых скриптов доступен отдельный просмотр исходника перед импортом. [Рабочий процесс и ограничения](docs/unity-recipes.md).
-
-## Модели
-
-**Локально:** запустите Ollama. Установленные разговорные модели появляются в списке автоматически; кнопка «Обновить» проверяет подключение сразу. [Запуск и диагностика](docs/local-models.md).
-
-**Другой API:** в окне подключений задайте протокол, endpoint, точный ID модели и при необходимости ключ. Поддерживаются Ollama и OpenAI-compatible. Ключи сохраняются локально и не должны попадать в Git. [Как добавить новый API](docs/custom-api.md).
-
-Нативный режим требует поддержки вызова функций выбранной моделью и провайдером. В настройках есть прежний JSON-режим совместимости. Бюджеты нативного режима: до 16/32/64 шагов и 15/30/60 минут; это пределы, а не обещание скорости. Локальные модели могут работать значительно медленнее облачных и ошибаться чаще. Доступность бесплатного облака зависит от условий и квот провайдера.
-
-## Проверки
-
-[Протокол выпуска 1.7.0](deliverables/WorldWeaver-1.7.0-validation.json) связывает хеши пакета с результатами Unity Test Runner, живых запросов и установки в рабочий проект. [Пояснения к проверкам](deliverables/WorldWeaver-1.7.0-notes.md) отделяют выполненные операции от подтверждения всей задачи.
-
-Последняя сборка прошла **767 Editor-тестов**, **27 Play Mode-тестов** и **16 Python-тестов**; два отдельных сетевых Play Mode-теста явно пропущены. Сетевой мост дополнительно проверяется настоящим циклом `smolagents`, включая ошибку инструмента и восстановление нативной памяти. Отдельная проверка сохранённой агентом сцены подаёт реальные события мыши и WASD, измеряет движение камеры, перемещение и позу костей без исправления сцены.
-
-**Последний живой прогон: 5 из 7 сценариев прошли все условия стенда.** Два условия остаются неподтверждёнными: кратеры в скачанной карте высот не учтены счётчиком процедурных кратеров; существующая поверхность размером 500×500 м не достигает принятого стендом порога 512×512 м. Исходные отрицательные результаты сохранены. Эти расхождения ещё проверяются и не выданы за успешное выполнение всех пользовательских требований.
-
-Исторические пользовательские запросы проверяются через публичный контроллер чата: импортированный герой, кратеры и физическая пещера, жители и выживание, расширение мира и звёзды, объяснение результата и выбранной модели, C# с точными размерами. Отдельно воспроизводится исходный составной запрос про персонажа, камеру и карту Марса. Итог каждого сценария, включая неудачные части, указан в протоколе. Проверочный код не подставляет планы и не достраивает сцену после агента.
-
-В [протоколе 1.6.0](deliverables/WorldWeaver-1.6.0-validation.json) сохранены прежние испытания: замена героя, физический балансир, пандус из собственного меша и изменение мира.
-
-Количество навыков не гарантирует выполнение любого запроса. Компиляция не доказывает игровое поведение, а успешные отдельные сценарии не доказывают полную замену разработчика.
-
-```sh
-python3 scripts/import_agent_skills.py
-python3 scripts/import_model_catalog.py
-python3 scripts/check_repository.py
-```
-
-Команды офлайн проверяют исходники навыков, рецептов, каталога моделей, лицензий и целостность репозитория. Unity-тесты находятся в `Packages/com.worldweaver.toolkit/Tests`.
-
-## Документация
-
-- [Общий цикл 1.7 и исправления протокола](docs/agent-loop-1.7.md)
-- [Открытый интернет-агент: установка, источники и ограничения](docs/web-agent.md)
-- [История общего цикла 1.6](docs/agent-loop-1.6.md)
-- [Навыки, API-рецепты и расширение агента](docs/unity-recipes.md)
-- [Исследование Unity-агентов и источники заимствования](docs/research/unity-agent-architecture.md)
-- [Подключение моделей и нового API](docs/custom-api.md)
-- [Локальная Ollama](docs/local-models.md)
-- [Материалы и лицензии ассетов](docs/material-library.md)
-- [NPC и свободный разговор](docs/npc-ai.md)
-- [Составной запрос и цикл проверки](docs/general-agent-workflow.md)
-- [Архитектура и пределы агента](docs/agent-architecture-and-limits.md)
-- [История 1.4.0](deliverables/WorldWeaver-1.4.0-notes.md) · [История 1.3](docs/1.3-status.md)
-
-Текст ВКР и материалы защиты находятся в `deliverables`; их исторические утверждения нужно сопоставлять с версией программного пакета и протоколом соответствующего выпуска.
+Keep credentials, local history, generated test projects and Unity caches out of commits. Third-party components retain their respective licenses; the original project code currently has no project-wide reuse license assigned. See [licensing details](docs/LICENSING.md).

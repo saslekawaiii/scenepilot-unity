@@ -1,5 +1,0 @@
-{
-  "aborted": true,
-  "source": "general-agent-9b-1.4.0-r2.json",
-  "reason": "Decoder sanitizer must distinguish a JSON Schema type annotation from a property named type; fixed shared traversal and added a regression test."
-}

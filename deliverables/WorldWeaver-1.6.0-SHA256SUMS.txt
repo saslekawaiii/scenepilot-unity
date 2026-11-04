@@ -1,3 +1,0 @@
-5bee85cd7edb148c48c71e4ec0890f1161aef8627f068ad5a66de91f862a3066  com.worldweaver.toolkit-1.6.0.tgz
-eebb4cf8f0271ed5bda3c5507832f3d7659b44ee54fdd387800583bc6a2d9f3f  WorldWeaver-1.6.0-validation.json
-bbf3d14d191cc5227c037310bcb9dddac92b5f1b7af635a5d1e45c2db3dcf382  WorldWeaver-1.6.0-notes.md

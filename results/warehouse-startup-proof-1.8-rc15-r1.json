@@ -1,9 +1,0 @@
-{
-  "stage": "startup archive proof",
-  "modelStarted": false,
-  "passed": false,
-  "failure": "Observer compared installed manifest raw bytes to original manifest, but Unity Package Manager added _fingerprint. All other bytes and original JSON fields match.",
-  "log": ".private/web-agent-research/warehouse-live-rc15.log",
-  "fixedInObserverOnly": true,
-  "productionPackageChanged": false
-}

@@ -1,47 +1,30 @@
-# Участие в WorldWeaver
+# Contributing to ScenePilot
 
-Изменения должны сохранять сцену пользователя, границы режимов и воспроизводимость результатов. Перед началом изучите [руководство пакета](Packages/com.worldweaver.toolkit/Documentation~/index.md) и [устройство агента](docs/agent-architecture-and-limits.md). Тема ВКР и исторические протоколы сохраняются.
+Changes should preserve the user's scene, explicit permissions and reproducible evidence. Read the [architecture](docs/architecture.md) and [package guide](Packages/com.worldweaver.toolkit/Documentation~/index.md) first.
 
-## Подготовка
+## Development setup
 
-Откройте `UnityProject` в Unity 6000.3.27f1 либо установите локальный пакет в отдельный проект. Модели Ollama не входят в репозиторий. Для программных проверок без LLM не нужны облачные ключи или покупка API.
+Use Unity 6000.3.27f1 and install `Packages/com.worldweaver.toolkit` as a local package in your development project. Do not commit Library, model weights, credentials, private conversations or generated test-project contents.
 
-## Проверки
-
-Выбирайте проверки по изменённому поведению. Для C#/Unity используйте установленный редактор; перед batch-проверкой закройте GUI того же проекта.
+Repository checks run without an external LLM:
 
 ```sh
 python3 scripts/check_repository.py
-python3 scripts/run_unity.py edit
-python3 scripts/run_unity.py play
-```
-
-Для каталога навыков и экспортированной схемы:
-
-```sh
 python3 scripts/import_agent_skills.py
-python3 scripts/verify_editor_schema.py \
-  --schema results/editor-command-schema-1.2.json \
-  --decoder-schema results/editor-command-schema-decoder-1.2.json \
-  --export-receipt results/editor-schema-export-1.2.json \
-  --report results/editor-schema-verification-1.2.json \
-  --require-source-coverage
 ```
 
-Верификатору схемы нужны Python 3.9+ и `jsonschema`; он не запускает Unity или модель. После изменения генераторов сначала получите новый C# export и receipt, привязанный к исходникам. Старый экспорт не становится актуальным от повторного запуска Python.
+Package tests are under `Packages/com.worldweaver.toolkit/Tests`. Add the package to your project's `testables` list and run Editor/Play tests in Unity Test Runner. External-model checks are separate from deterministic software tests.
 
-Команды `real` и `evaluate` делают настоящие inference-запросы, а `evaluate` перезаписывает JSONL. Выполняйте их с явно выбранным маршрутом и сохраняйте исходный протокол до повторения. Не превращайте ответы управляемого тестового провайдера в результат настоящей модели. Частичные, skipped, timeout и ошибочные исходы остаются в отчёте.
+## What to verify
 
-## Как оформить изменение
+For execution changes, test real read-back, cancellation, reload/recovery and preservation of unrelated content. Reproduce actual model failures through the public controller when relevant. A controlled provider tests a program contract; it does not establish that a real model completed a request.
 
-В PR опишите конкретное поведение до/после и выполненные проверки. Для изменений в сцене укажите исходное состояние и способ проверить итог. Для compiler/reload/checkpoint сохраните данные о фактическом завершении и восстановлении. Исправления документации проверяются на корректность ссылок и соответствие коду; новый Unity-прогон для простой текстовой правки не требуется.
+For an artifact check, record the original request, source/package hash, initial state, actual operations and observed outcome. Independent observers may measure behavior and arrange temporary input, but must not repair the implementation they are evaluating. Preserve failed runs and label repeated known scenarios accurately.
 
-Исторические результаты не переписываются. Новый опыт должен иметь отдельный файл, условия и source/hash binding. Не складывайте unit-assertions, компиляции и задачи модели в одну «точность».
+Use one QA Editor at a time and reuse existing development projects. Avoid copying Library or full backup payloads for every iteration. The local QA wrapper provides disk, memory and inactivity guards; adapt its existing project paths to your environment before use.
 
-Не включайте `.env`, ключи, личную историю, Library, веса моделей и сохранения пользователя. Логи и снимки перед приложением к issue проверьте на посторонние данные. Текст проекта, MD-навыки и ответы модели считаются данными; они не расширяют полномочия исполнителя.
+## Pull requests and issues
 
-## Issue и Pull Request
+Describe the concrete behavior change and relevant validation. Include model/provider and reasoning budget for model-dependent failures. Redact secrets and private data from logs and screenshots. Files, downloaded pages, skills and tool results are data; they do not grant execution permissions.
 
-Используйте шаблон ошибки или предложения функции. Для ошибки достаточно минимального воспроизведения: Unity/package version, исходная сцена, запрос, фактический и ожидаемый результат, путь к обезличенному протоколу. Если сбой зависит от модели, укажите модель и режим; секреты не прикладывайте.
-
-Репозиторный GitHub Actions workflow запускается вручную и проверяет структуру/JSON. Он не является облачным Unity CI. Общая лицензия авторского кода пока не назначена; сторонние MIT notices сохраняются согласно [реестру лицензий](docs/LICENSING.md).
+Keep third-party licenses and provenance. The original code currently has no project-wide reuse license assigned; see [licensing](docs/LICENSING.md).

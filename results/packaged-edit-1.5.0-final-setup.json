@@ -1,6 +1,0 @@
-{
-  "accepted": false,
-  "testCount": 0,
-  "reason": "Isolated moon consumer manifest omitted testables, so package tests were not discovered. Added testables and reran using the explicit test assembly. No product package changes.",
-  "xml": "/tmp/worldweaver-packaged-edit-1.5-final.xml"
-}

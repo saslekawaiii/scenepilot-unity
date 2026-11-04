@@ -1,0 +1,217 @@
+{
+  "rawModelInternalsOmitted": true,
+  "successRateNotComputed": true,
+  "cases": [
+    {
+      "case": "warehouse",
+      "modelRunPackage": "1.8.0-rc16",
+      "packageSourceCommit": "14fe6f3c8f56add2cab355c1689a75efebef5249",
+      "packageArchiveSha256": "88dc00b803a6a11d5f296e04134d04c6f9571fe6d5b20eec65cf2d777b806ac5",
+      "controllerReport": {
+        "localRecord": "warehouse-controller-1.8-rc16-continuation.json",
+        "originalSha256": "3017ebfd142dccc1dabce5113ae8b2afe465814edf90fc7733ca8bababf30075"
+      },
+      "request": "Создай небольшой играбельный прототип «Сбор посылок на складе».\n\nСделай склад размером примерно 30×20 метров: пол, стены, стеллажи и широкие проходы. Добавь управляемого персонажа с камерой, движением WASD, бегом и прыжком. Используй встроенные ресурсы или уже имеющиеся ассеты проекта.\n\nРазмести в доступных местах пять посылок. Когда игрок подходит к посылке и нажимает E, она должна исчезать, а счётчик на экране увеличиваться. После сбора всех пяти покажи сообщение «Все посылки собраны».\n\nНапиши необходимые C#-скрипты, прикрепи их к объектам и настрой ссылки самостоятельно. У стен и стеллажей должны быть коллайдеры; персонаж не должен проходить сквозь них.\n\nИнтернет для этой задачи не используй. Проверяй компиляцию и поведение в Play Mode. В конце перечисли, что действительно проверено, и укажи управление.",
+      "controllerReportedSuccess": true,
+      "implementationInferenceCalls": 49,
+      "reviewInferenceCalls": null,
+      "packageUnchangedDuringRequest": true,
+      "readyImplementationOrPlanInjected": false,
+      "sceneRepairByHarness": false,
+      "paidApiUsed": false,
+      "independentChecks": [
+        {
+          "localRecord": "warehouse-artifact-input-1.8-rc16.xml",
+          "originalSha256": "feb53dbc77997ceb772c5bdf3d57e59d0986630c6cb7c8426a6d81c7d8698e9d",
+          "passed": 3,
+          "failed": 0,
+          "durationSeconds": 4.9734323
+        },
+        {
+          "localRecord": "warehouse-independent-artifact-1.8-rc16.json",
+          "originalSha256": "3f64d2a886803223db0bb431d00b12a4d03300bf53ec605dc24c1ff8819336fe"
+        }
+      ],
+      "measuredScope": [
+        "Actual W/Shift/Space/mouse inputs and obstacle collision",
+        "1643 connected swept-capsule grid cells from actual spawn; all five parcels reachable",
+        "Five actual E pickups increment once, completion only after fifth"
+      ],
+      "limitations": [
+        "Continuation from model-authored partial scene after failed RC15 fresh run; not fresh-from-empty success",
+        "Input checks temporarily reposition player for individual measurements; separate grid checks actual spawn reachability",
+        "No artistic-quality assessment"
+      ]
+    },
+    {
+      "case": "modify_physics",
+      "modelRunPackage": "1.8.0-rc17",
+      "packageSourceCommit": "2ae7ee30bc5338033906a33dc5210f328f96a517",
+      "packageArchiveSha256": "a7857c6df6b1194f2dbe047e3806d740d3aa57b2bc5204f14f273973be2c8676",
+      "controllerReport": {
+        "localRecord": "holdout-controller-1.8-rc17.json",
+        "originalSha256": "ea8865ee160cf6dac40b8e6e954d93be1537ab5521ad58d7e9bccea6c155367f"
+      },
+      "request": "В этой сцене расширь рампу в полтора раза и поверни её на 90 градусов вокруг вертикальной оси. Сохрани все три шара, их массы, цвета и исходные положения. Новые объекты не добавляй. Проверь размеры и сохранность существующих объектов.",
+      "controllerReportedSuccess": true,
+      "implementationInferenceCalls": 8,
+      "reviewInferenceCalls": 3,
+      "packageUnchangedDuringRequest": true,
+      "readyImplementationOrPlanInjected": false,
+      "sceneRepairByHarness": false,
+      "paidApiUsed": false,
+      "independentChecks": [
+        {
+          "localRecord": "holdout-scene-audit-1.8-rc17.json",
+          "originalSha256": "5ed80f561e0c5b4411394f543ae12b259fa59b5564e8bde879135b4baa80e3ee"
+        }
+      ],
+      "measuredScope": [
+        "Same existing object IDs; no extra scene objects",
+        "Requested horizontal scaling and 90-degree rotation, followed by independent transform comparison"
+      ],
+      "limitations": [
+        "Original horizontal-width axis was unspecified; both X/Z were scaled, vertical scale preserved"
+      ]
+    },
+    {
+      "case": "modify_width_only",
+      "modelRunPackage": "1.8.0-rc17",
+      "packageSourceCommit": "2ae7ee30bc5338033906a33dc5210f328f96a517",
+      "packageArchiveSha256": "a7857c6df6b1194f2dbe047e3806d740d3aa57b2bc5204f14f273973be2c8676",
+      "controllerReport": {
+        "localRecord": "holdout-controller-1.8-rc17.json",
+        "originalSha256": "ea8865ee160cf6dac40b8e6e954d93be1537ab5521ad58d7e9bccea6c155367f"
+      },
+      "request": "В существующей сцене увеличь только локальный размер рампы по оси X на 20 процентов. Локальные размеры Y и Z, позицию и поворот рампы не меняй. Сохрани все три шара, их массы, цвета и исходные положения, а также остальные объекты. Новых объектов не добавляй. Проверь фактические исходные и конечные значения. Интернет не используй.",
+      "controllerReportedSuccess": true,
+      "implementationInferenceCalls": 6,
+      "reviewInferenceCalls": 1,
+      "packageUnchangedDuringRequest": true,
+      "readyImplementationOrPlanInjected": false,
+      "sceneRepairByHarness": false,
+      "paidApiUsed": false,
+      "independentChecks": [
+        {
+          "localRecord": "holdout-scene-audit-1.8-rc17.json",
+          "originalSha256": "5ed80f561e0c5b4411394f543ae12b259fa59b5564e8bde879135b4baa80e3ee"
+        }
+      ],
+      "measuredScope": [
+        "Existing local X scale multiplied by 1.2 only; other transforms retained",
+        "Same object IDs; no extra scene objects"
+      ],
+      "limitations": [
+        "Checked saved scene values, not gameplay behavior"
+      ]
+    },
+    {
+      "case": "lift",
+      "modelRunPackage": "1.8.0-rc18",
+      "packageSourceCommit": "96bb8312bb3c97fed8cc5b8d0604d00420bbeaa0",
+      "packageArchiveSha256": "380b730541dcac91e33329ef1c5972a77ec21fc9a3a8d00a327a3639f908e226",
+      "controllerReport": {
+        "localRecord": "holdout-controller-1.8-rc18.json",
+        "originalSha256": "56e749f2399382150cdd321fccd38405576be7099afd2105289c47b8bb35a570"
+      },
+      "request": "Создай отдельный тестовый стенд с платформой-лифтом. Платформа размером 4×0,3×4 метра должна непрерывно перемещаться по вертикали между y=1 и y=5 и обратно; полный цикл занимает 8 секунд.\n\nДобавь экранную кнопку «Пауза». Она останавливает движение и меняет надпись на «Продолжить». Повторное нажатие продолжает движение с прежнего положения без скачка. Добавь освещение и камеру, чтобы стенд было видно.\n\nСам напиши и подключи нужный C#, настрой события и ссылки. Проверь в Play Mode действительное перемещение, паузу и продолжение, затем перечисли, что проверено. Интернет не используй.\n",
+      "controllerReportedSuccess": true,
+      "implementationInferenceCalls": 18,
+      "reviewInferenceCalls": 5,
+      "packageUnchangedDuringRequest": true,
+      "readyImplementationOrPlanInjected": false,
+      "sceneRepairByHarness": false,
+      "paidApiUsed": false,
+      "independentChecks": [
+        {
+          "localRecord": "lift-artifact-input-1.8-rc18-on-rc21.xml",
+          "originalSha256": "1eaacfb630aa04644b8df7b38bd7c00e5239adaeb4c84f0fd7ccfda57967e8af",
+          "passed": 1,
+          "failed": 0,
+          "durationSeconds": 22.8566174
+        },
+        {
+          "localRecord": "lift-independent-artifact-1.8-rc18-on-rc21.json",
+          "originalSha256": "af564ed42fa85b5ed226633c89f8c1efe329b5cdf4a918fa6a4ca00931e891fe"
+        }
+      ],
+      "measuredScope": [
+        "Model-authored PlatformLift C#; compilation, references, scene saved",
+        "Independent checks on RC21: visible 4 x .3 x 4 platform, height 1..5, actual 8-second period",
+        "Actual virtual pointer Pause/Continue, stationary pause and resume without reset; continuous observation 17 seconds"
+      ],
+      "limitations": [
+        "Model run was RC18; independent check RC21, not new RC23 inference",
+        "World camera image excludes ScreenSpaceOverlay UI; no artistic-quality claim"
+      ]
+    },
+    {
+      "case": "physics_repair",
+      "modelRunPackage": "1.8.0-rc22",
+      "packageSourceCommit": "ee05ca3be6a8c772204f614154fe49dd14191248",
+      "packageArchiveSha256": "38a17d0a07259b8e0c6065a657aed69f58a73c738bcc5c26a7063919df6d0f03",
+      "controllerReport": {
+        "localRecord": "physics-repair-controller-1.8-rc22.json",
+        "originalSha256": "008fc4a9543bc89493683d921ccade80b06952d3f527c3259f35aa12ba61abdb"
+      },
+      "request": "Создай физическую демонстрацию: большую ровную площадку, одну наклонную рампу и три шара разных цветов. У шаров должны быть динамические Rigidbody с массами 1, 2 и 4 кг, включённая гравитация, коллайдеры и нулевая упругость. Размести их над площадкой так, чтобы при запуске они падали и оставались на физической поверхности. Проверь поведение в Play Mode и сообщи реальные результаты. Интернет не используй.\n\nНезависимая проверка сохранённой сцены выявила ошибку: через 4,6 секунды все три шара оказались при z≈−11,05 и y≈−0,09, продолжая падать. Физическая площадка заканчивается при z=−10, поэтому они скатываются с края. Это не успешное выполнение требования оставаться на поверхности. Сам исследуй текущую сцену, исправь результат и проверь достаточно длительное реальное поведение в Play Mode. Планы и игровой код проверяющий не подставляет.\nДополнительная реальная проверка после предыдущего исправления длилась 10,04 секунды: все три шара оказались при z≈−17,27 и y≈−36,49 и продолжали падать. Сохранена именно та модельная сцена; краткое приземление ещё не подтверждает требование оставаться на физической поверхности. Исправь текущий результат и проверь длительное поведение.\nПоследняя независимая проверка сохранённого результата RC20: первые 10,6 секунды шары сохраняют опору, но на 18,30 секунды SphereMass4 достигает (3, 0.6, 10), где твёрдой опоры под ним уже нет. Короткая проверка скрыла отложенное падение. Устрани оставшуюся причину, сохранив исходный запрос. Проверь реальное непрерывное поведение не менее 30 секунд после начального падения. Сам выбери исправление; готовые планы и игровой код не передаются.",
+      "controllerReportedSuccess": true,
+      "implementationInferenceCalls": 14,
+      "reviewInferenceCalls": 4,
+      "packageUnchangedDuringRequest": true,
+      "readyImplementationOrPlanInjected": false,
+      "sceneRepairByHarness": false,
+      "paidApiUsed": false,
+      "independentChecks": [
+        {
+          "localRecord": "physics-artifact-input-1.8-rc22-long-r2.xml",
+          "originalSha256": "c594d32994078e0b7a06edc8fa32e968631603b153ee4498647c3c8e703709a6",
+          "passed": 1,
+          "failed": 0,
+          "durationSeconds": 31.4798519
+        },
+        {
+          "localRecord": "physics-independent-artifact-1.8-rc22.json",
+          "originalSha256": "122ee2f9b7b7c6171c511056067b188234cd2df489cbef597f97cff1beca2ced"
+        }
+      ],
+      "measuredScope": [
+        "Real model repair from saved partial scene, given original request and measured failure only",
+        "Model-authored 30.04-second runtime probe",
+        "Independent real Play Mode observation: 30 seconds after .6-second initial fall; final contact, masses 1/2/4, colors, gravity, zero bounce, flat and inclined colliders"
+      ],
+      "limitations": [
+        "Earlier short pass on RC20 failed an extended check at 18.3 seconds and was rejected",
+        "Final model moved balls over platform center; original request did not require them to roll down ramp",
+        "First independent launch hung before tests began; successful retry reused same consumer with graphics"
+      ]
+    }
+  ],
+  "additionalVerifiedScope": [
+    {
+      "case": "ui_light",
+      "modelRunPackage": "1.8.0-rc16",
+      "independentCheckPackage": "1.8.0-rc17",
+      "checks": {
+        "localRecord": "light-ui-artifact-input-1.8-rc16-on-rc17.xml",
+        "originalSha256": "378b28fd3854ade29a242f6870c89dcbe1c63522dc4620fe444734d3cd88bc52"
+      },
+      "scope": "Actual slider binding to point-light intensity; Reset pointer interaction; slider 0..4 starts at 1"
+    },
+    {
+      "case": "official_web_read",
+      "modelRunPackage": "1.8.0-rc16",
+      "checks": {
+        "localRecord": "holdout-scene-audit-1.8-rc16.json",
+        "originalSha256": "71feb4fab4379b7edccae86c5c32a85ad8cd0f3db5a457bc81036ccad57d80c1"
+      },
+      "scope": "Official CharacterController.SimpleMove documentation obtained; scene/project bytes unchanged"
+    }
+  ],
+  "preservedFailures": [
+    "Fresh warehouse RC15 failed before model-authored RC16 continuation succeeded",
+    "Relative edit RC16 added unwanted workspace object; independently rejected",
+    "Physics RC16/17/18/19 attempts failed; RC20 short pass failed longer check",
+    "RC21 stopped when actual 15-second product observation limit prevented required longer check; general bounded limit corrected in RC22"
+  ]
+}

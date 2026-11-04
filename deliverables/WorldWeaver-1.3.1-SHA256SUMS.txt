@@ -1,3 +1,0 @@
-26b074ffacc1a1bf9a1e27d7811cacfe66368e53bf4adab9d1402983ce39fa54  com.worldweaver.toolkit-1.3.1.tgz
-e879b5a422c9d84ed764dbddb4267df271a08704c0ef44e87e7a7faa614c2833  WorldWeaver-1.3.1-validation.json
-c964f5d0f0e3732dbae313c92ec1746c5c286e89ad6185eda4bd918705a633e5  WorldWeaver-1.3.1-notes.md

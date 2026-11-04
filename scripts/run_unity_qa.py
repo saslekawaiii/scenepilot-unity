@@ -55,8 +55,12 @@ def main():
     parser.add_argument('--project', choices=PROJECTS, required=True)
     parser.add_argument('--log', type=Path, required=True)
     parser.add_argument('--graphics', action='store_true')
+    parser.add_argument('--inactivity-seconds', type=int, default=300,
+                        help='Stop only this owned Editor after this many seconds without log or acceptance-report activity.')
     parser.add_argument('unity_args', nargs=argparse.REMAINDER)
     args = parser.parse_args()
+    if not 60 <= args.inactivity_seconds <= 3600:
+        parser.error('Inactivity limit must be between 60 and 3600 seconds.')
     extra = args.unity_args[1:] if args.unity_args[:1] == ['--'] else args.unity_args
     if any(flag in extra for flag in ['-projectPath', '-batchmode', '-logFile', '-nographics']):
         parser.error('Project, mode and log are controlled by this runner.')
@@ -92,14 +96,41 @@ def main():
         print(json.dumps({'event': 'started', 'role': args.project, 'pid': child.pid, 'freeGiB': round(free_before / GIB, 2)}, ensure_ascii=False), flush=True)
         stop_reason = None
         critical_since = None
+        stopping_since = None
+        watched = [log]
+        for name in ('WW_REGRESSION_OUTPUT', 'WW_RUNTIME_PROBE_OUTPUT'):
+            value = os.environ.get(name)
+            if value:
+                path = Path(value).resolve()
+                if ROOT in path.parents:
+                    watched.append(path)
+        last_activity = time.monotonic()
+        last_signature = None
         def forward(sig, _frame):
-            nonlocal stop_reason
+            nonlocal stop_reason, stopping_since
             stop_reason = 'QA runner interrupted'
+            stopping_since = stopping_since or time.monotonic()
             if child.poll() is None:
                 child.send_signal(sig)
         signal.signal(signal.SIGINT, forward)
         signal.signal(signal.SIGTERM, forward)
         while child.poll() is None:
+            signature = []
+            for path in watched:
+                try:
+                    stat = path.stat()
+                    signature.append((stat.st_size, stat.st_mtime_ns))
+                except FileNotFoundError:
+                    signature.append(None)
+            if signature != last_signature:
+                last_signature, last_activity = signature, time.monotonic()
+            if stopping_since is not None and time.monotonic() - stopping_since >= 15:
+                child.kill()
+                break
+            if stopping_since is None and time.monotonic() - last_activity >= args.inactivity_seconds:
+                stop_reason = 'No log or acceptance-report activity for ' + str(args.inactivity_seconds) + ' seconds'
+                stopping_since = time.monotonic()
+                child.terminate()
             free = shutil.disk_usage(ROOT).free
             level = pressure()
             critical_since = (critical_since or time.monotonic()) if level == 4 else None
@@ -117,6 +148,7 @@ def main():
                   'role': args.project, 'project': str(project.relative_to(ROOT)), 'pid': child.pid,
                   'freeBeforeBytes': free_before, 'freeAfterBytes': shutil.disk_usage(ROOT).free,
                   'exitCode': code, 'resourceStopReason': stop_reason, 'log': str(log.relative_to(ROOT)),
+                  'inactivityLimitSeconds': args.inactivity_seconds,
                   'newProjectCreated': False, 'libraryCloned': False}
         with (PRIVATE / 'unity-qa-runs.jsonl').open('a') as output:
             output.write(json.dumps(record, ensure_ascii=False) + '\n')

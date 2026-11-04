@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<test-run id="2" testcasecount="0" result="Passed" total="0" passed="0" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-01 18:16:23Z" end-time="2026-11-01 18:16:23Z" duration="0.0023195">
-  <test-suite type="TestSuite" id="1004" name="test" fullname="test" runstate="Runnable" testcasecount="0" result="Passed" start-time="2026-11-01 18:16:23Z" end-time="2026-11-01 18:16:23Z" duration="0.002320" total="0" passed="0" failed="0" inconclusive="0" skipped="0" asserts="0">
-    <properties>
-      <property name="platform" value="PlayMode" />
-    </properties>
-  </test-suite>
-</test-run>

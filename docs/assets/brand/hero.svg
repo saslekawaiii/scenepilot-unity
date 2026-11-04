@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="330" viewBox="0 0 1200 330" role="img" aria-label="ScenePilot — AI agent for Unity">
+<defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#121a30"/><stop offset="1" stop-color="#192844"/></linearGradient><linearGradient id="accent" x2="1" y2="1"><stop stop-color="#8b9aff"/><stop offset="1" stop-color="#50ddd0"/></linearGradient></defs>
+<rect width="1200" height="330" rx="24" fill="url(#bg)"/>
+<path d="M820 274h300M845 244h250M869 214h200M891 184h156M918 154h104M945 124h52M820 274l125-150M890 274l73-150M960 274l20-150M1030 274l-33-150M1100 274l-86-150" stroke="#344967" stroke-width="1" opacity=".65"/>
+<path d="m973 66 80 46v93l-80 46-80-46v-93z" fill="#253a57" stroke="url(#accent)" stroke-width="3"/><path d="m893 112 80 47 80-47M973 159v92" fill="none" stroke="url(#accent)" stroke-width="3"/><path d="m938 110 35-20 35 20-35 20z" fill="#7d9cff" opacity=".7"/>
+<circle cx="893" cy="112" r="5" fill="#55ddcc"/><circle cx="1053" cy="205" r="5" fill="#9aabff"/><circle cx="973" cy="251" r="5" fill="#55ddcc"/>
+<text x="64" y="75" font-family="Arial,sans-serif" font-size="16" font-weight="700" letter-spacing="3" fill="#7fded8">AI AGENT FOR UNITY</text>
+<text x="60" y="156" font-family="Arial,sans-serif" font-size="76" font-weight="700" letter-spacing="-3" fill="#f4f7ff">ScenePilot</text>
+<text x="64" y="205" font-family="Arial,sans-serif" font-size="25" fill="#b6c8e1">Build scenes. Write C#. Verify in Play Mode.</text>
+<g font-family="Arial,sans-serif" font-size="15" fill="#dce7fa"><rect x="64" y="247" width="125" height="34" rx="17" fill="#283a58"/><text x="89" y="270">Unity 6</text><rect x="200" y="247" width="145" height="34" rx="17" fill="#283a58"/><text x="227" y="270">Local / cloud</text><rect x="356" y="247" width="147" height="34" rx="17" fill="#283a58"/><text x="383" y="270">Source available</text></g>
+</svg>

@@ -1,4 +1,0 @@
-{
-  "interruptedUtc": "2026-11-01T20:49:54.748870+00:00",
-  "reason": "OpenAI-compatible Text route repeatedly used the full 6000-token output limit without returning a plan. Stop this incompatible configuration; keep raw results. Native Ollama with think:false already returned valid plans. Product package unchanged."
-}

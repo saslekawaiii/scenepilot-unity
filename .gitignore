@@ -34,3 +34,61 @@ deliverables/com.worldweaver.toolkit-*-r[0-9]*.tgz
 # Raw live-agent traces contain private prompts and opaque provider continuation data.
 /results/warehouse-live-*.json
 /results/agent-holdouts-*.json
+
+# Local development artifacts and archived working material are not product source.
+/UnityProject/
+/results/
+/deliverables/
+/thesis/
+/IMPLEMENTATION_PLAN.md
+/PROGRESS.md
+/TODO_NEXT_SESSION.md
+/WORKPLAN-1.2.md
+/WORKPLAN-1.3.md
+/docs/research/comparison-published-theses.md
+/docs/research/sources.json
+/docs/research/vkr-requirements-2026.md
+/docs/thesis-1.3-supplement.md
+/scripts/build_documents.py
+/scripts/build_presentation.mjs
+/scripts/build_presentation_defense.py
+/scripts/build_supplement_1_3.py
+/scripts/enrich_thesis.py
+/scripts/finalize_thesis_text.py
+/scripts/map_document_pages.py
+/scripts/package_delivery.py
+/scripts/presentation-evidence-1.2.schema.json
+/scripts/verify_presentation.mjs
+/scripts/verify_presentation_evidence.py
+
+# Historical working notes retained locally.
+/docs/1.3-status.md
+/docs/agent-loop-1.6.md
+/docs/agent-loop-1.7.md
+/docs/agent-loop-1.8.md
+/docs/releases/1.2.0.md
+/docs/releases/1.2.1.md
+/docs/releases/1.3.0.md
+/docs/research/analogues.md
+/docs/research/chat-agent-acceptance-guide.md
+/docs/research/chat-agent-comparison.md
+/docs/research/chat-agent-test-summary.md
+/docs/research/competitive-roadmap-1.2.md
+/docs/research/environment.md
+/docs/research/final-code-audit.md
+/docs/research/sources.md
+/docs/uml/architecture-1.2-manifest.json
+/docs/uml/architecture-1.2-notes.md
+/scripts/research_catalog.py
+
+# Locally retained historical working notes
+/docs/agent-architecture-and-limits.md
+/docs/character-workflow-fix.md
+/docs/releases-v1.1.md
+/docs/pdf-fontconfig-macos.conf
+/docs/research/architecture-decisions.md
+
+# Historical captures and diagrams retained only locally
+/docs/assets/screenshots/
+/docs/screenshots/
+/docs/uml/

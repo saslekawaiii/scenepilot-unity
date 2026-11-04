@@ -1,5 +1,0 @@
-{
-  "aborted": true,
-  "source": "general-agent-9b-1.4.0-r3.json",
-  "reason": "Model repeatedly left new-object names empty. Stopped before mutation to implement ordinary unique creation defaults and a repeated-validation-error limit, rather than add prompt-specific object names."
-}
