@@ -31,6 +31,12 @@ namespace WorldWeaver.Tests
             var result=SceneToolExecutor.Execute(new EditorPlan{actions=new System.Collections.Generic.List<EditorCommand>{command}});
             Assert.IsFalse(result.Success);Assert.That(result.Error,Does.Contain("permission"));Assert.IsFalse(EditorApplication.isPlayingOrWillChangePlaymode);Assert.IsFalse(AgentEditorJobs.Busy);
         }
+        [Test] public void LeadingUsingDirectivesCompileAndCancellationPreventsTheQueuedPlayTransition()
+        {
+            var job=AgentEditorJobs.RunRuntimeProbe("using System.Linq; using Counts = System.Collections.Generic.List<int>; var values=new Counts{1,2,3};probe.Check(values.Count()==3,\"actual count\",values.Count);yield return null;",1);
+            AgentEditorJobs.Cancel(job.Id);var cancelled=AgentEditorJobs.Load(job.Id);
+            Assert.IsFalse(cancelled.Success);Assert.That(cancelled.Error,Does.Contain("cancelled"));Assert.IsFalse(AgentEditorJobs.Busy);Assert.IsFalse(EditorApplication.isPlayingOrWillChangePlaymode);
+        }
         [Test] public void RuntimeObservationProjectionKeepsMeasurementsAndOmitsExecutableSource()
         {
             var raw=new JObject{["Kind"]="runtime_probe",["Success"]=false,["ProbeCode"]="private source body",["ProbeSourceHash"]="actual-hash",["ProbeAssertions"]=new JArray(new JObject{["passed"]=false,["observed"]=3})};

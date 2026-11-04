@@ -3,6 +3,7 @@ using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEditor;
@@ -48,18 +49,24 @@ namespace WorldWeaver.Editor.Assistant
     }
     public static partial class AgentEditorJobs
     {
-        internal const string RuntimeProbeReference=@"run_runtime_probe: empty target; args {code:string,seconds?:0.25..15}. Standalone actual Play Mode job for arbitrary existing game mechanics, UI, physics, triggers, counters and references. Requires autonomous Editor C# permission, with the same full-trust boundary as execute_editor_code. code is an IEnumerator METHOD BODY up to 16000 characters, not a class: yield return null between frames; no other yield instructions. Usings System, Collections, Generic, Linq, UnityEngine, UnityEngine.UI, UnityEngine.EventSystems, WorldWeaver and Newtonsoft.Json.Linq are supplied; InputSystem/LowLevel when its backend is enabled. Parameter probe offers Record(name, measuredPrimitiveObject), Check(actualCondition,name,observedValue), and automatically cleaned-up virtual probe.Keyboard/probe.Mouse. Use STATIC InputSystem.QueueStateEvent(probe.Keyboard, new KeyboardState(Key.A)); release with new KeyboardState(). KeyboardState and MouseState are in UnityEngine.InputSystem.LowLevel, not UnityEngine.InputSystem. QueueStateEvent is not an instance method on Keyboard. Yield null, then measure actual game state. Use bounded Time.time loops; wait for Awake/Start (first frame is supplied). At least one real Check is required; any false check/exception/timeout fails. A host wall limit bounds yielded execution; C# must never block, spin, sleep, access network/files/secrets, save assets/scenes or alter Editor settings. Test arrangements inside Play Mode are temporary, not implementation. The job exits Play Mode and restores the original scene before completion; poll_job/job_result carries source hash, exact checks and measured data. Agent-authored checks only prove the behavior actually exercised, not unrelated criteria. Example: var light=UnityEngine.Object.FindFirstObjectByType<Light>(); probe.Check(light!=null,""light exists""); if(light!=null){float before=light.intensity; yield return null; probe.Record(""intensity"",new{before,after=light.intensity});} Never mark Check(true) as gameplay verification.";
+        internal const string RuntimeProbeReference=@"run_runtime_probe: empty target; args {code:string,seconds?:0.25..15}. Standalone actual Play Mode job for arbitrary existing game mechanics, UI, physics, triggers, counters and references. Requires autonomous Editor C# permission, with the same full-trust boundary as execute_editor_code. code is an IEnumerator METHOD BODY up to 16000 characters, not a class; optional leading using directives are supported: yield return null between frames; no other yield instructions. Usings System, Collections, Generic, Linq, UnityEngine, UnityEngine.UI, UnityEngine.EventSystems, WorldWeaver and Newtonsoft.Json.Linq are supplied; InputSystem/LowLevel when its backend is enabled. Parameter probe offers Record(name, measuredPrimitiveObject), Check(actualCondition,name,observedValue), and automatically cleaned-up virtual probe.Keyboard/probe.Mouse. Use STATIC InputSystem.QueueStateEvent(probe.Keyboard, new KeyboardState(Key.A)); release with new KeyboardState(). KeyboardState and MouseState are in UnityEngine.InputSystem.LowLevel, not UnityEngine.InputSystem. QueueStateEvent is not an instance method on Keyboard. Yield null, then measure actual game state. Use bounded Time.time loops; wait for Awake/Start (first frame is supplied). At least one real Check is required; any false check/exception/timeout fails. A host wall limit bounds yielded execution; C# must never block, spin, sleep, access network/files/secrets, save assets/scenes or alter Editor settings. Test arrangements inside Play Mode are temporary, not implementation. The job exits Play Mode and restores the original scene before completion; poll_job/job_result carries source hash, exact checks and measured data. Agent-authored checks only prove the behavior actually exercised, not unrelated criteria. Example: var light=UnityEngine.Object.FindFirstObjectByType<Light>(); probe.Check(light!=null,""light exists""); if(light!=null){float before=light.intensity; yield return null; probe.Record(""intensity"",new{before,after=light.intensity});} Never mark Check(true) as gameplay verification.";
         static IEnumerator runtimeProbe;
         static RuntimeProbeContext runtimeContext;
         static int runtimeFrame,runtimeSamples;
         static double runtimeDeadline;
         static string ProbeSource(string code)
         {
+            string directives="";
+            while(true)
+            {
+                var directive=Regex.Match(code,@"\A\s*using\s+(?:(?:static\s+)?[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*|[A-Za-z_][A-Za-z0-9_]*\s*=\s*[^;{}]+)\s*;");
+                if(!directive.Success)break;directives+=directive.Value+"\n";code=code.Substring(directive.Length);
+            }
             string input="";
 #if ENABLE_INPUT_SYSTEM
             input="using UnityEngine.InputSystem;using UnityEngine.InputSystem.LowLevel;";
 #endif
-            return "using System;using System.Collections;using System.Collections.Generic;using System.Linq;using UnityEngine;using UnityEngine.UI;using UnityEngine.EventSystems;using WorldWeaver;using WorldWeaver.Editor.Assistant;using Newtonsoft.Json.Linq;"+input+"\npublic static class WWRuntimeProbeSnippet{public static IEnumerator Run(RuntimeProbeContext probe){yield return null;\n"+code+"\n}}";
+            return "using System;using System.Collections;using System.Collections.Generic;using System.Linq;using UnityEngine;using UnityEngine.UI;using UnityEngine.EventSystems;using WorldWeaver;using WorldWeaver.Editor.Assistant;using Newtonsoft.Json.Linq;"+input+"\n"+directives+"\npublic static class WWRuntimeProbeSnippet{public static IEnumerator Run(RuntimeProbeContext probe){yield return null;\n"+code+"\n}}";
         }
         static Assembly CompileRuntimeProbe(string code)
         {

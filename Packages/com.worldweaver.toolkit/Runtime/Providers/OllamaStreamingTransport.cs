@@ -88,7 +88,7 @@ namespace WorldWeaver
                                 idle.Token.ThrowIfCancellationRequested();
                             }
                             timeout.Token.ThrowIfCancellationRequested();
-                            if (terminal == null) throw new ProviderException("Ollama stream ended without done:true.");
+                            if (terminal == null) throw new ProviderException("Ollama stream ended without done:true.",502,true);
                             return terminal;
                         }
                     }
@@ -99,8 +99,8 @@ namespace WorldWeaver
                 catch (ObjectDisposedException) { throw new ProviderException("Ollama stream timeout or closed response.", 408, true); }
                 catch (HttpRequestException) { throw new ProviderException("Ollama stream connection failed.", 0, true); }
                 catch (IOException) { throw new ProviderException("Ollama stream interrupted.", 0, true); }
-                catch (JsonException) { throw new ProviderException("Malformed Ollama stream JSON."); }
-                catch (DecoderFallbackException) { throw new ProviderException("Malformed Ollama stream UTF-8."); }
+                catch (JsonException) { throw new ProviderException("Malformed Ollama stream JSON.",502,true); }
+                catch (DecoderFallbackException) { throw new ProviderException("Malformed Ollama stream UTF-8.",502,true); }
             }
         }
 
@@ -112,8 +112,15 @@ namespace WorldWeaver
             if (terminal != null) throw new ProviderException("Ollama stream contains data after done:true.");
             RejectNonJsonExtensions(text);
             var frame = JToken.Parse(text, new JsonLoadSettings { DuplicatePropertyNameHandling = DuplicatePropertyNameHandling.Error }) as JObject;
-            if (frame == null || frame["done"]?.Type != JTokenType.Boolean) throw new ProviderException("Malformed Ollama stream frame.");
-            if (frame["error"] != null) throw new ProviderException("Ollama reported a stream error.");
+            if(frame?["error"]!=null&&frame["error"].Type!=JTokenType.Null)
+            {
+                // Error frames need not contain done. Classify known categories,
+                // never echo arbitrary upstream error text or execute partial calls.
+                string error=frame["error"].Type==JTokenType.String?((string)frame["error"]).ToLowerInvariant():"";
+                int status=error.Contains("unauthor")||error.Contains("authentication")?401:error.Contains("rate limit")||error.Contains("too many requests")?429:error.Contains("quota")||error.Contains("credit")||error.Contains("balance")?402:error.Contains("not found")?404:error.Contains("timeout")||error.Contains("timed out")?408:502;
+                throw new ProviderException("Ollama reported a stream error (REMOTE_"+status+").",status,status==408||status==429||status>=500);
+            }
+            if (frame == null || frame["done"]?.Type != JTokenType.Boolean) throw new ProviderException("Malformed Ollama stream frame.",502,true);
             if (frame["message"] != null && !(frame["message"] is JObject)) throw new ProviderException("Malformed Ollama stream message.");
             var message = frame["message"] as JObject;
             if (message?["content"] != null && message["content"].Type != JTokenType.String) throw new ProviderException("Malformed Ollama stream content.");

@@ -143,6 +143,17 @@ namespace WorldWeaver.Tests
                 Assert.That(rejected, Is.True, "Accepted invalid stream: " + body);
             }
         }
+        [UnityTest] public IEnumerator ErrorFramesWithoutDoneAreClassifiedWithoutEchoingTheirText() => Await(CheckErrorFrames());
+        static async Task CheckErrorFrames()
+        {
+            foreach(var item in new[]{("runner timeout private-fixture-token",408,true),("upstream unavailable private-fixture-token",502,true),("quota exhausted private-fixture-token",402,false),("unauthorized private-fixture-token",401,false)})
+            using(var server=new NdjsonServer(new JObject{["error"]=item.Item1}.ToString(Newtonsoft.Json.Formatting.None)+"\n",""))
+            using(var transport=new OllamaStreamingTransport())
+            {
+                ProviderException failure=null;try{await transport.SendAsync(server.Url,new JObject(),5,null,CancellationToken.None);}catch(ProviderException error){failure=error;}
+                Assert.IsNotNull(failure);Assert.AreEqual(item.Item2,failure.Status);Assert.AreEqual(item.Item3,failure.Transient);Assert.That(failure.Message,Does.Not.Contain("private-fixture-token"));
+            }
+        }
         [UnityTest] public IEnumerator TerminalStatisticsRejectNegativeAndWrongTypes() => Await(CheckInvalidStatistics());
         private static async Task CheckInvalidStatistics()
         {

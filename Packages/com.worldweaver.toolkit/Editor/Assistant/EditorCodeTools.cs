@@ -38,7 +38,7 @@ execute_editor_code: optional existing owned target, otherwise an owned workspac
             string directives="";
             while(true)
             {
-                var directive=Regex.Match(code,@"\A\s*using\s+(?:(?:static\s+)?[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*|[A-Za-z_][A-Za-z0-9_]*\s*=\s*(?:global::)?[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\s*;");
+                var directive=Regex.Match(code,@"\A\s*using\s+(?:(?:static\s+)?[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*|[A-Za-z_][A-Za-z0-9_]*\s*=\s*[^;{}]+)\s*;");
                 if(!directive.Success)break;directives+=directive.Value+"\n";code=code.Substring(directive.Length);
             }
             string source="using System; using System.Collections.Generic; using System.Linq;\nusing UnityEngine; using UnityEditor; using WorldWeaver; using Newtonsoft.Json.Linq;\n"+directives+"\npublic static class WWEditorSnippet\n{\n public static object Execute(GameObject target)\n {\n"+code+"\n }\n}";
