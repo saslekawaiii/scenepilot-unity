@@ -20,7 +20,20 @@ namespace WorldWeaver.Editor.Assistant
     {
         public static event Action Changed;
         internal const string Folder = "Assets/WorldWeaverGenerated/Scripts";
-        private const string Marker = "// Generated with WorldWeaver. User-reviewed C# source.";
+        private const string LegacyMarker = "// Generated with WorldWeaver. User-reviewed C# source.";
+        private const string Marker = "// Generated with WorldWeaver. Imported under current script permissions.";
+        static bool IsGeneratedSource(string code)=>code!=null&&(code.StartsWith(Marker,StringComparison.Ordinal)||code.StartsWith(LegacyMarker,StringComparison.Ordinal));
+        internal static string WithoutServiceMarkers(string code)
+        {
+            code=(code??"").TrimStart('\ufeff','\r','\n');
+            while(true)
+            {
+                string marker=code.StartsWith(Marker+"\n",StringComparison.Ordinal)||code.StartsWith(Marker+"\r\n",StringComparison.Ordinal)?Marker:code.StartsWith(LegacyMarker+"\n",StringComparison.Ordinal)||code.StartsWith(LegacyMarker+"\r\n",StringComparison.Ordinal)?LegacyMarker:null;
+                if(marker==null)break;code=code.Substring(marker.Length).TrimStart('\r','\n');
+            }
+            return code.TrimEnd('\r','\n');
+        }
+        internal static string SourceForImport(string code)=>Marker+"\n"+WithoutServiceMarkers(code)+"\n";
         private const string StatePath = "UserSettings/WorldWeaverChatCode.json";
         private const string JournalFolder = "UserSettings/WorldWeaverChatCode";
         private static readonly List<string> errors = new List<string>();
@@ -36,9 +49,9 @@ namespace WorldWeaver.Editor.Assistant
             public List<FileBackup> Files = new List<FileBackup>();
         }
 
-        public static string ToolInstructions => @"CODE TOOLS (always reviewed before import):
+        public static string ToolInstructions => @"CODE TOOLS (reviewed before import unless the user explicitly enabled autonomous scripts in Execute mode):
 draft_script: name=ASCII C# MonoBehaviour class name (no extension/path), target='', args={code:'complete C# source',description:'Russian purpose'}. Code must declare that exact class deriving MonoBehaviour, use Unity APIs, have no hard-coded credentials, and avoid Editor-only APIs. Inspect inspect_project for active input backend. Prefer WorldWeaver.WorldInput.LookDegrees(speed,deltaTime,requireRightButton) for mouse look and WorldInput.Movement/JumpPressed for cross-backend input. Never call legacy UnityEngine.Input unconditionally in a new-Input-System-only project. When a custom camera script owns rotation, set the player ExternalCameraControl=true to prevent competing writers. Create small self-contained scripts; no shell, package downloads or changes to project settings. Existing own generated script of the same class can be revised; all other files are preserved. Do not attach a draft until it compiles. The user can apply/reject the code in chat. Real Unity compilation results are included in context; repair errors with a new draft of the same name.
-attach_script: name=class name of an ALREADY COMPILED WorldWeaver-generated script, target=existing scene object, args={}. This is also a reviewed change. Never attempt attach_script in the same plan as draft_script. Use attach_behavior for existing built-in rotation/patrol/bob without drafting code.";
+attach_script: name=class name of an ALREADY COMPILED WorldWeaver-generated script, target=existing scene object, args={}. The same explicit script permission controls attachment. Never attempt attach_script in the same plan as draft_script. Use attach_behavior for existing built-in rotation/patrol/bob without drafting code.";
 
         static ScriptDrafts()
         {
@@ -68,7 +81,7 @@ attach_script: name=class name of an ALREADY COMPILED WorldWeaver-generated scri
                 var state = JsonConvert.DeserializeObject<State>(File.ReadAllText(path));
                 if (state == null || state.Files == null || state.Files.Count == 0 || state.Files.Count > 4 ||
                     !ChatHistoryStore.ValidId(state.SessionId) || !ChatHistoryStore.ValidId(state.MessageId) ||
-                    state.Files.Any(f => f == null || f.Path == null || !Regex.IsMatch(f.Path, "^" + Regex.Escape(Folder) + @"/[A-Za-z_][A-Za-z0-9_]{0,79}\.cs$") || f.After == null || !f.After.StartsWith(Marker, StringComparison.Ordinal))) return null;
+                    state.Files.Any(f => f == null || f.Path == null || !Regex.IsMatch(f.Path, "^" + Regex.Escape(Folder) + @"/[A-Za-z_][A-Za-z0-9_]{0,79}\.cs$") || f.After == null || !IsGeneratedSource(f.After))) return null;
                 // Legacy single-backup state is migrated before the next import replaces its mirror.
                 if (string.IsNullOrEmpty(state.ImportId)) state.ImportId = Hash(Encoding.UTF8.GetBytes(state.SessionId + "|" + state.MessageId + "|" + string.Join("|", state.Files.Select(f => f.Path + f.After)))).Substring(0, 32);
                 if (!Regex.IsMatch(state.ImportId, "^[a-f0-9]{32}$")) return null;
@@ -138,7 +151,7 @@ attach_script: name=class name of an ALREADY COMPILED WorldWeaver-generated scri
         {
             if(action.tool!="draft_script"||!Regex.IsMatch(action.name??"","^[A-Za-z_][A-Za-z0-9_]{0,79}$")||action.args?["code"]?.Type!=JTokenType.String)return false;
             string path=Folder+"/"+action.name+".cs";
-            return CurrentSourceWasCompiled(path)&&File.ReadAllText(path)==Marker+"\n"+(string)action.args["code"]+"\n";
+            return CurrentSourceWasCompiled(path)&&WithoutServiceMarkers(File.ReadAllText(path))==WithoutServiceMarkers((string)action.args["code"]);
         }
         public static string CompilationContext()
         {
@@ -171,7 +184,7 @@ attach_script: name=class name of an ALREADY COMPILED WorldWeaver-generated scri
             {
                 if (action.args.Count != 0) throw new ArgumentException("attach_script не принимает args.");
                 var path = Folder + "/" + action.name + ".cs";
-                if (!File.Exists(path) || !File.ReadAllText(path).StartsWith(Marker, StringComparison.Ordinal)) throw new ArgumentException("Можно подключать только ранее проверенный скрипт WorldWeaver.");
+                if (!File.Exists(path) || !IsGeneratedSource(File.ReadAllText(path))) throw new ArgumentException("Можно подключать только ранее проверенный скрипт WorldWeaver.");
                 ValidateActiveInput(File.ReadAllText(path));
                 var script = AssetDatabase.LoadAssetAtPath<MonoScript>(path);
                 var type = script ? script.GetClass() : null;
@@ -190,7 +203,7 @@ attach_script: name=class name of an ALREADY COMPILED WorldWeaver-generated scri
             if (code.Contains("```") || code.Contains("[InitializeOnLoad") || code.Contains("UnityEditor") || ChatHistoryStore.Redact(code) != code)
                 throw new ArgumentException("Предоставьте обычный runtime C# без Markdown, Editor initialization и секретных ключей.");
             string destination = Folder + "/" + action.name + ".cs";
-            if (File.Exists(destination) && !File.ReadAllText(destination).StartsWith(Marker, StringComparison.Ordinal))
+            if (File.Exists(destination) && !IsGeneratedSource(File.ReadAllText(destination)))
                 throw new ArgumentException("Существующий пользовательский скрипт не будет перезаписан. Выберите новое имя класса.");
         }
 
@@ -209,7 +222,7 @@ attach_script: name=class name of an ALREADY COMPILED WorldWeaver-generated scri
             {
                 string path = Folder + "/" + action.name + ".cs"; bool exists = File.Exists(path);
                 byte[] before = exists ? File.ReadAllBytes(path) : null;
-                string after = Marker + "\n" + (string)action.args["code"] + "\n";
+                string after = SourceForImport((string)action.args["code"]);
                 state.Files.Add(new FileBackup { Path = path, Existed = exists, Before = exists ? File.ReadAllText(path) : null,
                     BeforeBytes = exists ? Convert.ToBase64String(before) : null, BeforeSha256 = exists ? Hash(before) : null,
                     After = after, AfterSha256 = Hash(new UTF8Encoding(false).GetBytes(after)) });

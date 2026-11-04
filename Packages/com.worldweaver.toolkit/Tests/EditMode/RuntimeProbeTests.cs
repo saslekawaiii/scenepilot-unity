@@ -49,5 +49,26 @@ namespace WorldWeaver.Tests
             var method=typeof(ChatController).GetMethod("JobObservationForModel",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic);
             var projected=(JObject)method.Invoke(null,new object[]{raw});Assert.IsNull(projected["ProbeCode"]);Assert.IsNotNull(raw["ProbeCode"]);Assert.AreEqual("actual-hash",(string)projected["ProbeSourceHash"]);Assert.IsFalse((bool)projected["ProbeAssertions"][0]["passed"]);
         }
+        [Test] public void FailedGenericProbeRemainsVisibleAndNeedsFreshMeasurementAfterSourceRepair()
+        {
+            var flags=System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic;
+            var ledger=typeof(ChatController).GetMethod("ObservationLedger",flags);var rechecks=typeof(ChatController).GetMethod("RequiredRuntimeRechecks",flags);
+            var failed=new JObject{["Id"]="measured-job",["Kind"]="runtime_probe",["Status"]="failed",["Success"]=false,["ProbeSourceHash"]=new string('a',64),["ProbeCode"]="fixture-only code",["RequestedSeconds"]=8,["ProbeAssertions"]=new JArray(new JObject{["name"]="actual condition",["passed"]=false,["observed"]=1})};
+            var steps=new System.Collections.Generic.List<EditorCommandResult>{new EditorCommandResult{Tool="job_result",Success=false,Summary=failed.ToString()}};
+            var observations=(JArray)ledger.Invoke(null,new object[]{steps});Assert.AreEqual(1,observations.Count);Assert.IsFalse((bool)observations[0]["data"]["Success"]);Assert.IsNull(observations[0]["data"]["ProbeCode"]);
+            Assert.IsEmpty((JArray)rechecks.Invoke(null,new object[]{steps}));steps.Add(new EditorCommandResult{Tool="draft_script",Success=true});steps.Add(new EditorCommandResult{Tool="compile_scripts",Success=true});
+            var gaps=(JArray)rechecks.Invoke(null,new object[]{steps});Assert.AreEqual(1,gaps.Count);Assert.AreEqual("run_runtime_probe",(string)gaps[0]["tool"]);Assert.AreEqual(0,(int)gaps[0]["recoverSourceWith"]["args"]["index"]);
+            steps.Add(new EditorCommandResult{Tool="run_runtime_probe",Success=true});var fresh=(JObject)failed.DeepClone();fresh["Success"]=true;fresh["Status"]="completed";steps.Add(new EditorCommandResult{Tool="job_result",Success=true,Summary=fresh.ToString()});
+            Assert.IsEmpty((JArray)rechecks.Invoke(null,new object[]{steps}));Assert.AreEqual(1,((JArray)ledger.Invoke(null,new object[]{steps})).Count);
+        }
+        [Test] public void ReadingAndResubmittingGeneratedSourceDoesNotMultiplyServiceComments()
+        {
+            var source=typeof(ScriptDrafts).GetMethod("SourceForImport",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic);
+            const string legacy="// Generated with WorldWeaver. User-reviewed C# source.";
+            const string body="// Keep this user comment\nusing UnityEngine;public class Echo : MonoBehaviour {public string Value=\"unchanged\";}";
+            string once=(string)source.Invoke(null,new object[]{body});
+            Assert.AreEqual(once,(string)source.Invoke(null,new object[]{once+"\n\n"}));Assert.AreEqual(once,(string)source.Invoke(null,new object[]{legacy+"\r\n"+legacy+"\n"+body+"\n"}));
+            Assert.That(once.Split('\n')[0],Does.Not.Contain("User-reviewed"));Assert.That(once,Does.EndWith(body+"\n"));
+        }
     }
 }

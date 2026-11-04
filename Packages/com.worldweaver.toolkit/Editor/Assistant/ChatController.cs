@@ -210,7 +210,7 @@ namespace WorldWeaver.Editor.Assistant
                     var repeatedReadResults=new Dictionary<string,int>(StringComparer.Ordinal);
                     int emptyPlanRepairs = 0;
                     int planningRepairs = 0; // One fresh format repair is available even in Fast; it never grants another execution round.
-                    int transientInferenceRepairs=0, protocolInferenceRepairs=0, consecutiveValidationFailures=0;
+                    int transientInferenceRepairs=0, protocolInferenceRepairs=0, consecutiveWireShapeFailures=0;
                     string textRecoveryKind=answer.Attempts.LastOrDefault(a=>a.RepairKind=="native-empty-to-json-contract"||a.RepairKind=="native-stall-to-json-contract"||a.RepairKind=="native-protocol-to-json-contract")?.RepairKind;
                     bool textToolRecovery=textRecoveryKind!=null;
                     int observationRounds=0;
@@ -294,7 +294,7 @@ namespace WorldWeaver.Editor.Assistant
                             if(totalActions+plannedCost>128)throw new ArgumentException("Достигнут лимит 128 изменений. Выполненные этапы сохранены; можно продолжить задачу.");
                             totalActions+=plannedCost;
                             attempt.Accepted = true;
-                            repeatedValidationFailures.Clear();consecutiveValidationFailures=0;
+                            repeatedValidationFailures.Clear();consecutiveWireShapeFailures=0;
                             // A valid fresh replacement resolves a format-only failure; prior failed tools/checks remain unresolved.
                             if(!answer.Steps.Any(s=>!s.Success)&&answer.Task?.Checks.Any(c=>!c.Passed)!=true)unresolvedFailure=false;
                         }
@@ -302,8 +302,10 @@ namespace WorldWeaver.Editor.Assistant
                         {
                             unresolvedFailure = true;
                             string failureKey=error.Message;
-                            consecutiveValidationFailures++;
-                            if(Settings.UseNativeFunctions&&!textToolRecovery&&consecutiveValidationFailures>=2)
+                            // A semantic/precondition rejection does not imply an unsupported wire protocol.
+                            bool wireShapeFailure=error is JsonException||error.Message.StartsWith("Native batches require",StringComparison.Ordinal);
+                            consecutiveWireShapeFailures=wireShapeFailure?consecutiveWireShapeFailures+1:0;
+                            if(Settings.UseNativeFunctions&&!textToolRecovery&&consecutiveWireShapeFailures>=2)
                             {textToolRecovery=true;textRecoveryKind="native-protocol-to-json-contract";}
                             repeatedValidationFailures.TryGetValue(failureKey,out int repeats);repeatedValidationFailures[failureKey]=repeats+1;
                             attempt.Error = ChatHistoryStore.Redact(error.Message);

@@ -56,7 +56,7 @@ namespace WorldWeaver.Editor.Assistant
             int changed=-1;for(int i=steps.Count-1;i>=0;i--)if(IsImplementationProgress(steps[i])){changed=i;break;}
             for(int i=steps.Count-1;i>=0&&rows.Count<18;i--)
             {
-                var step=steps[i];if(!step.Success||!SceneToolExecutor.IsReadOnlyTool(step.Tool)||WebResearchTools.Handles(step.Tool)||new[]{"plan_task","review_stage","discover_tools","read_skill","list_skills","read_task_step"}.Contains(step.Tool))continue;
+                var step=steps[i];if(!step.Success&&step.Tool!="job_result"||!SceneToolExecutor.IsReadOnlyTool(step.Tool)||WebResearchTools.Handles(step.Tool)||new[]{"plan_task","review_stage","discover_tools","read_skill","list_skills","read_task_step"}.Contains(step.Tool))continue;
                 JObject data=null;try{data=JObject.Parse(step.Summary??"");}catch(JsonException){}
                 var discriminator=data?["path"]??data?["component"]??data?["type"]??data?["Id"]??data?["query"];
                 // Durable jobs arrive after reload, outside the original native
@@ -144,8 +144,10 @@ namespace WorldWeaver.Editor.Assistant
             for(int i=steps.Count-1;i>=0;i--)
             {
                 if(steps[i].Tool!="job_result")continue;JObject job;try{job=JObject.Parse(steps[i].Summary??"");}catch(JsonException){continue;}
-                string kind=(string)job["Kind"],target=(string)job["StableTarget"];if(string.IsNullOrEmpty(target)||!seen.Add(kind+":"+target)||i>=changed)continue;
-                if(kind=="player_control")rows.Add(new JObject{["tool"]="run_player_check",["target"]=target,["args"]=new JObject{["seconds"]=(double?)job["RequestedSeconds"]??2,["check_relaxed_arms"]=(bool?)job["RequireRelaxedArms"]??false},["previousResultStep"]=i,["changedAfterStep"]=changed});
+                string kind=(string)job["Kind"],target=(string)job["StableTarget"];
+                if(!seen.Add(kind+":"+(target??""))||i>=changed)continue;
+                if(kind=="runtime_probe")rows.Add(new JObject{["tool"]="run_runtime_probe",["target"]="",["seconds"]=(double?)job["RequestedSeconds"]??10,["previousResultStep"]=i,["previousSourceHash"]=job["ProbeSourceHash"]?.DeepClone(),["changedAfterStep"]=changed,["recoverSourceWith"]=new JObject{["tool"]="read_task_step",["args"]=new JObject{["index"]=i}},["note"]="Recover or correct the previous assertion code, then measure the current game before another speculative source edit. Validate test arrangement, actual actor positions and input timing; a failed probe can also be a probe error."});
+                if(kind=="player_control"&&!string.IsNullOrEmpty(target))rows.Add(new JObject{["tool"]="run_player_check",["target"]=target,["args"]=new JObject{["seconds"]=(double?)job["RequestedSeconds"]??2,["check_relaxed_arms"]=(bool?)job["RequireRelaxedArms"]??false},["previousResultStep"]=i,["changedAfterStep"]=changed});
                 if(rows.Count>=3)break;
             }
             return rows;

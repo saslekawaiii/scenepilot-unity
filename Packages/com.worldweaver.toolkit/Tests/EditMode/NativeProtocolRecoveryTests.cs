@@ -113,5 +113,34 @@ namespace WorldWeaver.Tests
             }
             finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
         }
+        sealed class SemanticRepairProvider:ILLMProvider
+        {
+            public int Calls;public bool JsonSeen;
+            public Task<CompletionResult> CompleteAsync(CompletionRequest request,CancellationToken token)
+            {
+                Calls++;JsonSeen|=!request.UseToolCalls;
+                if(Calls==1)return Task.FromResult(new CompletionResult{Text="```json\n{}\n```"});
+                var plan=new EditorPlan{complete=Calls>3};
+                if(Calls==2)plan.actions.Add(new EditorCommand{tool="set_transform",target="NoSuchSceneTarget",args=new JObject{["position"]=new JArray(0,0,0)}});
+                if(Calls==3)plan.actions.Add(new EditorCommand{tool="create_node",name="SemanticRecoveredGoal"});
+                return Task.FromResult(new CompletionResult{Text=JsonConvert.SerializeObject(plan)});
+            }
+            public Task<bool> HealthAsync(CancellationToken token)=>Task.FromResult(true);
+            public void Dispose(){}
+        }
+        [Test] public async Task MissingSceneTargetAfterOneFormatErrorDoesNotDisableWorkingNativeTools()
+        {
+            EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);var provider=new SemanticRepairProvider();
+            try
+            {
+                using(var controller=new ChatController(_=>provider,"UserSettings/SemanticRecovery-"+Guid.NewGuid().ToString("N")))
+                {
+                    controller.Settings.UseNativeFunctions=true;controller.Settings.AutoVerify=false;controller.Settings.UseSkills=false;controller.Settings.Power=AssistantPower.Deep;
+                    await controller.SendAsync("Создай пустой узел SemanticRecoveredGoal.");var answer=controller.Current.Messages.Last();
+                    Assert.IsFalse(answer.IsError,answer.Text);Assert.IsFalse(provider.JsonSeen);Assert.AreEqual(4,provider.Calls);Assert.IsTrue(GameObject.Find("SemanticRecoveredGoal"));Assert.AreEqual(1,answer.Steps.Count(s=>s.Tool=="create_node"));
+                }
+            }
+            finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
+        }
     }
 }

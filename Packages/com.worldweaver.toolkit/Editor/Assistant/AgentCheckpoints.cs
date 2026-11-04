@@ -18,7 +18,10 @@ namespace WorldWeaver.Editor.Assistant
         private const long ByteLimit=300L*1024*1024;
         private const int FileLimit=20000;
         private static readonly Dictionary<string,long> storedBytes=new Dictionary<string,long>();
+        private static readonly Dictionary<string,Tuple<long,long>> verifiedSharedFiles=new Dictionary<string,Tuple<long,long>>();
+        internal const long SharedStorageLimitBytes=2L*1024*1024*1024;
         private static string Root=>Path.GetFullPath("UserSettings/WorldWeaverCheckpoints");
+        private static string SharedContent=>Path.Combine(Root,"shared-content");
         [Serializable] private sealed class FileState { public string Path,Hash; public long Bytes; }
         [Serializable] private sealed class SceneState { public string Path,Name,Hash; public bool Dirty,Active; }
         [Serializable] private sealed class Journal
@@ -316,13 +319,75 @@ namespace WorldWeaver.Editor.Assistant
         private static void DeleteTemporary(string path) { if(!AssetDatabase.DeleteAsset(path)) { if(File.Exists(path))File.Delete(path);if(File.Exists(path+".meta"))File.Delete(path+".meta"); } }
         private static string Hash(byte[] bytes) { using(var sha=SHA256.Create())return BitConverter.ToString(sha.ComputeHash(bytes)).Replace("-","").ToLowerInvariant(); }
         private static string Folder(string id) { if(!Guid.TryParseExact(id,"N",out _))throw new ArgumentException("Invalid checkpoint identity.");return Path.Combine(Root,id); }
-        private static string Blob(string id,string hash) { if(hash==null||hash.Length!=64||hash.Any(c=>!Uri.IsHexDigit(c)))throw new InvalidDataException("Invalid checkpoint blob.");return Path.Combine(Folder(id),"content",hash); }
+        private static bool ContentHash(string hash)=>hash!=null&&hash.Length==64&&hash.All(Uri.IsHexDigit);
+        private static string Blob(string id,string hash)
+        {
+            if(!ContentHash(hash))throw new InvalidDataException("Invalid checkpoint blob.");
+            // Old journals keep their original local content. New journals hold
+            // small hash references to one immutable project-wide copy.
+            return File.Exists(Path.Combine(Folder(id),"references",hash))?Path.Combine(SharedContent,hash):Path.Combine(Folder(id),"content",hash);
+        }
+        internal static void EnsureSharedCapacity(long used,long incoming)
+        {
+            if(used<0||incoming<0||incoming>SharedStorageLimitBytes||used>SharedStorageLimitBytes-incoming)
+                throw new InvalidOperationException("Checkpoint shared storage would exceed 2 GiB. Existing recovery data was preserved. Remove only unneeded checkpoint journals, then collect unreferenced checkpoint content before retrying.");
+        }
+        /// <summary>Only unreachable shared blobs are removed; no journal or referenced backup is deleted.</summary>
+        public static long CollectUnreferencedContent()
+        {
+            if(!Directory.Exists(SharedContent))return 0;
+            var referenced=new HashSet<string>(StringComparer.Ordinal);
+            foreach(string directory in Directory.GetDirectories(Root).Where(d=>Guid.TryParseExact(Path.GetFileName(d),"N",out _)))
+            {
+                string references=Path.Combine(directory,"references");
+                if(Directory.Exists(references))foreach(string path in Directory.GetFiles(references))if(ContentHash(Path.GetFileName(path)))referenced.Add(Path.GetFileName(path));
+            }
+            long removed=0;
+            foreach(string path in Directory.GetFiles(SharedContent))
+            {
+                string name=Path.GetFileName(path);var parts=name.Split('.');
+                bool abandonedWrite=parts.Length==3&&ContentHash(parts[0])&&Guid.TryParseExact(parts[1],"N",out _)&&parts[2]=="tmp";
+                if(ContentHash(name)&&!referenced.Contains(name)||abandonedWrite)
+                {removed+=new FileInfo(path).Length;File.Delete(path);verifiedSharedFiles.Remove(path);}
+            }
+            return removed;
+        }
+        [MenuItem("Tools/WorldWeaver/Обслуживание/Удалить неиспользуемые данные контрольных точек")]
+        private static void CollectUnreferencedContentMenu()=>Debug.Log("WorldWeaver: removed "+CollectUnreferencedContent()+" bytes of unreferenced checkpoint content. Referenced recovery data was preserved.");
         private static void Store(string id,byte[] bytes,string hash)
         {
-            string path=Blob(id,hash),directory=Path.GetDirectoryName(path);Directory.CreateDirectory(directory);if(File.Exists(path))return;
-            if(!storedBytes.TryGetValue(id,out var used))used=Directory.GetFiles(directory).Sum(p=>new FileInfo(p).Length);
+            if(!ContentHash(hash)||Hash(bytes)!=hash)throw new InvalidDataException("Source changed during checkpoint capture; no coherent backup was admitted.");
+            string folder=Folder(id),references=Path.Combine(folder,"references"),reference=Path.Combine(references,hash),legacy=Path.Combine(folder,"content",hash);
+            if(File.Exists(reference)||File.Exists(legacy)){CheckBlob(id,hash);return;}
+            if(!storedBytes.TryGetValue(id,out var used))
+            {
+                var hashes=new HashSet<string>(StringComparer.Ordinal);
+                foreach(string directory in new[]{Path.Combine(folder,"content"),references})
+                    if(Directory.Exists(directory))foreach(string path in Directory.GetFiles(directory))if(ContentHash(Path.GetFileName(path)))hashes.Add(Path.GetFileName(path));
+                used=hashes.Sum(h=>new FileInfo(Blob(id,h)).Length);
+            }
             if(used+bytes.Length>ByteLimit)throw new InvalidOperationException("Checkpoint backup exceeds the 300 MiB limit.");
-            File.WriteAllBytes(path,bytes);storedBytes[id]=used+bytes.Length;
+            Directory.CreateDirectory(SharedContent);string shared=Path.Combine(SharedContent,hash);
+            if(!File.Exists(shared))
+            {
+                long total=Directory.GetFiles(SharedContent).Sum(p=>new FileInfo(p).Length);
+                if(total>SharedStorageLimitBytes-bytes.Length){CollectUnreferencedContent();total=Directory.GetFiles(SharedContent).Sum(p=>new FileInfo(p).Length);}
+                EnsureSharedCapacity(total,bytes.Length);
+                string temporary=shared+"."+Guid.NewGuid().ToString("N")+".tmp";
+                try{File.WriteAllBytes(temporary,bytes);File.Move(temporary,shared);}
+                finally{if(File.Exists(temporary))File.Delete(temporary);}
+                var info=new FileInfo(shared);verifiedSharedFiles[shared]=Tuple.Create(info.Length,info.LastWriteTimeUtc.Ticks);
+            }
+            else
+            {
+                var info=new FileInfo(shared);
+                if(!verifiedSharedFiles.TryGetValue(shared,out var verified)||verified.Item1!=info.Length||verified.Item2!=info.LastWriteTimeUtc.Ticks)
+                {
+                    if(info.Length!=bytes.Length||Hash(File.ReadAllBytes(shared))!=hash)throw new InvalidDataException("Shared checkpoint content is corrupted; existing recovery data was preserved.");
+                    verifiedSharedFiles[shared]=Tuple.Create(info.Length,info.LastWriteTimeUtc.Ticks);
+                }
+            }
+            Directory.CreateDirectory(references);File.WriteAllBytes(reference,Array.Empty<byte>());storedBytes[id]=used+bytes.Length;
         }
         private static void CheckBlob(string id,string hash) { string path=Blob(id,hash);if(!File.Exists(path)||Hash(File.ReadAllBytes(path))!=hash)throw new InvalidDataException("Checkpoint backup is missing or corrupted."); }
         private static Journal Read(string id)

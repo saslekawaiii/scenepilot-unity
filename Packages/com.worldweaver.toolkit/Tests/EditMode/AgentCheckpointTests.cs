@@ -86,8 +86,44 @@ namespace WorldWeaver.Tests
         [Test] public void CorruptBackupFailsBeforeChangingSceneOrFiles()
         {
             string file=Folder+"/asset.txt";File.WriteAllText(file,"before");var go=new GameObject("original");string id=Begin();File.WriteAllText(file,"agent");go.transform.position=Vector3.right;EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());AgentCheckpoints.Seal(id);
-            string directory=Path.Combine("UserSettings/WorldWeaverCheckpoints",id,"content");foreach(string blob in Directory.GetFiles(directory))File.WriteAllText(blob,"corrupt");
-            Assert.Throws<InvalidDataException>(()=>AgentCheckpoints.Restore(id));Assert.AreEqual("agent",File.ReadAllText(file));Assert.AreEqual(Vector3.right,go.transform.position);
+            var journal=JObject.Parse(File.ReadAllText(Path.Combine("UserSettings/WorldWeaverCheckpoints",id,"journal.json")));
+            string hash=(string)journal["Before"].Single(row=>(string)row["Path"]==file)["Hash"];
+            string blob=(string)typeof(AgentCheckpoints).GetMethod("Blob",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic).Invoke(null,new object[]{id,hash});byte[] original=File.ReadAllBytes(blob);
+            try{File.WriteAllText(blob,"corrupt");Assert.Throws<InvalidDataException>(()=>AgentCheckpoints.Restore(id));Assert.AreEqual("agent",File.ReadAllText(file));Assert.AreEqual(Vector3.right,go.transform.position);}
+            finally{File.WriteAllBytes(blob,original);}
+        }
+        [Test] public void IndependentCheckpointsShareAssetContentAndDeletingOneJournalDoesNotBreakTheOther()
+        {
+            string immutable=Folder+"/immutable.bytes",mutable=Folder+"/mutable.txt";byte[] data=new byte[1024*1024];new System.Random(19).NextBytes(data);Guid.NewGuid().ToByteArray().CopyTo(data,0);File.WriteAllBytes(immutable,data);File.WriteAllText(mutable,"before");
+            string first=Begin(),second=null;
+            try
+            {
+                File.WriteAllText(mutable,"first");AgentCheckpoints.Seal(first);
+                second=checkpoint=AgentCheckpoints.Begin(Guid.NewGuid().ToString("N"),Guid.NewGuid().ToString("N"));File.WriteAllText(mutable,"second");AgentCheckpoints.Seal(second);
+                string hash;using(var sha=System.Security.Cryptography.SHA256.Create())hash=BitConverter.ToString(sha.ComputeHash(data)).Replace("-","").ToLowerInvariant();
+                string root="UserSettings/WorldWeaverCheckpoints",shared=Path.Combine(root,"shared-content",hash);
+                CollectionAssert.AreEqual(data,File.ReadAllBytes(shared));Assert.AreEqual(0,new FileInfo(Path.Combine(root,first,"references",hash)).Length);Assert.AreEqual(0,new FileInfo(Path.Combine(root,second,"references",hash)).Length);
+                Assert.IsFalse(Directory.Exists(Path.Combine(root,first,"content")),"Unchanged assets must not be copied into each checkpoint");
+                Directory.Delete(Path.Combine(root,first),true);AgentCheckpoints.CollectUnreferencedContent();Assert.IsTrue(File.Exists(shared),"The second checkpoint still references these bytes");
+                Assert.IsTrue((bool)AgentCheckpoints.Restore(second)["success"]);Assert.AreEqual("first",File.ReadAllText(mutable));CollectionAssert.AreEqual(data,File.ReadAllBytes(immutable));
+                Directory.Delete(Path.Combine(root,second),true);second=checkpoint=null;AgentCheckpoints.CollectUnreferencedContent();Assert.IsFalse(File.Exists(shared),"Only content with no remaining references may be removed");
+            }
+            finally{foreach(string id in new[]{first,second}.Where(id=>id!=null)){string path=Path.Combine("UserSettings/WorldWeaverCheckpoints",id);if(Directory.Exists(path))Directory.Delete(path,true);}}
+        }
+        [Test] public void LegacyLocalContentLayoutRemainsRestorableAfterSharedContentCollection()
+        {
+            string file=Folder+"/legacy.txt";File.WriteAllText(file,"legacy original");string id=Begin();File.WriteAllText(file,"new value");AgentCheckpoints.Seal(id);
+            string root=Path.Combine("UserSettings/WorldWeaverCheckpoints",id),references=Path.Combine(root,"references"),legacy=Path.Combine(root,"content");Directory.CreateDirectory(legacy);
+            foreach(string reference in Directory.GetFiles(references))File.Copy(Path.Combine("UserSettings/WorldWeaverCheckpoints/shared-content",Path.GetFileName(reference)),Path.Combine(legacy,Path.GetFileName(reference)));
+            Directory.Delete(references,true);AgentCheckpoints.CollectUnreferencedContent();
+            Assert.IsTrue(AgentCheckpoints.CanRestore(id));Assert.IsTrue((bool)AgentCheckpoints.Restore(id)["success"]);Assert.AreEqual("legacy original",File.ReadAllText(file));
+        }
+        [Test] public void SharedStorageBudgetRejectsOverflowWithoutAllocatingLargeFiles()
+        {
+            var ensure=typeof(AgentCheckpoints).GetMethod("EnsureSharedCapacity",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic);const long limit=2L*1024*1024*1024;
+            Assert.DoesNotThrow(()=>ensure.Invoke(null,new object[]{limit-1,1L}));
+            foreach(var value in new[]{Tuple.Create(limit,1L),Tuple.Create(long.MaxValue,1L),Tuple.Create(-1L,0L)})
+            {var error=Assert.Throws<System.Reflection.TargetInvocationException>(()=>ensure.Invoke(null,new object[]{value.Item1,value.Item2}));Assert.IsInstanceOf<InvalidOperationException>(error.InnerException);}
         }
     }
 }
