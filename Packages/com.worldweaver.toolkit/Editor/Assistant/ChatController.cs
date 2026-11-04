@@ -210,7 +210,7 @@ namespace WorldWeaver.Editor.Assistant
                     var repeatedReadResults=new Dictionary<string,int>(StringComparer.Ordinal);
                     int emptyPlanRepairs = 0;
                     int planningRepairs = 0; // One fresh format repair is available even in Fast; it never grants another execution round.
-                    int transientInferenceRepairs=0, protocolInferenceRepairs=0, consecutiveWireShapeFailures=0, consecutiveProviderShapeFailures=0;
+                    int transientInferenceRepairs=0, protocolInferenceRepairs=0, consecutiveWireShapeFailures=0, consecutiveProviderShapeFailures=0, consecutiveProviderAvailabilityFailures=0;
                     string textRecoveryKind=answer.Attempts.LastOrDefault(a=>a.RepairKind=="native-empty-to-json-contract"||a.RepairKind=="native-stall-to-json-contract"||a.RepairKind=="native-protocol-to-json-contract")?.RepairKind;
                     bool textToolRecovery=textRecoveryKind!=null;
                     int observationRounds=0;
@@ -239,15 +239,18 @@ namespace WorldWeaver.Editor.Assistant
                         };
                         CompletionResult completion;
                         var inferenceClock=Stopwatch.StartNew();
-                        try { completion = await provider.CompleteAsync(request, operation.Token); transientInferenceRepairs=protocolInferenceRepairs=0; }
+                        try { completion = await provider.CompleteAsync(request, operation.Token); transientInferenceRepairs=protocolInferenceRepairs=consecutiveProviderAvailabilityFailures=0; }
                         catch(ProviderException error) when(round+1<rounds&&(error.Message.StartsWith("FUNCTION_PROTOCOL:",StringComparison.Ordinal)?protocolInferenceRepairs++<(Settings.UseNativeFunctions?6:2):error.Transient&&transientInferenceRepairs++<2))
                         {
                             // No command from this incomplete response was parsed or executed.
                             // Record the failed inference, then rebuild from the last committed tool state.
                             attempt.ProviderElapsedMs=inferenceClock.ElapsedMilliseconds;
                             attempt.Diagnostics=error.Diagnostics;
-                            attempt.Error=ChatHistoryStore.Redact(error.Message);attempt.WireResponse=ChatHistoryStore.Redact(error.WireResponse);answer.Status="Восстанавливаю шаг";Save();
-                            request=BuildRequest(session,text);
+                            attempt.Error=ChatHistoryStore.Redact(error.Message);attempt.WireResponse=ChatHistoryStore.Redact(error.WireResponse);answer.Status="Восстанавливаю шаг";
+                            bool unavailable=AgentFunctionProtocol.IsToolAvailabilityError(error.Message);
+                            consecutiveProviderAvailabilityFailures=unavailable?consecutiveProviderAvailabilityFailures+1:0;
+                            if(Settings.UseNativeFunctions&&!textToolRecovery&&consecutiveProviderAvailabilityFailures>=2&&!answer.Attempts.Any(a=>a.RepairKind=="native-fresh-plan"))attempt.RepairKind="native-fresh-plan";
+                            Save();request=BuildRequest(session,text);
                             if(error.Message.StartsWith("EMPTY_RESPONSE:",StringComparison.Ordinal)){textToolRecovery=true;textRecoveryKind="native-empty-to-json-contract";request.EnableThinking=false;}
                             bool providerShapeFailure=error.Message.StartsWith("FUNCTION_PROTOCOL:",StringComparison.Ordinal)&&!AgentFunctionProtocol.IsToolAvailabilityError(error.Message);
                             consecutiveProviderShapeFailures=providerShapeFailure?consecutiveProviderShapeFailures+1:0;
@@ -288,6 +291,9 @@ namespace WorldWeaver.Editor.Assistant
                                 throw new ArgumentException("This exact configuration already succeeded and no later mutation has intervened. Repeating it does not advance the task. Inspect the current result or call finish_task to request a FRESH review after the repair; old review failures are historical.");
                             if(Settings.UseNativeFunctions&&plan.actions.Count>1&&(plan.actions.Count>8||plan.actions.Any(a=>!SceneToolExecutor.IsReadOnlyTool(a.tool))))throw new ArgumentException("Native batches require at most eight independent read-only observations; mutations are standalone.");
                             if(!Settings.AllowEditorCode&&plan.actions.Any(a=>a.tool=="execute_editor_code"||a.tool=="run_runtime_probe"))throw new ArgumentException("Autonomous Editor C# is disabled; use reviewed script tools.");
+                            foreach(var proposed in plan.actions.Where(a=>a.tool=="plan_task"))
+                                if(answer.Task?.Approach.Count>0&&proposed.args["steps"] is JArray stages&&stages.All(v=>v.Type==JTokenType.String)&&answer.Task.Approach.SequenceEqual(stages.Values<string>()))
+                                    throw new ArgumentException("This exact tentative approach is already recorded. Rewriting it is not execution. Use its existing stages and actual observations to implement an unmet requirement or request review_stage; submit a changed approach only when the method really changes. No plan or scene changed.");
                             foreach(var codeAction in plan.actions.Where(a=>a.tool=="execute_editor_code"))
                             {
                                 int observed=StaleEditorCodeObservation(answer.Steps,codeAction);

@@ -112,6 +112,61 @@ namespace WorldWeaver.Tests
             }
             finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
         }
+        sealed class AvailabilityPlanningProvider:ILLMProvider
+        {
+            public int Calls;public bool FreshEpochSeen,NativePreserved=true;
+            public Task<CompletionResult> CompleteAsync(CompletionRequest request,CancellationToken token)
+            {
+                Calls++;NativePreserved&=request.UseToolCalls;
+                if(Calls<=2)throw new ProviderException("FUNCTION_PROTOCOL: function 'plan_task' was not advertised. No action executed. Advertised: execute_editor_code, finish_task.");
+                if(Calls==3)FreshEpochSeen=request.Messages.Any(m=>m.Content.Contains("Fresh native planning epoch"));
+                var plan=new EditorPlan{reply="Продолжаю",complete=Calls>=4};if(Calls==3)plan.actions.Add(Code("return new GameObject(\"AfterAvailabilityReset\");"));
+                return Task.FromResult(new CompletionResult{Text=JsonConvert.SerializeObject(plan),Model="availability-fresh-plan-fixture"});
+            }
+            public Task<bool> HealthAsync(CancellationToken token)=>Task.FromResult(true);public void Dispose(){}
+        }
+        [Test] public async Task RepeatedUnavailableFunctionGetsABoundedFreshNativeContext()
+        {
+            EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);var provider=new AvailabilityPlanningProvider();
+            try
+            {
+                using(var controller=new ChatController(_=>provider,Path.Combine("UserSettings","AvailabilityNativePlan-"+Guid.NewGuid().ToString("N"))))
+                {
+                    controller.Settings.AllowEditorCode=true;controller.Settings.UseNativeFunctions=true;controller.Settings.UseSkills=false;controller.Settings.AutoVerify=false;controller.Settings.Power=AssistantPower.Deep;
+                    await controller.SendAsync("Через C# создай один объект.");var answer=controller.Current.Messages.Last();Assert.IsFalse(answer.IsError,answer.Text);
+                    Assert.AreEqual(4,provider.Calls);Assert.IsTrue(provider.FreshEpochSeen);Assert.IsTrue(provider.NativePreserved);Assert.AreEqual(1,answer.Attempts.Count(a=>a.RepairKind=="native-fresh-plan"));Assert.IsTrue(GameObject.Find("AfterAvailabilityReset"));
+                }
+            }
+            finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
+        }
+        sealed class RepeatingApproachProvider:ILLMProvider
+        {
+            public int Calls;public bool FreshEpochSeen;
+            public Task<CompletionResult> CompleteAsync(CompletionRequest request,CancellationToken token)
+            {
+                Calls++;if(Calls==4)FreshEpochSeen=request.Messages.Any(m=>m.Content.Contains("Fresh native planning epoch"));
+                var plan=new EditorPlan{reply="Продолжаю",complete=Calls>=5};
+                if(Calls<=3)plan.actions.Add(new EditorCommand{tool="plan_task",args=new JObject{["steps"]=new JArray("Создать один объект и проверить его наличие.")}});
+                else if(Calls==4)plan.actions.Add(Code("return new GameObject(\"AfterRepeatedApproach\");"));
+                return Task.FromResult(new CompletionResult{Text=JsonConvert.SerializeObject(plan),Model="repeated-approach-fixture"});
+            }
+            public Task<bool> HealthAsync(CancellationToken token)=>Task.FromResult(true);public void Dispose(){}
+        }
+        [Test] public async Task RepeatingAnUnchangedApproachDoesNotMasqueradeAsTaskExecution()
+        {
+            EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);var provider=new RepeatingApproachProvider();
+            try
+            {
+                using(var controller=new ChatController(_=>provider,Path.Combine("UserSettings","RepeatedApproach-"+Guid.NewGuid().ToString("N"))))
+                {
+                    controller.Settings.AllowEditorCode=true;controller.Settings.UseNativeFunctions=true;controller.Settings.UseSkills=false;controller.Settings.AutoVerify=false;controller.Settings.Power=AssistantPower.Deep;
+                    await controller.SendAsync("Через C# создай один объект.");var answer=controller.Current.Messages.Last();Assert.IsFalse(answer.IsError,answer.Text);
+                    Assert.AreEqual(5,provider.Calls);Assert.IsTrue(provider.FreshEpochSeen);Assert.AreEqual(1,answer.Steps.Count(v=>v.Tool=="plan_task"));Assert.AreEqual(1,answer.Steps.Count(v=>v.Tool=="execute_editor_code"));
+                    Assert.AreEqual(2,answer.Attempts.Count(a=>!a.Accepted&&(a.Error??"").Contains("This exact tentative approach")));Assert.IsTrue(GameObject.Find("AfterRepeatedApproach"));
+                }
+            }
+            finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
+        }
         sealed class RepeatingProvider:ILLMProvider
         {
             public int Calls;public bool SawActualReplayDiagnostic,NativePreserved=true;
