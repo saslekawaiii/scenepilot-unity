@@ -307,6 +307,20 @@ namespace WorldWeaver.Tests
             }
             finally{UnityEngine.Object.DestroyImmediate(root);}
         }
+        [Test] public void EncodedReferenceIsDecodedOnlyForAnActualReferenceFieldAndStillValidatesItsScope()
+        {
+            var root=new UnityEngine.GameObject("Reference field fixture");root.AddComponent<GeneratedSceneObject>();var player=root.AddComponent<WorldPlayer>();
+            var cameraObject=new UnityEngine.GameObject("Reference camera fixture");cameraObject.AddComponent<GeneratedSceneObject>();var camera=cameraObject.AddComponent<UnityEngine.Camera>();
+            try
+            {
+                string encoded=new JObject{["target"]=ProjectContextIndex.StableTarget(cameraObject),["component"]="UnityEngine.Camera"}.ToString(Newtonsoft.Json.Formatting.None);
+                var command=new EditorCommand{tool="set_component",target=ProjectContextIndex.StableTarget(root),args=new JObject{["type"]="WorldWeaver.WorldPlayer",["property"]="View",["value"]=encoded}};
+                var plan=new EditorPlan{actions=new System.Collections.Generic.List<EditorCommand>{command}};var assigned=SceneToolExecutor.Execute(plan);Assert.IsTrue(assigned.Success,assigned.Error);Assert.AreSame(camera,player.View);Assert.AreEqual(JTokenType.Object,command.args["value"].Type);
+                command.args["property"]="LastMessage";command.args["value"]=encoded;var text=SceneToolExecutor.Execute(plan);Assert.IsTrue(text.Success,text.Error);Assert.AreEqual(encoded,player.LastMessage);Assert.AreEqual(JTokenType.String,command.args["value"].Type);
+                command.args["property"]="View";command.args["value"]="{\"asset\":\"../private.asset\"}";Assert.Throws<ArgumentException>(()=>SceneToolExecutor.Validate(plan));Assert.AreSame(camera,player.View);
+            }
+            finally{UnityEngine.Object.DestroyImmediate(root);UnityEngine.Object.DestroyImmediate(cameraObject);}
+        }
         [Test] public void ScenePaginationDeliversEveryRowThroughNativeAndWorkingMemoryBudgets()
         {
             var root=new UnityEngine.GameObject("PagedInventoryFixture");root.AddComponent<GeneratedSceneObject>();var expected=new System.Collections.Generic.HashSet<string>();

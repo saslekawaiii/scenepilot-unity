@@ -211,7 +211,7 @@ namespace WorldWeaver.Editor.Assistant
                     int emptyPlanRepairs = 0;
                     int planningRepairs = 0; // One fresh format repair is available even in Fast; it never grants another execution round.
                     int transientInferenceRepairs=0, protocolInferenceRepairs=0;
-                    string textRecoveryKind=answer.Attempts.LastOrDefault(a=>a.RepairKind=="native-empty-to-json-contract"||a.RepairKind=="native-stall-to-json-contract")?.RepairKind;
+                    string textRecoveryKind=answer.Attempts.LastOrDefault(a=>a.RepairKind=="native-empty-to-json-contract"||a.RepairKind=="native-stall-to-json-contract"||a.RepairKind=="native-protocol-to-json-contract")?.RepairKind;
                     bool textToolRecovery=textRecoveryKind!=null;
                     int observationRounds=0;
                     string lastAppliedConfiguration=null;
@@ -249,7 +249,8 @@ namespace WorldWeaver.Editor.Assistant
                             attempt.Error=ChatHistoryStore.Redact(error.Message);attempt.WireResponse=ChatHistoryStore.Redact(error.WireResponse);answer.Status="Восстанавливаю шаг";Save();
                             request=BuildRequest(session,text);
                             if(error.Message.StartsWith("EMPTY_RESPONSE:",StringComparison.Ordinal)){textToolRecovery=true;textRecoveryKind="native-empty-to-json-contract";request.EnableThinking=false;}
-                            request.Messages.Add(new ChatMessage("user","Previous inference failed before any action from that response was executed. Actual diagnostic (data): "+attempt.Error+". Continue the ORIGINAL request from successful tool results. Do not repeat existing creations. Choose one next function."));
+                            if(error.Message.StartsWith("FUNCTION_PROTOCOL:",StringComparison.Ordinal)&&protocolInferenceRepairs>=2){textToolRecovery=true;textRecoveryKind="native-protocol-to-json-contract";request.EnableThinking=false;}
+                            request.Messages.Add(new ChatMessage("user","Previous inference failed before any action from that response was executed. Actual diagnostic (data): "+attempt.Error+". Continue the ORIGINAL request from successful tool results. Do not repeat existing creations. Choose one next operation using the active wire contract."));
                             continue;
                         }
                         finally{if(attempt.ProviderElapsedMs==0)attempt.ProviderElapsedMs=inferenceClock.ElapsedMilliseconds;}

@@ -114,6 +114,14 @@ open_scene: target empty,args {path:Assets/...unity}. Standalone reviewed action
                 // strings. Only an unambiguous literal for an inspected bool field
                 // can be normalized; arbitrary truthy strings remain invalid.
                 if(field.propertyType==SerializedPropertyType.Boolean&&c.args["value"]?.Type==JTokenType.String&&bool.TryParse((string)c.args["value"],out bool literal))c.args["value"]=literal;
+                // Decode a provider wrapper only after Unity has identified the actual
+                // reference field. JSON text in ordinary string fields stays literal.
+                if(field.propertyType==SerializedPropertyType.ObjectReference&&c.args["value"]?.Type==JTokenType.String)
+                {
+                    string encoded=(string)c.args["value"];
+                    if(encoded.Length<=4000&&encoded.TrimStart().StartsWith("{",StringComparison.Ordinal))
+                        try{c.args["value"]=JObject.Parse(encoded);}catch(JsonException){throw new ArgumentException("Reference JSON is malformed; use {target,component?} or {asset}.");}
+                }
                 ValidateProperty(field,c.args["value"],resolve);
             }
             if(c.tool=="plan_task" && (!(c.args["steps"] is JArray stages)||stages.Count<1||stages.Count>12||stages.Any(n=>n.Type!=JTokenType.String||string.IsNullOrWhiteSpace((string)n)||((string)n).Length>300)))throw new ArgumentException("A task plan needs 1-12 bounded steps.");
