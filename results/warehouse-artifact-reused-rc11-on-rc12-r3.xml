@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="3" result="Passed" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-04 15:35:13Z" end-time="2026-11-04 15:35:18Z" duration="4.9600238">
+  <test-suite type="TestSuite" id="1000" name="test" fullname="test" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-11-04 15:35:13Z" end-time="2026-11-04 15:35:18Z" duration="4.960024" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1005" name="Assembly-CSharp-Editor.dll" fullname="/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/warehouse-consumer-1.8-rc11/Library/ScriptAssemblies/Assembly-CSharp-Editor.dll" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-11-04 15:35:13Z" end-time="2026-11-04 15:35:18Z" duration="4.833861" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="39748" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestFixture" id="1001" name="WarehouseResultAcceptanceTests" fullname="WarehouseResultAcceptanceTests" classname="WarehouseResultAcceptanceTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-11-04 15:35:13Z" end-time="2026-11-04 15:35:18Z" duration="4.830030" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1003" name="AllFiveParcelsHavePathsFromTheActualPlayStartingPose" fullname="WarehouseResultAcceptanceTests.AllFiveParcelsHavePathsFromTheActualPlayStartingPose" methodname="AllFiveParcelsHavePathsFromTheActualPlayStartingPose" classname="WarehouseResultAcceptanceTests" runstate="Runnable" seed="509517118" result="Passed" start-time="2026-11-04 15:34:44Z" end-time="2026-11-04 15:34:53Z" duration="9.385057" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+          </properties>
+          <output><![CDATA[WAREHOUSE_REACHABILITY half-metre capsule grid connected to actual Play starting pose, reachable cells=2060; effective radius=0.22; input arrangements do not change geometry
+]]></output>
+        </test-case>
+        <test-case id="1004" name="FiveActualEPickupsIncrementOnceAndCompleteOnlyAfterTheFifth" fullname="WarehouseResultAcceptanceTests.FiveActualEPickupsIncrementOnceAndCompleteOnlyAfterTheFifth" methodname="FiveActualEPickupsIncrementOnceAndCompleteOnlyAfterTheFifth" classname="WarehouseResultAcceptanceTests" runstate="Runnable" seed="956617363" result="Passed" start-time="2026-11-04 15:34:53Z" end-time="2026-11-04 15:35:07Z" duration="14.015181" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+          </properties>
+          <output><![CDATA[WAREHOUSE_PICKUPS five actual E inputs, no held-key duplicate, completion only after fifth
+WAREHOUSE_CAPTURE actual gameplay camera world render; ScreenSpaceOverlay UI excluded: /Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/web-agent-research/warehouse-camera-rc11-on-rc12-r3.png
+]]></output>
+        </test-case>
+        <test-case id="1002" name="RealKeyboardMovementSprintJumpCameraAndSolidObstacles" fullname="WarehouseResultAcceptanceTests.RealKeyboardMovementSprintJumpCameraAndSolidObstacles" methodname="RealKeyboardMovementSprintJumpCameraAndSolidObstacles" classname="WarehouseResultAcceptanceTests" runstate="Runnable" seed="287124794" result="Passed" start-time="2026-11-04 15:35:07Z" end-time="2026-11-04 15:35:18Z" duration="10.716147" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+            <property name="retryIteration" value="0" />
+            <property name="repeatIteration" value="0" />
+          </properties>
+          <output><![CDATA[WAREHOUSE_INPUT_SETUP originalSpawn=(0.00, 0.08, 0.68) clear measurement site=(-5.50, 0.08, -8.00); geometry is not changed
+WAREHOUSE_INPUT walk=0.310 sprint=0.780 jump=1.097 yaw=18.00 pitch=10.50 obstacle=Shelf_N2
+Saving results to: /Users/kirillkovalenko/Library/Application Support/DefaultCompany/test/TestResults.xml
+]]></output>
+        </test-case>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

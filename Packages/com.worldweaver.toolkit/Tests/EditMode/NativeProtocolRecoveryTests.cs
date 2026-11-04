@@ -142,5 +142,45 @@ namespace WorldWeaver.Tests
             }
             finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
         }
+        sealed class AvailabilityRepairProvider:ILLMProvider
+        {
+            public int Calls;public bool JsonSeen;
+            public Task<CompletionResult> CompleteAsync(CompletionRequest request,CancellationToken token)
+            {
+                Calls++;JsonSeen|=!request.UseToolCalls;
+                if(Calls==1)throw new ProviderException("FUNCTION_PROTOCOL: functions not advertised in this turn: inspect_component, read_script. No action executed. Available now: plan_task, finish_task.");
+                if(Calls==2)throw new ProviderException("FUNCTION_PROTOCOL: function 'discover_tools' was not advertised. No action executed. Advertised: plan_task, finish_task.");
+                var plan=new EditorPlan{complete=Calls>3};
+                if(Calls==3)plan.actions.Add(new EditorCommand{tool="create_node",name="AvailabilityRecoveredGoal"});
+                return Task.FromResult(new CompletionResult{Text=JsonConvert.SerializeObject(plan)});
+            }
+            public Task<bool> HealthAsync(CancellationToken token)=>Task.FromResult(true);
+            public void Dispose(){}
+        }
+        [Test] public async Task TwoWrongPhaseCallsCannotSwitchAWorkingNativeConnectionToTextMode()
+        {
+            EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);var provider=new AvailabilityRepairProvider();
+            try
+            {
+                using(var controller=new ChatController(_=>provider,"UserSettings/AvailabilityRecovery-"+Guid.NewGuid().ToString("N")))
+                {
+                    controller.Settings.UseNativeFunctions=true;controller.Settings.AutoVerify=false;controller.Settings.UseSkills=false;controller.Settings.Power=AssistantPower.Deep;
+                    await controller.SendAsync("Создай пустой узел AvailabilityRecoveredGoal.");var answer=controller.Current.Messages.Last();
+                    Assert.IsFalse(answer.IsError,answer.Text);Assert.IsFalse(provider.JsonSeen);Assert.AreEqual(4,provider.Calls);
+                    Assert.IsTrue(GameObject.Find("AvailabilityRecoveredGoal"));Assert.AreEqual(1,answer.Steps.Count(s=>s.Tool=="create_node"));
+                }
+            }
+            finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
+        }
+        [Test] public void PlanningPhaseRejectionExplainsTheAvailableRecoveryInsteadOfRequestingDisabledDiscovery()
+        {
+            var schema=EditorPlan.Schema(true,nativeFunctions:true);
+            var branches=(JArray)schema["properties"]["actions"]["items"]["anyOf"];
+            schema["properties"]["actions"]["items"]["anyOf"]=new JArray(branches.OfType<JObject>().Where(b=>EditorToolSchema.ToolName(b)=="plan_task").Select(b=>b.DeepClone()));
+            var message=new JObject{["tool_calls"]=new JArray(new JObject{["function"]=new JObject{["name"]="discover_tools",["arguments"]=new JObject()}})};
+            var error=Assert.Throws<ProviderException>(()=>AgentFunctionProtocol.Normalize(message,schema));
+            Assert.That(error.Message,Does.Contain("Complete the required plan_task step first"));Assert.That(error.Message,Does.Contain("Discovery is not enabled"));Assert.That(error.Message,Does.Not.Contain("Discover the exact missing function"));
+            Assert.IsTrue(AgentFunctionProtocol.IsToolAvailabilityError(error.Message));
+        }
     }
 }
