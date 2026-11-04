@@ -403,7 +403,7 @@ namespace WorldWeaver.Editor.Assistant
                                     throw new ArgumentException("Approach stages remain unverified; full task completion was not accepted.");
                                 }
                             }
-                            bool missingRequestedChanges=!readOnlyRequest&&answer.Task?.MutationAuthorized==true&&AgentCapabilities.IsChangeRequest(text)&&!answer.Steps.Any(s=>s.Success&&s.ChangesApplied!=false&&!SceneToolExecutor.IsReadOnlyTool(s.Tool)&&s.Tool!="remember_design");
+                            bool missingRequestedChanges=!readOnlyRequest&&answer.Task?.MutationAuthorized==true&&AgentCapabilities.IsChangeRequest(text)&&!answer.Steps.Any(IsImplementationProgress);
                             if(missingRequestedChanges&&!answer.Steps.Any(s=>!s.Success)&&emptyPlanRepairs++<1&&round+1<rounds)
                             {
                                 requireImplementationStep=answer.Steps.Any(s=>s.Success&&(s.Tool=="discover_tools"||s.Tool=="plan_task"||s.Tool=="read_skill"));
@@ -437,7 +437,7 @@ namespace WorldWeaver.Editor.Assistant
                                 }
                             }
                             answer.IsError = unresolvedFailure;
-                            answer.Status = unresolvedFailure ? "Проверки не пройдены" : plan.complete ? answer.Task?.Checks.Count>0&&answer.Task.Checks.All(c=>c.Passed)&&answer.Task.Requirements.Any(r=>r.Kind!="task_change")?"Проверки пройдены":answer.Steps.Any(s=>s.Success&&s.ChangesApplied!=false&&!SceneToolExecutor.IsReadOnlyTool(s.Tool))?"Изменения применены":"Готово" : "Нужно уточнение";
+                            answer.Status = unresolvedFailure ? "Проверки не пройдены" : plan.complete ? answer.Task?.Checks.Count>0&&answer.Task.Checks.All(c=>c.Passed)&&answer.Task.Requirements.Any(r=>r.Kind!="task_change")?"Проверки пройдены":answer.Steps.Any(IsImplementationProgress)?"Изменения применены":"Готово" : "Нужно уточнение";
                             if(answer.Task!=null)answer.Task.ContinueAfterReload=false;
                             if (unresolvedFailure) Phase = answer.Text;
                             break;

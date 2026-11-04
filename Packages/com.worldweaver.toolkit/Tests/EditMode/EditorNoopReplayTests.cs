@@ -167,6 +167,54 @@ namespace WorldWeaver.Tests
             }
             finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
         }
+        sealed class CapturingReviewProvider:ILLMProvider
+        {
+            public JObject Input;
+            public Task<CompletionResult> CompleteAsync(CompletionRequest request,CancellationToken token){Input=JObject.Parse(request.Messages.Last().Content);return Task.FromResult(new CompletionResult{Text="{\"passed\":false,\"issues\":[\"Actual behavior needs verification\"],\"evidence\":\"Controlled review input capture\"}",Model="review-input-fixture"});}
+            public Task<bool> HealthAsync(CancellationToken token)=>Task.FromResult(true);public void Dispose(){}
+        }
+        [Test] public async Task FailedRuntimeEvidenceDoesNotBecomeHistoricalAfterAnActualEditorRead()
+        {
+            EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
+            try
+            {
+                var go=new GameObject("ReviewValueSubject");go.AddComponent<GeneratedSceneObject>();var light=go.AddComponent<Light>();light.intensity=0;
+                using(var controller=new ChatController(historyFolder:Path.Combine("UserSettings","ReviewReadChronology-"+Guid.NewGuid().ToString("N"))))
+                {
+                    var context=Context(controller);var answer=context.Message;answer.Task=AgentTaskVerifier.Create("Проверь фактическое поведение света",false);
+                    answer.Steps.Add(new EditorCommandResult{Tool="job_result",Target="fixture-observation",Success=false,Summary="{\"Kind\":\"runtime_probe\",\"Status\":\"failed\",\"Success\":false,\"Samples\":1,\"ProbeAssertions\":[{\"name\":\"measured value\",\"passed\":false,\"observed\":0}]}"});
+                    var read=await Execute(Code("return GameObject.Find(\"ReviewValueSubject\").GetComponent<Light>().intensity;"),context);Assert.IsFalse(Progress(read));answer.Steps.Add(read);
+                    var reviewer=new CapturingReviewProvider();var method=typeof(ChatController).GetMethod("ReviewEditorResultAsync",BindingFlags.Instance|BindingFlags.NonPublic);
+                    await (Task<EditorResultReview>)method.Invoke(controller,new object[]{answer,reviewer,CancellationToken.None,-1});
+                    Assert.IsFalse((bool)reviewer.Input["ActualToolEvidence"][0]["HistoricalObservation"],"A read must not erase the earlier failed behavioral observation");
+                    Assert.IsFalse((bool)reviewer.Input["DurableHostVerification"][0]["HistoricalBeforeLastChange"],"Both host evidence views must agree");
+                    var write=await Execute(Code("var light=GameObject.Find(\"ReviewValueSubject\").GetComponent<Light>(); Undo.RecordObject(light,\"Change light\"); light.intensity=3; return light.intensity;"),context);Assert.IsTrue(Progress(write));answer.Steps.Add(write);
+                    await (Task<EditorResultReview>)method.Invoke(controller,new object[]{answer,reviewer,CancellationToken.None,-1});
+                    Assert.IsTrue((bool)reviewer.Input["ActualToolEvidence"][0]["HistoricalObservation"]);Assert.IsTrue((bool)reviewer.Input["DurableHostVerification"][0]["HistoricalBeforeLastChange"],"An actual intervening change requires a fresh runtime check");
+                }
+            }
+            finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
+        }
+        sealed class ReadOnlyEditorProvider:ILLMProvider
+        {
+            int calls;
+            public Task<CompletionResult> CompleteAsync(CompletionRequest request,CancellationToken token){var plan=new EditorPlan{reply="Значение прочитано",complete=++calls>=2};if(calls==1)plan.actions.Add(Code("return target==null;"));return Task.FromResult(new CompletionResult{Text=JsonConvert.SerializeObject(plan),Model="read-status-fixture"});}
+            public Task<bool> HealthAsync(CancellationToken token)=>Task.FromResult(true);public void Dispose(){}
+        }
+        [Test] public async Task SuccessfulEditorInspectionDoesNotReportAppliedChanges()
+        {
+            EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);
+            try
+            {
+                using(var controller=new ChatController(_=>new ReadOnlyEditorProvider(),Path.Combine("UserSettings","ReadStatus-"+Guid.NewGuid().ToString("N"))))
+                {
+                    controller.Settings.AllowEditorCode=true;controller.Settings.UseNativeFunctions=true;controller.Settings.UseSkills=false;controller.Settings.AutoVerify=false;controller.Settings.Power=AssistantPower.Deep;
+                    await controller.SendAsync("Изучи текущее значение через C# и сообщи наблюдение.");var answer=controller.Current.Messages.Last();Assert.IsFalse(answer.IsError,answer.Text);
+                    Assert.AreEqual(1,answer.Steps.Count(v=>v.Tool=="execute_editor_code"));Assert.IsFalse(Progress(answer.Steps.Single(v=>v.Tool=="execute_editor_code")));Assert.AreNotEqual("Изменения применены",answer.Status);
+                }
+            }
+            finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
+        }
         sealed class RepeatingProvider:ILLMProvider
         {
             public int Calls;public bool SawActualReplayDiagnostic,NativePreserved=true;
