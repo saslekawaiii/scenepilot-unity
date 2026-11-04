@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -50,7 +51,7 @@ namespace WorldWeaver.Tests
                     using(var provider=new LocalProvider(profile))await provider.CompleteAsync(new CompletionRequest{Schema=schema},CancellationToken.None);
                     var body=JObject.Parse(server.LastRequest.Substring(server.LastRequest.IndexOf("\r\n\r\n",StringComparison.Ordinal)+4));
                     Assert.That(body["format"],Is.Null);Assert.That((bool)body["think"],Is.False);
-                    StringAssert.Contains(schema.ToString(Newtonsoft.Json.Formatting.None),(string)body["messages"][0]["content"]);
+                    Assert.IsTrue(((JArray)body["messages"]).Any(m=>(string)m["role"]=="system"&&((string)m["content"]??"").Contains(schema.ToString(Newtonsoft.Json.Formatting.None))),"The exact schema must be transmitted as a trusted instruction.");
                     Assert.That(JToken.DeepEquals(schema,original),Is.True,"Cloud compatibility must not weaken host bounds or mutate the source schema.");
                 }
                 finally{UnityEngine.Object.DestroyImmediate(profile);}

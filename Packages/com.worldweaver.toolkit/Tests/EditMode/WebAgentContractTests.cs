@@ -230,7 +230,7 @@ namespace WorldWeaver.Tests
             var method=typeof(ChatController).GetMethod("WebSourceLedger",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic);var rows=(JArray)method.Invoke(null,new object[]{steps});
             Assert.AreEqual(1,rows.Count);Assert.AreEqual("https://data.example/elevation.img",(string)rows[0]["url"]);Assert.That((string)rows[0]["status"],Does.Contain("not proof of download"));Assert.AreEqual(0,(int)rows[0]["index"]);
         }
-        [Test] public void APlannedStageUsesOnlyTheLatestAcceptedNativeExchangeAndKeepsTheFullAudit()
+        [Test] public void APlannedStageKeepsBoundedCausalExchangesIncludingTheLatestRejection()
         {
             var answer=new AssistantMessage{Task=new AgentTaskState{Approach=new System.Collections.Generic.List<string>{"Implement a pending stage"}}};
             for(int i=0;i<8;i++)
@@ -239,7 +239,7 @@ namespace WorldWeaver.Tests
                 answer.Attempts.Add(new EditorPlanAttempt{Accepted=true,Round=i+1,FirstResultIndex=i,ResultCount=1,WireResponse=new JObject{["tool_calls"]=new JArray(new JObject{["id"]="actual_"+i,["function"]=new JObject{["name"]="inspect_object",["arguments"]=new JObject{["target"]="owned:fixture"}}})}.ToString()});
             }
             answer.Attempts.Add(new EditorPlanAttempt{Accepted=false,Error="Unknown tool",WireResponse="{\"tool_calls\":[{\"function\":{\"name\":\"not_registered\",\"arguments\":{}}}]}"});
-            var request=new CompletionRequest();Assert.IsTrue(NativeHistory(request,answer));Assert.AreEqual(2,request.Messages.Count);Assert.AreEqual("actual_7",request.Messages[1].ToolCallId);Assert.AreEqual(7,(int)JObject.Parse(request.Messages[1].Content)["data"]["actualValue"]);Assert.AreEqual(9,answer.Attempts.Count);Assert.AreEqual(8,answer.Steps.Count);
+            var request=new CompletionRequest();Assert.IsTrue(NativeHistory(request,answer));Assert.AreEqual(8,request.Messages.Count);var latestObservation=request.Messages.Single(m=>m.ToolCallId=="actual_7");Assert.AreEqual(7,(int)JObject.Parse(latestObservation.Content)["data"]["actualValue"]);Assert.That(request.Messages.Last().Content,Does.Contain("Unknown tool"));Assert.IsFalse((bool)JObject.Parse(request.Messages.Last().Content)["executed"]);Assert.AreEqual(9,answer.Attempts.Count);Assert.AreEqual(8,answer.Steps.Count);
         }
         [Test] public void NativeHistoryKeepsALargeSourceBatchedBesideSmallObservations()
         {
@@ -272,6 +272,18 @@ namespace WorldWeaver.Tests
             var answer=new AssistantMessage();answer.Attempts.Add(new EditorPlanAttempt{Round=2,Accepted=false,Error="Missing name",WireResponse="{\"tool_calls\":[{\"id\":\"call_rejected\",\"function\":{\"name\":\"attach_script\",\"arguments\":{\"target\":\"owned:original\"}}}]}"});
             var request=new CompletionRequest();Assert.IsTrue(NativeHistory(request,answer));var result=JObject.Parse(request.Messages[1].Content);
             Assert.IsFalse((bool)result["success"]);Assert.IsFalse((bool)result["executed"]);Assert.That((string)result["error"],Does.Contain("Missing name"));Assert.AreEqual("call_rejected",request.Messages[1].ToolCallId);
+        }
+        [Test] public void StagedHistoryKeepsTheLatestRejectionAfterSuccessfulObservations()
+        {
+            var answer=new AssistantMessage{Task=new AgentTaskState()};
+            answer.Task.Approach.Add("Implement the requested behavior");
+            answer.Steps.Add(new EditorCommandResult{Tool="read_task_step",Success=true,Summary="{\"actual\":true}"});
+            answer.Attempts.Add(new EditorPlanAttempt{Round=1,Accepted=true,FirstResultIndex=0,ResultCount=1,WireResponse="{\"tool_calls\":[{\"id\":\"read_actual\",\"function\":{\"name\":\"read_task_step\",\"arguments\":{\"index\":0}}}]}"});
+            answer.Attempts.Add(new EditorPlanAttempt{Round=2,Accepted=false,Error="Actual validation feedback",WireResponse="{\"tool_calls\":[{\"id\":\"rejected_actual\",\"function\":{\"name\":\"attach_script\",\"arguments\":{}}}]}"});
+            var request=new CompletionRequest();Assert.IsTrue(NativeHistory(request,answer));
+            Assert.AreEqual("rejected_actual",request.Messages.Last().ToolCallId);
+            Assert.That(request.Messages.Last().Content,Does.Contain("Actual validation feedback"));
+            Assert.IsFalse((bool)JObject.Parse(request.Messages.Last().Content)["executed"]);
         }
         [TestCase("true",true)]
         [TestCase("false",false)]

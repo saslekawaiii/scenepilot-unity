@@ -278,8 +278,6 @@ namespace WorldWeaver.Editor.Assistant
                             if(completion.OutputTruncated)throw new ArgumentException("Модель достигла лимита ответа ("+(completion.FinishReason??"length")+"). Незавершённый план и код не исполнялись. Нужен новый короткий полный шаг.");
                             plan = EditorPlan.Parse(parsedResponse);
                             foreach(var proposed in plan.actions)WebResearchTools.ValidateResearchBudget(answer.Task,proposed,Settings.Power);
-                            if(Settings.UseNativeFunctions&&plan.actions.Any(c=>staleReadCommands.Any(old=>ReadFingerprint(old)==ReadFingerprint(c))))
-                                throw new ArgumentException("This exact read already returned the available evidence repeatedly. No call executed. Use the existing observation, a different specific prerequisite, an implementation or a fresh result review instead of polling an unchanged completed result.");
                             if(Settings.UseNativeFunctions&&Settings.AllowAutonomousScripts&&plan.actions.Any(c=>ScriptDrafts.AlreadyCompiledUnchanged(c)&&answer.Steps.Any(s=>s.Success&&s.Tool=="compile_scripts"&&s.SourceHashes!=null&&s.SourceHashes.ContainsKey(ScriptDrafts.Folder+"/"+c.name+".cs"))))
                                 throw new ArgumentException("This exact source already compiled successfully in this task and the file is unchanged. Do not import it again. Attach the compiled class, implement another missing responsibility, or review the actual user goal. No source was rewritten.");
                             if(Settings.UseNativeFunctions&&plan.actions.Count==1&&IsConfiguration(plan.actions[0].tool)&&ReadFingerprint(plan.actions[0])==lastAppliedConfiguration)

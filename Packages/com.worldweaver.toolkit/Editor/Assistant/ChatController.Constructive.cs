@@ -77,7 +77,7 @@ namespace WorldWeaver.Editor.Assistant
             if(answer==null)return false;
             var groups=new List<List<ChatMessage>>();int remaining=40000;
             bool staged=answer.Task?.Approach.Count>0;
-            foreach(var attempt in answer.Attempts.Where(a=>!staged||a.Accepted).TakeLast(staged?1:8).Reverse())
+            foreach(var attempt in answer.Attempts.TakeLast(staged?4:8).Reverse())
             {
                 if(string.IsNullOrEmpty(attempt.WireResponse))continue;
                 try
