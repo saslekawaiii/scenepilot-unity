@@ -30,3 +30,7 @@ deliverables/Состав_поставки.json
 # Intermediate package candidates stay local; the release uses the canonical TGZ.
 deliverables/com.worldweaver.toolkit-*-rc[0-9]*.tgz
 deliverables/com.worldweaver.toolkit-*-r[0-9]*.tgz
+
+# Raw live-agent traces contain private prompts and opaque provider continuation data.
+/results/warehouse-live-*.json
+/results/agent-holdouts-*.json

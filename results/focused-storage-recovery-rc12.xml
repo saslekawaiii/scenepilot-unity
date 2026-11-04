@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="68" result="Passed" total="68" passed="68" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-04 15:04:15Z" end-time="2026-11-04 15:04:26Z" duration="10.3688215">
+  <test-suite type="TestSuite" id="1000" name="UnityProject" fullname="UnityProject" runstate="Runnable" testcasecount="799" result="Passed" start-time="2026-11-04 15:04:15Z" end-time="2026-11-04 15:04:26Z" duration="10.368822" total="68" passed="68" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1903" name="WorldWeaver.EditMode.dll" fullname="/Users/kirillkovalenko/Documents/ChatGPT/Диплом/.private/runtime-probe-qa/Library/ScriptAssemblies/WorldWeaver.EditMode.dll" runstate="Runnable" testcasecount="799" result="Passed" start-time="2026-11-04 15:04:16Z" end-time="2026-11-04 15:04:26Z" duration="10.300040" total="68" passed="68" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="36851" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1904" name="WorldWeaver" fullname="WorldWeaver" runstate="Runnable" testcasecount="799" result="Passed" start-time="2026-11-04 15:04:16Z" end-time="2026-11-04 15:04:26Z" duration="10.298616" total="68" passed="68" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1908" name="Tests" fullname="WorldWeaver.Tests" runstate="Runnable" testcasecount="765" result="Passed" start-time="2026-11-04 15:04:16Z" end-time="2026-11-04 15:04:26Z" duration="10.284054" total="68" passed="68" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestFixture" id="1041" name="AgentCheckpointTests" fullname="WorldWeaver.Tests.AgentCheckpointTests" classname="WorldWeaver.Tests.AgentCheckpointTests" runstate="Runnable" testcasecount="10" result="Passed" start-time="2026-11-04 15:04:16Z" end-time="2026-11-04 15:04:16Z" duration="0.025746" total="10" passed="10" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1046" name="CodeSealIncludesMetaAndSurvivesRealCompileDomainReload" fullname="WorldWeaver.Tests.AgentCheckpointTests.CodeSealIncludesMetaAndSurvivesRealCompileDomainReload" methodname="CodeSealIncludesMetaAndSurvivesRealCompileDomainReload" classname="WorldWeaver.Tests.AgentCheckpointTests" runstate="Runnable" seed="650740620" result="Passed" start-time="2026-11-04 15:04:03Z" end-time="2026-11-04 15:04:09Z" duration="6.806527" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1048" name="CorruptBackupFailsBeforeChangingSceneOrFiles" fullname="WorldWeaver.Tests.AgentCheckpointTests.CorruptBackupFailsBeforeChangingSceneOrFiles" methodname="CorruptBackupFailsBeforeChangingSceneOrFiles" classname="WorldWeaver.Tests.AgentCheckpointTests" runstate="Runnable" seed="720684055" result="Passed" start-time="2026-11-04 15:04:10Z" end-time="2026-11-04 15:04:10Z" duration="0.259483" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1049" name="IndependentCheckpointsShareAssetContentAndDeletingOneJournalDoesNotBreakTheOther" fullname="WorldWeaver.Tests.AgentCheckpointTests.IndependentCheckpointsShareAssetContentAndDeletingOneJournalDoesNotBreakTheOther" methodname="IndependentCheckpointsShareAssetContentAndDeletingOneJournalDoesNotBreakTheOther" classname="WorldWeaver.Tests.AgentCheckpointTests" runstate="Runnable" seed="1527257489" result="Passed" start-time="2026-11-04 15:04:10Z" end-time="2026-11-04 15:04:11Z" duration="1.735584" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1050" name="LegacyLocalContentLayoutRemainsRestorableAfterSharedContentCollection" fullname="WorldWeaver.Tests.AgentCheckpointTests.LegacyLocalContentLayoutRemainsRestorableAfterSharedContentCollection" methodname="LegacyLocalContentLayoutRemainsRestorableAfterSharedContentCollection" classname="WorldWeaver.Tests.AgentCheckpointTests" runstate="Runnable" seed="196078714" result="Passed" start-time="2026-11-04 15:04:11Z" end-time="2026-11-04 15:04:12Z" duration="0.332122" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1044" name="ManualFileConflictPreservesEveryCurrentChange" fullname="WorldWeaver.Tests.AgentCheckpointTests.ManualFileConflictPreservesEveryCurrentChange" methodname="ManualFileConflictPreservesEveryCurrentChange" classname="WorldWeaver.Tests.AgentCheckpointTests" runstate="Runnable" seed="327466444" result="Passed" start-time="2026-11-04 15:04:12Z" end-time="2026-11-04 15:04:12Z" duration="0.228189" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1045" name="ManualInMemorySceneEditIsAConflictAndUnrelatedFileIsPreserved" fullname="WorldWeaver.Tests.AgentCheckpointTests.ManualInMemorySceneEditIsAConflictAndUnrelatedFileIsPreserved" methodname="ManualInMemorySceneEditIsAConflictAndUnrelatedFileIsPreserved" classname="WorldWeaver.Tests.AgentCheckpointTests" runstate="Runnable" seed="1076705054" result="Passed" start-time="2026-11-04 15:04:12Z" end-time="2026-11-04 15:04:12Z" duration="0.206548" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1047" name="MultipleBatchesRestoreOnlyTheirWriteSetAndPreserveLaterUnrelatedFile" fullname="WorldWeaver.Tests.AgentCheckpointTests.MultipleBatchesRestoreOnlyTheirWriteSetAndPreserveLaterUnrelatedFile" methodname="MultipleBatchesRestoreOnlyTheirWriteSetAndPreserveLaterUnrelatedFile" classname="WorldWeaver.Tests.AgentCheckpointTests" runstate="Runnable" seed="2000647195" result="Passed" start-time="2026-11-04 15:04:12Z" end-time="2026-11-04 15:04:13Z" duration="0.388804" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1043" name="SavedSceneDirtyWorkingStateRestoresWithoutChangingItsDiskBytes" fullname="WorldWeaver.Tests.AgentCheckpointTests.SavedSceneDirtyWorkingStateRestoresWithoutChangingItsDiskBytes" methodname="SavedSceneDirtyWorkingStateRestoresWithoutChangingItsDiskBytes" classname="WorldWeaver.Tests.AgentCheckpointTests" runstate="Runnable" seed="673553371" result="Passed" start-time="2026-11-04 15:04:13Z" end-time="2026-11-04 15:04:13Z" duration="0.252152" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1051" name="SharedStorageBudgetRejectsOverflowWithoutAllocatingLargeFiles" fullname="WorldWeaver.Tests.AgentCheckpointTests.SharedStorageBudgetRejectsOverflowWithoutAllocatingLargeFiles" methodname="SharedStorageBudgetRejectsOverflowWithoutAllocatingLargeFiles" classname="WorldWeaver.Tests.AgentCheckpointTests" runstate="Runnable" seed="688317314" result="Passed" start-time="2026-11-04 15:04:13Z" end-time="2026-11-04 15:04:13Z" duration="0.089369" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1042" name="UnsavedDirtySceneAssetsAndSourceRestoreAfterReloadingJournal" fullname="WorldWeaver.Tests.AgentCheckpointTests.UnsavedDirtySceneAssetsAndSourceRestoreAfterReloadingJournal" methodname="UnsavedDirtySceneAssetsAndSourceRestoreAfterReloadingJournal" classname="WorldWeaver.Tests.AgentCheckpointTests" runstate="Runnable" seed="1164989480" result="Passed" start-time="2026-11-04 15:04:13Z" end-time="2026-11-04 15:04:16Z" duration="2.687539" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <reason>
+                <message><![CDATA[]]></message>
+              </reason>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1330" name="AgentTestSceneScopeTests" fullname="WorldWeaver.Tests.AgentTestSceneScopeTests" classname="WorldWeaver.Tests.AgentTestSceneScopeTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-11-04 15:04:16Z" end-time="2026-11-04 15:04:17Z" duration="1.006005" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1331" name="DirtySavedWorkingCopyAndDiskBytesSurviveStagingAndReload" fullname="WorldWeaver.Tests.AgentTestSceneScopeTests.DirtySavedWorkingCopyAndDiskBytesSurviveStagingAndReload" methodname="DirtySavedWorkingCopyAndDiskBytesSurviveStagingAndReload" classname="WorldWeaver.Tests.AgentTestSceneScopeTests" runstate="Runnable" seed="7667884" result="Passed" start-time="2026-11-04 15:04:16Z" end-time="2026-11-04 15:04:16Z" duration="0.630862" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1332" name="LaterManualSceneEditIsPreservedAndOriginalSnapshotRetained" fullname="WorldWeaver.Tests.AgentTestSceneScopeTests.LaterManualSceneEditIsPreservedAndOriginalSnapshotRetained" methodname="LaterManualSceneEditIsPreservedAndOriginalSnapshotRetained" classname="WorldWeaver.Tests.AgentTestSceneScopeTests" runstate="Runnable" seed="2139787983" result="Passed" start-time="2026-11-04 15:04:16Z" end-time="2026-11-04 15:04:17Z" duration="0.189676" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1333" name="LaterOriginalSceneAssetEditIsNeverOverwritten" fullname="WorldWeaver.Tests.AgentTestSceneScopeTests.LaterOriginalSceneAssetEditIsNeverOverwritten" methodname="LaterOriginalSceneAssetEditIsNeverOverwritten" classname="WorldWeaver.Tests.AgentTestSceneScopeTests" runstate="Runnable" seed="574721975" result="Passed" start-time="2026-11-04 15:04:17Z" end-time="2026-11-04 15:04:17Z" duration="0.175960" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1538" name="MaterialCheckpointAdmissionTests" fullname="WorldWeaver.Tests.MaterialCheckpointAdmissionTests" classname="WorldWeaver.Tests.MaterialCheckpointAdmissionTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-11-04 15:04:17Z" end-time="2026-11-04 15:04:18Z" duration="1.202309" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1540" name="CacheHitCannotResealOrAbsorbUnrelatedManualEdits" fullname="WorldWeaver.Tests.MaterialCheckpointAdmissionTests.CacheHitCannotResealOrAbsorbUnrelatedManualEdits" methodname="CacheHitCannotResealOrAbsorbUnrelatedManualEdits" classname="WorldWeaver.Tests.MaterialCheckpointAdmissionTests" runstate="Runnable" seed="1178557626" result="Passed" start-time="2026-11-04 15:04:17Z" end-time="2026-11-04 15:04:17Z" duration="0.498547" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1541" name="PreCallbackCancellationAndImportFailureCannotChangeTheSealedJournal" fullname="WorldWeaver.Tests.MaterialCheckpointAdmissionTests.PreCallbackCancellationAndImportFailureCannotChangeTheSealedJournal" methodname="PreCallbackCancellationAndImportFailureCannotChangeTheSealedJournal" classname="WorldWeaver.Tests.MaterialCheckpointAdmissionTests" runstate="Runnable" seed="100786404" result="Passed" start-time="2026-11-04 15:04:17Z" end-time="2026-11-04 15:04:18Z" duration="0.357421" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1539" name="RejectedMutationCallbackKeepsTheOlderSealedJournalByteExactly" fullname="WorldWeaver.Tests.MaterialCheckpointAdmissionTests.RejectedMutationCallbackKeepsTheOlderSealedJournalByteExactly" methodname="RejectedMutationCallbackKeepsTheOlderSealedJournalByteExactly" classname="WorldWeaver.Tests.MaterialCheckpointAdmissionTests" runstate="Runnable" seed="952209388" result="Passed" start-time="2026-11-04 15:04:18Z" end-time="2026-11-04 15:04:18Z" duration="0.340127" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1579" name="NativeProtocolRecoveryTests" fullname="WorldWeaver.Tests.NativeProtocolRecoveryTests" classname="WorldWeaver.Tests.NativeProtocolRecoveryTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-11-04 15:04:18Z" end-time="2026-11-04 15:04:20Z" duration="1.842129" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="ParameterizedMethod" id="1586" name="AutonomousScriptPermissionAlsoControlsTypedMonoBehaviourAttachment" fullname="WorldWeaver.Tests.NativeProtocolRecoveryTests.AutonomousScriptPermissionAlsoControlsTypedMonoBehaviourAttachment" classname="WorldWeaver.Tests.NativeProtocolRecoveryTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-04 15:04:18Z" end-time="2026-11-04 15:04:19Z" duration="0.679319" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1584" name="AutonomousScriptPermissionAlsoControlsTypedMonoBehaviourAttachment(False)" fullname="WorldWeaver.Tests.NativeProtocolRecoveryTests.AutonomousScriptPermissionAlsoControlsTypedMonoBehaviourAttachment(False)" methodname="AutonomousScriptPermissionAlsoControlsTypedMonoBehaviourAttachment" classname="WorldWeaver.Tests.NativeProtocolRecoveryTests" runstate="Runnable" seed="80749727" result="Passed" start-time="2026-11-04 15:04:18Z" end-time="2026-11-04 15:04:18Z" duration="0.336819" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1585" name="AutonomousScriptPermissionAlsoControlsTypedMonoBehaviourAttachment(True)" fullname="WorldWeaver.Tests.NativeProtocolRecoveryTests.AutonomousScriptPermissionAlsoControlsTypedMonoBehaviourAttachment(True)" methodname="AutonomousScriptPermissionAlsoControlsTypedMonoBehaviourAttachment" classname="WorldWeaver.Tests.NativeProtocolRecoveryTests" runstate="Runnable" seed="1080977866" result="Passed" start-time="2026-11-04 15:04:18Z" end-time="2026-11-04 15:04:19Z" duration="0.341126" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-suite type="ParameterizedMethod" id="1583" name="HostValidationRecoveryCountsConsecutiveFailuresAndNeverAppliesRejectedMutations" fullname="WorldWeaver.Tests.NativeProtocolRecoveryTests.HostValidationRecoveryCountsConsecutiveFailuresAndNeverAppliesRejectedMutations" classname="WorldWeaver.Tests.NativeProtocolRecoveryTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-04 15:04:19Z" end-time="2026-11-04 15:04:19Z" duration="0.649325" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1581" name="HostValidationRecoveryCountsConsecutiveFailuresAndNeverAppliesRejectedMutations(False)" fullname="WorldWeaver.Tests.NativeProtocolRecoveryTests.HostValidationRecoveryCountsConsecutiveFailuresAndNeverAppliesRejectedMutations(False)" methodname="HostValidationRecoveryCountsConsecutiveFailuresAndNeverAppliesRejectedMutations" classname="WorldWeaver.Tests.NativeProtocolRecoveryTests" runstate="Runnable" seed="1557471769" result="Passed" start-time="2026-11-04 15:04:19Z" end-time="2026-11-04 15:04:19Z" duration="0.387448" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1582" name="HostValidationRecoveryCountsConsecutiveFailuresAndNeverAppliesRejectedMutations(True)" fullname="WorldWeaver.Tests.NativeProtocolRecoveryTests.HostValidationRecoveryCountsConsecutiveFailuresAndNeverAppliesRejectedMutations(True)" methodname="HostValidationRecoveryCountsConsecutiveFailuresAndNeverAppliesRejectedMutations" classname="WorldWeaver.Tests.NativeProtocolRecoveryTests" runstate="Runnable" seed="109022302" result="Passed" start-time="2026-11-04 15:04:19Z" end-time="2026-11-04 15:04:19Z" duration="0.260497" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-case id="1587" name="MissingSceneTargetAfterOneFormatErrorDoesNotDisableWorkingNativeTools" fullname="WorldWeaver.Tests.NativeProtocolRecoveryTests.MissingSceneTargetAfterOneFormatErrorDoesNotDisableWorkingNativeTools" methodname="MissingSceneTargetAfterOneFormatErrorDoesNotDisableWorkingNativeTools" classname="WorldWeaver.Tests.NativeProtocolRecoveryTests" runstate="Runnable" seed="1499708187" result="Passed" start-time="2026-11-04 15:04:19Z" end-time="2026-11-04 15:04:19Z" duration="0.263720" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1580" name="RepeatedMalformedNativeCallsRecoverThroughTheSameValidatedJsonContract" fullname="WorldWeaver.Tests.NativeProtocolRecoveryTests.RepeatedMalformedNativeCallsRecoverThroughTheSameValidatedJsonContract" methodname="RepeatedMalformedNativeCallsRecoverThroughTheSameValidatedJsonContract" classname="WorldWeaver.Tests.NativeProtocolRecoveryTests" runstate="Runnable" seed="699710866" result="Passed" start-time="2026-11-04 15:04:19Z" end-time="2026-11-04 15:04:20Z" duration="0.247430" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1669" name="RuntimeProbeTests" fullname="WorldWeaver.Tests.RuntimeProbeTests" classname="WorldWeaver.Tests.RuntimeProbeTests" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-11-04 15:04:20Z" end-time="2026-11-04 15:04:22Z" duration="2.040154" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1678" name="FailedGenericProbeRemainsVisibleAndNeedsFreshMeasurementAfterSourceRepair" fullname="WorldWeaver.Tests.RuntimeProbeTests.FailedGenericProbeRemainsVisibleAndNeedsFreshMeasurementAfterSourceRepair" methodname="FailedGenericProbeRemainsVisibleAndNeedsFreshMeasurementAfterSourceRepair" classname="WorldWeaver.Tests.RuntimeProbeTests" runstate="Runnable" seed="1207745599" result="Passed" start-time="2026-11-04 15:04:20Z" end-time="2026-11-04 15:04:20Z" duration="0.004638" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1671" name="InvalidProbeCodeCannotEnterPlayModeOrCreateAnActiveJob" fullname="WorldWeaver.Tests.RuntimeProbeTests.InvalidProbeCodeCannotEnterPlayModeOrCreateAnActiveJob" methodname="InvalidProbeCodeCannotEnterPlayModeOrCreateAnActiveJob" classname="WorldWeaver.Tests.RuntimeProbeTests" runstate="Runnable" seed="250521084" result="Passed" start-time="2026-11-04 15:04:20Z" end-time="2026-11-04 15:04:21Z" duration="0.832319" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1673" name="LeadingUsingDirectivesCompileAndCancellationPreventsTheQueuedPlayTransition" fullname="WorldWeaver.Tests.RuntimeProbeTests.LeadingUsingDirectivesCompileAndCancellationPreventsTheQueuedPlayTransition" methodname="LeadingUsingDirectivesCompileAndCancellationPreventsTheQueuedPlayTransition" classname="WorldWeaver.Tests.RuntimeProbeTests" runstate="Runnable" seed="1103382211" result="Passed" start-time="2026-11-04 15:04:21Z" end-time="2026-11-04 15:04:21Z" duration="0.641995" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1672" name="ProbeRequiresTheSameExplicitCodePermissionAsEditorSnippets" fullname="WorldWeaver.Tests.RuntimeProbeTests.ProbeRequiresTheSameExplicitCodePermissionAsEditorSnippets" methodname="ProbeRequiresTheSameExplicitCodePermissionAsEditorSnippets" classname="WorldWeaver.Tests.RuntimeProbeTests" runstate="Runnable" seed="533550702" result="Passed" start-time="2026-11-04 15:04:21Z" end-time="2026-11-04 15:04:21Z" duration="0.004529" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1679" name="ReadingAndResubmittingGeneratedSourceDoesNotMultiplyServiceComments" fullname="WorldWeaver.Tests.RuntimeProbeTests.ReadingAndResubmittingGeneratedSourceDoesNotMultiplyServiceComments" methodname="ReadingAndResubmittingGeneratedSourceDoesNotMultiplyServiceComments" classname="WorldWeaver.Tests.RuntimeProbeTests" runstate="Runnable" seed="315318695" result="Passed" start-time="2026-11-04 15:04:21Z" end-time="2026-11-04 15:04:21Z" duration="0.000884" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1677" name="RuntimeObservationProjectionKeepsMeasurementsAndOmitsExecutableSource" fullname="WorldWeaver.Tests.RuntimeProbeTests.RuntimeObservationProjectionKeepsMeasurementsAndOmitsExecutableSource" methodname="RuntimeObservationProjectionKeepsMeasurementsAndOmitsExecutableSource" classname="WorldWeaver.Tests.RuntimeProbeTests" runstate="Runnable" seed="1418077918" result="Passed" start-time="2026-11-04 15:04:21Z" end-time="2026-11-04 15:04:21Z" duration="0.000393" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1670" name="RuntimeProbeAdvertisesBoundedIteratorAndActualAssertionSemantics" fullname="WorldWeaver.Tests.RuntimeProbeTests.RuntimeProbeAdvertisesBoundedIteratorAndActualAssertionSemantics" methodname="RuntimeProbeAdvertisesBoundedIteratorAndActualAssertionSemantics" classname="WorldWeaver.Tests.RuntimeProbeTests" runstate="Runnable" seed="902853918" result="Passed" start-time="2026-11-04 15:04:21Z" end-time="2026-11-04 15:04:21Z" duration="0.020880" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1676" name="UnityObjectAliasesCompileAndExplicitAliasesRemainAuthoritative" fullname="WorldWeaver.Tests.RuntimeProbeTests.UnityObjectAliasesCompileAndExplicitAliasesRemainAuthoritative" classname="WorldWeaver.Tests.RuntimeProbeTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-04 15:04:21Z" end-time="2026-11-04 15:04:22Z" duration="0.529783" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1674" name="UnityObjectAliasesCompileAndExplicitAliasesRemainAuthoritative(&quot;var all=Object.FindObjectsByType&lt;Transform&gt;(FindObjectsSortMode.None);float r=Random.Range(0f,1f);probe.Check(all!=null&amp;&amp;r&gt;=0,\&quot;Unity aliases\&quot;);yield return null;&quot;)" fullname="WorldWeaver.Tests.RuntimeProbeTests.UnityObjectAliasesCompileAndExplicitAliasesRemainAuthoritative(&quot;var all=Object.FindObjectsByType&lt;Transform&gt;(FindObjectsSortMode.None);float r=Random.Range(0f,1f);probe.Check(all!=null&amp;&amp;r&gt;=0,\&quot;Unity aliases\&quot;);yield return null;&quot;)" methodname="UnityObjectAliasesCompileAndExplicitAliasesRemainAuthoritative" classname="WorldWeaver.Tests.RuntimeProbeTests" runstate="Runnable" seed="152692971" result="Passed" start-time="2026-11-04 15:04:21Z" end-time="2026-11-04 15:04:22Z" duration="0.290028" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1675" name="UnityObjectAliasesCompileAndExplicitAliasesRemainAuthoritative(&quot;using Object=System.Object;var value=new Object();probe.Check(value!=null,\&quot;Explicit alias\&quot;);yield return null;&quot;)" fullname="WorldWeaver.Tests.RuntimeProbeTests.UnityObjectAliasesCompileAndExplicitAliasesRemainAuthoritative(&quot;using Object=System.Object;var value=new Object();probe.Check(value!=null,\&quot;Explicit alias\&quot;);yield return null;&quot;)" methodname="UnityObjectAliasesCompileAndExplicitAliasesRemainAuthoritative" classname="WorldWeaver.Tests.RuntimeProbeTests" runstate="Runnable" seed="1749201407" result="Passed" start-time="2026-11-04 15:04:22Z" end-time="2026-11-04 15:04:22Z" duration="0.236661" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+          </test-suite>
+          <test-suite type="TestFixture" id="1746" name="WebAgentContractTests" fullname="WorldWeaver.Tests.WebAgentContractTests" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" testcasecount="37" result="Passed" start-time="2026-11-04 15:04:22Z" end-time="2026-11-04 15:04:26Z" duration="4.056137" total="37" passed="37" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1766" name="APlannedStageKeepsBoundedCausalExchangesIncludingTheLatestRejection" fullname="WorldWeaver.Tests.WebAgentContractTests.APlannedStageKeepsBoundedCausalExchangesIncludingTheLatestRejection" methodname="APlannedStageKeepsBoundedCausalExchangesIncludingTheLatestRejection" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="560816695" result="Passed" start-time="2026-11-04 15:04:22Z" end-time="2026-11-04 15:04:22Z" duration="0.003809" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1763" name="CompletedReloadedJobsReachThePlannerAsLatestMeasuredObservations" fullname="WorldWeaver.Tests.WebAgentContractTests.CompletedReloadedJobsReachThePlannerAsLatestMeasuredObservations" methodname="CompletedReloadedJobsReachThePlannerAsLatestMeasuredObservations" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="1215972908" result="Passed" start-time="2026-11-04 15:04:22Z" end-time="2026-11-04 15:04:22Z" duration="0.001322" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1761" name="DiscoveryWithinAReadBatchEnablesItsExactReadOnTheNextImplementationTurn" fullname="WorldWeaver.Tests.WebAgentContractTests.DiscoveryWithinAReadBatchEnablesItsExactReadOnTheNextImplementationTurn" methodname="DiscoveryWithinAReadBatchEnablesItsExactReadOnTheNextImplementationTurn" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="1917047759" result="Passed" start-time="2026-11-04 15:04:22Z" end-time="2026-11-04 15:04:22Z" duration="0.016914" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1774" name="EncodedReferenceIsDecodedOnlyForAnActualReferenceFieldAndStillValidatesItsScope" fullname="WorldWeaver.Tests.WebAgentContractTests.EncodedReferenceIsDecodedOnlyForAnActualReferenceFieldAndStillValidatesItsScope" methodname="EncodedReferenceIsDecodedOnlyForAnActualReferenceFieldAndStillValidatesItsScope" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="613761076" result="Passed" start-time="2026-11-04 15:04:22Z" end-time="2026-11-04 15:04:22Z" duration="0.017804" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1755" name="FailedWebReadDoesNotDiscardAnIndependentActualSceneObservation" fullname="WorldWeaver.Tests.WebAgentContractTests.FailedWebReadDoesNotDiscardAnIndependentActualSceneObservation" methodname="FailedWebReadDoesNotDiscardAnIndependentActualSceneObservation" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="913022689" result="Passed" start-time="2026-11-04 15:04:22Z" end-time="2026-11-04 15:04:22Z" duration="0.012316" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1786" name="HeightmapCannotReadArbitraryLocalFiles" fullname="WorldWeaver.Tests.WebAgentContractTests.HeightmapCannotReadArbitraryLocalFiles" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-11-04 15:04:22Z" end-time="2026-11-04 15:04:22Z" duration="0.004346" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1782" name="HeightmapCannotReadArbitraryLocalFiles(&quot;../.env&quot;)" fullname="WorldWeaver.Tests.WebAgentContractTests.HeightmapCannotReadArbitraryLocalFiles(&quot;../.env&quot;)" methodname="HeightmapCannotReadArbitraryLocalFiles" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="481850116" result="Passed" start-time="2026-11-04 15:04:22Z" end-time="2026-11-04 15:04:22Z" duration="0.000633" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1783" name="HeightmapCannotReadArbitraryLocalFiles(&quot;Packages/private.env&quot;)" fullname="WorldWeaver.Tests.WebAgentContractTests.HeightmapCannotReadArbitraryLocalFiles(&quot;Packages/private.env&quot;)" methodname="HeightmapCannotReadArbitraryLocalFiles" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="311771295" result="Passed" start-time="2026-11-04 15:04:22Z" end-time="2026-11-04 15:04:22Z" duration="0.000250" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1784" name="HeightmapCannotReadArbitraryLocalFiles(&quot;Assets/../.env&quot;)" fullname="WorldWeaver.Tests.WebAgentContractTests.HeightmapCannotReadArbitraryLocalFiles(&quot;Assets/../.env&quot;)" methodname="HeightmapCannotReadArbitraryLocalFiles" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="1519233209" result="Passed" start-time="2026-11-04 15:04:22Z" end-time="2026-11-04 15:04:22Z" duration="0.000235" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1785" name="HeightmapCannotReadArbitraryLocalFiles(&quot;Assets/Something.cs&quot;)" fullname="WorldWeaver.Tests.WebAgentContractTests.HeightmapCannotReadArbitraryLocalFiles(&quot;Assets/Something.cs&quot;)" methodname="HeightmapCannotReadArbitraryLocalFiles" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="1378060987" result="Passed" start-time="2026-11-04 15:04:22Z" end-time="2026-11-04 15:04:22Z" duration="0.000281" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-case id="1749" name="ImportedArtifactPathSurvivesManyLaterReadsWithoutInventingFailedOutputs" fullname="WorldWeaver.Tests.WebAgentContractTests.ImportedArtifactPathSurvivesManyLaterReadsWithoutInventingFailedOutputs" methodname="ImportedArtifactPathSurvivesManyLaterReadsWithoutInventingFailedOutputs" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="2121423349" result="Passed" start-time="2026-11-04 15:04:22Z" end-time="2026-11-04 15:04:22Z" duration="0.000604" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1751" name="InstalledPackageSourceCanBeReadWithItsHashWhileTraversalStillFails" fullname="WorldWeaver.Tests.WebAgentContractTests.InstalledPackageSourceCanBeReadWithItsHashWhileTraversalStillFails" methodname="InstalledPackageSourceCanBeReadWithItsHashWhileTraversalStillFails" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="621185669" result="Passed" start-time="2026-11-04 15:04:22Z" end-time="2026-11-04 15:04:22Z" duration="0.002970" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1781" name="InternetObservationsAreBatchableWhileAcquisitionAndTerrainMutationsRemainStandalone" fullname="WorldWeaver.Tests.WebAgentContractTests.InternetObservationsAreBatchableWhileAcquisitionAndTerrainMutationsRemainStandalone" methodname="InternetObservationsAreBatchableWhileAcquisitionAndTerrainMutationsRemainStandalone" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="1956557952" result="Passed" start-time="2026-11-04 15:04:22Z" end-time="2026-11-04 15:04:22Z" duration="0.131739" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1754" name="InvalidLocalReadDoesNotCancelAnIndependentSceneRead" fullname="WorldWeaver.Tests.WebAgentContractTests.InvalidLocalReadDoesNotCancelAnIndependentSceneRead" methodname="InvalidLocalReadDoesNotCancelAnIndependentSceneRead" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="1608687450" result="Passed" start-time="2026-11-04 15:04:22Z" end-time="2026-11-04 15:04:22Z" duration="0.004695" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1787" name="LegacyInputInActiveGeneratedCodeIsRejectedBeforeItCanFailDuringPlay" fullname="WorldWeaver.Tests.WebAgentContractTests.LegacyInputInActiveGeneratedCodeIsRejectedBeforeItCanFailDuringPlay" methodname="LegacyInputInActiveGeneratedCodeIsRejectedBeforeItCanFailDuringPlay" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="1421072349" result="Passed" start-time="2026-11-04 15:04:22Z" end-time="2026-11-04 15:04:22Z" duration="0.007939" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1753" name="MissingComponentObservationReturnsRealDescendantsWithoutAUnityFakeNullException" fullname="WorldWeaver.Tests.WebAgentContractTests.MissingComponentObservationReturnsRealDescendantsWithoutAUnityFakeNullException" methodname="MissingComponentObservationReturnsRealDescendantsWithoutAUnityFakeNullException" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="886990176" result="Passed" start-time="2026-11-04 15:04:22Z" end-time="2026-11-04 15:04:22Z" duration="0.002867" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1747" name="NativeDefinitionsExplainActualToolPurposeRatherThanOnlyProtocolRules" fullname="WorldWeaver.Tests.WebAgentContractTests.NativeDefinitionsExplainActualToolPurposeRatherThanOnlyProtocolRules" methodname="NativeDefinitionsExplainActualToolPurposeRatherThanOnlyProtocolRules" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="167121263" result="Passed" start-time="2026-11-04 15:04:22Z" end-time="2026-11-04 15:04:22Z" duration="0.014771" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1768" name="NativeHistoryBindsActualObservationToItsOriginalCallAndKeepsLegacyHistoryUninvented" fullname="WorldWeaver.Tests.WebAgentContractTests.NativeHistoryBindsActualObservationToItsOriginalCallAndKeepsLegacyHistoryUninvented" methodname="NativeHistoryBindsActualObservationToItsOriginalCallAndKeepsLegacyHistoryUninvented" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="536729705" result="Passed" start-time="2026-11-04 15:04:22Z" end-time="2026-11-04 15:04:22Z" duration="0.001311" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1767" name="NativeHistoryKeepsALargeSourceBatchedBesideSmallObservations" fullname="WorldWeaver.Tests.WebAgentContractTests.NativeHistoryKeepsALargeSourceBatchedBesideSmallObservations" methodname="NativeHistoryKeepsALargeSourceBatchedBesideSmallObservations" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="349263849" result="Passed" start-time="2026-11-04 15:04:22Z" end-time="2026-11-04 15:04:22Z" duration="0.008597" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1748" name="NativeObservationsCannotExhaustTheBudgetNeededForTheActualChange" fullname="WorldWeaver.Tests.WebAgentContractTests.NativeObservationsCannotExhaustTheBudgetNeededForTheActualChange" methodname="NativeObservationsCannotExhaustTheBudgetNeededForTheActualChange" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="1465712153" result="Passed" start-time="2026-11-04 15:04:22Z" end-time="2026-11-04 15:04:24Z" duration="2.084372" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1756" name="NativeSchemaDeclaredArraysDecodeProviderWrappersWithoutChangingTextArguments" fullname="WorldWeaver.Tests.WebAgentContractTests.NativeSchemaDeclaredArraysDecodeProviderWrappersWithoutChangingTextArguments" methodname="NativeSchemaDeclaredArraysDecodeProviderWrappersWithoutChangingTextArguments" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="2105050468" result="Passed" start-time="2026-11-04 15:04:24Z" end-time="2026-11-04 15:04:24Z" duration="0.044841" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1780" name="NativeScriptCallsRequireTheActualClassName" fullname="WorldWeaver.Tests.WebAgentContractTests.NativeScriptCallsRequireTheActualClassName" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-04 15:04:24Z" end-time="2026-11-04 15:04:24Z" duration="0.063199" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1778" name="NativeScriptCallsRequireTheActualClassName(&quot;draft_script&quot;)" fullname="WorldWeaver.Tests.WebAgentContractTests.NativeScriptCallsRequireTheActualClassName(&quot;draft_script&quot;)" methodname="NativeScriptCallsRequireTheActualClassName" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="1018283347" result="Passed" start-time="2026-11-04 15:04:24Z" end-time="2026-11-04 15:04:24Z" duration="0.031766" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1779" name="NativeScriptCallsRequireTheActualClassName(&quot;attach_script&quot;)" fullname="WorldWeaver.Tests.WebAgentContractTests.NativeScriptCallsRequireTheActualClassName(&quot;attach_script&quot;)" methodname="NativeScriptCallsRequireTheActualClassName" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="2002814429" result="Passed" start-time="2026-11-04 15:04:24Z" end-time="2026-11-04 15:04:24Z" duration="0.029094" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-case id="1752" name="ObservationStallGetsIndependentFeedbackAndCanContinueToARealMutation" fullname="WorldWeaver.Tests.WebAgentContractTests.ObservationStallGetsIndependentFeedbackAndCanContinueToARealMutation" methodname="ObservationStallGetsIndependentFeedbackAndCanContinueToARealMutation" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="70877891" result="Passed" start-time="2026-11-04 15:04:24Z" end-time="2026-11-04 15:04:25Z" duration="0.515648" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1765" name="ObservedWebSourceSurvivesLaterReadsWithoutInventingACompletedDownload" fullname="WorldWeaver.Tests.WebAgentContractTests.ObservedWebSourceSurvivesLaterReadsWithoutInventingACompletedDownload" methodname="ObservedWebSourceSurvivesLaterReadsWithoutInventingACompletedDownload" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="1743424063" result="Passed" start-time="2026-11-04 15:04:25Z" end-time="2026-11-04 15:04:25Z" duration="0.000668" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1776" name="OversizedInventoryRowKeepsAnInspectableTargetWithoutBreakingThePage" fullname="WorldWeaver.Tests.WebAgentContractTests.OversizedInventoryRowKeepsAnInspectableTargetWithoutBreakingThePage" methodname="OversizedInventoryRowKeepsAnInspectableTargetWithoutBreakingThePage" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="802115079" result="Passed" start-time="2026-11-04 15:04:25Z" end-time="2026-11-04 15:04:25Z" duration="0.004199" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1760" name="PlannedStageEvidenceNeverCompletesAnUnfinishedWholeTask" fullname="WorldWeaver.Tests.WebAgentContractTests.PlannedStageEvidenceNeverCompletesAnUnfinishedWholeTask" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-04 15:04:25Z" end-time="2026-11-04 15:04:26Z" duration="0.909863" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1758" name="PlannedStageEvidenceNeverCompletesAnUnfinishedWholeTask(False)" fullname="WorldWeaver.Tests.WebAgentContractTests.PlannedStageEvidenceNeverCompletesAnUnfinishedWholeTask(False)" methodname="PlannedStageEvidenceNeverCompletesAnUnfinishedWholeTask" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="1597233062" result="Passed" start-time="2026-11-04 15:04:25Z" end-time="2026-11-04 15:04:25Z" duration="0.491368" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1759" name="PlannedStageEvidenceNeverCompletesAnUnfinishedWholeTask(True)" fullname="WorldWeaver.Tests.WebAgentContractTests.PlannedStageEvidenceNeverCompletesAnUnfinishedWholeTask(True)" methodname="PlannedStageEvidenceNeverCompletesAnUnfinishedWholeTask" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="1605910005" result="Passed" start-time="2026-11-04 15:04:25Z" end-time="2026-11-04 15:04:26Z" duration="0.412313" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-case id="1757" name="ReadBatchReportsTheExactUnavailableFunctionInsteadOfAnUnrelatedMutationError" fullname="WorldWeaver.Tests.WebAgentContractTests.ReadBatchReportsTheExactUnavailableFunctionInsteadOfAnUnrelatedMutationError" methodname="ReadBatchReportsTheExactUnavailableFunctionInsteadOfAnUnrelatedMutationError" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="426772734" result="Passed" start-time="2026-11-04 15:04:26Z" end-time="2026-11-04 15:04:26Z" duration="0.011840" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1769" name="RejectedNativeCallReceivesExplicitNonExecutionFeedbackInItsToolChannel" fullname="WorldWeaver.Tests.WebAgentContractTests.RejectedNativeCallReceivesExplicitNonExecutionFeedbackInItsToolChannel" methodname="RejectedNativeCallReceivesExplicitNonExecutionFeedbackInItsToolChannel" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="903874047" result="Passed" start-time="2026-11-04 15:04:26Z" end-time="2026-11-04 15:04:26Z" duration="0.000528" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1764" name="RuntimeEvidenceUsesOnlyItsOwnMetricsAndRequestsFreshChecksAfterChanges" fullname="WorldWeaver.Tests.WebAgentContractTests.RuntimeEvidenceUsesOnlyItsOwnMetricsAndRequestsFreshChecksAfterChanges" methodname="RuntimeEvidenceUsesOnlyItsOwnMetricsAndRequestsFreshChecksAfterChanges" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="536056174" result="Passed" start-time="2026-11-04 15:04:26Z" end-time="2026-11-04 15:04:26Z" duration="0.001563" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1750" name="RuntimeNpcRoutesDoNotInheritEditorReasoningBudget" fullname="WorldWeaver.Tests.WebAgentContractTests.RuntimeNpcRoutesDoNotInheritEditorReasoningBudget" methodname="RuntimeNpcRoutesDoNotInheritEditorReasoningBudget" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="2092268055" result="Passed" start-time="2026-11-04 15:04:26Z" end-time="2026-11-04 15:04:26Z" duration="0.091141" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1775" name="ScenePaginationDeliversEveryRowThroughNativeAndWorkingMemoryBudgets" fullname="WorldWeaver.Tests.WebAgentContractTests.ScenePaginationDeliversEveryRowThroughNativeAndWorkingMemoryBudgets" methodname="ScenePaginationDeliversEveryRowThroughNativeAndWorkingMemoryBudgets" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="1233739033" result="Passed" start-time="2026-11-04 15:04:26Z" end-time="2026-11-04 15:04:26Z" duration="0.025657" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1773" name="SerializedBooleanProviderLiteralsAreNormalizedAgainstTheActualField" fullname="WorldWeaver.Tests.WebAgentContractTests.SerializedBooleanProviderLiteralsAreNormalizedAgainstTheActualField" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-04 15:04:26Z" end-time="2026-11-04 15:04:26Z" duration="0.027175" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1771" name="SerializedBooleanProviderLiteralsAreNormalizedAgainstTheActualField(&quot;true&quot;,True)" fullname="WorldWeaver.Tests.WebAgentContractTests.SerializedBooleanProviderLiteralsAreNormalizedAgainstTheActualField(&quot;true&quot;,True)" methodname="SerializedBooleanProviderLiteralsAreNormalizedAgainstTheActualField" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="1498567720" result="Passed" start-time="2026-11-04 15:04:26Z" end-time="2026-11-04 15:04:26Z" duration="0.016734" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1772" name="SerializedBooleanProviderLiteralsAreNormalizedAgainstTheActualField(&quot;false&quot;,False)" fullname="WorldWeaver.Tests.WebAgentContractTests.SerializedBooleanProviderLiteralsAreNormalizedAgainstTheActualField(&quot;false&quot;,False)" methodname="SerializedBooleanProviderLiteralsAreNormalizedAgainstTheActualField" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="1538926124" result="Passed" start-time="2026-11-04 15:04:26Z" end-time="2026-11-04 15:04:26Z" duration="0.007985" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-case id="1770" name="StagedHistoryKeepsTheLatestRejectionAfterSuccessfulObservations" fullname="WorldWeaver.Tests.WebAgentContractTests.StagedHistoryKeepsTheLatestRejectionAfterSuccessfulObservations" methodname="StagedHistoryKeepsTheLatestRejectionAfterSuccessfulObservations" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="593953027" result="Passed" start-time="2026-11-04 15:04:26Z" end-time="2026-11-04 15:04:26Z" duration="0.000877" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1762" name="StageWorkingMemoryKeepsLatestActualFieldAndFlagsObservationsBeforeAChange" fullname="WorldWeaver.Tests.WebAgentContractTests.StageWorkingMemoryKeepsLatestActualFieldAndFlagsObservationsBeforeAChange" methodname="StageWorkingMemoryKeepsLatestActualFieldAndFlagsObservationsBeforeAChange" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="1480722488" result="Passed" start-time="2026-11-04 15:04:26Z" end-time="2026-11-04 15:04:26Z" duration="0.001183" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1777" name="StructuralInventoryFindsMultipleRussianNamedSurfacesAfterAnEnglishMiss" fullname="WorldWeaver.Tests.WebAgentContractTests.StructuralInventoryFindsMultipleRussianNamedSurfacesAfterAnEnglishMiss" methodname="StructuralInventoryFindsMultipleRussianNamedSurfacesAfterAnEnglishMiss" classname="WorldWeaver.Tests.WebAgentContractTests" runstate="Runnable" seed="1045804384" result="Passed" start-time="2026-11-04 15:04:26Z" end-time="2026-11-04 15:04:26Z" duration="0.010981" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Saving results to: /Users/kirillkovalenko/Documents/ChatGPT/Диплом/results/focused-storage-recovery-rc12.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>
