@@ -175,7 +175,7 @@ namespace WorldWeaver.Editor.Assistant
             {
                 if(Settings.UseNativeFunctions&&Settings.AutoVerify&&Settings.Power==AssistantPower.Deep&&answer.Task?.MutationAuthorized==true&&string.IsNullOrEmpty(answer.Task.InitialSceneFacts))
                 {
-                    var facts=ProjectContextIndex.Objects().Where(g=>g.GetComponent<Terrain>()||g.GetComponent<WorldPlayer>()||g.GetComponent<WorldModelVisual>()||g.GetComponent<WorldEnvironment>()||g.GetComponent<Rigidbody>()).OrderByDescending(g=>g.GetComponent<Terrain>()!=null).Take(12).ToArray();
+                    var facts=ProjectContextIndex.Objects().Where(g=>g.GetComponent<GeneratedSceneObject>()?.Kind!="model_part").OrderByDescending(g=>g.GetComponent<Terrain>()!=null).ThenByDescending(g=>g.GetComponent<Renderer>()||g.GetComponent<Collider>()||g.GetComponent<WorldPlayer>()).Take(32).ToArray();
                     answer.Task.InitialSceneFacts=facts.Length>0?EditorCodeTools.ReadScene(facts[0],facts.Skip(1).ToArray()).ToString(Formatting.None):"[]";
                 }
                 profile = BuildProfile();
