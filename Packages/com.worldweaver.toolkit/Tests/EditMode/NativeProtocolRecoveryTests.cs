@@ -47,5 +47,42 @@ namespace WorldWeaver.Tests
             }
             finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
         }
+        sealed class HostRejectionProvider:ILLMProvider
+        {
+            public int Calls;public bool Consecutive,JsonSeen;
+            public Task<CompletionResult> CompleteAsync(CompletionRequest request,CancellationToken token)
+            {
+                Calls++;JsonSeen|=!request.UseToolCalls;
+                bool invalid=Consecutive?Calls<=2:Calls<=5&&Calls%2==1;
+                var plan=new EditorPlan{complete=Calls>(Consecutive?3:6)};
+                if(invalid)
+                {
+                    plan.actions.Add(new EditorCommand{tool="create_node",name="RejectedA"});
+                    plan.actions.Add(new EditorCommand{tool="create_node",name="RejectedB"});
+                }
+                else if(Calls<(Consecutive?3:6))plan.actions.Add(new EditorCommand{tool="read_scene"});
+                else if(!plan.complete)plan.actions.Add(new EditorCommand{tool="create_node",name="HostRecoveredGoal"});
+                return Task.FromResult(new CompletionResult{Text=JsonConvert.SerializeObject(plan)});
+            }
+            public Task<bool> HealthAsync(CancellationToken token)=>Task.FromResult(true);
+            public void Dispose(){}
+        }
+        [TestCase(false)] [TestCase(true)]
+        public async Task HostValidationRecoveryCountsConsecutiveFailuresAndNeverAppliesRejectedMutations(bool consecutive)
+        {
+            EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);var provider=new HostRejectionProvider{Consecutive=consecutive};
+            try
+            {
+                using(var controller=new ChatController(_=>provider,"UserSettings/HostRecovery-"+Guid.NewGuid().ToString("N")))
+                {
+                    controller.Settings.UseNativeFunctions=true;controller.Settings.AutoVerify=false;controller.Settings.UseSkills=false;controller.Settings.Power=AssistantPower.Deep;
+                    await controller.SendAsync("Создай пустой узел HostRecoveredGoal.");var answer=controller.Current.Messages.Last();
+                    Assert.IsFalse(answer.IsError,answer.Text);Assert.IsTrue(GameObject.Find("HostRecoveredGoal"));Assert.IsFalse(GameObject.Find("RejectedA"));Assert.IsFalse(GameObject.Find("RejectedB"));
+                    Assert.AreEqual(consecutive,provider.JsonSeen);Assert.AreEqual(consecutive?4:7,provider.Calls);
+                    Assert.AreEqual(consecutive?2:3,answer.Attempts.Count(a=>!a.Accepted));
+                }
+            }
+            finally{EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);}
+        }
     }
 }

@@ -37,6 +37,12 @@ namespace WorldWeaver.Tests
             AgentEditorJobs.Cancel(job.Id);var cancelled=AgentEditorJobs.Load(job.Id);
             Assert.IsFalse(cancelled.Success);Assert.That(cancelled.Error,Does.Contain("cancelled"));Assert.IsFalse(AgentEditorJobs.Busy);Assert.IsFalse(EditorApplication.isPlayingOrWillChangePlaymode);
         }
+        [TestCase("var all=Object.FindObjectsByType<Transform>(FindObjectsSortMode.None);float r=Random.Range(0f,1f);probe.Check(all!=null&&r>=0,\"Unity aliases\");yield return null;")]
+        [TestCase("using Object=System.Object;var value=new Object();probe.Check(value!=null,\"Explicit alias\");yield return null;")]
+        public void UnityObjectAliasesCompileAndExplicitAliasesRemainAuthoritative(string code)
+        {
+            var job=AgentEditorJobs.RunRuntimeProbe(code,1);AgentEditorJobs.Cancel(job.Id);Assert.IsFalse(AgentEditorJobs.Busy);Assert.IsFalse(EditorApplication.isPlayingOrWillChangePlaymode);
+        }
         [Test] public void RuntimeObservationProjectionKeepsMeasurementsAndOmitsExecutableSource()
         {
             var raw=new JObject{["Kind"]="runtime_probe",["Success"]=false,["ProbeCode"]="private source body",["ProbeSourceHash"]="actual-hash",["ProbeAssertions"]=new JArray(new JObject{["passed"]=false,["observed"]=3})};

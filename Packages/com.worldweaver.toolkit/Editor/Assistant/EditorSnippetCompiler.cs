@@ -156,6 +156,14 @@ namespace WorldWeaver.Editor.Assistant
             }
         }
 
+        internal static string DefaultUnityAliases(string directives)
+        {
+            string result="";
+            foreach(string type in new[]{"Object","Random"})
+                if(!System.Text.RegularExpressions.Regex.IsMatch(directives??"",@"\busing\s+"+type+@"\s*="))result+="using "+type+" = UnityEngine."+type+";\n";
+            return result;
+        }
+
         public static Assembly Compile(string source, string[] assemblyPaths, out List<string> errors)
         {
             errors = new List<string>();

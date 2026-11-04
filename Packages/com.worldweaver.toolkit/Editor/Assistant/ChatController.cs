@@ -210,7 +210,7 @@ namespace WorldWeaver.Editor.Assistant
                     var repeatedReadResults=new Dictionary<string,int>(StringComparer.Ordinal);
                     int emptyPlanRepairs = 0;
                     int planningRepairs = 0; // One fresh format repair is available even in Fast; it never grants another execution round.
-                    int transientInferenceRepairs=0, protocolInferenceRepairs=0;
+                    int transientInferenceRepairs=0, protocolInferenceRepairs=0, consecutiveValidationFailures=0;
                     string textRecoveryKind=answer.Attempts.LastOrDefault(a=>a.RepairKind=="native-empty-to-json-contract"||a.RepairKind=="native-stall-to-json-contract"||a.RepairKind=="native-protocol-to-json-contract")?.RepairKind;
                     bool textToolRecovery=textRecoveryKind!=null;
                     int observationRounds=0;
@@ -294,6 +294,7 @@ namespace WorldWeaver.Editor.Assistant
                             if(totalActions+plannedCost>128)throw new ArgumentException("Достигнут лимит 128 изменений. Выполненные этапы сохранены; можно продолжить задачу.");
                             totalActions+=plannedCost;
                             attempt.Accepted = true;
+                            repeatedValidationFailures.Clear();consecutiveValidationFailures=0;
                             // A valid fresh replacement resolves a format-only failure; prior failed tools/checks remain unresolved.
                             if(!answer.Steps.Any(s=>!s.Success)&&answer.Task?.Checks.Any(c=>!c.Passed)!=true)unresolvedFailure=false;
                         }
@@ -301,11 +302,14 @@ namespace WorldWeaver.Editor.Assistant
                         {
                             unresolvedFailure = true;
                             string failureKey=error.Message;
+                            consecutiveValidationFailures++;
+                            if(Settings.UseNativeFunctions&&!textToolRecovery&&consecutiveValidationFailures>=2)
+                            {textToolRecovery=true;textRecoveryKind="native-protocol-to-json-contract";}
                             repeatedValidationFailures.TryGetValue(failureKey,out int repeats);repeatedValidationFailures[failureKey]=repeats+1;
                             attempt.Error = ChatHistoryStore.Redact(error.Message);
                             if(repeats>=2)throw new ArgumentException("Модель трижды повторила недопустимый шаг: "+attempt.Error+" Ничего из отклонённых планов не применялось."); answer.Status = "Исправляю план"; Save();
                             request = BuildRequest(session, text);
-                            if(repeats>=2)request.Messages.Add(new ChatMessage("system","This exact precondition failure has repeated three times. Rejected calls executed NOTHING. Stop repeating this unchanged path: inspect and repair its prerequisite, use another valid capability, or complete other independent parts. Do not abandon the whole compound request merely because one operation is blocked. Report any actual remaining blocker honestly with finish_task partial/blocked."));
+
                             // A malformed assistant message can anchor the next generation to
                             // the same broken prefix. Keep the raw answer in the audit trail;
                             // give the repair turn a fresh request and an error as data.
