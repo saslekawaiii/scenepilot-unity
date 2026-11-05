@@ -36,6 +36,17 @@ namespace WorldWeaver.Tests
    var restored=JsonConvert.DeserializeObject<List<EditorCommandResult>>(JsonConvert.SerializeObject(steps));Assert.AreEqual(3,Call("ObservationsSinceImplementation",restored));Assert.IsTrue((bool)Call("HasUnresolvedBehaviorFailure",restored));
    restored.Add(new EditorCommandResult{Tool="job_result",Success=true,Summary="{\"Kind\":\"runtime_probe\",\"Status\":\"completed\"}"});Assert.IsFalse((bool)Call("HasUnresolvedBehaviorFailure",restored));restored.Add(new EditorCommandResult{Tool="set_transform",Success=true});Assert.AreEqual(0,Call("ObservationsSinceImplementation",restored));
   }
+  [Test] public void RecoveryDoesNotHideTargetedDiagnosticsOrCapture()
+  {
+   using(var controller=new ChatController(historyFolder:"UserSettings/RecoverySchema-"+System.Guid.NewGuid().ToString("N")))
+   {
+    controller.Settings.Mode=AssistantMode.Execute;controller.Settings.UseNativeFunctions=true;controller.Settings.AllowAutonomousScripts=true;
+    typeof(ChatController).GetField("requireImplementationStep",BindingFlags.Instance|BindingFlags.NonPublic).SetValue(controller,true);
+    var request=new CompletionRequest{Schema=EditorPlan.Schema(true,nativeFunctions:true)};string before=request.Schema.ToString();
+    var result=(CompletionRequest)typeof(ChatController).GetMethod("RequireImplementation",BindingFlags.Instance|BindingFlags.NonPublic).Invoke(controller,new object[]{request});
+    Assert.AreEqual(before,result.Schema.ToString(),"Recovery should guide the model without removing the unmet capture or diagnostic tool");Assert.That(result.Schema.ToString(),Does.Contain("capture_scene"));Assert.That(result.Schema.ToString(),Does.Contain("inspect_component"));
+   }
+  }
   [Test] public void TimingReferenceWarnsAgainstTreatingFrameCountAsPhysicalTime()
   {
    var description=AgentFunctionProtocol.Definitions(EditorPlan.Schema(true,nativeFunctions:true)).Single(d=>(string)d["function"]["name"]=="run_runtime_probe")["function"]["description"].ToString();Assert.That(description,Does.Contain("Frame counts are NOT elapsed physical time"));Assert.That(description,Does.Contain("Time.timeAsDouble"));
