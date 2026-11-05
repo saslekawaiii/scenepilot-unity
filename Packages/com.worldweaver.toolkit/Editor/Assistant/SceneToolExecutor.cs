@@ -100,6 +100,7 @@ read_script: target empty; args {path:Assets/.../Name.cs or installed Packages/.
             var inventory=go.GetComponent<Inventory>();if(inventory)value["inventory"]=JObject.FromObject(inventory.Snapshot());
             var light=go.GetComponent<Light>();if(light)value["light"]=new JObject{["type"]=light.type.ToString().ToLowerInvariant(),["range"]=light.range,["spot_angle"]=light.spotAngle,["intensity"]=light.intensity,["color"]=new JArray(light.color.r,light.color.g,light.color.b)};
             var renderer=go.GetComponent<Renderer>();if(renderer&&renderer.sharedMaterial)value["material"]=renderer.sharedMaterial.name;
+            var geometry=GeometryDiagnostics.Summary(go);if(geometry!=null)value["geometry"]=geometry;
             return value;
         }
         private static string Short(string text,int max)=>(text??"").Substring(0,Math.Min(max,(text??"").Length));

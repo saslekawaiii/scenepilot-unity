@@ -36,20 +36,10 @@ namespace WorldWeaver.Editor.Assistant
             if(Settings.UseNativeFunctions)
             {
                 request.Messages.Add(new ChatMessage("system","Requested work remains. Implement the next justified part of the ORIGINAL request using the confirmed state and artifacts. Do not create an unrelated object just to satisfy a mutation check. If actual investigation establishes a missing resource, unavailable service or unsupported operation, finish_task with outcome blocked (or partial if some requested work succeeded), explicit blockers and confirmed results. Never label that completed."));
-                if(Settings.AllowAutonomousScripts)
-                {
-                    var nativeBranches=request.Schema?["properties"]?["actions"]?["items"]?["anyOf"] as JArray;
-                    if(nativeBranches!=null)
-                    {
-                        var permittedReads=new HashSet<string>(new[]{"review_stage","discover_tools","web_search","web_read","web_research"},StringComparer.Ordinal);
-                        var lastTurn=executingMessage?.Attempts.LastOrDefault(a=>a.Accepted&&a.FirstResultIndex>=0&&a.ResultCount>0);
-                        if(lastTurn!=null)
-                            foreach(var discovery in executingMessage.Steps.Skip(lastTurn.FirstResultIndex).Take(lastTurn.ResultCount).Where(s=>s.Success&&s.Tool=="discover_tools"))
-                                try{foreach(string name in JObject.Parse(discovery.Summary)["enabledTools"]??new JArray())permittedReads.Add(name);}catch(JsonException){}
-                        request.Schema=(JObject)request.Schema.DeepClone();request.Schema["properties"]["actions"]["items"]["anyOf"]=new JArray(nativeBranches.OfType<JObject>().Where(b=>!SceneToolExecutor.IsReadOnlyTool(EditorToolSchema.ToolName(b))||permittedReads.Contains(EditorToolSchema.ToolName(b))).Select(b=>b.DeepClone()));
-                        request.Messages.Add(new ChatMessage("system","Observation phase has completed without the required result. Choose one concrete pending implementation or real runtime verification now, using the observed targets and persistent artifact outputs. General scene/source inspection is temporarily hidden to stop repeated reconnaissance. If a SPECIFIC new prerequisite is missing, discover its exact read tool and use it on the next turn; public resource research and truthful finish_task partial/blocked remain available. Never make unrelated changes to bypass this phase."));
-                    }
-                }
+                // Keep targeted diagnostics available during recovery. Hiding all
+                // read tools also hid unmet capture/inspection stages and trapped
+                // the planner behind a fabricated prerequisite.
+                request.Messages.Add(new ChatMessage("system","Repeated observations have not resolved the request. Targeted diagnostics, capture_scene and source reads remain available. Reuse the durable observations already supplied; do not reread the same persisted page. Diagnose the measured failure, implement a justified repair, or give a truthful partial/blocked result. Never mutate unrelated content merely to count progress."));
                 return request;
             }
             var actions=request.Schema?["properties"]?["actions"] as JObject;var branches=actions?["items"]?["anyOf"] as JArray;if(branches==null)return request;

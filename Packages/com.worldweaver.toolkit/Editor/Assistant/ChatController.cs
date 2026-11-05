@@ -163,7 +163,7 @@ namespace WorldWeaver.Editor.Assistant
             executingMessage=answer;
             staleReadCommands.Clear();
             expandToolSelection=false;
-            requireImplementationStep=false;
+            requireImplementationStep=ObservationsSinceImplementation(answer.Steps)>=6;
             Busy = true; userCancelled = false; operation = new CancellationTokenSource();
             bool extendedWorkflow=AgentCapabilities.NeedsExtendedWorkflow(text)&&!SimpleAnimatedPlayerRequest(text);
             long executionLimitMs=(readOnlyRequest?300L:Settings.Power==AssistantPower.Fast?900L:Settings.Power==AssistantPower.Deep?3600L:1800L)*1000;
@@ -213,7 +213,7 @@ namespace WorldWeaver.Editor.Assistant
                     int transientInferenceRepairs=0, protocolInferenceRepairs=0, consecutiveWireShapeFailures=0, consecutiveProviderShapeFailures=0, consecutiveProviderAvailabilityFailures=0;
                     string textRecoveryKind=answer.Attempts.LastOrDefault(a=>a.RepairKind=="native-empty-to-json-contract"||a.RepairKind=="native-stall-to-json-contract"||a.RepairKind=="native-protocol-to-json-contract")?.RepairKind;
                     bool textToolRecovery=textRecoveryKind!=null;
-                    int observationRounds=0;
+                    int observationRounds=ObservationsSinceImplementation(answer.Steps);
                     string lastAppliedConfiguration=null;
                     bool unresolvedFailure = false;
                     for (int round = 0; round < rounds; round++)
@@ -294,6 +294,11 @@ namespace WorldWeaver.Editor.Assistant
                             foreach(var proposed in plan.actions.Where(a=>a.tool=="plan_task"))
                                 if(answer.Task?.Approach.Count>0&&proposed.args["steps"] is JArray stages&&stages.All(v=>v.Type==JTokenType.String)&&answer.Task.Approach.SequenceEqual(stages.Values<string>()))
                                     throw new ArgumentException("This exact tentative approach is already recorded. Rewriting it is not execution. Use its existing stages and actual observations to implement an unmet requirement or request review_stage; submit a changed approach only when the method really changes. No plan or scene changed.");
+                            foreach(var evidenceRead in plan.actions.Where(a=>a.tool=="read_task_step"))
+                            {
+                                int prior=RepeatedEvidencePage(answer.Steps,evidenceRead);
+                                if(prior>=0)throw new ArgumentException("This persisted evidence page has already been retrieved at durable step "+prior+". Its original result is immutable and supplied in the observation ledger. Choose a different missing page, targeted diagnostic, implementation repair or truthful terminal result. No tool executed.");
+                            }
                             foreach(var codeAction in plan.actions.Where(a=>a.tool=="execute_editor_code"))
                             {
                                 int observed=StaleEditorCodeObservation(answer.Steps,codeAction);
@@ -483,7 +488,7 @@ namespace WorldWeaver.Editor.Assistant
                         // notice that the goal is already met. Periodic independent
                         // observation prevents long runs of needless further edits.
                         if(batch.Results.Any(IsImplementationProgress))observationRounds=0;
-                        else observationRounds++;
+                        else observationRounds=ObservationsSinceImplementation(answer.Steps);
                         bool stalledObservations=Settings.AllowAutonomousScripts&&!readOnlyRequest&&Settings.Mode==AssistantMode.Execute&&observationRounds>=6;
                         // A proposed plan and the review-call cap cannot exempt a
                         // task from the bounded observation phase. Real verification,
@@ -496,7 +501,7 @@ namespace WorldWeaver.Editor.Assistant
                         {
                             int stage=Settings.AllowAutonomousScripts&&answer.Task?.Approach.Count>0&&answer.Task.ActiveApproachStage<answer.Task.Approach.Count?answer.Task.ActiveApproachStage:-1;
                             var progress=await ReviewEditorResultAsync(answer,provider,operation.Token,stage);
-                            observationRounds=0;var progressChecks=VerifyTask(answer);
+                            observationRounds=ObservationsSinceImplementation(answer.Steps);var progressChecks=VerifyTask(answer);
                             if((stalledObservations||stageCheckpoint)&&!progress.Passed)requireImplementationStep=true;
                             // Repeated valid observations are a planning problem,
                             // not evidence that native function encoding is broken.
@@ -509,6 +514,19 @@ namespace WorldWeaver.Editor.Assistant
                             if(stage<0&&progress.Passed&&progressChecks.All(check=>check.Passed))
                             {
                                 answer.IsError=false;answer.Status="Проверки пройдены";answer.Text="Изменения применены. "+ChatHistoryStore.Redact(progress.Evidence);answer.Task.ContinueAfterReload=false;Save();break;
+                            }
+                        }
+                        if(stalledObservations&&!WaitingForEditor(answer)&&HasUnresolvedBehaviorFailure(answer.Steps))
+                        {
+                            int changed=LastBehaviorChange(answer.Steps);
+                            var epoch=answer.Attempts.LastOrDefault(a=>a.RepairKind=="native-stall-replan"&&a.FirstResultIndex>changed);
+                            if(epoch==null){attempt.RepairKind="native-stall-replan";Save();}
+                            else if(answer.Steps.Count-(epoch.FirstResultIndex+epoch.ResultCount)>=6)
+                            {
+                                if(answer.Task!=null){answer.Task.ContinueAfterReload=false;answer.Task.Status="partial";}
+                                answer.IsError=true;answer.Status="Нет прогресса";
+                                answer.Text="Задача не завершена: после нового планирования инструменты снова возвращали наблюдения без изменения реализации. Выполненные изменения и неудачные проверки сохранены в шагах. Продолжение остановлено, чтобы не повторять тот же цикл.";
+                                Save();break;
                             }
                         }
                         if(batch.Success&&batch.Results.Any(s=>s.Tool=="discover_tools"||s.Tool=="read_skill"||s.Tool=="plan_task"))rounds=maximumRounds;

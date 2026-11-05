@@ -50,22 +50,60 @@ namespace WorldWeaver.Editor.Assistant
             }
             return rows;
         }
+        internal static bool IsProvenEditorObservation(EditorCommandResult step)
+        {
+            if(step.Tool!="execute_editor_code"||!step.Success)return false;
+            try{var data=JObject.Parse(step.Summary??"");return (bool?)data["sceneChanged"]==false&&(bool?)data["projectChanged"]==false;}catch(JsonException){return false;}
+        }
+        internal static int RepeatedEvidencePage(IReadOnlyList<EditorCommandResult> steps,EditorCommand command)
+        {
+            if(command.tool!="read_task_step")return -1;
+            int index=(int?)command.args["index"]??-1,offset=(int?)command.args["offset"]??0;
+            var retained=ObservationLedger(steps);
+            for(int i=steps.Count-1;i>=0;i--)
+            {
+                if(!steps[i].Success||steps[i].Tool!="read_task_step")continue;
+                try{var data=JObject.Parse(steps[i].Summary??"");if((int?)data["index"]==index&&((int?)data["offset"]??0)==offset&&retained.OfType<JObject>().Any(row=>(string)row["tool"]=="read_task_step"&&JToken.DeepEquals(row["data"],data)))return i;}catch(JsonException){}
+            }
+            return -1;
+        }
+        internal static bool HasUnresolvedBehaviorFailure(IReadOnlyList<EditorCommandResult> steps)
+        {
+            var seen=new HashSet<string>(StringComparer.Ordinal);
+            for(int i=steps.Count-1;i>=0;i--)
+            {
+                if(steps[i].Tool!="job_result")continue;
+                try{var job=JObject.Parse(steps[i].Summary??"");string kind=(string)job["Kind"];
+                    if(!new[]{"runtime_probe","player_control","rotation","tests"}.Contains(kind))continue;
+                    string key=kind+":"+((string)job["StableTarget"]??(string)job["Filter"]??"");
+                    if(seen.Add(key)&&!steps[i].Success)return true;
+                }catch(JsonException){}
+            }
+            return false;
+        }
+        internal static int ObservationsSinceImplementation(IReadOnlyList<EditorCommandResult> steps)
+        {
+            int count=0;for(int i=steps.Count-1;i>=0;i--){if(IsImplementationProgress(steps[i]))break;count++;}return count;
+        }
         internal static JArray ObservationLedger(IReadOnlyList<EditorCommandResult> steps)
         {
             var rows=new JArray();var seen=new HashSet<string>(StringComparer.Ordinal);int budget=32000;
             int changed=-1;for(int i=steps.Count-1;i>=0;i--)if(IsImplementationProgress(steps[i])){changed=i;break;}
-            for(int i=steps.Count-1;i>=0&&rows.Count<18;i--)
+            foreach(int i in Enumerable.Range(0,steps.Count).OrderByDescending(n=>steps[n].Tool=="job_result").ThenByDescending(n=>n))
             {
-                var step=steps[i];if(!step.Success&&step.Tool!="job_result"||!SceneToolExecutor.IsReadOnlyTool(step.Tool)||WebResearchTools.Handles(step.Tool)||new[]{"plan_task","review_stage","discover_tools","read_skill","list_skills","read_task_step"}.Contains(step.Tool))continue;
+                if(rows.Count>=18)break;
+                var step=steps[i];if(!step.Success&&step.Tool!="job_result"||(!SceneToolExecutor.IsReadOnlyTool(step.Tool)&&!IsProvenEditorObservation(step))||WebResearchTools.Handles(step.Tool)||new[]{"plan_task","review_stage","discover_tools","read_skill","list_skills"}.Contains(step.Tool))continue;
                 JObject data=null;try{data=JObject.Parse(step.Summary??"");}catch(JsonException){}
                 var discriminator=data?["path"]??data?["component"]??data?["type"]??data?["Id"]??data?["query"];
+                if(step.Tool=="execute_editor_code")discriminator=data?["commandFingerprint"]??data?["sourceHash"]??new JValue(i);
+                if(step.Tool=="read_task_step")discriminator=data?["index"];
                 // Durable jobs arrive after reload, outside the original native
                 // tool exchange. Keep their latest measured result by subject,
                 // not by the unique job ID, in the planner's observation channel.
                 string observationTarget=step.Target;
                 if(step.Tool=="job_result"){observationTarget=(string)data?["StableTarget"]??(string)data?["Filter"]??"";discriminator=data?["Kind"];}
                 string key=step.Tool+":"+observationTarget+":"+(discriminator?.ToString(Formatting.None)??"")+":"+(data?["offset"]?.ToString(Formatting.None)??"");if(!seen.Add(key))continue;
-                string value=ToolEvidenceForModel(step);int cap=step.Tool=="read_script"?20000:step.Tool=="list_scene_objects"?13000:7000;cap=Math.Min(cap,budget-350);if(cap<400)break;
+                string value=ToolEvidenceForModel(step);int cap=step.Tool=="read_script"||step.Tool=="read_task_step"?20000:step.Tool=="list_scene_objects"?13000:7000;cap=Math.Min(cap,budget-350);if(cap<400)break;
                 if(value.Length>cap)value=value.Substring(0,cap)+" [bounded actual observation; retrieve persisted step "+i+" for omitted detail]";
                 JToken observation;try{observation=JToken.Parse(value);}catch(JsonException){observation=new JValue(value);}
                 var row=new JObject{["index"]=i,["tool"]=step.Tool,["target"]=observationTarget,["historicalBeforeLastChange"]=i<changed,["data"]=observation};int cost=row.ToString(Formatting.None).Length;if(cost>budget)continue;budget-=cost;rows.Add(row);
@@ -80,9 +118,9 @@ namespace WorldWeaver.Editor.Assistant
             // A bounded fresh planning epoch drops the failed opaque continuation,
             // while the constructive request still supplies original scope, durable
             // observations, artifacts and host state. Later turns stay in this epoch.
-            int epoch=answer.Attempts.FindLastIndex(a=>a.RepairKind=="native-fresh-plan");
+            int epoch=answer.Attempts.FindLastIndex(a=>a.RepairKind=="native-fresh-plan"||a.RepairKind=="native-stall-replan");
             var epochAttempts=answer.Attempts.Skip(epoch+1).ToArray();
-            if(epoch>=0&&epochAttempts.Length==0)request.Messages.Add(new ChatMessage("system","Fresh native planning epoch after repeated semantic rejection. Re-plan the ORIGINAL request from current host state and durable observations. Prior successful work remains applied. Do not repeat the rejected operation or duplicate existing objects. Choose the next justified tool yourself; no new permissions are granted."));
+            if(epoch>=0&&epochAttempts.Length==0)request.Messages.Add(new ChatMessage("system","Fresh native planning epoch after repeated rejection or non-progress. Re-plan the ORIGINAL request from current host state and durable observations. Prior successful work remains applied. Do not repeat the rejected operation or duplicate existing objects. Choose the next justified tool yourself; no new permissions are granted."));
             foreach(var attempt in epochAttempts.TakeLast(staged?4:8).Reverse())
             {
                 if(string.IsNullOrEmpty(attempt.WireResponse))continue;
@@ -225,7 +263,7 @@ namespace WorldWeaver.Editor.Assistant
             request.Messages.Add(new ChatMessage("system","Model identity has two separate meanings here: the ACTIVE ASSISTANT MODEL is the inference backend; a character's 3D model is a scene asset. For an ambiguous model-identity question briefly identify both using the actual configured backend and observed asset. Never substitute one identity for the other."));
             request.Messages.Add(new ChatMessage("user","ORIGINAL USER REQUEST: "+input));
             bool nativeHistory=Settings.UseNativeFunctions&&AddNativeToolHistory(request,answer);
-            if(staged)request.Messages.Add(new ChatMessage("user","LATEST KNOWN HOST OBSERVATIONS (data, deduplicated by actual object/component/source; timestamps are durable step indices). Historical observations before later changes may be stale. Use these values rather than repeating the same reads; inspect a specific changed or missing value when necessary: "+ObservationLedger(answer.Steps).ToString(Formatting.None)));
+            if(answer!=null)request.Messages.Add(new ChatMessage("user","LATEST KNOWN HOST OBSERVATIONS (data, deduplicated by actual object/component/source; timestamps are durable step indices). Historical observations before later changes may be stale. Use these values rather than repeating the same reads; inspect a specific changed or missing value when necessary: "+ObservationLedger(answer.Steps).ToString(Formatting.None)));
             var recent=(answer?.Steps??new List<EditorCommandResult>()).TakeLast(nativeHistory?(staged?0:2):8).Reverse().ToArray();
             var compact=new List<object>();int evidenceBudget=26000;
             for(int i=0;i<recent.Length;i++)

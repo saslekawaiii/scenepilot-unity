@@ -32,7 +32,8 @@ review_stage: target empty,args {}. Request independent verification of the CURR
 list_scene_objects: target empty,args {component?:type name,kind?:exact generated kind,parent?:actual scene target,offset?:0..20000,limit?:1..100}. Structural active-scene inventory independent of names/language. Defaults omit transform-only skeleton nodes. Use component Renderer/Terrain/WorldPlayer to find geometry; actual paths, materials and dimensions identify old surfaces. Limit is a MAXIMUM row count; pages also fit the model context. Follow actual nextOffset until null; never assume offset+requested limit. Oversized rows expose a stable target with listingDetailsOmitted for separate inspection. Paged read only.
 find_scene_objects: target empty,args {query:string,limit?:1..50}. Literal AND-token search; no translation or synonyms. Empty query lists objects. Addressed retrieval over all loaded scenes/assets, returns stable targets. Editing remains restricted to active scene.
 inspect_project: target empty,args {}. Actual Unity/platform/packages/build-scenes metadata, no environment files.
-inspect_component: target existing object,args {type:string}. Read actual serialized component fields; credentials are masked.
+inspect_component: target existing object,args {type:string}. Read actual serialized component fields; credentials are masked. MeshFilter/MeshCollider/SkinnedMeshRenderer also return geometryDiagnostics: bounded triangle normals/topology and actual front/back-facing collider ray coverage; this never repairs geometry.
+Procedural geometry diagnostics: when a generated surface is visible but collisions/probes fail, inspect its MeshFilter and MeshCollider before repeating tests. Compare actual world triangle normals, front/back-facing ray observations, mesh references, convex mode and transform scale against the intended surface. Measurements are not fixes; change the implementation when evidence requires it, then rerun the behavioral check. Do not enable global backface queries or weaken assertions to hide a winding/collision defect.
 set_component: target existing object,args {type:string,property:string,value:scalar|vector|object-reference}. Change one existing serialized field; inspect first. Does not invoke arbitrary methods. Reference value is {target:'existing scene target',component?:'UnityEngine.Transform'} or {asset:'Assets/path'} or null. Component references require component type explicitly.
 add_component: target existing object,args {type:full registered Component type name}. Native components execute directly. MonoBehaviour components require review unless the user enabled autonomous scripts AND automatic application in Execute mode. This permission never authorizes scene switching or changing Build Settings.
 read_console: target empty,args {limit?:1..100}. Observed console and actual compiler feedback.
@@ -194,7 +195,9 @@ open_scene: target empty,args {path:Assets/...unity}. Standalone reviewed action
                 }
                 fields.Add(field);
             }
-            return new JObject{["component"]=component.GetType().FullName,["fields"]=fields};
+            var result=new JObject{["component"]=component.GetType().FullName};
+            var geometry=GeometryDiagnostics.Inspect(component);if(geometry!=null)result["geometryDiagnostics"]=geometry;
+            result["fields"]=fields;return result;
         }
         static string PropertyText(SerializedProperty p)
         {
