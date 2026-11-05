@@ -33,8 +33,12 @@ namespace WorldWeaver.Tests
         static EditorCommandResult Fail(string body)
         {
             var session=new ChatSession();session.Settings.Mode=AssistantMode.Execute;session.Settings.AllowEditorCode=true;
-            var batch=SceneToolExecutor.Execute(new EditorPlan{actions=new List<EditorCommand>{new EditorCommand{tool="execute_editor_code",args=new JObject{["code"]=body}}}},executionContext:new AgentExecutionContext{Session=session});
-            Assert.That(batch.Success,Is.False);return batch.Results.Single(r=>r.Tool=="execute_editor_code");
+            var context=new AgentExecutionContext{Session=session,Message=new AssistantMessage{Task=new AgentTaskState{MutationAuthorized=true,OriginalRequest="Create a new scene object named MustNeverExecute with Editor C#; preserve existing objects."}}};
+            var batch=SceneToolExecutor.Execute(new EditorPlan{actions=new List<EditorCommand>{new EditorCommand{tool="execute_editor_code",args=new JObject{["code"]=body}}}},executionContext:context);
+            Assert.That(batch.Success,Is.False);var failure=batch.Results.Single(r=>r.Tool=="execute_editor_code");
+            Assert.That(failure.Error,Does.Contain("C# compilation failed"),"The authorized fixture must reach real compilation instead of an admission denial.");
+            Assert.That(failure.Summary,Does.Contain("\"compiled\":false"),"A real compiler failure has structured compiled=false evidence before JSON parsing.");
+            return failure;
         }
         [TestCase("")]
         [TestCase("using Object = System.Object;\nusing StaticAlias = System.Math;\n")]
