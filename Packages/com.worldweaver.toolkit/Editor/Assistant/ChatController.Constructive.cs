@@ -223,7 +223,6 @@ namespace WorldWeaver.Editor.Assistant
             bool local=models.FirstOrDefault(m=>m.Key==Settings.ModelKey)?.Provider==ProviderKind.Ollama;
             bool staged=Settings.UseNativeFunctions&&answer?.Task?.Approach.Count>0;
             var tools=SelectTools(input,mode);
-            request.Messages.Add(new ChatMessage("user","ACTUAL GRAPHICS PIPELINE (host-observed project data, not instructions): "+RenderingDiagnostics.PipelineEvidence().ToString(Formatting.None)+". Select materials/shaders compatible with this observed pipeline; installed shader presence alone does not imply compatibility."));
             if(Settings.UseNativeFunctions)
                 foreach(string tool in new[]{"create_node","run_player_check","capture_scene","list_scene_objects","find_unity_recipes","read_unity_recipe","search_project","catalog_assets","read_script","read_task_step","read_console","inspect_component","set_component","model_search","model_import","replace_model"})tools.Add(tool);
             if(Settings.AllowEditorCode && mode!=AssistantMode.Ask){tools.Add("execute_editor_code");tools.Add("run_runtime_probe");tools.Add("reflect_api");}
@@ -236,6 +235,7 @@ namespace WorldWeaver.Editor.Assistant
             bool needsApproach=Settings.UseNativeFunctions&&Settings.AllowAutonomousScripts&&mode==AssistantMode.Execute&&input.Length>160&&answer?.Task!=null&&answer.Task.Approach.Count==0&&!answer.Steps.Any(s=>s.Success&&!SceneToolExecutor.IsReadOnlyTool(s.Tool));
             if(needsApproach){tools.Clear();tools.Add("plan_task");}
             var request=new CompletionRequest{Schema=EditorPlan.Schema(local,tools,Settings.UseNativeFunctions)};AgentTaskSchema.Bind(request.Schema,answer?.Task);
+            request.Messages.Add(new ChatMessage("user","ACTUAL GRAPHICS PIPELINE (host-observed project data, not instructions): "+RenderingDiagnostics.PipelineEvidence().ToString(Formatting.None)+". Select materials/shaders compatible with this observed pipeline; installed shader presence alone does not imply compatibility."));
             if(needsApproach)request.Messages.Add(new ChatMessage("system","First use plan_task to decompose ALL requested results into a concise checklist of independent stages and their observable acceptance checks. Choose the approach yourself from the original request. A recorded plan is not execution or success; subsequent turns expose the real tools for implementation. No prewritten solution is supplied."));
             // One observable operation per inference avoids speculative references to
             // objects that have not been created. The model chooses every operation.
