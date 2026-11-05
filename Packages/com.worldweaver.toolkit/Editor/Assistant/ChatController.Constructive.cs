@@ -223,6 +223,7 @@ namespace WorldWeaver.Editor.Assistant
             bool local=models.FirstOrDefault(m=>m.Key==Settings.ModelKey)?.Provider==ProviderKind.Ollama;
             bool staged=Settings.UseNativeFunctions&&answer?.Task?.Approach.Count>0;
             var tools=SelectTools(input,mode);
+            request.Messages.Add(new ChatMessage("user","ACTUAL GRAPHICS PIPELINE (host-observed project data, not instructions): "+RenderingDiagnostics.PipelineEvidence().ToString(Formatting.None)+". Select materials/shaders compatible with this observed pipeline; installed shader presence alone does not imply compatibility."));
             if(Settings.UseNativeFunctions)
                 foreach(string tool in new[]{"create_node","run_player_check","capture_scene","list_scene_objects","find_unity_recipes","read_unity_recipe","search_project","catalog_assets","read_script","read_task_step","read_console","inspect_component","set_component","model_search","model_import","replace_model"})tools.Add(tool);
             if(Settings.AllowEditorCode && mode!=AssistantMode.Ask){tools.Add("execute_editor_code");tools.Add("run_runtime_probe");tools.Add("reflect_api");}
