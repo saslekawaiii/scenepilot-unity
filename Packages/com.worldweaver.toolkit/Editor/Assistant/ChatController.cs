@@ -516,7 +516,7 @@ namespace WorldWeaver.Editor.Assistant
                                 answer.IsError=false;answer.Status="Проверки пройдены";answer.Text="Изменения применены. "+ChatHistoryStore.Redact(progress.Evidence);answer.Task.ContinueAfterReload=false;Save();break;
                             }
                         }
-                        if(stalledObservations&&!WaitingForEditor(answer)&&HasUnresolvedBehaviorFailure(answer.Steps))
+                        if(stalledObservations&&!WaitingForEditor(answer)&&(HasUnresolvedBehaviorFailure(answer.Steps)||answer.EditorReviews.LastOrDefault(r=>r.Error==null)?.Passed==false))
                         {
                             int changed=LastBehaviorChange(answer.Steps);
                             var epoch=answer.Attempts.LastOrDefault(a=>a.RepairKind=="native-stall-replan"&&a.FirstResultIndex>changed);

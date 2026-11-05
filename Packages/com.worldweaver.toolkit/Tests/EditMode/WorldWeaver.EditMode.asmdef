@@ -3,7 +3,8 @@
   "references": [
     "WorldWeaver.Runtime",
     "WorldWeaver.Editor",
-    "Unity.ugui"
+    "Unity.ugui",
+    "Unity.InputSystem"
   ],
   "includePlatforms": [
     "Editor"
