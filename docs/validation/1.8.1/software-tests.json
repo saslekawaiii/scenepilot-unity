@@ -1,0 +1,171 @@
+{
+  "version": "1.8.1",
+  "unity": "6000.3.27f1",
+  "candidate": "1.8.1-rc20",
+  "packageSourceCommit": "c265cea12ce47a5e79d8e2e28b24ba15fc2f0fdd",
+  "packageArchiveSha256": "1730d51649e8aa70fd1d74e813ada4b00ab87522c05a5aad464a509d8d9acc2f",
+  "softwareChecksDoNotMeasureGeneralTaskSuccess": true,
+  "editor": {
+    "status": "completed",
+    "record": "editor-full-1.8.1-rc20.xml",
+    "originalSha256": "b78364b489861af61b646d15e77faaf6db459f9acacbdc58cbe36c792840018c",
+    "total": 965,
+    "passed": 958,
+    "failed": 0,
+    "skipped": 7,
+    "inconclusive": 0,
+    "durationSeconds": 275.644618
+  },
+  "play": {
+    "status": "completed",
+    "record": "play-full-1.8.1-rc20.xml",
+    "originalSha256": "07d1788d61660e337eb50bd89bcdcb31a2adffd6bf7ce3b9a66e3dbfccba47aa",
+    "total": 29,
+    "passed": 27,
+    "failed": 0,
+    "skipped": 2,
+    "inconclusive": 0,
+    "durationSeconds": 18.7649691
+  },
+  "python": {
+    "status": "completed",
+    "record": "python-tools-1.8.1-rc20.json",
+    "originalSha256": "221a77b8d24f656d54bbcd5f7302d5efbba786eabf279b7b5127a29090d500cd",
+    "testsPassed": 16,
+    "testsFailed": 0,
+    "exitCode": 0,
+    "externalModelNotPartOfTheseTests": true
+  },
+  "runtimeProbes": {
+    "status": "completed",
+    "record": "runtime-probes-1.8.1-rc20.json",
+    "originalSha256": "4afc3797ea2cadc9ac39c54486eacf7f902edd26be02eccf4cfb62c621b5b2d6",
+    "passed": 11,
+    "failed": 0,
+    "cases": [
+      {
+        "case": "actual_unity_value_measurements",
+        "expectedSuccess": true,
+        "actualSuccess": true,
+        "passed": true,
+        "sceneRestored": true,
+        "sceneFileUnchanged": true,
+        "devicesRestored": true
+      },
+      {
+        "case": "measure_after_frames",
+        "expectedSuccess": true,
+        "actualSuccess": true,
+        "passed": true,
+        "sceneRestored": true,
+        "sceneFileUnchanged": true,
+        "devicesRestored": true
+      },
+      {
+        "case": "actual_keyboard_and_mouse",
+        "expectedSuccess": true,
+        "actualSuccess": true,
+        "passed": true,
+        "sceneRestored": true,
+        "sceneFileUnchanged": true,
+        "devicesRestored": true
+      },
+      {
+        "case": "actual_interact_edge",
+        "expectedSuccess": true,
+        "actualSuccess": true,
+        "passed": true,
+        "sceneRestored": true,
+        "sceneFileUnchanged": true,
+        "devicesRestored": true
+      },
+      {
+        "case": "current_keyboard_interact_edge",
+        "expectedSuccess": true,
+        "actualSuccess": true,
+        "passed": true,
+        "sceneRestored": true,
+        "sceneFileUnchanged": true,
+        "devicesRestored": true
+      },
+      {
+        "case": "long_observation_beyond_previous_limit",
+        "expectedSuccess": true,
+        "actualSuccess": true,
+        "passed": true,
+        "sceneRestored": true,
+        "sceneFileUnchanged": true,
+        "devicesRestored": true
+      },
+      {
+        "case": "failed_assertion",
+        "expectedSuccess": false,
+        "actualSuccess": false,
+        "passed": true,
+        "sceneRestored": true,
+        "sceneFileUnchanged": true,
+        "devicesRestored": true
+      },
+      {
+        "case": "missing_assertion",
+        "expectedSuccess": false,
+        "actualSuccess": false,
+        "passed": true,
+        "sceneRestored": true,
+        "sceneFileUnchanged": true,
+        "devicesRestored": true
+      },
+      {
+        "case": "yielded_timeout",
+        "expectedSuccess": false,
+        "actualSuccess": false,
+        "passed": true,
+        "sceneRestored": true,
+        "sceneFileUnchanged": true,
+        "devicesRestored": true
+      },
+      {
+        "case": "actual_exception",
+        "expectedSuccess": false,
+        "actualSuccess": false,
+        "passed": true,
+        "sceneRestored": true,
+        "sceneFileUnchanged": true,
+        "devicesRestored": true
+      },
+      {
+        "case": "cancel",
+        "expectedSuccess": false,
+        "actualSuccess": false,
+        "passed": true,
+        "sceneRestored": true,
+        "sceneFileUnchanged": true,
+        "devicesRestored": true
+      }
+    ]
+  },
+  "supplemental": [
+    {
+      "name": "Actual URP light/capture regressions and independent saved-artifact cases",
+      "run": {
+        "label": "1.8.1-rc20",
+        "sourceCommit": "c265cea12ce47a5e79d8e2e28b24ba15fc2f0fdd",
+        "archiveSha256": "1730d51649e8aa70fd1d74e813ada4b00ab87522c05a5aad464a509d8d9acc2f",
+        "proof": {
+          "record": "upm-package-1.8.1-rc20.json",
+          "originalSha256": "3e9eb4ad119a9dcbf9b8a9e1c5230715a75cfd60e60593adeea19729a436cd9f"
+        }
+      },
+      "result": {
+        "record": "independent-final-1.8.1-rc20.xml",
+        "originalSha256": "b0fa4d6185bdab744b078fd8a0c19b36cf45795bff3e20c6f01ad9d2195cf8fa",
+        "total": 44,
+        "passed": 44,
+        "failed": 0,
+        "skipped": 0,
+        "inconclusive": 0,
+        "requiredPassedTests": []
+      }
+    }
+  ]
+}

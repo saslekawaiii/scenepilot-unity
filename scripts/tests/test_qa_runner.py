@@ -17,11 +17,26 @@ SPEC.loader.exec_module(QA)
 
 
 class ProcessBoundaryTests(unittest.TestCase):
-    def run_fixture(self, *, ignore_terminate=False, report_progress=False):
+    def run_fixture(self, *, ignore_terminate=False, report_progress=False, test_results=None):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder).resolve()
             clock = [0.0]
             progress = root / 'acceptance.json'
+            report = root / 'test-results.xml'
+            extra = []
+            if test_results is not None:
+                extra = ['--', '-runTests', '-testResults']
+                if test_results != 'missing':
+                    value = os.path.relpath(report, Path.cwd()) if test_results == 'relative' else str(report)
+                    if test_results == 'outside':
+                        value = str(root.parent / 'outside-report.xml')
+                    if test_results == 'next_flag':
+                        value = '-testPlatform'
+                    extra.append(value)
+                    if test_results == 'duplicate':
+                        extra.extend(['-testResults', str(root / 'other-report.xml')])
+                    if test_results == 'existing':
+                        report.write_text('Preserve this earlier report')
 
             class Child:
                 pid = 424242
@@ -67,9 +82,17 @@ class ProcessBoundaryTests(unittest.TestCase):
                  patch.object(QA.signal, 'signal'), \
                  patch.object(QA.subprocess, 'Popen', return_value=child) as spawn, \
                  patch.dict(os.environ, {'WW_REGRESSION_OUTPUT': str(progress), 'WW_RUNTIME_PROBE_OUTPUT': ''}), \
-                 patch.object(sys, 'argv', ['run_unity_qa.py', '--project', 'tools', '--log', str(root / 'editor.log'), '--inactivity-seconds', '60']), \
-                 contextlib.redirect_stdout(io.StringIO()):
-                code = QA.main()
+                 patch.object(sys, 'argv', ['run_unity_qa.py', '--project', 'tools', '--log', str(root / 'editor.log'), '--inactivity-seconds', '60'] + extra), \
+                 contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                try:
+                    code = QA.main()
+                except SystemExit:
+                    spawn.assert_not_called()
+                    if test_results == 'existing':
+                        self.assertEqual(report.read_text(), 'Preserve this earlier report')
+                    raise
+            child.command = spawn.call_args.args[0]
+            child.expected_report_path = str(report)
             record = json.loads((root / '.private/unity-qa-runs.jsonl').read_text())
             self.assertEqual(spawn.call_count, 1)
             self.assertFalse(record['newProjectCreated'])
@@ -98,6 +121,31 @@ class ProcessBoundaryTests(unittest.TestCase):
         self.assertGreaterEqual(elapsed, 130)
         self.assertEqual(child.terminations + child.kills, 0)
         self.assertIsNone(record['resourceStopReason'])
+
+
+    def test_relative_test_report_is_forwarded_as_exact_validated_absolute_path(self):
+        _, child, record, _ = self.run_fixture(test_results='relative')
+        value = child.command[child.command.index('-testResults') + 1]
+        self.assertEqual(value, child.expected_report_path)
+        self.assertTrue(Path(value).is_absolute())
+        self.assertEqual(record['testResults'], 'test-results.xml')
+
+    def test_absolute_test_report_is_preserved(self):
+        _, child, record, _ = self.run_fixture(test_results='absolute')
+        self.assertEqual(child.command[child.command.index('-testResults') + 1], child.expected_report_path)
+        self.assertEqual(record['testResults'], 'test-results.xml')
+
+    def test_invalid_result_arguments_reject_before_starting_an_editor(self):
+        for value in ['missing', 'duplicate', 'next_flag', 'outside']:
+            with self.subTest(value=value):
+                with self.assertRaises(SystemExit) as raised:
+                    self.run_fixture(test_results=value)
+                self.assertEqual(raised.exception.code, 2)
+
+    def test_existing_result_is_preserved_and_no_editor_starts(self):
+        with self.assertRaises(SystemExit) as raised:
+            self.run_fixture(test_results='existing')
+        self.assertEqual(raised.exception.code, 2)
 
 
 if __name__ == '__main__':

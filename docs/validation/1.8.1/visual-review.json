@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "actualPixelsReviewed": true,
+  "capture": "hollow-mesh-final.png",
+  "captureSha256": "012e732358009657212fe5a258451d6de43f8c39db1828293894564355d10bce",
+  "observationPackageSourceCommit": "9ed25783cf3fdf697e6246271c6e82cdf79d6036",
+  "observationPackageArchiveSha256": "411ae7fb54c455869bd90426a963f5c08cb3bfa795c454d6412674597a99309b",
+  "physicalNUnitOriginalSha256": "c83883510bd97f715f8116584f7f3f6778f4b5f98a6ed19a319505ab7789a5ce",
+  "independentArtifactIntegritySha256": "26db8b610d2c6a77b4faf9ee2f38679234665d9f56fbe824ed178f235bb6648b",
+  "modelInferenceCandidate": "1.8.1-rc17",
+  "modelInferenceSourceCommit": "9af594540ee9fdf7c386fd08dc6eb0c9b25f8d1d",
+  "sceneRepairByHarness": false,
+  "reviewedUtc": "2026-11-05T13:34:02.282337Z",
+  "observations": [
+    "Actual PNG personally viewed: readable gray outer walls and inner walls with a bright annular top surface and visible central opening.",
+    "The lowest part of the outer body is slightly cropped; no full-frame or artistic-quality guarantee is claimed.",
+    "The exact RC19 independent suite passed all 29 cases, including referenced stored normals, material/pipeline compatibility, camera visibility, physical ring/aperture rays and dynamic support."
+  ],
+  "limits": [
+    "This is an observed geometric and rendering result from a continuation/repair chain, not fresh RC19 mesh inference.",
+    "A readable image and these bounded checks do not establish general task reliability or artistic quality."
+  ]
+}

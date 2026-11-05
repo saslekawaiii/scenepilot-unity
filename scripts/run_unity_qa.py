@@ -70,10 +70,19 @@ def main():
     log = args.log.resolve()
     if ROOT not in log.parents or log.exists():
         parser.error('Use a fresh log path inside this workspace.')
+    report = None
     if '-testResults' in extra:
-        report = Path(extra[extra.index('-testResults') + 1]).resolve()
+        if extra.count('-testResults') != 1:
+            parser.error('Pass exactly one -testResults path.')
+        report_index = extra.index('-testResults') + 1
+        if report_index >= len(extra) or extra[report_index].startswith('-'):
+            parser.error('-testResults requires a report path.')
+        report = Path(extra[report_index]).resolve()
         if ROOT not in report.parents or report.exists():
             parser.error('Use a fresh test report inside this workspace.')
+        # Unity resolves relative result paths against its consumer project, not
+        # this runner's invocation directory. Forward the exact validated path.
+        extra[report_index] = str(report)
     PRIVATE.mkdir(exist_ok=True)
     with (PRIVATE / 'unity-qa.lock').open('a') as lock:
         try:
@@ -87,6 +96,8 @@ def main():
         if free_before < 20 * GIB or pressure() == 4:
             parser.error('Need at least 20 GiB free and no critical memory pressure. No Editor started.')
         log.parent.mkdir(parents=True, exist_ok=True)
+        if report is not None:
+            report.parent.mkdir(parents=True, exist_ok=True)
         command = [str(UNITY), '-batchmode', '-projectPath', str(project), '-logFile', str(log)]
         if not args.graphics:
             command.append('-nographics')
@@ -149,6 +160,7 @@ def main():
                   'freeBeforeBytes': free_before, 'freeAfterBytes': shutil.disk_usage(ROOT).free,
                   'exitCode': code, 'resourceStopReason': stop_reason, 'log': str(log.relative_to(ROOT)),
                   'inactivityLimitSeconds': args.inactivity_seconds,
+                  'testResults': str(report.relative_to(ROOT)) if report is not None else None,
                   'newProjectCreated': False, 'libraryCloned': False}
         with (PRIVATE / 'unity-qa-runs.jsonl').open('a') as output:
             output.write(json.dumps(record, ensure_ascii=False) + '\n')

@@ -1,0 +1,320 @@
+{
+  "schemaVersion": 2,
+  "status": "selected_cases_independently_passed",
+  "observationCandidate": "1.8.1-rc20",
+  "observationPackageSourceCommit": "c265cea12ce47a5e79d8e2e28b24ba15fc2f0fdd",
+  "observationPackageArchiveSha256": "1730d51649e8aa70fd1d74e813ada4b00ab87522c05a5aad464a509d8d9acc2f",
+  "rawModelInternalsOmitted": true,
+  "generalSuccessRateNotComputed": true,
+  "modelSourceAttributionRetained": true,
+  "cases": [
+    {
+      "case": "hollow_mesh_repair",
+      "domain": "mesh_visual",
+      "origin": "repair",
+      "modelRun": {
+        "label": "1.8.1-rc17",
+        "sourceCommit": "9af594540ee9fdf7c386fd08dc6eb0c9b25f8d1d",
+        "archiveSha256": "21259a84c7281cd1ba98176190e43f1a092b74d2968cbfd1fbf594810c7de9a0",
+        "proof": {
+          "record": "upm-package-1.8.1-rc17.json",
+          "originalSha256": "af4be18a02d4b655303d3f11a3150026078c26833c72dd4944fc99a9754c22e1"
+        }
+      },
+      "controllerReport": {
+        "record": "agent-controller-render-repair-1.8.1-rc17.json",
+        "originalSha256": "925f4be026c93bf40faf38c9b7df248a7a6ef0ee5e1384ed309baae4e809404c"
+      },
+      "controllerReportedSuccess": true,
+      "observationRun": {
+        "label": "1.8.1-rc20",
+        "sourceCommit": "c265cea12ce47a5e79d8e2e28b24ba15fc2f0fdd",
+        "archiveSha256": "1730d51649e8aa70fd1d74e813ada4b00ab87522c05a5aad464a509d8d9acc2f",
+        "proof": {
+          "record": "upm-package-1.8.1-rc20.json",
+          "originalSha256": "3e9eb4ad119a9dcbf9b8a9e1c5230715a75cfd60e60593adeea19729a436cd9f"
+        }
+      },
+      "independentNUnit": {
+        "record": "independent-final-1.8.1-rc20.xml",
+        "originalSha256": "b0fa4d6185bdab744b078fd8a0c19b36cf45795bff3e20c6f01ad9d2195cf8fa",
+        "total": 44,
+        "passed": 44,
+        "failed": 0,
+        "skipped": 0,
+        "inconclusive": 0,
+        "requiredPassedTests": [
+          "HollowMeshArtifactAcceptanceTests.ActualPersistentOctagonalMeshAndPhysicalThroughHole"
+        ]
+      },
+      "integrity": {
+        "record": "independent-artifacts-1.8.1-rc20.json",
+        "originalSha256": "787797a1c9428f8b8384acc3bea967ee989feb432f40763281661d2460ce557c"
+      },
+      "savedArtifactUnchanged": true,
+      "sceneRepairByHarness": false,
+      "observerUsedExactReleaseArchive": true,
+      "modelSourceAttributionRetained": true,
+      "measuredScope": [
+        "Persistent editable mesh and actual physical ring/aperture checks",
+        "Actual final camera rendering and pipeline-compatible material; no observer repairs",
+        "Actual referenced known-lit vertex normals are finite and nonzero; actual camera image personally reviewed"
+      ],
+      "observationAttributionNote": "Independent observers rerun on the final frozen package; original model candidate attribution is retained separately.",
+      "requiredIndependentCasesPassed": true,
+      "wholeIndependentBatchHadOtherFailures": false,
+      "priorModelRuns": [
+        {
+          "label": "1.8.1-rc6",
+          "sourceCommit": "2e9301b7a3662ac745cdf31f77cb7d9196f61bb9",
+          "archiveSha256": "68b3153854f8b26de2606131d60938d0a5ce95f2eeccb0fba314f3ca54f660a8",
+          "proof": {
+            "record": "upm-package-1.8.1-rc6.json",
+            "originalSha256": "ce76f2192d23bd54aa63f40f90d53c6dad4bb796100bed664d70434e2a78e2a7"
+          },
+          "controllerReport": {
+            "record": "agent-controller-1.8.1-rc6-mesh.json",
+            "originalSha256": "5faffb29f426b68064f32244c3b531681fa698baec7c710ad8555e72ee828251"
+          },
+          "case": "hollow_mesh",
+          "controllerReportedSuccess": true,
+          "roleAndLimitations": "Earlier geometry/physics output was independently physically checked, but actual camera rendering was magenta; not complete visual success.",
+          "notCountedAsFreshFinalCandidateSuccess": true
+        },
+        {
+          "label": "1.8.1-rc8",
+          "sourceCommit": "f5d18be6507f17e14bcd2f8b5549b524f8c87c4e",
+          "archiveSha256": "63321ea3c7185d0591f80c01c76fa29d04cc8235bf2a0e6933e14831bef77ecc",
+          "proof": {
+            "record": "upm-package-1.8.1-rc8.json",
+            "originalSha256": "72a4d3513d17a393ea2feca1b2542b4e920117c1ea9b7dd3dd063378c5c9bb30"
+          },
+          "controllerReport": {
+            "record": "agent-controller-render-repair-1.8.1-rc8.json",
+            "originalSha256": "71157020a5ef1ebac26bd918bd7b93b63f052e4557d47b19f04fa74c73951743"
+          },
+          "case": "hollow_mesh_repair",
+          "controllerReportedSuccess": false,
+          "roleAndLimitations": "Material repair was interrupted by a false checkpoint conflict after URP lazily added light data during capture; preserve this failed earlier run.",
+          "notCountedAsFreshFinalCandidateSuccess": true
+        },
+        {
+          "label": "1.8.1-rc10",
+          "sourceCommit": "0b26b0030c213ef350d7f2d0f1e6c3c2d3fb95dc",
+          "archiveSha256": "1af831233359ac61a0cfa2e3c1c03b8c9c2e7f2bf552ae67dff54c715741da04",
+          "proof": {
+            "record": "upm-package-1.8.1-rc10.json",
+            "originalSha256": "09a23c2ec00380d740bffff331ad98ff619474015778b9d80663b658b8222b3b"
+          },
+          "controllerReport": {
+            "record": "agent-controller-render-repair-1.8.1-rc10.json",
+            "originalSha256": "42fe4c14e842bb058cbe51f259e98d8bedc2993e60b15aa4dfd9e19639215a0a"
+          },
+          "case": "hollow_mesh_repair",
+          "controllerReportedSuccess": true,
+          "roleAndLimitations": "Controller reported completion, but independent actual image review on RC11 found nearly black walls and116/128zero stored normals; not a complete visual result.",
+          "notCountedAsFreshFinalCandidateSuccess": true
+        },
+        {
+          "label": "1.8.1-rc12",
+          "sourceCommit": "7e22dd8e016f925e9eb78dd7d99ebd6c7089290b",
+          "archiveSha256": "33d5bf4b837d2d15b6ba475d84ee198e5741eb69879540ea8850e736e3d589d2",
+          "proof": {
+            "record": "upm-package-1.8.1-rc12.json",
+            "originalSha256": "49e66e4748ada71b80b9476362f4f5b54739b1e4a623d2a59d337af8d06302d5"
+          },
+          "controllerReport": {
+            "record": "agent-controller-render-repair-1.8.1-rc12.json",
+            "originalSha256": "b539e2567e6043d181c2ec9098fd789b6c6c0c848dc4cfc9d9182acbf23fdd0d"
+          },
+          "case": "hollow_mesh_repair",
+          "controllerReportedSuccess": false,
+          "roleAndLimitations": "General stored-normal diagnostics exposed the actual problem. The model failed after repeated unchanged observations and a wrong CSharp overload; strict repeat guards stopped it without false success. The recovery-format contradiction was then fixed generally.",
+          "notCountedAsFreshFinalCandidateSuccess": true
+        },
+        {
+          "label": "1.8.1-rc13",
+          "sourceCommit": "82383839a3151a32615d787204eac9ebb4f123ca",
+          "archiveSha256": "1a77d69a4d935c967e12550934106946f508a214909472796bc77cd848a21dbd",
+          "proof": {
+            "record": "upm-package-1.8.1-rc13.json",
+            "originalSha256": "6400dca50b6939f751873418256cff5638af53632b27754920f4246af0be89f9"
+          },
+          "controllerReport": {
+            "record": "agent-controller-render-repair-1.8.1-rc13.json",
+            "originalSha256": "795955b50eef1ff412eb0a9b88eba0a27b6ec087d3d9b34452544eb2e45a0db8"
+          },
+          "case": "hollow_mesh_repair",
+          "controllerReportedSuccess": false,
+          "roleAndLimitations": "Diagnosed the defect but failed after diagnostic stages had already consumed the implementation observation budget; new fresh planning began on the first implementation-stage observation. Generated diagnostic CSharp also failed. No completed visual result.",
+          "notCountedAsFreshFinalCandidateSuccess": true
+        }
+      ],
+      "visualReview": {
+        "record": "visual-review-rc20.json",
+        "originalSha256": "08312d2a3f054eb654fdf844f74220822dbbeedd423a1a7e3be4a888c78307fd",
+        "passed": true,
+        "actualPixelsReviewed": true,
+        "capture": {
+          "record": "hollow-mesh-rc20.png",
+          "originalSha256": "012e732358009657212fe5a258451d6de43f8c39db1828293894564355d10bce"
+        }
+      }
+    },
+    {
+      "case": "hinged_door",
+      "domain": "input",
+      "origin": "fresh",
+      "modelRun": {
+        "label": "1.8.1-rc3",
+        "sourceCommit": "0e3e55d15e59d99f6ce5fd1db71cb793f3882184",
+        "archiveSha256": "834dfd9086d4c9fab99269014807cb5be2d42fd37b71aa1ed92822f371415d45",
+        "proof": {
+          "record": "upm-package-1.8.1-rc3.json",
+          "originalSha256": "d2012bb502bd20f47c8662ab268e12fded53d8bc9ceac6510f64f959808a903c"
+        }
+      },
+      "controllerReport": {
+        "record": "agent-controller-1.8.1-rc3.json",
+        "originalSha256": "b185bbb311f2b5823a1a33afe1d6cd4ae421dd36f7385c5657cc07ba4e54afae"
+      },
+      "controllerReportedSuccess": true,
+      "observationRun": {
+        "label": "1.8.1-rc20",
+        "sourceCommit": "c265cea12ce47a5e79d8e2e28b24ba15fc2f0fdd",
+        "archiveSha256": "1730d51649e8aa70fd1d74e813ada4b00ab87522c05a5aad464a509d8d9acc2f",
+        "proof": {
+          "record": "upm-package-1.8.1-rc20.json",
+          "originalSha256": "3e9eb4ad119a9dcbf9b8a9e1c5230715a75cfd60e60593adeea19729a436cd9f"
+        }
+      },
+      "independentNUnit": {
+        "record": "independent-final-1.8.1-rc20.xml",
+        "originalSha256": "b0fa4d6185bdab744b078fd8a0c19b36cf45795bff3e20c6f01ad9d2195cf8fa",
+        "total": 44,
+        "passed": 44,
+        "failed": 0,
+        "skipped": 0,
+        "inconclusive": 0,
+        "requiredPassedTests": [
+          "NextAgentArtifactAcceptanceTests.DoorRespondsToActualKeyboardLockAndLeavesPhysicalPassage"
+        ]
+      },
+      "integrity": {
+        "record": "independent-artifacts-1.8.1-rc20.json",
+        "originalSha256": "787797a1c9428f8b8384acc3bea967ee989feb432f40763281661d2460ce557c"
+      },
+      "savedArtifactUnchanged": true,
+      "sceneRepairByHarness": false,
+      "observerUsedExactReleaseArchive": true,
+      "modelSourceAttributionRetained": true,
+      "measuredScope": [
+        "Actual L/Space keyboard input, lock/UI, smooth hinge and physical passage"
+      ],
+      "observationAttributionNote": "Independent observers rerun on the final frozen package; original model candidate attribution is retained separately.",
+      "requiredIndependentCasesPassed": true,
+      "wholeIndependentBatchHadOtherFailures": false
+    },
+    {
+      "case": "persistent_counter",
+      "domain": "input",
+      "origin": "fresh",
+      "modelRun": {
+        "label": "1.8.1-rc3",
+        "sourceCommit": "0e3e55d15e59d99f6ce5fd1db71cb793f3882184",
+        "archiveSha256": "834dfd9086d4c9fab99269014807cb5be2d42fd37b71aa1ed92822f371415d45",
+        "proof": {
+          "record": "upm-package-1.8.1-rc3.json",
+          "originalSha256": "d2012bb502bd20f47c8662ab268e12fded53d8bc9ceac6510f64f959808a903c"
+        }
+      },
+      "controllerReport": {
+        "record": "agent-controller-1.8.1-rc3.json",
+        "originalSha256": "b185bbb311f2b5823a1a33afe1d6cd4ae421dd36f7385c5657cc07ba4e54afae"
+      },
+      "controllerReportedSuccess": true,
+      "observationRun": {
+        "label": "1.8.1-rc20",
+        "sourceCommit": "c265cea12ce47a5e79d8e2e28b24ba15fc2f0fdd",
+        "archiveSha256": "1730d51649e8aa70fd1d74e813ada4b00ab87522c05a5aad464a509d8d9acc2f",
+        "proof": {
+          "record": "upm-package-1.8.1-rc20.json",
+          "originalSha256": "3e9eb4ad119a9dcbf9b8a9e1c5230715a75cfd60e60593adeea19729a436cd9f"
+        }
+      },
+      "independentNUnit": {
+        "record": "independent-final-1.8.1-rc20.xml",
+        "originalSha256": "b0fa4d6185bdab744b078fd8a0c19b36cf45795bff3e20c6f01ad9d2195cf8fa",
+        "total": 44,
+        "passed": 44,
+        "failed": 0,
+        "skipped": 0,
+        "inconclusive": 0,
+        "requiredPassedTests": [
+          "NextAgentArtifactAcceptanceTests.CounterUsesActualPointerClampsAndPersistsAcrossPlayRestarts"
+        ]
+      },
+      "integrity": {
+        "record": "independent-artifacts-1.8.1-rc20.json",
+        "originalSha256": "787797a1c9428f8b8384acc3bea967ee989feb432f40763281661d2460ce557c"
+      },
+      "savedArtifactUnchanged": true,
+      "sceneRepairByHarness": false,
+      "observerUsedExactReleaseArchive": true,
+      "modelSourceAttributionRetained": true,
+      "measuredScope": [
+        "Actual pointer +1/-1/reset, bounds and two genuine Play Mode restarts"
+      ],
+      "observationAttributionNote": "Independent observers rerun on the final frozen package; original model candidate attribution is retained separately.",
+      "requiredIndependentCasesPassed": true,
+      "wholeIndependentBatchHadOtherFailures": false
+    }
+  ],
+  "limitations": [
+    "The door and persistent counter were originally generated on RC3; final observers do not turn them into fresh final-candidate generations.",
+    "The mesh case is an explicit continuation and repair chain, with all earlier failures retained.",
+    "The selected independent examples do not establish arbitrary-task success, artistic quality or replacement of a developer.",
+    "External-provider-dependent software skips are reported separately; final counts must come from the exact RC20 suites rather than earlier candidates.",
+    "Updating a GitHub repository does not update a Git/TGZ dependency already installed in Unity."
+  ],
+  "preservedEarlierModelRecords": {
+    "record": "earlier-model-requests.json",
+    "originalSha256": "202fcaba9722c7fbb8e2e882361cf2725f69f3f554fd2da96c8ec96f1884f3d6"
+  },
+  "separateReadOnlyWebEvidence": {
+    "record": "web-reference.json",
+    "originalSha256": "562c76ef2f1357e15705c8c94a279cfbb78182bc358540870520757c3c44f6b3",
+    "modelCandidateAttributionNotRewritten": true
+  },
+  "previousFailure": {
+    "version": "1.8.0-rc23",
+    "case": "hollow_mesh",
+    "result": "failed",
+    "publicRecord": "../1.8.0/hollow-mesh.json",
+    "historicalResultRewritten": false
+  },
+  "preservedReadOnlyWebFailure": {
+    "candidate": "1.8.1-rc19",
+    "controllerReport": "results/agent-controller-web-reference-1.8.1-rc19.json",
+    "controllerReportSha256": "a20f5abd46aef013932acd29388769e6591ac0d8707acce1c32310b721bf9268",
+    "controllerPassed": false,
+    "note": "The controller failed after an earlier failed web_search even though later official-page reads and the answer succeeded. Keep this failed controller outcome; a general recovery fix and any new model run are separate evidence."
+  },
+  "finalReadOnlyWebEvidence": {
+    "record": "web-reference-rc20.json",
+    "originalSha256": "33c818d4c8646783552366090be2a26070afb7bcb2de629731ece77d277274be",
+    "candidate": "1.8.1-rc20",
+    "passed": true,
+    "packageSourceCommit": "c265cea12ce47a5e79d8e2e28b24ba15fc2f0fdd",
+    "packageArchiveSha256": "1730d51649e8aa70fd1d74e813ada4b00ab87522c05a5aad464a509d8d9acc2f",
+    "controllerPassed": true,
+    "controllerTaskStatus": "explanation_complete",
+    "observedProjectFiles": 287,
+    "projectFilesAndSceneUnchanged": true,
+    "exactCitedUrlSpellingMatchesOpenedUrls": false,
+    "allCitationsResolveToActualOpenedSources": true,
+    "failedDiscoveryStepsRetained": [
+      1
+    ]
+  }
+}

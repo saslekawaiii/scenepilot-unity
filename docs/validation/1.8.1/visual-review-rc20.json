@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "actualPixelsReviewed": true,
+  "capture": "hollow-mesh-rc20.png",
+  "captureSha256": "012e732358009657212fe5a258451d6de43f8c39db1828293894564355d10bce",
+  "observationPackageSourceCommit": "c265cea12ce47a5e79d8e2e28b24ba15fc2f0fdd",
+  "observationPackageArchiveSha256": "1730d51649e8aa70fd1d74e813ada4b00ab87522c05a5aad464a509d8d9acc2f",
+  "physicalNUnitOriginalSha256": "b0fa4d6185bdab744b078fd8a0c19b36cf45795bff3e20c6f01ad9d2195cf8fa",
+  "independentArtifactIntegritySha256": "787797a1c9428f8b8384acc3bea967ee989feb432f40763281661d2460ce557c",
+  "modelInferenceCandidate": "1.8.1-rc17",
+  "modelInferenceSourceCommit": "9af594540ee9fdf7c386fd08dc6eb0c9b25f8d1d",
+  "sceneRepairByHarness": false,
+  "reviewedUtc": "2026-11-05T14:12:36.820698Z",
+  "observations": [
+    "Actual RC20 PNG personally viewed: readable gray outer and inner walls, bright annular top and visible central opening.",
+    "The lowest outer edge is slightly cropped; no full-frame or artistic-quality guarantee is claimed.",
+    "The exact RC20 independent suite passed all 44 cases, including referenced stored normals, material/pipeline compatibility, camera visibility, actual physical ring/aperture queries and dynamic support."
+  ],
+  "limits": [
+    "This remains an RC17 continuation/repair result, not fresh RC20 mesh inference.",
+    "These bounded checks and image review do not establish arbitrary-task reliability."
+  ]
+}

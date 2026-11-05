@@ -30,7 +30,13 @@ using UnityEngine.InputSystem;
     };
     static RuntimeProbeAcceptanceRunner(){if(!AssetDatabase.IsAssetImportWorkerProcess())EditorApplication.update+=Tick;}
     static string Hash(string p){using(var h=SHA256.Create())return BitConverter.ToString(h.ComputeHash(File.ReadAllBytes(p))).Replace("-","").ToLowerInvariant();}
+    static bool startupQueued;
     public static void Run()
+    {
+        if(startupQueued)return;startupQueued=true;
+        EditorApplication.delayCall+=()=>{try{StartAfterEditorStartup();}catch(Exception error){Debug.LogException(error);EditorApplication.Exit(1);}};
+    }
+    static void StartAfterEditorStartup()
     {
         if(Environment.GetEnvironmentVariable("WW_RUNTIME_PROBE_ACCEPTANCE")!="1"||!Application.isBatchMode)throw new InvalidOperationException("Explicit offline fixture required");
         if(File.Exists(Output))throw new IOException("Fresh report required");
@@ -40,7 +46,7 @@ using UnityEngine.InputSystem;
         var light=new GameObject("ProbeFixtureLight").AddComponent<Light>();light.intensity=1;
         Directory.CreateDirectory("Assets/ProbeAcceptance");const string scene="Assets/ProbeAcceptance/fixture.unity";EditorSceneManager.SaveScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene(),scene);
         bool invalidRejected=false;try{AgentEditorJobs.RunRuntimeProbe("invalid csharp ???",2);}catch(ArgumentException){invalidRejected=true;}
-        report=new JObject{["startedUtc"]=DateTime.UtcNow.ToString("O"),["invalidCodeRejectedBeforePlay"]=invalidRejected,["scene"]=scene,["sceneHash"]=Hash(scene),["devices"]=new JArray(InputSystem.devices.Select(d=>d.deviceId)),["caseIndex"]=0,["jobId"]=null,["cases"]=new JArray(),["completed"]=false};Save();
+        report=new JObject{["startedUtc"]=DateTime.UtcNow.ToString("O"),["invalidCodeRejectedBeforePlay"]=invalidRejected,["scene"]=scene,["sceneHash"]=Hash(scene),["initialRunInBackground"]=Application.runInBackground,["devices"]=new JArray(InputSystem.devices.Select(d=>d.deviceId)),["caseIndex"]=0,["jobId"]=null,["cases"]=new JArray(),["completed"]=false};Save();
     }
     static async void Tick()
     {
@@ -64,11 +70,15 @@ using UnityEngine.InputSystem;
             var compilationEvidence=typeof(ChatController).GetMethod("SuccessfulPlayCompilationEvidence",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic);
             var measuredStep=new EditorCommandResult{Tool="job_result",Target=job.Id,Success=job.Success,Summary=JObject.FromObject(job).ToString()};
             bool compilationEvidenceMatched=(compilationEvidence.Invoke(null,new object[]{new System.Collections.Generic.List<EditorCommandResult>{measuredStep}})!=null)==job.Success;
-            bool passed=job.Success==item.Item3&&restored&&sceneUnchanged&&devicesRestored&&File.Exists(job.ResultPath)&&compilationEvidenceMatched;
+            bool backgroundRestored=Application.runInBackground==(bool)report["initialRunInBackground"];
+            bool inputEvidenceMatched=true;
+            if(item.Item1=="actual_keyboard_and_mouse")inputEvidenceMatched=(int?)job.ProbeInputEvidence["keyboardStateEvents"]>0&&(int?)job.ProbeInputEvidence["mouseStateEvents"]>0;
+            if(item.Item1=="actual_interact_edge"||item.Item1=="current_keyboard_interact_edge")inputEvidenceMatched=(int?)job.ProbeInputEvidence["keyboardStateEvents"]>0;
+            bool passed=backgroundRestored&&inputEvidenceMatched&&job.Success==item.Item3&&restored&&sceneUnchanged&&devicesRestored&&File.Exists(job.ResultPath)&&compilationEvidenceMatched;
             if(item.Item1=="yielded_timeout")passed&=(job.Error??"").Contains("wall-time");
             if(item.Item1=="missing_assertion")passed&=(job.Error??"").Contains("No runtime assertion");
             if(item.Item1=="cancel")passed&=(job.Error??"").Contains("cancelled");
-            ((JArray)report["cases"]).Add(new JObject{["case"]=item.Item1,["expectedSuccess"]=item.Item3,["actualSuccess"]=job.Success,["status"]=job.Status,["error"]=job.Error,["passed"]=passed,["sceneRestored"]=restored,["sceneFileUnchanged"]=sceneUnchanged,["devicesRestored"]=devicesRestored,["compilationEvidenceMatched"]=compilationEvidenceMatched,["devicesAfter"]=new JArray(InputSystem.devices.Select(d=>new JObject{["name"]=d.name,["layout"]=d.layout})),["samples"]=job.Samples,["sourceHash"]=job.ProbeSourceHash,["observations"]=job.ProbeObservations,["assertions"]=job.ProbeAssertions});
+            ((JArray)report["cases"]).Add(new JObject{["case"]=item.Item1,["expectedSuccess"]=item.Item3,["actualSuccess"]=job.Success,["status"]=job.Status,["error"]=job.Error,["passed"]=passed,["sceneRestored"]=restored,["sceneFileUnchanged"]=sceneUnchanged,["devicesRestored"]=devicesRestored,["compilationEvidenceMatched"]=compilationEvidenceMatched,["runInBackgroundRestored"]=backgroundRestored,["inputEvidenceMatched"]=inputEvidenceMatched,["inputDelivery"]=job.ProbeInputEvidence,["devicesAfter"]=new JArray(InputSystem.devices.Select(d=>new JObject{["name"]=d.name,["layout"]=d.layout})),["samples"]=job.Samples,["sourceHash"]=job.ProbeSourceHash,["observations"]=job.ProbeObservations,["assertions"]=job.ProbeAssertions});
             report["caseIndex"]=i+1;report["jobId"]=null;
             if(i+1==Cases.Length){report["completed"]=true;report["passed"]=(bool)report["invalidCodeRejectedBeforePlay"]&&((JArray)report["cases"]).All(c=>(bool)c["passed"]);report["finishedUtc"]=DateTime.UtcNow.ToString("O");Save();EditorApplication.Exit((bool)report["passed"]?0:1);return;}Save();
         }

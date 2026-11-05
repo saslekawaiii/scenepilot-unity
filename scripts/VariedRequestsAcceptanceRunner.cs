@@ -71,7 +71,15 @@ public static class VariedRequestsAcceptanceRunner
         }
         return Hash(System.Text.Encoding.UTF8.GetBytes(all.ToString(Formatting.None)));
     }
+    static bool startupQueued;
     public static void Run()
+    {
+        if(startupQueued)return;startupQueued=true;
+        // -executeMethod runs inside FinishLoadingProject. Scene loading can
+        // wait on asset GC that needs the first normal Editor loop.
+        EditorApplication.delayCall+=()=>{try{StartAfterEditorStartup();}catch(Exception error){Debug.LogException(error);EditorApplication.Exit(1);}};
+    }
+    static void StartAfterEditorStartup()
     {
         if(!Application.isBatchMode||Environment.GetEnvironmentVariable("WW_AGENT_ACCEPTANCE")!="1"||Path.GetFullPath(Directory.GetParent(Application.dataPath).FullName)!=Path.GetFullPath(Environment.GetEnvironmentVariable("WW_AGENT_PROJECT")??""))throw new InvalidOperationException("Explicit isolated fixture required");
         if(File.Exists(Output))throw new IOException("Fresh output required");
@@ -121,8 +129,11 @@ public static class VariedRequestsAcceptanceRunner
             var answer=controller.Current.Messages.LastOrDefault(m=>m.Role=="assistant");if(answer==null||controller.Busy||answer.Task?.ContinueAfterReload==true||ScriptDrafts.Pending||AgentSourcePatches.Pending)return;
             row=(JObject)((JArray)report["cases"]).Last;string name=item.Item1;
                 var checks=new JObject{["realModelUsed"]=answer.Attempts.Count>0,["noError"]=!answer.IsError,["noPendingPlan"]=answer.PendingPlan==null};
+            var activeScene=UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+            bool savedByAgent=!string.IsNullOrEmpty(activeScene.path)&&File.Exists(activeScene.path)&&!activeScene.isDirty;
+            if((bool?)CaseConfig[index]["requireSavedScene"]==true)checks["agentSavedSceneBeforeArtifactCapture"]=savedByAgent;
             checks["notBlocked"]=answer.Task?.Status!="blocked"&&answer.Task?.Status!="partial"&&answer.Task?.Status!="failed"&&answer.Task?.Status!="cancelled"&&answer.Task?.Status!="timed_out";checks["notStoppedByHarness"]=(bool?)report["stoppedByHarness"]!=true;
-            row["behaviorNotYetIndependentlyVerified"]=true;row["checks"]=checks;row["passed"]=checks.Properties().All(p=>(bool)p.Value);row["answer"]=JObject.FromObject(answer);report["caseIndex"]=index+1;report["startedCase"]=false;
+            row["agentScenePathBeforeArtifactCapture"]=activeScene.path;row["agentSceneDirtyBeforeArtifactCapture"]=activeScene.isDirty;row["behaviorNotYetIndependentlyVerified"]=true;row["checks"]=checks;row["passed"]=checks.Properties().All(p=>(bool)p.Value);row["answer"]=JObject.FromObject(answer);report["caseIndex"]=index+1;report["startedCase"]=false;
             row["afterProjectFiles"]=ProjectFiles();row["afterInventory"]=Snapshot();row["afterSceneDigest"]=SceneDigest();string outputFolder=Environment.GetEnvironmentVariable("WW_AGENT_ARTIFACT_FOLDER")??"Assets/VariedAcceptance";if(!outputFolder.StartsWith("Assets/",StringComparison.Ordinal)||outputFolder.Contains(".."))throw new ArgumentException("Artifact folder must be below Assets");Directory.CreateDirectory(outputFolder);EditorSceneManager.SaveScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene(),outputFolder+"/"+name+".unity");Save();
             if(index+1==Cases.Length||(bool?)report["stoppedByHarness"]==true){report["packageUnchanged"]=(string)report["packageDigest"]==PackageDigest();report["completed"]=true;report["passed"]=((JArray)report["cases"]).All(c=>(bool)c["passed"])&&(bool)report["packageUnchanged"];report["finishedUtc"]=DateTime.UtcNow.ToString("O");Save();controller.Dispose();EditorApplication.Exit((bool)report["passed"]?0:1);}
         }

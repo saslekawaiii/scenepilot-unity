@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 1,
+  "case": "web_reference_nonalloc",
+  "result": "passed",
+  "verificationKind": "Independent inspection of an actual fresh read-only model request, recorded tool data, project integrity snapshots and official documentation; no new model inference.",
+  "checkedUtc": "2026-11-05T12:46:51.651710Z",
+  "modelRun": {
+    "candidate": "1.8.1-rc16",
+    "startedUtc": "2026-11-05T12:41:17.3840880Z",
+    "finishedUtc": "2026-11-05T12:42:12.7431150Z",
+    "inferenceCalls": 3,
+    "reviewInferenceCalls": 0,
+    "toolSteps": 4,
+    "operations": {
+      "web_search": 2,
+      "web_read": 2
+    },
+    "controllerPassed": true,
+    "controllerTaskStatus": "checks_failed",
+    "controllerTaskStatusNote": "The original checks_failed task-state field is retained. Independent acceptance below is based on actual read-only integrity, opened sources and answer content, separately from that field.",
+    "paidApiUsed": false,
+    "providerInjected": false,
+    "sceneRepairByHarness": false
+  },
+  "packageProof": {
+    "sourceCommit": "8e8b5f65099a8f3ac2ea109929f9fbddba2fdeed",
+    "archive": "com.worldweaver.toolkit-1.8.1-rc16.tgz",
+    "archiveSha256": "e4c21d3f2b98aea9ddaf36c6283392adedb251dc61deae60687d9071d908882a",
+    "fileCount": 1876,
+    "frozenSourceTreeSha256": "afea9869759d33da7403c41cf420443d9a877ddbd1fbffdb5f068c6be9737ff4",
+    "proofRecordSha256": "375110f77b33de6716b082cf8e25b0d9db339f0de692d42bb7327f7e76621bfb",
+    "installedPayloadMatchesFrozenProof": true,
+    "packageUnchangedDuringModelRequest": true,
+    "modelCandidateAttributionPreserved": true
+  },
+  "sourceReports": {
+    "sanitizedControllerReport": "results/agent-controller-web-reference-1.8.1-rc16.json",
+    "sanitizedControllerReportSha256": "50980b80c44700eab8b13bd18feea4f4981a08684facb638d2326334d6cfdb22",
+    "actualRunRecordSha256": "d67878d0ec16de228b88a2ad02049acf165fff7609c7ad680eeb668202972040",
+    "rawModelInternalsOmitted": true,
+    "inspectedActualCaseFields": [
+      "beforeProjectFiles",
+      "afterProjectFiles",
+      "beforeSceneDigest",
+      "afterSceneDigest",
+      "answer.Task.MutationAuthorized",
+      "answer.Steps tool/success/change/summary fields only"
+    ]
+  },
+  "readOnlyIntegrity": {
+    "passed": true,
+    "mutationAuthorized": false,
+    "allObservedToolsReadOnly": true,
+    "playModeToolUsed": false,
+    "beforeProjectFileCount": 249,
+    "afterProjectFileCount": 249,
+    "projectFileHashMapsEqual": true,
+    "beforeProjectFileHashMapSha256": "e6b046491689dcc79196dbae425aad67088c64b638c454a09db9b8634982511d",
+    "afterProjectFileHashMapSha256": "e6b046491689dcc79196dbae425aad67088c64b638c454a09db9b8634982511d",
+    "mapHashEncoding": "SHA-256 of UTF-8 JSON sorted by key, compact separators, ensure_ascii=false",
+    "addedFiles": 0,
+    "removedFiles": 0,
+    "changedFiles": 0,
+    "beforeSceneDigest": "53986d30313f15dd4d981facbdbf401e8080b337c3237300bd99b4d6b0986fde",
+    "afterSceneDigest": "53986d30313f15dd4d981facbdbf401e8080b337c3237300bd99b4d6b0986fde",
+    "sceneDigestEqual": true,
+    "scope": "The project files captured by the harness and its scene digest; not a claim about every file on the computer."
+  },
+  "searches": [
+    {
+      "stepIndex": 0,
+      "tool": "web_search",
+      "toolSuccess": true,
+      "changesApplied": null,
+      "backend": "duckduckgo",
+      "resultCount": 6,
+      "attempts": [
+        {
+          "backend": "duckduckgo",
+          "results": 6
+        }
+      ]
+    },
+    {
+      "stepIndex": 1,
+      "tool": "web_search",
+      "toolSuccess": true,
+      "changesApplied": null,
+      "backend": "google",
+      "resultCount": 6,
+      "attempts": [
+        {
+          "backend": "duckduckgo",
+          "error": "DDGSException"
+        },
+        {
+          "backend": "google",
+          "results": 6
+        }
+      ]
+    }
+  ],
+  "openedSources": [
+    {
+      "stepIndex": 2,
+      "tool": "web_read",
+      "toolSuccess": true,
+      "changesApplied": null,
+      "observedUrl": "https://docs.unity3d.com/6000.1/Documentation/ScriptReference/Physics.OverlapSphereNonAlloc.html",
+      "originalHttpStatus": null,
+      "originalHttpStatusNote": "The original web_read summary records success, URL and returned text; it does not expose a numeric HTTP status.",
+      "returnedTextUtf8Bytes": 3581,
+      "returnedTextSha256": "0361ff311bfa71e8b628f3ce3bdc0fff6e9ea4e3108566f9993bde8e56d48ded",
+      "stepSummarySha256": "642719b78df5eef10c3e65355a7b2035bc259aa2046eaec2950b2b74feb47a52",
+      "linkedInFinalReply": true,
+      "independentHttpRecheck": {
+        "requestedUrl": "https://docs.unity3d.com/6000.1/Documentation/ScriptReference/Physics.OverlapSphereNonAlloc.html",
+        "resolvedUrl": "https://docs.unity3d.com/6000.1/Documentation/ScriptReference/Physics.OverlapSphereNonAlloc.html",
+        "httpStatus": 200,
+        "contentType": "text/html,text/html; charset=utf-8",
+        "bodyBytes": 18256,
+        "bodySha256": "6b9b24e13eafe9257443edc2c57f3ceb5d69422a098ef3cd3586d2798c53758e",
+        "retrievedUtc": "2026-11-05T12:45:08.415660Z",
+        "tlsVerification": "curl default certificate verification; no insecure option",
+        "tlsVerifyResult": 0
+      }
+    },
+    {
+      "stepIndex": 3,
+      "tool": "web_read",
+      "toolSuccess": true,
+      "changesApplied": null,
+      "observedUrl": "https://docs.unity.com/en-us/engine/6000.0/script-reference/unityengine/physics/overlapsphere",
+      "originalHttpStatus": null,
+      "originalHttpStatusNote": "The original web_read summary records success, URL and returned text; it does not expose a numeric HTTP status.",
+      "returnedTextUtf8Bytes": 2650,
+      "returnedTextSha256": "3917e9ed39db8ef0d41e5dee96f9d0e15f1dfb01339a0f188d2e514f8928d6c4",
+      "stepSummarySha256": "ceee09c1bffc5fb6a63c1735ee9098a8a27104951c54de41df726c20d174104b",
+      "linkedInFinalReply": true,
+      "independentHttpRecheck": {
+        "requestedUrl": "https://docs.unity.com/en-us/engine/6000.0/script-reference/unityengine/physics/overlapsphere",
+        "resolvedUrl": "https://docs.unity.com/en-us/engine/6000.0/script-reference/unityengine/physics/overlapsphere",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bodyBytes": 905657,
+        "bodySha256": "18221ebe9a6a390b383bed3339539e725f67678d509c505080b55228a55f49b0",
+        "retrievedUtc": "2026-11-05T12:45:08.588674Z",
+        "tlsVerification": "curl default certificate verification; no insecure option",
+        "tlsVerifyResult": 0
+      }
+    }
+  ],
+  "replyLinks": {
+    "urls": [
+      "https://docs.unity3d.com/6000.1/Documentation/ScriptReference/Physics.OverlapSphereNonAlloc.html",
+      "https://docs.unity.com/en-us/engine/6000.0/script-reference/unityengine/physics/overlapsphere"
+    ],
+    "exactlyMatchActualOpenedUrls": true,
+    "finalReplySha256": "ca4f1179e957875ac7910cfc3501275edacfabfcbdbd20452601dd5e6de6252e"
+  },
+  "answerVerification": {
+    "method": "Human comparison of the final reply against the two actual returned documents, then independent official-page retrieval. No implementation or model reasoning was inspected.",
+    "checks": [
+      {
+        "claim": "OverlapSphere returns Collider[] and allocates memory.",
+        "passed": true,
+        "source": "https://docs.unity.com/en-us/engine/6000.0/script-reference/unityengine/physics/overlapsphere",
+        "section": "Definition, Returns and Remarks"
+      },
+      {
+        "claim": "NonAlloc writes into the supplied buffer without growing it and returns the written count.",
+        "passed": true,
+        "source": "https://docs.unity3d.com/6000.1/Documentation/ScriptReference/Physics.OverlapSphereNonAlloc.html",
+        "section": "Returns and Description"
+      },
+      {
+        "claim": "Only indices [0, returnedCount) are current results.",
+        "passed": true,
+        "source": "https://docs.unity3d.com/6000.1/Documentation/ScriptReference/Physics.OverlapSphereNonAlloc.html",
+        "section": "Returns and example loop",
+        "interpretation": "Consequence of the written-count contract; matches the documented example."
+      },
+      {
+        "claim": "A full buffer indicates possible truncation, not proof that additional hits existed.",
+        "passed": true,
+        "source": "https://docs.unity3d.com/6000.1/Documentation/ScriptReference/Physics.OverlapSphereNonAlloc.html",
+        "section": "Description",
+        "interpretation": "A fixed-capacity count cannot distinguish exact fit from truncation; the reply uses a possibility qualifier."
+      }
+    ],
+    "nonAllocScopeNote": "The query avoids result garbage; allocating a new caller-owned buffer still allocates memory.",
+    "apiExecutionTestPerformed": false,
+    "apiExecutionTestScope": "This case requested researched explanation only; no physics simulation or Play Mode was required."
+  },
+  "startupEvidence": {
+    "rc16RequestActuallySubmittedAndFinished": true,
+    "earlierRC15ModelRequestSubmitted": false,
+    "earlierRC15FailureClassification": "Editor startup/harness before inference",
+    "scope": "The completed RC16 request confirms the deferred startup path worked for this run; it does not establish that every future Editor startup will succeed."
+  },
+  "limits": [
+    "One researched explanation is not evidence of reliability on arbitrary scene-building tasks.",
+    "Original web_read tool summaries lack numeric HTTP status; independent HTTP statuses are labeled separately.",
+    "Original model-run attribution remains RC16 even if later software or observer checks use a newer package."
+  ]
+}
