@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
+using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -24,7 +25,7 @@ namespace WorldWeaver.Tests
         const string EnglishExplanation = "Only explain how to create 2 trees and a playable player. Do not write a C# script or change code, and do not run Play Mode.";
         const string Implementation = "Create 2 trees, a playable player and write a C# script.";
         Scene scene, previous;
-        string folder;
+        string folder, stagedScenePath;
         bool fixtureActive;
         readonly List<ChatController> controllers = new List<ChatController>();
 
@@ -43,7 +44,7 @@ namespace WorldWeaver.Tests
 
         [SetUp] public void SetUp()
         {
-            fixtureActive = false; scene = default;
+            fixtureActive = false; scene = default; stagedScenePath = null;
             previous = SceneManager.GetActiveScene();
             bool untitled = Enumerable.Range(0, SceneManager.sceneCount).Select(SceneManager.GetSceneAt).Any(s => s.isLoaded && string.IsNullOrEmpty(s.path));
             if (untitled && !Application.isBatchMode) Assert.Ignore("Save open scenes before GUI execution of this isolated fixture.");
@@ -63,6 +64,7 @@ namespace WorldWeaver.Tests
                 if (previous.IsValid() && previous.isLoaded) EditorSceneManager.CloseScene(scene, true);
                 else EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             }
+            if (!string.IsNullOrEmpty(stagedScenePath)) AssetDatabase.DeleteAsset(stagedScenePath);
             foreach (string id in checkpoints)
                 if (Guid.TryParseExact(id, "N", out _))
                 {
@@ -213,14 +215,24 @@ namespace WorldWeaver.Tests
             Assert.That(answer.Task.CompilationRequired, Is.True);
             string playerRequirement = answer.Task.Requirements.Single(r => r.Kind == "player").Id;
             Assert.That(scene.rootCount, Is.Zero);
+            // The consumer can retain a saved game scene. Our fresh additive scene
+            // then needs a path before the real checkpoint/approval transaction.
+            // Prove the original fixture restriction instead of weakening it.
+            if (SceneManager.sceneCount > 1 && string.IsNullOrEmpty(scene.path))
+            {
+                var failure = Assert.Throws<InvalidOperationException>(() => AgentCheckpoints.Begin(controller.Current.Id, answer.Id));
+                StringAssert.Contains("Save additive scenes before checkpoint", failure.Message);
+            }
+            stagedScenePath = "Assets/__ScenePilotTaskPurpose-" + Guid.NewGuid().ToString("N") + ".unity";
+            Assert.That(EditorSceneManager.SaveScene(scene, stagedScenePath), Is.True, "Could not stage the isolated fixture scene for checkpoint-safe approval.");
             // Do not schedule further inference; this fixture covers approval and real executor verification.
             answer.Task.ResumeAttempts = int.MaxValue;
             yield return Finish(controller.ApplyPendingAsync(answer.Id));
             Assert.That(answer.Task.MutationAuthorized, Is.True);
             Assert.That(answer.Task.Purpose, Is.EqualTo("implementation"));
             Assert.That(answer.Task.CompilationRequired, Is.True);
-            Assert.That(answer.PendingPlan, Is.Null);
-            Assert.That(answer.Steps.Any(s => s.Tool == "create_node" && s.Success), Is.True);
+            Assert.That(answer.PendingPlan, Is.Null, answer.Text + "\n" + controller.Phase);
+            Assert.That(answer.Steps.Any(s => s.Tool == "create_node" && s.Success), Is.True, answer.Text + "\n" + controller.Phase);
             Assert.That(answer.Task.Checks.Single(c => c.RequirementId == playerRequirement).Passed, Is.False);
             Assert.That(answer.Task.Checks.Single(c => c.RequirementId == "required_compilation").Passed, Is.False);
             Assert.That(answer.IsError, Is.True, "Approval of a partial node plan cannot satisfy missing player/code requirements.");
