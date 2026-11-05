@@ -16,6 +16,8 @@ jobs:
           persist-credentials: false
       - name: Repository invariants and credential scan
         run: python3 scripts/check_repository.py
+      - name: Documentation links, images and heading anchors
+        run: python3 scripts/check_docs.py
       - name: Pinned skill and recipe integrity (offline)
         run: python3 scripts/import_agent_skills.py
       - name: QA process guard (no Unity process started)

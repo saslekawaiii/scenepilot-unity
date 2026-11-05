@@ -1,64 +1,60 @@
-# Живые NPC: свободный разговор, память и общение между персонажами
+# NPC dialogue, memory and social behavior
 
-WorldWeaver разделяет личность персонажа, ответ языковой модели и проверенные игровые действия. Модель может ответить на неожиданную реплику, возразить и вспомнить разговор; одно утверждение в тексте не завершает квест и не выдаёт награду.
+Unity Editor Agent's runtime NPCs combine a character profile, model-generated responses and validated game actions. A spoken claim is not itself a quest transition, inventory transfer or reward.
 
-## Включить ИИ у персонажа
+## Enable AI on a character
 
-1. Выберите NPC в Hierarchy. В `Intelligent NPC` включите **«Включить ИИ»**.
-2. Задайте имя, роль, характер, биографию, цели и ограничения. Можно назначить собственный `Portrait`.
-3. В **«Модели персонажа»** назначьте `Orchestrator Profile`: `Dialogue` для разговора, `Planning` для автономных действий. Каждый маршрут ссылается на `Model Profile` с endpoint, точным ID модели и лимитами. API-ключ хранится только во внешней переменной окружения; профиль сохраняет её имя.
+1. Select an NPC with an **`IntelligentNPC`** component.
+2. In its Inspector, enable **«Включить ИИ»** and set the name, role, personality, biography, goals and constraints. `Portrait` is optional.
+3. Assign **«Модели персонажа»** to an `OrchestratorProfile`. Its `Dialogue` and `Planning` routes reference `ModelProfile` assets with the provider, endpoint, exact model ID and limits.
+4. For a hosted API, put only an environment-variable **name** in the model profile. The running game/Editor must receive the credential separately.
 
-То же самое можно поручить чату: **«Включи ИИ у выбранного NPC и используй выбранную модель»**. Инструмент `configure_npc_ai` принимает `enabled`, `social`, `autonomous`, `topic`, `cooldown_seconds`, `assign_selected_model`. Для копирования текущей модели чата нужно явное `assign_selected_model: true`; смена модели в чате сама по себе не перенастраивает существующих персонажей.
+You can request this through chat:
 
-Для локального подключения в `Model Profile` укажите `Provider = Ollama`, например `http://127.0.0.1:11434` и точное имя установленной разговорной модели. Выбирайте модель, которую компьютер держит в памяти, и отдельно проверяйте её смысловые ответы; маленький размер сам по себе не подтверждает пригодность для NPC. Несколько NPC не означают несколько одновременно загруженных моделей: запросы NPC проходят через общую последовательную очередь.
+> Enable AI for the selected NPC and explicitly assign the model currently selected in chat. Keep its appearance, identity and existing behavior.
 
-Новые NPC, созданные демонстрационной командой R11 без своего профиля, получают `qwen3.5:9b`, контекст **8192**, максимум **512** выходных токенов, timeout **150 с**, retries **0** и температуру **0,25**. Установите `ollama pull qwen3.5:9b` либо явно назначьте подходящую установленную модель. Эти значения не мигрируют в уже существующие пользовательские профили.
+The `configure_npc_ai` tool supports `enabled`, `social`, `autonomous`, `topic`, `cooldown_seconds` and **`assign_selected_model`**. Only an explicit `assign_selected_model=true` replaces the NPC's model routes. Selecting another chat model later leaves existing NPC profiles intact.
 
-## Поговорить в игре
+Use a conversational model that fits the machine and test its actual responses. A newly enabled NPC still needs a working model route; the editor does not invent an AI reply when the provider is unavailable. See [Ollama setup](local-models.md) and [custom APIs](custom-api.md).
 
-Подойдите и нажмите **E**. Это открывает окно разговора и приостанавливает движение игрока. Введите собственную реплику и нажмите Enter; Shift+Enter добавляет строку. Можно задать вопрос вне ожидаемого сценария, продолжить мысль или сослаться на предыдущий разговор. NPC получает последние реплики, свою личность, цели, знания и проверенное состояние мира.
+## Talk during Play Mode
 
-**«Отменить»** останавливает текущий запрос. **Esc** или **«Закончить»** закрывает окно. При отключении или удалении NPC окно закрывается автоматически. Переключатель ИИ относится к выбранному персонажу.
+With the package's player/dialogue setup, approach a character and press **E**. Write a free-form reply and press **Enter**; **Shift+Enter** inserts a line. **«Отменить»** cancels an active response, and **Esc** or **«Закончить»** closes the conversation. Player movement pauses while the dialogue window is open.
 
-Письмо и награда остаются отдельными действиями **«По делу: взять письмо»** / **«По делу: передать письмо»**. Само открытие разговора не принимает квест. Фраза «я уже всё выполнил» не меняет этап квеста: действуют проверки расстояния, предметов, текущего этапа и однократной награды.
+The NPC receives its scoped identity, goals, knowledge, recent conversation and validated world context. Test unexpected questions and references to earlier turns; accepting free text does not guarantee that every answer stays factual or in character.
 
-## Общение NPC между собой
+The included letter-quest controls remain separate from free dialogue. Opening a conversation or claiming a task is finished does not bypass item, distance, stage or one-time reward checks. A custom player/UI must provide its own interaction wiring.
 
-В Inspector включите **«Разговаривать с соседями»** или попросите чат: **«Включи общение Игната и Мирона. Пусть обсуждают, нужно ли закрывать мост ночью; стражу важна безопасность, торговцу — свободный проход»**.
+## Let NPCs talk to each other
 
-Компонент `NpcSocialAutonomy` использует отдельные убеждения и память каждого участника. Разговор состоит из поочерёдных реальных обращений к выбранной модели. По умолчанию это до трёх реплик; допустимый предел — четыре. Несогласие зависит от заданных характеров и фактических ответов модели, оно не подменяется заранее написанной сценкой.
+Enable **«Разговаривать с соседями»** in the Inspector, or ask:
 
-Персонажи выбирают доступного соседа поблизости. При наличии `NavMeshAgent` и запечённого NavMesh персонаж может сначала подойти по проверенному пути. По умолчанию поиск ограничен 20 м, разговор — 8 м, попытка подхода — 12 секундами. Расписание и следование не перехватывают маршрут во время разговора. Если путь не подтверждён, персонаж не заявляет, что дошёл.
+> Enable social conversation for the guard and merchant. Let them discuss whether the bridge should close at night: the guard values safety and the merchant values access.
 
-Участники должны находиться внутри одного `WorldSaveState`; при его отсутствии — под одним корневым объектом. `CharacterId` должен быть уникальным. Копии NPC с одинаковым ID нужно исправить до начала накопления памяти. Inspector показывает предупреждение и кнопку назначения нового ID для персонажа без истории.
+`NpcSocialAutonomy` finds eligible nearby characters and makes alternating real model requests. Chat configuration uses three turns; the component supports up to four. Distinct interests can produce disagreement, but the model's actual answers determine the conversation.
 
-## Нагрузка, память и отсутствие сети
+Characters must share a `WorldSaveState`, or the same root when no save-state component exists, and have unique `CharacterId` values. When an enabled `NavMeshAgent` has a baked route, a character can approach a partner. Without a valid path, the system does not claim that the character arrived. Autonomous planning is a separate option from social conversation.
 
-- Одновременно выполняется один запрос NPC. Новый запрос игрока отменяет активное фоновое планирование/общение и проходит перед ожидающими фоновыми запросами.
-- Общий предел — **4 фоновых слота вызова маршрутизатора в скользящую минуту**, включая автономное планирование и исправление ответа. Это предел вызовов `IModelRouter.CompleteAsync`, а не гарантированный предел HTTP-попыток: сетевые повторы `Model Profile.Retries` учитываются провайдером отдельно. В локальном приёмочном сценарии `Retries = 0`. Отменённая начатая попытка тоже расходует предел. Повторные разговоры ограничены cooldown, по умолчанию 60 секунд; первая автоматическая попытка разнесена на 2–6 секунд после включения.
-- Оба участника сохраняют общий протокол разговора, но память принадлежит конкретному NPC. Хранятся до 32 реплик и 32 эпизодов. Контекст запроса дополнительно ограничен; это не бесконечная память обо всём мире.
-- `WorldSaveState` сохраняет характер, цели, переключатели ИИ и общения, протокол, эпизоды, отношения и проверенное игровое состояние. Старые сохранения версии 1 без новых полей остаются допустимы. Профили и секреты модели в сохранение не копируются.
-- Фоновые разговоры используют ограниченный поиск по собственным знаниям и памяти без переключения на embedding-модель. Если semantic retrieval недоступен в разговоре с игроком, применяется ограниченный поиск по тексту с сохранением области NPC.
-- Если сама разговорная модель не отвечает, показывается ошибка. Вымышленный ответ «от ИИ» не создаётся. Квестовые действия могут работать отдельно от модели.
+## Memory and request load
 
-Если JSON модели или запрошенное действие не проходит проверку, агент может один раз запросить исправление с фактической причиной отказа и той же схемой разрешений. Исходный отклонённый вариант не исполняется и не попадает в память как состоявшееся событие; каждый начатый вызов, включая отменённый и завершившийся ошибкой, сохраняется в `PipelineTrace.Attempts` со статусом; результат и метрики заполняются только при получении ответа. Ошибки соединения не запускают такое исправление. Дополнительный фоновый запрос также расходует общий лимит 4 слотов маршрутизатора в минуту. Если исправление тоже не прошло или бюджет закончился, возвращается явная ошибка, без автоматической выдачи предметов или подмены модельной реплики.
+- Each NPC keeps bounded scoped memory: up to **32 conversation entries** and **32 episodic memories**. Model context is bounded as well.
+- NPC requests use a shared sequential scheduler. A player conversation takes priority over background planning/social requests.
+- Background work is limited to **four started router calls per rolling minute**, including repair calls. Provider retries can produce additional HTTP attempts.
+- Social conversations use a cooldown, **60 seconds** by default. Increasing NPC count does not make responses instantaneous or provide unlimited simultaneous inference.
+- `WorldSaveState` can persist character state, scoped memory, relationships and conversation. Model profiles and secret values are not copied into the save file.
 
-В NPC–NPC разговоре разрешены только `Talk` и `Wait`. Текст, полученный от другого NPC, не может выдавать предметы, запускать произвольный код и менять квест. В разговоре с игроком остальные действия проходят существующий детерминированный валидатор разрешений, расстояний, навигации и инвентаря.
+Social dialogue permits only `Talk` and `Wait`. Player-facing actions pass deterministic permission and world-state checks. A rejected structured response can receive one bounded repair attempt; network failures remain explicit errors.
 
-## Что измерено на настоящей модели
+## Integrate another dialogue UI
 
-В отдельном нативном опыте R10 временный runtime-профиль с параметрами 512/150/0/0,25/8192 дал ответ на свободный русский вопрос о мосте без доставки письма. Полный pipeline занял **120,522 с**, собственно модельный ответ — **103,691 с**; RAG и память оставались включёнными. Это один завершённый ответ, а не оценка любой реплики или задержки первого токена. Исходный профиль R10 с 1024 токенами, 90 с и одним повтором до этого завершился ошибкой транспорта; оба результата сохранены. В R11 успешный профиль стал исходным для новых демонстрационных NPC, а отдельный нативный разговор R11 уже завершён без подмены профиля: 102,777 с модельный ответ и 142,789 с весь pipeline. Последняя реплика видна в компактном окне; независимый разбор R11 (historical record retained locally) дал PASS доставке и видимости, смысловой PARTIAL и слабую обработку метафоры.
-
-В более широких разговорах R6 и R8 модель 9B прошла автоматические условия памяти, ролей и действий, однако независимый смысловой итог **PARTIAL** сохраняет выдуманную предысторию и неестественные фразы. Неожиданная реплика принимается свободным вводом, но достоверность и характер каждого ответа требуют предметной проверки. Протоколы и ограничения (historical record retained locally).
-
-## API для собственной интеграции
+Use the runtime API around your own input widget:
 
 ```csharp
 npc.BeginPlayerConversation();
 try
 {
     PipelineTrace trace = await npc.SpeakToPlayerAsync(playerText, cancellationToken);
-    // trace.Validation описывает фактически проверенное действие.
+    // Inspect trace.Validation for any game action that actually ran.
 }
 finally
 {
@@ -66,10 +62,18 @@ finally
 }
 ```
 
-Если отмена пришла после проверки и фактического исполнения действия, `PipelineTrace.Validation` сохраняет этот результат, а `ReplySuppressed = true` означает, что новую реплику не опубликовали. Это не отменяет уже исполненное действие: интерфейс не должен автоматически повторять такой запрос. При закрытии разговора `EndPlayerConversation()` отменяет ещё активный запрос игрока.
+Subscribe to `SpeechReceived` for `NpcUtterance` events and `AiStatusChanged` for request state. If cancellation arrives after a validated action already executed, `ReplySuppressed` can hide the reply while `Validation` retains that action result; do not blindly replay the request. To replace profiles at runtime, finish/cancel active work and call `ReleaseServices()` before the next request.
 
-`SpeechReceived` передаёт `NpcUtterance` с автором, адресатом и признаком реального ответа модели `IsAi`. `AiStatusChanged` сообщает состояние запроса. `ConversationHistory` возвращает защитные копии. Для своего backend можно явно передать `IModelRouter` и `IEmbeddingProvider` через `ConfigureInference`; владение ими переходит NPC. Автоматической подмены на тестовый провайдер нет.
+## Diagnose a quiet or incorrect NPC
 
-При замене всего `npc.Models` во время исполнения сначала дождитесь завершения/отмены запроса и вызовите `ReleaseServices()`, чтобы следующий запрос создал маршрутизатор для нового профиля.
+| Symptom | Check |
+| --- | --- |
+| No model response | AI toggle, Dialogue/Planning routes, endpoint, exact ID and inherited credentials. |
+| No social conversation | Both characters enabled, unique IDs, same scope, range, cooldown and background budget. |
+| NPC does not walk over | Enabled agent, baked NavMesh and an actual complete path. |
+| Wrong facts or character voice | Profile constraints, scoped knowledge/memory and the actual selected model's output. |
+| Broken mesh or animation | Inspect the imported rig, avatar/controller and visual setup separately from dialogue AI. |
 
-Техническая основа: [формат сообщений и структурированный JSON Ollama](https://github.com/ollama/ollama/blob/main/docs/api.md), [поиск объектов Unity](https://docs.unity.com/en-us/engine/6000.6/script-reference/unityengine/object/findobjectsbytype). Фиксированные тестовые провайдеры в автоматических проверках служат только для проверки правил и жизненного цикла; они не подтверждают качество реальных диалогов модели.
+Next: [chat workflow](chat-workflow.md), [examples](examples.md), [troubleshooting](troubleshooting.md).
+
+Implementation: [NPC component](../Packages/com.worldweaver.toolkit/Runtime/NPC/IntelligentNPC.cs), [social controller](../Packages/com.worldweaver.toolkit/Runtime/NPC/NpcSocialAutonomy.cs), [scheduler](../Packages/com.worldweaver.toolkit/Runtime/NPC/NpcInferenceScheduler.cs), [dialogue pipeline](../Packages/com.worldweaver.toolkit/Runtime/Dialogue/NpcPipeline.cs).

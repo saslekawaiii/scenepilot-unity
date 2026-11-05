@@ -1,41 +1,83 @@
-# Навыки и расширение агента в 1.5.0
+# Skills and Unity API recipes
 
-WorldWeaver использует 114 MD-навыков и отдельную библиотеку из 466 Markdown/C#-рецептов. Навык помогает выбрать подход и проверки; рецепт содержит пример Unity API. Это справочные материалы, а не 466 установленных исполняемых команд.
+Unity Editor Agent ships **114 Markdown skills** and **466 Unity API recipes**. Skills describe an approach and useful checks; recipes provide reference code. The available executable operations still come from the host's actual tool registry and project permissions.
 
-## Как агент получает новую возможность
+## Use the bundled library
 
-1. Читает фактическое состояние проекта и обнаруживает подходящие встроенные инструменты через `discover_tools`.
-2. Для отсутствующей операции вызывает `find_unity_recipes` с терминами Unity API. Поиск учитывает загруженные типы Component и возвращает настоящие ID рецептов.
-3. Загружает нужный текст через `read_unity_recipe`. Большой документ выдаётся страницами; ссылки на общие зависимости возвращаются отдельными ID.
-4. Проверяет неизвестные сигнатуры через `reflect_api`, адаптирует полезное тело метода и вызывает `execute_editor_code`. Исходные IRunCommand/ExecutionResult относятся к другому хосту и не считаются установленными.
-5. Получает настоящие ошибки Roslyn либо результат выполнения и независимые измерения геометрии из хоста. При ошибке выбирает следующий шаг; при успехе проверяет состояние и исходные требования. Перед завершением операции через собственный C# отдельный модельный разбор получает свежие измерения Unity без прежнего ответа исполнителя. Непройденный разбор возвращает несоответствия в цикл исправления; запрос и ответ сохраняются в EditorReviews. Это дополнительная модельная оценка, а не замена детерминированных проверок или игрового испытания.
+Skill retrieval is enabled by **«Использовать навыки»** in chat settings. You can ask the agent to discover relevant references before implementing an unfamiliar operation:
 
-Для Editor C# включите **«Автономный C# с доступом Unity Editor»** в настройках чата. По умолчанию он выключен. Нативные вызовы функций включены по умолчанию; модель должна поддерживать их. Режим «Спросить» не получает права изменять сцену от наличия рецепта.
+> Inspect the existing project setup, find the relevant Unity API recipes and adapt them to this version. Reuse the current controller, then compile and check the resulting behavior.
 
-Сниппет — тело метода `object Execute(GameObject target)`, без объявления класса и namespace. Стандартные using уже предоставлены; дополнительные using в начале поддерживаются. `target` — настоящий выбранный объект агента либо его рабочий узел. Для сериализуемого игрового MonoBehaviour нужны сохранённый исходник, компиляция Unity и подключение компонента; динамический тип сниппета не заменяет этот процесс.
+The agent's reference workflow is:
 
-## Что обеспечивает хост
+1. `discover_tools` finds the actual available operations.
+2. `list_skills` / `read_skill` retrieve a relevant guide.
+3. `find_unity_recipes` searches by Unity type, operation or domain.
+4. `read_unity_recipe` retrieves the exact returned ID, including additional pages/prerequisites when needed.
+5. `reflect_api` checks public signatures in the current project before unfamiliar code is used.
+6. An existing tool, reviewed runtime script or permitted `execute_editor_code` applies the operation; subsequent observations check the result.
 
-Схемы функций строятся из реального реестра команд, а аргументы проверяются до применения. Исходный ответ провайдера, нормализованный план и результаты инструментов сохраняются отдельно. Усечённый ответ не исполняется. Страницы рецептов и измерения C# передаются со специальными лимитами контекста: общий короткий префикс не должен скрывать код и геометрические предупреждения. Повтор без новых данных блокируется для конкретного чтения; другие запросы и переход к тексту рецепта остаются доступны.
+English API terms such as `HingeJoint`, `Terrain holes` or `Canvas raycaster` often work better than a broad natural-language search. A recipe may depend on a package or API version your project does not have.
 
-Проверки чисел, компонентов и связей читают состояние Unity. Для запроса создания физических объектов дополнительно выявляется новое тело с коллайдером без видимой геометрии; явно запрошенные невидимые служебные тела исключаются. Проверка артефакта не доказывает его игровую динамику.
+## Enable code only when needed
 
-Editor C# выполняется с полномочиями редактора на главном потоке. Это **не песочница**. Undo охватывает зарегистрированные изменения сцены; произвольная запись файлов не становится транзакционной. Бесконечный цикл способен остановить редактор. Изменения файлов игровых скриптов проходят отдельный процесс просмотра и компиляции. Эти пределы сохраняются независимо от количества навыков.
+**«Автономный C# с доступом Unity Editor»** allows generated Editor snippets. A snippet is a method body returning an observation; an omitted `target` is `null`, so code must explicitly find or receive an existing target. Leading `using` directives are supported. A saved runtime `MonoBehaviour` instead needs a source file, real Unity compilation and component assignment.
 
-## Источники и воспроизводимость
+**«Импортировать и подключать игровые скрипты автоматически»** controls autonomous runtime-script import. Without the relevant permission, references remain useful for planning or reviewed drafts. Ask mode does not gain scene-edit permission from a skill.
 
-- CoplayDev/unity-mcp, MIT: адаптирован RoslynCompiler; полный текст лицензии включён в пакет.
-- Besty0728/Unity-Skills и Nice-Wolf-Studio/unity-claude-skills, MIT: исходные 80 адаптированных руководств.
-- batihandev/unity-mcp-skills, MIT, ревизия `090c8e3eaefa23d57a98e237572a4ffbd19df444`: 34 адаптированных руководства и 466 неизменённых рецептов.
-- IvanMurzak/Unity-MCP и официальные Unity-Technologies/skills изучены. Их код и тексты не включены; официальные навыки имеют отдельную Unity Companion License.
+Editor code runs with Editor access on the main thread. Use it only in trusted projects and inspect generated source. A Markdown instruction cannot make arbitrary code sandboxed, transactional or safe to run forever.
 
-[Реестр исследования](research/unity-agents-2026-11-02.json), [исходный каталог навыков](../Packages/com.worldweaver.toolkit/Editor/Skills/catalog.json), [каталог рецептов](../Packages/com.worldweaver.toolkit/Editor/RecipeLibrary/catalog.json), [фиксированные хеши импорта](skills/unity-recipes-lock.json).
+## Add your own Markdown guide
+
+In advanced chat settings, **«Дополнительные папки с навыками · по одной на строку»** accepts up to eight local roots. Use this layout:
+
+```text
+MyAgentSkills/
+└── studio-door-conventions/
+    └── SKILL.md
+```
+
+A minimal guide:
+
+```markdown
+---
+name: studio-door-conventions
+description: Project conventions for configuring and checking doors.
+category: physics
+keywords: door hinge interaction collision
+tools: inspect_object inspect_component verify_scene
+mode: advisory
+---
+
+# Studio door conventions
+
+Inspect the existing hinge axis, input mapping and collision layers.
+Reuse the project's controller. Verify closed collision and opened passage.
+```
+
+The folder name must match `name`: lowercase letters, digits and hyphens, up to 64 characters. The description must be 8–320 characters. Keep each file under 64 KiB, use ordinary local folders rather than links, and avoid IDs already supplied by the bundled catalog. Click **«Обновить каталог»** after changing the configured folders.
+
+External guides are treated as untrusted references. Their `tools` field points to existing operations; it cannot install a backend, open new permissions or turn another project's MCP command names into local commands. Adapt imported instructions to the actual host and keep their license/source information.
+
+## Sources and licenses
+
+| Included reference | Source |
+| --- | --- |
+| Adapted skills | [Besty0728/Unity-Skills](https://github.com/Besty0728/Unity-Skills), [Nice-Wolf-Studio/unity-claude-skills](https://github.com/Nice-Wolf-Studio/unity-claude-skills) — MIT. |
+| Additional adapted guides and pinned recipes | [batihandev/unity-mcp-skills](https://github.com/batihandev/unity-mcp-skills) — MIT. |
+| Roslyn compiler adaptation used by Editor snippets | [CoplayDev/unity-mcp](https://github.com/CoplayDev/unity-mcp) — MIT. |
+
+Original revisions, paths and hashes are recorded in the [skill catalog](../Packages/com.worldweaver.toolkit/Editor/Skills/catalog.json), [recipe catalog](../Packages/com.worldweaver.toolkit/Editor/RecipeLibrary/catalog.json) and [import lock](skills/unity-recipes-lock.json). Licenses are retained in [skill notices](../Packages/com.worldweaver.toolkit/Editor/Skills/THIRD-PARTY-NOTICES.md) and [package notices](../Packages/com.worldweaver.toolkit/ThirdPartyNotices/).
+
+For source contributors, these commands verify the checked-in catalogs offline:
 
 ```sh
 python3 scripts/import_agent_skills.py
 python3 scripts/import_unity_recipes.py
 ```
 
-Обе проверки работают офлайн. Повторный импорт `--build` требует точных исходных ревизий, указанных в скриптах. После обновления источника нужно заново проверить совместимость, лицензию, хеши и живой путь «найти → прочитать → адаптировать → выполнить».
+Rebuilding from another upstream revision is a source change: review compatibility and licensing, update the lock and verify the adapted execution path. Increasing the number of guides alone does not establish that a task can be completed.
 
-При размещении процедурных построек учитываются занятые физические зоны и подходы к пещерам. База без явно заданных координат выбирает ближайший свободный участок; явно заданная пересекающая постройку позиция пещеры отклоняется с диагностикой. Существующие объекты при этом не удаляются. Проверка создания объектов дополняется отдельным испытанием движения в реальной сгенерированной сцене.
+Next: [examples](examples.md), [chat workflow](chat-workflow.md), [FAQ](faq.md).
+
+Implementation: [skill loader](../Packages/com.worldweaver.toolkit/Editor/Assistant/AgentSkillCatalog.cs), [recipe lookup](../Packages/com.worldweaver.toolkit/Editor/Assistant/UnityRecipeCatalog.cs).

@@ -1,54 +1,59 @@
-# Локальные модели Ollama
+# Local models with Ollama
 
-Откройте **Tools → WorldWeaver → Чат**, затем запустите приложение Ollama или команду `ollama serve`. Установленные модели на `http://127.0.0.1:11434` появляются в списке WorldWeaver автоматически. Добавлять обычную локальную Ollama через форму API не требуется.
+Unity Editor Agent discovers conversational models from an existing local Ollama server. You do not need to register each model as a custom API.
 
-## Запуск и установка модели
+In the current 1.8.1 package, open **Tools → ScenePilot → Chat**. The shipped chat labels are in Russian; the model selector is **«Модель помощника»**.
 
-Если Ollama уже запущена приложением, второй `ollama serve` не нужен. Для запуска из терминала:
+## Connect a local model
 
-```sh
-ollama serve
-```
+1. [Install Ollama](https://docs.ollama.com/quickstart) and start the app. If you run the server from a terminal, use `ollama serve`; a second server is unnecessary when the app is already serving requests.
+2. Install a conversational model from the [Ollama model catalog](https://ollama.com/search). Replace `<model-id>` with its exact ID:
 
-В другом окне терминала скачайте нужную модель. Например, небольшая модель для проверки установки и обнаружения:
+   ```sh
+   ollama pull <model-id>
+   ollama list
+   ```
 
-```sh
-ollama pull qwen3.5:2b
-ollama list
-```
+3. Keep Ollama running, open the chat and select the installed model. **«Обновить»** refreshes the list manually.
+4. Start with **«Спросить»** (Ask) and a short project question, then use **«Выполнить»** (Execute) for an editing task. See the [chat workflow](chat-workflow.md).
 
-Дождитесь завершения `pull`, оставьте Ollama работающей и откройте список моделей в чате. Для проверки подключения не требуется выполнять `ollama run`: установленная модель загрузится в память при первом настоящем запросе. Скачать другую модель можно её командой `ollama pull <точный-ID>`; вручную прописывать каждый новый ID в WorldWeaver не нужно.
+Model downloads use disk space; loading a model also needs memory alongside Unity. Select a model your machine can run and check its tool use on a small task. Discovery confirms availability, not task quality.
 
-Установка и обнаружение не подтверждают качество ответа. В сохранённых предметных опытах `qwen3.5:2b` допускала смысловые ошибки; `qwen3.5:9b` лучше выполнила ряд задач, но также ошибалась и отвечала медленно. Для новых NPC игровой демонстрации R11 по умолчанию требуется **`qwen3.5:9b`**: установите её командой `ollama pull qwen3.5:9b` либо явно назначьте NPC другую выбранную модель через `assign_selected_model: true`. Существующие профили автоматически не заменяются. Подробные результаты: статус 1.3 (historical record retained locally), [настройки NPC](npc-ai.md).
+## What appears automatically
 
-Для другого порта или proxy используйте **Добавить API… → Ollama** и укажите адрес и точный ID. Автопоиск обращается только к стандартному loopback-серверу; сканирования сети и произвольных портов нет. Облачные OpenAI-compatible подключения описаны в [инструкции по API](custom-api.md).
+The default discovery address is `http://127.0.0.1:11434`. The package does not scan your network or other ports.
 
-## Как обновляется список
-
-| Состояние | Поведение |
+| State | What you see |
 | --- | --- |
-| Окно чата открыто, Ollama отвечает | Проверка установленного списка примерно раз в 10 секунд |
-| Ollama остановлена или список повреждён | Прежние записи сохраняются недоступными; повтор примерно через 30 секунд |
-| Модель скачана при открытом Unity | Появляется на следующей проверке; ручная кнопка «Обновить» ускоряет проверку |
-| Идёт запрос агента, компиляция, импорт проекта или Play Mode | Фоновая проверка ждёт завершения работы |
-| Окно чата закрыто или начинается domain reload | Опрос отключается, незавершённый HTTP-запрос отменяется |
+| Installed conversational model | Available after its capabilities are checked. It can load on the first request. |
+| Model already loaded by Ollama | A separate “loaded in memory” state. |
+| Embedding-only model | Not offered as a conversational model. |
+| Capability check pending or failed | Unavailable until the check succeeds. |
+| Server temporarily stopped | Previous entries remain unavailable; they are not treated as deleted. |
+| Selected model removed | Its unavailable entry is retained so the choice is not silently replaced. |
 
-Интервалы отсчитываются от завершения предыдущей проверки. Одновременно выполняется один цикл обнаружения. Сетевые операции асинхронны; кадры интерфейса не ждут HTTP. Фоновое обнаружение не проверяет облачные API и не отправляет запросов генерации.
+The open chat checks about every **10 seconds** when the server responds and **30 seconds** when it does not. Background checks pause during agent work, compilation, import and Play Mode. Large catalogs can take several polls to finish capability checks. Your selected model and saved custom connections are preserved.
 
-Выбранная пользователем модель и сохранённые API-подключения сохраняются. Обнаружение не переключает чат на другую модель. Если выбранная модель удалена, её строка остаётся с пометкой недоступности; удалённые невыбранные модели исчезают после успешного чтения списка сервера. При временном отключении сервера строки не считаются удалёнными.
+Discovery reads metadata only: [`/api/tags`](https://docs.ollama.com/api/tags) lists installed models, [`/api/ps`](https://docs.ollama.com/api/ps) lists loaded models, and `/api/show` supplies capabilities. It does not pull models or send generation requests. An empty loaded-model list is therefore compatible with a usable installed model.
 
-## «Установлена» и «в памяти»
+## Another port, proxy or cloud model
 
-`GET /api/tags` сообщает об установленных моделях. `GET /api/ps` сообщает о моделях, уже загруженных в память. Это разные состояния: отсутствие модели в `/api/ps` не запрещает использовать её в чате. [Официальное описание установленного списка](https://docs.ollama.com/api/tags), [описание загруженных моделей](https://docs.ollama.com/api/ps).
+Use **«Добавить API…» → Ollama** for a different endpoint and an exact model ID. See [custom connections](custom-api.md). The adapter accepts HTTPS or HTTP on this computer; it does not attach a Bearer API key to Ollama requests.
 
-Пометка **«в памяти»** основана на реальном `/api/ps`. Если сервер не поддерживает этот метод, список установленных моделей продолжает работать, но состояние памяти указывается как неизвестное.
+A model ending in `:cloud` can still be reached through the local Ollama app. Its inference runs remotely and depends on that service's account access and quota. A loopback URL does not make a cloud model local, and the package does not purchase access or guarantee a free tier.
 
-Возможности читаются через `POST /api/show` без запуска inference. Только объявленная capability `completion` делает автоматически обнаруженную модель доступной для чата; capability `vision` включает изображения. Модели только для embeddings не предлагаются как чат-модели, даже если их название не содержит `embed`. Если свойства ещё не получены, строка недоступна до успешной проверки. [Официальный API Ollama: Show Model Information](https://github.com/ollama/ollama/blob/main/docs/api.md#show-model-information).
+For screenshots, the local Ollama model must actually advertise vision support. A model can support chat without supporting images. Changing the editor chat model also does not reassign existing [NPC model profiles](npc-ai.md).
 
-Свойства кэшируются на 10 минут и сразу перепроверяются при изменении digest/modified_at модели. Неудачная проверка свойств повторяется через 30 секунд. Один цикл проверяет максимум восемь новых/изменённых моделей, не более трёх одновременно; большой каталог заполняется постепенно. Максимум установленного списка — 128 записей. Повторные `name`/`name:latest` объединяются; явные теги сохраняются.
+## Common connection problems
 
-## Фактическая проверка
+| Symptom | Next step |
+| --- | --- |
+| “Ollama does not respond” | Start the app/server and confirm `http://127.0.0.1:11434/api/tags` responds. |
+| A newly pulled model is missing | Wait for the pull and capability checks to finish, then refresh while Unity is idle. |
+| The model stays unavailable | Check its exact ID and whether Ollama reports conversational completion capability. |
+| A model is installed but not in memory | Send a request; preloading it with `ollama run` is not required. |
+| Requests are slow or run out of memory | Try a model that fits the available memory, close unused model sessions and reduce the task size. |
 
-Новый класс обнаружения и настоящий `JsonTransport` скомпилированы и выполнены вне редактора на встроенном .NET 6 Unity против работающего локального Ollama. Найдены четыре модели: три с `completion`, две с `vision`, одна embedding-only. Два последовательных цикла завершились успешно. Запросов `/api/chat`, `/api/generate`, загрузки модели в память или скачивания модели эта проверка не выполняла.
+See [troubleshooting](troubleshooting.md) for request errors and [getting started](getting-started.md) for installation.
 
-Протокол находится в ollama-discovery-live-metadata-1.3.json (historical record retained locally). Он подтверждает чтение реальных metadata новым сервисом. Жизненный цикл контроллера, таймер интерфейса, сохранение выбора, отмена и имитация скачивания/удаления покрываются отдельными `OllamaDiscoveryTests`; результаты запуска Unity должны оцениваться по NUnit XML текущего среза исходников.
+Implementation: [discovery service](../Packages/com.worldweaver.toolkit/Editor/Assistant/OllamaModelDiscovery.cs), [refresh lifecycle](../Packages/com.worldweaver.toolkit/Editor/Assistant/ChatController.ModelDiscovery.cs).

@@ -1,40 +1,59 @@
-# Материалы и текстуры
+# Materials, textures and asset sources
 
-WorldWeaver использует два источника: встроенные поверхности для работы без сети и поиск настоящих PBR-текстур Poly Haven. Это текстурирование имеющейся геометрии; библиотека не превращает примитив в готовую профессиональную 3D-модель. Для сложной геометрии можно применять уже существующие проектные prefab-ресурсы.
+Unity Editor Agent can texture existing geometry with an offline starter library or supported Poly Haven PBR assets. Material assignment and model replacement are separate workflows: a better surface does not change the object's shape.
 
-## Без интернета
+## Start offline
 
-В пакет включены 13 оригинальных материалов: трава, камень, штукатурка, доски, черепица, металл, песок, снег, кора, ткань, кожа, вода и брусчатка. У каждого есть бесшовные карты цвета, нормалей и metallic/smoothness: 39 PNG по 256 × 256, около 0,88 МБ вместе. Все изображения сгенерированы математически, без заимствованных картинок; CC0-1.0. Генератор — `scripts/generate_builtin_materials.py`; хеши — `Runtime/Materials/builtin-provenance.json` внутри пакета. Карты лежат вне Editor, поэтому ссылки из материалов сохраняются и в Player-сборках.
+The package includes **13 original CC0 starter surfaces**: grass, stone, plaster, wood, roof tile, metal, sand, snow, bark, cloth, leather, water and cobblestone. Their albedo, normal and metallic/smoothness maps are bundled with runtime assets, so they do not need a network download.
 
-`create_world`, `create_village`, дома, крыши, деревья, дороги и NPC автоматически получают подходящие карты. Для созданных процедурных крыш и крон добавлены UV и tangents. Настройки рельефа, семя, пути, логика NPC и существующие пользовательские ресурсы сохраняются.
+Ask in chat:
 
-Из меню **Tools → WorldWeaver → Материалы и текстуры** можно просмотреть библиотеку, найти материал и применить его к выбранному объекту или Terrain. Флажок дочерних Renderer помогает обработать дом целиком. Повтор текстуры меняется слайдером. Назначается новая копия материала; чужие shared-материалы не перекрашиваются. При работе с Terrain создаётся копия TerrainData, остальные слои и веса смешивания сохраняются. Обычный Undo возвращает исходное назначение.
+> Apply the built-in wood material to the selected door, without internet access. Preserve the door's shape and controller. Show which renderers changed.
 
-## Поиск через чат
+For a direct picker, the current 1.8.1 menu is **Tools → WorldWeaver → Материалы и текстуры**. Select a Renderer or Terrain in the Hierarchy, choose a surface and adjust tiling. Enable child renderers when applying to a building root that has no Renderer itself.
 
-Примеры: «Найди на Poly Haven выветренное дерево, скачай и примени к двери»; «Сделай каменные стены и черепичную крышу»; «Без интернета используй встроенную брусчатку для площади».
+## Find an online surface
 
-Инструменты агента:
+> Find weathered wooden boards on Poly Haven, import a matching material and apply it to the selected door. If the download fails, tell me which fallback was actually used.
 
-- `material_search`: `query`, `source` (`any`, `builtin`, `polyhaven`), `limit` (1–8). Возвращает реальные каталожные ID, названия, источник и лицензию.
-- `material_import`: `material_id`, `allow_online`. Для `builtin:*` сеть не требуется. Для `polyhaven:*` сначала проверяется локальный импорт. Во время сбоя сети предлагается явно обозначенный встроенный материал; ответ содержит фактический ID и предупреждение. Самостоятельно придумывать имена файлов или URL не нужно.
-- `material_apply`: существующий `target`, `material_id`, `tiling_x`, `tiling_y`, `include_children`, `terrain_layer_index`. Онлайн-материал должен быть импортирован заранее. Назначение в сцене не обращается к сети. Для Terrain по умолчанию заменяется слой 0, с сохранением остальных слоёв и alphamap.
+The agent follows three separate steps:
 
-Материалы и JSON происхождения сохраняются в уникальных папках `Assets/WorldWeaverGenerated/Materials`. Существующие файлы не перезаписываются. Повторный импорт использует кеш, только если содержимое совпадает с записанными SHA-256. Пользовательские изменения прежнего материала сохраняются; при необходимости появляется новая копия. Отмена загрузки не оставляет частично импортированный набор.
+| Tool | Purpose |
+| --- | --- |
+| `material_search` | Return real IDs, names, sources and licenses. Choose `builtin`, `polyhaven` or `any`. |
+| `material_import` | Import an exact returned ID. An uncached online material requires `allow_online=true`. |
+| `material_apply` | Apply the actual imported ID to an existing Renderer/Terrain; this step does not fetch from the network. |
 
-## Poly Haven
+Use concrete surface terms such as `weathered wood`, `wood planks` or `rough stone`. Check the returned name and tags before applying; a tree-related result can be bark or forest litter rather than door boards.
 
-Используются официальные `/search`, `/info/{id}` и `/files/{id}`. В 2026 году публичный API бесплатен, не требует регистрации или ключа. Для русского запроса клиент заменяет только целые слова из ограниченного предметного словаря на английские термины каталога; неизвестные слова сохраняются. Это не универсальный переводчик. В интерфейсе и результатах показан обязательный кредит **Powered by Poly Haven**; assets имеют лицензию CC0. Код сервера не копируется в пакет.
+If an online import fails, the library can return a built-in fallback. Its **actual `MaterialId` and `Warning`** identify the result. A successful fallback is not evidence that the requested online maps were downloaded.
 
-- [Официальные возможности и условия API](https://polyhaven.com/our-api).
-- [Условия использования API](https://github.com/Poly-Haven/Public-API/blob/master/ToS.md).
-- [Лицензия assets](https://polyhaven.com/license).
-- [Спецификация протокола](https://github.com/Poly-Haven/Public-API/blob/master/swagger.yml).
+## Where changes go
 
-Загрузка ограничена official HTTPS hosts `api.polyhaven.com` и `dl.polyhaven.org`, только JPEG/PNG из texture-каталога. Redirect не выполняется. До 8 МиБ на карту и 24 МиБ на материал, разрешение источника 1k, проверка заголовка изображения и размеров до декодирования. Для каждой карты проверяются фактический размер и MD5 из API, сохраняется SHA-256. Поиск или комплект загрузки ограничен 90 секундами. Это предел сетевого инструмента; полная работа чата с несколькими обращениями модели имеет отдельный бюджет до 15 минут в режиме «Глубоко». Поддерживается отмена. HTML, архивы, скрипты, `.blend` и произвольные пользовательские URL не импортируются.
+Imports and provenance receipts are stored under `Assets/WorldWeaverGenerated/Materials/`. Reuse checks recorded hashes. Changed imported assets are preserved rather than silently overwritten.
 
-Сначала выполняется обычный GET. Если передача CDN зависает, применяется ограниченное восстановление: фрагменты по 16 КиБ, не более трёх одновременных запросов, одна повторная попытка на фрагмент и максимум 600 фрагментных запросов на карту. Для каждого проверяются точный `Content-Range`, общий размер и ETag при наличии. Целиком возвращённый ответ на ненулевой Range не добавляется к файлу. Запросы текстур ограничены 12 секундами, отсутствие новых байтов — 5 секундами; метаданные — 35 секундами. Итоговый MD5 проверяется после сборки целого файла. В окне материалов показаны полученные КиБ и состояние восстановления. Это полезно для сетей, в которых большая передача обрывается после первых десятков килобайт; обычное стабильное соединение не разбивается на сотни запросов.
+Application creates a material copy instead of recoloring a shared source asset. Terrain edits clone TerrainData/layer data and preserve other layers and blend weights. The chosen terrain layer must already exist, except index zero on an empty Terrain. Undo restores the previous assignment.
 
-Цвет импортируется в sRGB, normal/roughness/AO/metallic — в linear. Используется normal GL. Roughness инвертируется в smoothness и упаковывается в альфа-канал metallic/smoothness-карты для Standard и URP Lit. Встроенные карты уже упакованы. Для Terrain применяются цвет и нормали; индивидуальные roughness-карты в TerrainLayer не переносятся как полноценный HDRP mask. Поддерживаются Built-in и URP; HDRP требует отдельного адаптера. Текстурный набор воды даёт статическую рябь и блики, не физическую симуляцию или прозрачный водный шейдер.
+## Render-pipeline support
 
-В прямом опыте R11 первая загрузка получила общую SSL-ошибку Unity и явно вернула встроенный fallback; этот неуспех (historical record retained locally) сохранён. Повтор (historical record retained locally) без изменения кода и TLS прошёл 19/19 за 44,418 с со свежими четырьмя картами. Причина первой ошибки Unity не установлена; диагностика штатного TLS (historical record retained locally) не доказывает отказ самого Poly Haven.
+| Pipeline | Library behavior |
+| --- | --- |
+| Built-in | Standard material with supported maps. |
+| URP | URP Lit material with supported maps. |
+| HDRP or another custom pipeline | Requires a compatible shader/material adapter; the built-in importer does not provide one. |
+
+Albedo uses sRGB; data maps use linear sampling. Roughness is converted to smoothness for the supported material layouts. TerrainLayer uses supported color/normal fields; this is not a full HDRP mask workflow. The water surface is a static texture treatment, not a fluid simulation.
+
+If a result renders pink, inspect the active pipeline and shader before adjusting textures. If it is stretched, inspect UVs and tiling. Inspect both the material assignment and the rendered image; a completed import alone does not establish visual quality.
+
+## Resource boundaries and licenses
+
+Poly Haven imports use supported official HTTPS endpoints and **1k** image maps, with bounds of **8 MiB per map** and **24 MiB per material**. The client validates received image data and records hashes. It does not import arbitrary archives, scripts or `.blend` files through this material workflow.
+
+Poly Haven's [asset license](https://polyhaven.com/license) is CC0, and its [API page](https://polyhaven.com/our-api) describes current access and source-credit requirements. The integration displays **Powered by Poly Haven**. Bundled procedural maps have their own [CC0 notice](../Packages/com.worldweaver.toolkit/Runtime/Materials/LICENSE.txt) and [provenance manifest](../Packages/com.worldweaver.toolkit/Runtime/Materials/builtin-provenance.json).
+
+For existing geometry, ask the agent to search project prefabs first. Supported character models have a separate `model_search` → `model_import` → `replace_model` path; a rig still needs compatible animation and control setup. General data acquisition is covered in [web research](web-agent.md). Check each third-party model's own license before redistribution.
+
+Next: [examples](examples.md), [chat workflow](chat-workflow.md), [troubleshooting](troubleshooting.md).
+
+Implementation: [material library](../Packages/com.worldweaver.toolkit/Editor/Materials/WorldMaterialLibrary.cs), [agent tools](../Packages/com.worldweaver.toolkit/Editor/Assistant/WorldMaterialTools.cs), [Poly Haven client](../Packages/com.worldweaver.toolkit/Editor/Materials/PolyHavenMaterialClient.cs).

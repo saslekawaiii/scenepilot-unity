@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="Unity Editor Agent icon">
+  <defs><linearGradient id="accent" x2="1" y2="1"><stop stop-color="#a5b4ff"/><stop offset="1" stop-color="#61e7c4"/></linearGradient></defs>
+  <rect width="256" height="256" rx="52" fill="#101d2c"/>
+  <g fill="none" stroke="url(#accent)" stroke-width="7" stroke-linejoin="round"><path d="m128 45 73 42v84l-73 42-73-42V87zM55 87l73 42 73-42m-73 42v84"/></g>
+  <path d="m128 76 36 20-36 21-36-21z" fill="#a5b4ff" opacity=".65"/>
+  <circle cx="201" cy="171" r="10" fill="#61e7c4"/>
+</svg>

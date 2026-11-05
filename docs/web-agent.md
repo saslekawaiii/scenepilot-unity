@@ -1,46 +1,63 @@
-# Поиск и импорт ресурсов через открытого агента
+# Web research and downloaded resources
 
-WorldWeaver 1.7 подключает настоящий `smolagents.ToolCallingAgent` (Hugging Face, Apache-2.0), а не текстовую имитацию поискового агента. Его инструменты используют DDGS (MIT) и отдельный HTTPS-reader. Заказ поиска передаётся из Unity; наблюдения и скачанные файлы возвращаются с источником и SHA-256. Сценой управляет основной Unity-агент.
+Unity Editor Agent has an optional Python worker for real web search, page reading and bounded research. Multi-step research uses Hugging Face **smolagents `ToolCallingAgent`**; the Unity host retains control of scene changes and imports.
 
-## Установка
+## Install the optional worker
 
-В установленном пакете откройте `Tools~/web_agent` и выполните `python3.12 setup.py`. Зависимости закреплены в `requirements.lock`, среда создаётся в `~/.local/share/worldweaver/web-agent/venv`. Администратор и платный поисковый API не нужны. Для иной среды задайте `WORLDWEAVER_WEB_PYTHON` до запуска Unity. Python 3.12 проверен на macOS arm64.
+Use **Python 3.12**. Locate the installed package on disk and open its `Tools~/web_agent` directory. From that directory run:
 
-`web_search` и `web_read` работают без модели. `web_research` запускает до 16 шагов открытого агента через локальный Ollama `/api/chat`. По умолчанию используется `beam:cloud`; параметр `model` позволяет выбрать другую модель Ollama с function calling. Это отдельный выбор от основной модели чата. Агент получает релевантные ранее наблюдавшиеся публичные источники; их доступность и содержимое проверяются заново. Обрезанный моделью ответ не исполняется как готовый вызов инструмента. Доступность бесплатной облачной модели и поиска зависит от внешнего сервиса; покупки не выполняются. Полностью локальная модель также подходит, если умеет вызывать инструменты.
+```sh
+python3.12 setup.py
+```
 
-## Возможности, доступные через чат
+The installer creates a per-user virtual environment under `~/.local/share/worldweaver/web-agent/venv` and installs the pinned `requirements.lock`. It does not need administrator access. On Windows, the interpreter is in `Scripts/python.exe`; on macOS/Linux it is in `bin/python`.
 
-| Инструмент | Результат |
-| --- | --- |
-| `web_search` | Настоящая выдача со ссылками |
-| `web_read` | Текст страницы, метаданные и её реальные ссылки |
-| `web_research` | Многошаговый поиск и чтение первоисточников открытым агентом |
-| `asset_download` | Файл до 32 МиБ, происхождение, хеш; для PDS IMG — наблюдавшийся парный LBL |
-| `terrain_from_heightmap` | Копия TerrainData с измеренными высотами, коллайдером и сохранением позиции связанных объектов |
-| `run_player_check` | Реальный Play Mode: мышь по двум осям без RMB, W, перемещение, земля, доступная кость ноги |
+For an existing compatible environment, set **`WORLDWEAVER_WEB_PYTHON`** to its interpreter path in the environment inherited by Unity. Installing Python alone is insufficient: the worker dependencies must be installed in the interpreter Unity uses.
 
-Карты высот: grayscale PNG/TIFF, raw16 LE/BE со знаком и без, detached PDS3 MSB signed16 IMG+LBL. Цветная карта рельефа, фотография и постоянное изображение отвергаются как источники измеренных высот. Масштаб Unity задаётся отдельно; отображение глобальной планетной карты на небольшой Terrain не является географически точной реконструкцией местности.
+## Pick the right operation
 
-Скачивание разрешено только по реально наблюдавшимся ссылкам, без исполняемого кода/архивов. Чтение страниц ограничено HTTPS, публичными адресами и лимитом размера; редиректы повторно проверяются. Содержимое страниц — недоверенные данные. Файлы помещаются в `Assets/WorldWeaverGenerated/Web/<sha-prefix>/` вместе с происхождением. Правки пользователя не перезаписываются.
+| Tool | Result | Requires a research model? |
+| --- | --- | --- |
+| `web_search` | Search results with observed URLs and snippets. | No |
+| `web_read` | A public page's text and actual links. | No |
+| `web_research` | A bounded search/read loop using smolagents. | Yes, through local Ollama |
+| `asset_download` | A supported data file, source receipt and SHA-256. | No |
+| `terrain_from_heightmap` | Measured elevation applied to an existing generated Terrain. | No |
 
-Автоматический импорт и подключение игровых C# включаются в настройках чата переключателем «Импортировать и подключать игровые скрипты автоматически». Проверка имён класса, настоящая компиляция, контроль владения исходником и журнал изменений действуют и в этом режиме. В проекте только с новым Input System активные вызовы старого `UnityEngine.Input` отклоняются до Play Mode.
+The main chat still uses its selected model to decide which operation to request. The worker's **research** model is a separate choice: `web_research` accepts an exact Ollama `model` ID and currently defaults to `beam:cloud` through `http://127.0.0.1:11434`. To keep research local, explicitly request an installed local model that supports tool calls. The package does not download it, sign in or buy access; cloud availability and quotas remain provider-controlled.
 
-## Заимствования
+## Ask for sources, then inspect the result
 
-- [smolagents](https://github.com/huggingface/smolagents): установлен PyPI 1.26.0; используются ToolCallingAgent, Model и инструменты поиска. Лицензия сохранена в ThirdPartyNotices. Наш `ollama_model.py` передаёт структурированные вызовы native Ollama без текстовых stop-маркеров.
-- [DDGS](https://github.com/deedy5/ddgs): установлен 9.16.1, MIT; поиск без оплачиваемого ключа.
-- [browser-use](https://github.com/browser-use/browser-use) и [Crawl4AI](https://github.com/unclecode/crawl4ai) изучены, но в зависимости не включены: для публичных архивов и метаданных текущему мосту не нужен браузер с пользовательским профилем.
+For a researched explanation, use **Ask** or explicitly prohibit project edits:
 
-Это расширяет инструменты и цикл исполнения агента. Веса основной модели не обучались. Добавление MD-навыков само по себе не даёт модели доступ к сети или новым Unity API; навык должен опираться на существующий инструмент либо компилируемый код.
+> Only explain; do not change the project. Find and read official Unity documentation for the relevant APIs. Compare the behavior and link the pages actually opened. Do not enter Play Mode.
 
-При недоступной или пустой выдаче DDGS последовательно проверяет DuckDuckGo, Google и Yandex с отдельным лимитом ожидания. Ответ содержит движок и фактические попытки; ссылки появляются только из полученной выдачи. Ожидание отдельного облачного ответа исследователя ограничено 240 секундами, общий процесс исследования — 360 секундами.
+For a resource task, specify the destination and usage rights:
 
-`NativeOllamaToolCallingAgent` расширяет официальный ToolCallingAgent только транспортной памятью: нативные вызовы, их ID, служебное состояние модели и реально выданные upstream `ToolOutput` возвращаются в Ollama целиком. Текстовое представление `Calling tools: [...]` не подменяет протокол. При ошибке сохраняется диагностика и отсутствие результата, а не выдуманное успешное наблюдение. Тесты выполняют настоящий цикл smolagents с контролируемыми ответами HTTP, включая восстановление после ошибки инструмента.
+> Find a licensed grayscale elevation dataset suitable for the existing Terrain. Read its metadata, report the source and license, then import it at a walkable scale. Preserve the player and unrelated objects.
 
-## Осмотр сцены
+The normal path is **search → read the source → select an observed data URL → download → import/apply → verify**. A downloaded file is not automatically placed in the scene. For PBR surfaces, use the dedicated [material library](material-library.md).
 
-`capture_scene` поддерживает `overview`, `game` и `player`. Общий вид кадрирует настоящую геометрию, временно убирает туман для диагностики и восстанавливает настройки. Это не изображение атмосферы глазами игрока. Модель чата с поддержкой зрения получает сами пиксели. Для текстовой модели доступен отдельный наблюдатель из уже установленных локальных Ollama-моделей зрения: выбирается наибольшая модель размером до 8 ГиБ, иначе наименьшая доступная. Облачные модели в этот автоматический выбор не входят; скачивание моделей не выполняется.
+## Downloads, heightmaps and provenance
 
-Наблюдатель получает изображение и измерения объектов, но не жалобы пользователя, чтобы не повторять предполагаемые дефекты вместо осмотра. Его описание и существующие target ID возвращаются основному агенту как предположения для последующей проверки. Один неподвижный кадр не подтверждает работоспособность анимации, кода камеры или всей задачи. Отсутствие локальной модели зрения явно отражается в результате; снимок не помечается как просмотренный.
+Downloads must use a URL actually observed by search or page reading. Supported data includes images, elevation files, supported model/audio files and text metadata; scripts, executables and archives are rejected. Each file is limited to **32 MiB**. Data and source receipts go into a new content-addressed folder under `Assets/WorldWeaverGenerated/Web/`; changed destination files are preserved.
 
-После одноразового осмотра локальная модель освобождает память (`keep_alive=0`); контекст наблюдателя ограничен 8192 токенами. На Mac с общей памятью это уменьшает конкуренцию с Unity.
+Heightmap import accepts grayscale PNG/TIFF, supported raw 16-bit layouts and detached PDS3 signed big-endian 16-bit elevation with its actual LBL metadata. A colored relief map or a photograph is not scalar height data. Import clones TerrainData and updates its collider; it replaces existing heights/holes, so existing caves need deliberate review. World dimensions are chosen separately from source coverage: shrinking a global map into a small scene is not a geographically accurate reconstruction.
+
+A recorded URL and hash establish provenance, not permission to redistribute. Keep the resource's license and attribution with the asset; the required `license_note` may explicitly record that rights are unresolved. Prefer sources with clear terms.
+
+## Failures and limits
+
+- Search backends can be unavailable or empty. The worker tries bounded alternatives and reports actual attempts; it does not fabricate results.
+- `web_research` has a bounded tool loop. A partial investigation can return useful observed sources without completing the research goal.
+- The host also limits research time and unchanged repeated failures. Use a different actual source, an existing observation or an offline alternative when the budget is exhausted.
+- Reading supports public HTTPS pages, without login, a browser profile, uploads or private-network destinations. Redirects are validated. A site that requires interactive browsing may remain unavailable.
+- Page content is reference data. It cannot change the user's request, authorize code execution or grant project-edit permissions.
+
+See [troubleshooting](troubleshooting.md) for worker setup errors and [examples](examples.md) for bounded workflows.
+
+## Open-source components
+
+The worker pins [smolagents](https://github.com/huggingface/smolagents) **1.26.0** (Apache-2.0) and [DDGS](https://github.com/deedy5/ddgs) **9.16.1** (MIT). Search uses DDGS; research uses a real tool-calling agent. Dependency versions are in [requirements.lock](../Packages/com.worldweaver.toolkit/Tools~/web_agent/requirements.lock), and licenses are retained in the package's [third-party notices](../Packages/com.worldweaver.toolkit/ThirdPartyNotices/).
+
+Implementation: [Unity bridge](../Packages/com.worldweaver.toolkit/Editor/Assistant/WebResearchTools.cs), [worker](../Packages/com.worldweaver.toolkit/Tools~/web_agent/bridge.py), [native Ollama model adapter](../Packages/com.worldweaver.toolkit/Tools~/web_agent/ollama_model.py).

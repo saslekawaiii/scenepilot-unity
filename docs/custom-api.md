@@ -1,74 +1,83 @@
-# Подключить свою модель без кода
+# Connect an API or another model server
 
-В чате WorldWeaver нажмите **Добавить API…**. Откроется окно **Подключить модель**. Поддерживаются сервер Ollama и **OpenAI-compatible Chat Completions**. Нативные Anthropic Messages, Gemini и OpenAI Responses этим подключением не предоставляются. Новых аккаунтов или подписок форма не создаёт.
+Add a model to Unity Editor Agent from the chat's **«Добавить API…»** button. The connection form is **«Подключить модель»** in the current 1.8.1 interface.
 
-## Добавление
-
-1. Выберите **Тип API**: `OpenAICompatible` или `Ollama`.
-2. Заполните **Название в списке**, адрес **URL API** / **URL сервера Ollama** и **Точный ID модели**. Название произвольное, ID должен совпадать с серверным.
-3. Для OpenAI-compatible выберите **Формат ответа**. Начальный вариант — `JsonObject`; другие варианты описаны ниже.
-4. Если нужна авторизация, выберите один способ: введите **Ключ API** в password-поле либо укажите **Имя переменной** — имя заранее настроенной переменной окружения. Не заполняйте оба варианта одновременно. Для API без авторизации оставьте оба поля пустыми. Адаптер Ollama не использует ключ.
-5. Нажмите **Добавить и выбрать модель**. Подключение появится в том же списке моделей чата и будет выбрано. Само добавление не запускает сетевую проверку или генерацию.
-6. В разделе **Сохранённые подключения** выберите запись и нажмите **Проверить соединение**. Это чтение моделей и доступных capabilities без completion-запроса.
-7. Если сервер не предоставляет список моделей, можно явно нажать **Проверить ответ**. Это отдельный короткий запрос с пределом 64 выходных токенов; он может расходовать квоту провайдера. Получение текста не доказывает выполнение задачи инструментами Unity.
-
-После настройки вернитесь в чат и отправьте задачу обычной репликой. Интерфейс, режимы Спросить/Спланировать/Выполнить и просмотр C# остаются общими для маршрутов.
-
-## Адрес сервера
-
-Указывайте базовый URL из документации своего сервера. Пример формы адреса — `https://api.example.com/v1`.
-
-- Для OpenAI-compatible корневой адрес получает `/v1`; явно заданный custom path сохраняется. Суффикс `/chat/completions` или `/models` распознаётся и убирается из базы.
-- Для Ollama используются `/api/tags`, `/api/show` и `/api/chat`; эти суффиксы можно не добавлять вручную.
-- Поддержаны HTTPS либо HTTP на loopback этого компьютера. Логин/пароль в URL, query, fragment и ключ в адресе не принимаются.
-
-«Проверить соединение» не выбирает произвольную похожую модель: проверяется точный ID. Для Ollama допускается эквивалентное окончание `:latest`. Ошибка списка моделей не обязательно означает отсутствие Chat Completions; отдельная проверка ответа остаётся явным действием пользователя.
-
-## Формат ответа
-
-| Значение | Запрос к OpenAI-compatible серверу |
+| Protocol | Use it for |
 | --- | --- |
-| **JsonObject** | Передаёт `response_format: json_object`. Начальный режим формы. |
-| **JsonSchema** | Передаёт `json_schema` с контрактом, если сервер поддерживает этот формат. |
-| **Text** | Не передаёт `response_format`; ответ всё равно должен пройти парсер и валидаторы WorldWeaver. |
+| **OpenAICompatible** | A server implementing OpenAI-compatible **Chat Completions**. |
+| **Ollama** | An Ollama endpoint on another port or behind an HTTPS proxy. Standard local Ollama is [discovered automatically](local-models.md). |
 
-Поддержка конкретного сервера проверяется отдельно. Выбор JsonSchema сам по себе не доказывает server-side enforcement всех keywords или правильность результата. OpenAI-compatible подключения сейчас **только текстовые**. Vision доступно для loopback Ollama после фактического подтверждения capability через `/api/show`; embedding-only модель не считается доступной completion-моделью.
+Native Anthropic Messages, Gemini and OpenAI Responses require a compatible gateway or a separate adapter; they are not direct connection types in this form. OpenAI-compatible connections currently accept **text only**.
 
-## Ключ и срок его хранения
+<a id="облачные-модели-через-установленную-ollama"></a>
 
-**Ключ, введённый в форме**, помещается в окружение текущего процесса Unity под внутренним именем. Он доступен после domain reload/перекомпиляции. Закрытие окна формы после добавления не отключает подключение. Само значение не записывается функцией подключения в `connections.json` или историю; сохраняется имя внутренней переменной.
+## Ollama cloud routes
 
-После полного выхода и нового запуска Unity этот ключ нужно указать заново: сохранённая запись подключения остаётся, но её process credential не восстанавливается. В текущей форме для обновления параметров или ключа удалите прежнее подключение и добавьте новое. Можно сохранить до 12 подключений.
+An Ollama model ID ending in `:cloud` uses the Ollama protocol even when inference runs remotely. Keep the local Ollama app running and use its existing account access. See [local, proxy and cloud routes](local-models.md#another-port-proxy-or-cloud-model) for setup and quota behavior.
 
-**Постоянная настройка — отдельный выбор пользователя.** Заранее задайте собственную переменную окружения в среде, которую унаследует Unity, а в форме укажите только её имя. Плагин не создаёт системную переменную, не записывает ключ в shell-конфиги и не делает такой вариант автоматически. Удаление подключения не меняет внешнюю переменную окружения.
+## Add the connection
 
-Несекретные настройки хранятся в `UserSettings/WorldWeaverModels/connections.json`, вне Assets и Git: название, URL, модель, протокол, формат ответа и имя переменной. Не вставляйте ключ в эти поля. Ключ исполняемого процесса не является изоляцией от обычного кода Unity.
+1. Choose **«Тип API»** (protocol).
+2. Set **«Название в списке»** to a friendly label.
+3. Enter the **base URL** and **«Точный ID модели»**. Use the provider's exact model ID, not its display name.
+4. For OpenAI-compatible endpoints, choose an answer format and, if required, provide one credential method below.
+5. Click **«Добавить и выбрать модель»**. The connection is saved and selected; this action does not generate a response.
+6. Under **«Сохранённые подключения»**, select it and test the connection.
 
-## Если подключение не работает
+Example values are placeholders, not a supplied service:
 
-- **Модель не найдена:** проверьте точный ID и URL; затем прочитайте сообщение проверки списка моделей.
-- **После перезапуска нет ключа:** добавьте подключение с ключом заново либо настройте именованную переменную окружения для Unity.
-- **Сервер отвергает response_format:** выберите поддерживаемый им формат. Text отключает этот параметр, сохраняя проверку полного плана WorldWeaver.
-- **Изображение отклонено:** OpenAI-compatible маршрут текстовый; для изображений выберите поддерживаемый loopback Ollama.
-- **Кнопки недоступны:** дождитесь окончания задачи, компиляции или проверки Unity.
+```text
+Protocol:  OpenAICompatible
+Name:      My model server
+Base URL:  https://api.example.com/v1
+Model ID:  the-exact-server-model-id
+```
 
-Это руководство описывает контракт подключения, а не подтверждённый inference каждого внешнего провайдера. Условия сервиса, доступность и квоты определяются выбранным сервером.
+A root OpenAI-compatible URL gains `/v1`; an explicit custom path is preserved. A trailing `/chat/completions` or `/models` is removed from the base. Ollama's `/api`, `/api/chat`, `/api/tags` and `/api/show` suffixes are also normalized. Use HTTPS, or loopback HTTP for a server on this computer. URLs with embedded credentials, query strings or fragments are rejected.
 
-## Облачные модели через установленную Ollama
+## Choose the response format
 
-Для модели с суффиксом `:cloud` выберите **Тип API → Ollama** и адрес установленного сервера, например `http://127.0.0.1:11434`. Модель работает в облаке; loopback-адрес здесь является входом через локальную Ollama. Ключ в эту форму не нужен: используется уже настроенный доступ Ollama.
+| Setting | When to use it |
+| --- | --- |
+| **JsonObject** | The form's default for a server with JSON-object response mode. |
+| **JsonSchema** | A server that supports the requested structured-output schema. |
+| **Text** | A compatible server that rejects `response_format`. The returned plan is still parsed and validated. |
 
-В 1.4.0 облачный маршрут учитывает [отсутствие JSON Schema decoding в Ollama Cloud](https://docs.ollama.com/capabilities/structured-outputs): полный контракт передаётся в контексте, а ответы проверяются теми же строгими валидаторами Unity. Для локальных моделей остаётся декодирование с ограничениями. Сбой потокового запроса до первого фрагмента допускает настроенный ограниченный повтор; полученный частичный поток не склеивается с повтором.
+These settings govern the JSON-response path. Native function calls use the active tool contract instead. The server and selected model must support the mode used by the chat; selecting a schema setting cannot add missing provider capabilities.
 
-1–2 ноября 2026 года проверен `beam:cloud` во время [объявленного Ollama временного бесплатного доступа](https://registry.ollama.com/blog/reflection-beam). Это пример подключения, а не обещание постоянной бесплатности или доступности. Платёжные функции не включались. В тестовой среде нативный маршрут возвращал планы; маршрут OpenAI-compatible Text возвращал пустой контент с `finish_reason=length`. Предположительно бюджет занимало скрытое рассуждение; это не подтверждено отдельной трассировкой. Для испытанного рабочего подключения используется тип **Ollama**.
+## Test metadata before inference
 
-## Что проверено
+| Button | What it does |
+| --- | --- |
+| **«Проверить соединение»** | Reads the server's model list and available capabilities without asking for a completion. |
+| **«Проверить ответ»** | Makes an explicit short completion request, limited to 64 output tokens. It may consume provider quota. |
 
-14 программных проверок (historical record retained locally) прошли на локальном HTTP-fixture, включая настоящую перезагрузку домена Unity и сохранение process credential. Это проверка адаптера и жизненного цикла, без LLM inference. Отдельно в реальном интерфейсе (historical record retained locally) добавлен локальный OpenAI-compatible Ollama `http://127.0.0.1:11434/v1` с `qwen3.5:9b` и подтверждено наличие модели GET-запросом; генерация при этой проверке не запускалась. Снимки и изменённые подписи полей проверены отдельно от программного снимка исходников.
+A server can implement Chat Completions without exposing `/models`. In that case a failed model-list check is not conclusive: confirm the URL and exact ID, then use the explicit answer test. A short successful answer confirms transport, not reliable Unity tool execution.
 
+## Credentials and persistence
 
-## Протокол агента в 1.5.0
+Choose **one** method:
 
-В настройках чата включены нативные вызовы функций: Ollama получает `tools` без `format`, OpenAI-compatible — `tools` без `response_format`. Команды и аргументы всё равно проверяет Unity. На этом пути не нужна декодирующая JSON-грамматика большого EditorPlan. Для провайдера без поддержки функций отключите «Нативные вызовы функций модели»: сохранён прежний режим JSON-плана. NPC используют прежний отдельный протокол и маршруты.
+- **«Ключ API»**: enter a key for this Unity process. It survives recompilation/domain reload and closing the form, but is lost after a full Unity exit.
+- **«Имя переменной»**: enter the name of an environment variable that Unity already inherits, such as `MY_MODEL_API_KEY`. The value itself stays outside the connection file.
+- Leave both empty for an endpoint without authentication. The Ollama adapter does not use an API key.
 
-«Автономный C# с доступом Unity Editor» открывает `reflect_api` и `execute_editor_code`. По умолчанию этот режим выключен. Он позволяет модели реализовать Editor-операцию, для которой нет готовой кнопки, с настоящей компиляцией и диагностикой. Это доверенный C# с правами редактора, не песочница. Подробнее: [архитектура и ограничения](research/unity-agent-architecture.md).
+The package does not create a system environment variable or load a project's `.env` file for this form. To make an environment-based connection persistent, configure the launch environment that starts Unity. For a process-only key after restarting Unity, remove and re-add that connection with the key; the current form has no in-place editing flow.
+
+Up to **12** connections are stored in `UserSettings/WorldWeaverModels/connections.json`. It contains the label, endpoint, model ID, protocol, response mode and environment-variable name. Do not place a secret in those ordinary text fields or commit local credentials. Removing a connection does not delete a user-managed external environment variable.
+
+## Resolve a provider error
+
+| Error | What to check |
+| --- | --- |
+| Model not found / HTTP 404 | Exact model ID, API base path and server model availability. |
+| HTTP 401 or 403 | Credentials, account permissions and provider access restrictions. |
+| HTTP 400 / unsupported `response_format` | The server's supported response format and function-call mode. |
+| HTTP 429 or exhausted quota | Provider limits. The package cannot add quota; select an available route or wait as appropriate. |
+| Empty or truncated answer | Model output limits and provider compatibility. An empty answer is not a completed task. |
+| Missing key after restart | Restore the process credential or use an inherited environment variable. |
+| Image rejected | Use a supported local Ollama vision model; this custom OpenAI-compatible adapter is text only. |
+
+Next: [chat workflow](chat-workflow.md), [troubleshooting](troubleshooting.md), [FAQ](faq.md).
+
+Implementation: [connection form](../Packages/com.worldweaver.toolkit/Editor/Assistant/ChatModelConnectionWindow.cs), [validation and storage](../Packages/com.worldweaver.toolkit/Editor/Assistant/ChatModelConnections.cs), [OpenAI-compatible transport](../Packages/com.worldweaver.toolkit/Runtime/Providers/OpenAICompatibleProvider.cs).
