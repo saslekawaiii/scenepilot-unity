@@ -742,7 +742,7 @@ namespace WorldWeaver.Editor.Assistant
             // Unity importing is a transient state, not evidence of a manual edit.
             if(mutating)while(EditorApplication.isUpdating||EditorApplication.isCompiling)
             { token.ThrowIfCancellationRequested();Phase="Ожидаю завершения импорта Unity…";await Task.Delay(100,token); }
-            bool checkpointAdmitted=false;Dictionary<int,string> materialStateBefore=null;
+            bool checkpointAdmitted=false;Dictionary<int,string> materialStateBefore=null,lightStateBefore=null;
             void EnsureCheckpoint()
             {
                 if(!mutating)return;
@@ -754,14 +754,24 @@ namespace WorldWeaver.Editor.Assistant
                     var state=AgentCheckpoints.ExtensionStatus(task.CheckpointId);
                     if((bool)state["canExtend"]!=true)throw new InvalidOperationException("Проект изменён между шагами: контрольная точка не совпадает. Применение остановлено; уже выполненные действия сохранены. Конкретные различия: "+string.Join("; ",state["conflicts"].Values<string>()));
                 }
-                if(!checkpointAdmitted)materialStateBefore=RenderMaterialInitialization.Capture();
+                if(!checkpointAdmitted)
+                {
+                    materialStateBefore=RenderMaterialInitialization.Capture();
+                    lightStateBefore=RenderLightInitialization.Capture();
+                }
                 checkpointAdmitted=true;
+            }
+            void InitializeIntroducedRenderState()
+            {
+                if(!checkpointAdmitted)return;
+                if(materialStateBefore!=null)RenderMaterialInitialization.InitializeChanged(materialStateBefore);
+                if(lightStateBefore!=null)RenderLightInitialization.InitializeChanged(lightStateBefore);
             }
             bool deferredImport=plan.actions.Count==1&&(plan.actions[0].tool=="material_import"||plan.actions[0].tool=="model_import"||WebResearchTools.IsAsync(plan.actions[0].tool));
             if(!deferredImport)EnsureCheckpoint();
             EditorBatchResult Finish(EditorBatchResult batch)
             {
-                if(checkpointAdmitted&&materialStateBefore!=null)RenderMaterialInitialization.InitializeChanged(materialStateBefore);
+                InitializeIntroducedRenderState();
                 if(task!=null)
                 {
                     var world=batch.Results.LastOrDefault(r=>r.Success&&(r.Tool=="create_world"||r.Tool=="create_village"));if(world!=null)task.ScopeTarget=world.Target;
@@ -798,7 +808,7 @@ namespace WorldWeaver.Editor.Assistant
             catch
             {
                 foreach (var path in created.AsEnumerable().Reverse()) AssetDatabase.DeleteAsset(path);
-                if(checkpointAdmitted&&task!=null&&!string.IsNullOrEmpty(task.CheckpointId)){AgentCheckpoints.Seal(task.CheckpointId,true);task.CheckpointSealed=true;checkpointAvailability.Clear();}
+                if(checkpointAdmitted&&task!=null&&!string.IsNullOrEmpty(task.CheckpointId)){InitializeIntroducedRenderState();AgentCheckpoints.Seal(task.CheckpointId,true);task.CheckpointSealed=true;checkpointAvailability.Clear();}
                 throw;
             }
         }
