@@ -54,6 +54,26 @@ namespace WorldWeaver.Tests
             Assert.That((bool)Compatibility("HDRP/Lit","universal",true,"HDRenderPipeline")["definitePipelineMismatch"],Is.True);
             Assert.That((bool)Compatibility("Universal Render Pipeline/Lit","universal",true,"UniversalPipeline")["definitePipelineMismatch"],Is.False);
         }
+        [Test] public void CustomOfficialLookingPrefixesDoNotEstablishAnOfficialShaderFamily()
+        {
+            foreach(string name in new[]{"Universal Render Pipeline/MyProjectShader","HDRP/MyProjectShader"})
+            {
+                var result=Compatibility(name,"builtin",true);
+                Assert.That((bool)result["definitePipelineMismatch"],Is.False,name);
+                Assert.That((string)result["status"],Is.EqualTo("custom_or_untagged_shader_unverified"),name);
+            }
+        }
+        [Test] public void InactiveAndDisabledUnrelatedMaterialsDoNotOutrankOrAddActiveProblems()
+        {
+            var errorShader=Shader.Find("Hidden/InternalErrorShader");Assert.That(errorShader,Is.Not.Null);
+            var bad=new Material(errorShader);owned.Add(bad);var inactive=Renderer(bad,"Inactive unrelated");inactive.SetActive(false);var disabled=Renderer(bad,"Disabled unrelated");disabled.GetComponent<MeshRenderer>().enabled=false;
+            var requested=Renderer(Material(),"Requested active renderer");var baseline=Call("ReviewSceneEvidence",(object)new[]{requested});var result=Call("ReviewSceneEvidence",(object)new[]{inactive,disabled,requested});
+            Assert.That((string)result["renderers"][0]["name"],Is.EqualTo("Requested active renderer"));
+            Assert.That((int)result["renderersWithDefiniteObservedProblems"],Is.EqualTo((int)baseline["renderersWithDefiniteObservedProblems"]));
+            Assert.That((int)result["inactiveRenderersWithCompatibilityWarnings"],Is.EqualTo(2));
+            foreach(var row in ((JArray)result["renderers"]).Where(r=>!(bool)r["participatesInCurrentRendering"]))
+            {Assert.That((int)row["definiteObservedProblems"],Is.Zero);Assert.That((int)row["inactiveOnlyMaterialProblems"],Is.GreaterThan(0));}
+        }
         [Test] public void ErrorShaderAndUnsupportedShaderAreExplicitObservedProblems()
         {
             Assert.That((bool)Compatibility("Hidden/InternalErrorShader","custom")["errorShader"],Is.True);Assert.That((string)Compatibility("Custom supported elsewhere","builtin",false)["status"],Is.EqualTo("shader_not_supported"));

@@ -37,7 +37,10 @@ namespace WorldWeaver.Editor.Assistant
             shaderName=shaderName??"";pipelineTags=pipelineTags??Array.Empty<string>();
             bool error=shaderName=="Hidden/InternalErrorShader"||shaderName=="Hidden/Universal Render Pipeline/FallbackError"||shaderName=="Hidden/HDRP/FallbackError"||shaderName=="Hidden/HDRenderPipeline/FallbackError";
             bool builtinStandard=shaderName=="Standard"||shaderName=="Standard (Specular setup)"||shaderName=="Legacy Shaders/Diffuse"||shaderName=="Legacy Shaders/Specular";
-            bool universal=shaderName.StartsWith("Universal Render Pipeline/",StringComparison.Ordinal),hd=shaderName.StartsWith("HDRP/",StringComparison.Ordinal);
+            // A project shader can use any namespace-like name. Only these
+            // explicit prebuilt names establish a known family; prefixes alone do not.
+            bool universal=new[]{"Universal Render Pipeline/Lit","Universal Render Pipeline/Simple Lit","Universal Render Pipeline/Unlit","Universal Render Pipeline/Baked Lit","Universal Render Pipeline/Terrain/Lit"}.Contains(shaderName);
+            bool hd=shaderName=="HDRP/Lit"||shaderName=="HDRP/Unlit";
             bool knownFamily=family=="builtin"||family=="universal"||family=="highDefinition";
             bool mismatch=knownFamily&&(builtinStandard&&family!="builtin"||universal&&family!="universal"||hd&&family!="highDefinition");
             string expected=family=="universal"?"UniversalPipeline":family=="highDefinition"?"HDRenderPipeline":"";
@@ -73,7 +76,7 @@ namespace WorldWeaver.Editor.Assistant
         internal static JObject Summary(GameObject go)
         {
             if(!go)return null;var renderer=go.GetComponent<Renderer>();if(!renderer)return null;var pipeline=PipelineEvidence();string family=(string)pipeline["family"];var materials=renderer.sharedMaterials;
-            return new JObject{["pipelineFamily"]=family,["effectivePipelineAsset"]=pipeline["effectiveAsset"]?.DeepClone(),["materialSlotCount"]=materials.Length,["materialSlotsTruncated"]=materials.Length>4,["materials"]=new JArray(materials.Take(4).Select(m=>MaterialFacts(m,family))),["readOnly"]=true,["renderedOutputVerified"]=false};
+            return new JObject{["rendererEnabled"]=renderer.enabled,["activeInHierarchy"]=renderer.gameObject.activeInHierarchy,["pipelineFamily"]=family,["effectivePipelineAsset"]=pipeline["effectiveAsset"]?.DeepClone(),["materialSlotCount"]=materials.Length,["materialSlotsTruncated"]=materials.Length>4,["materials"]=new JArray(materials.Take(4).Select(m=>MaterialFacts(m,family))),["readOnly"]=true,["renderedOutputVerified"]=false};
         }
         internal static JObject ReviewSceneEvidence(IEnumerable<GameObject> objects)
         {
@@ -85,12 +88,13 @@ namespace WorldWeaver.Editor.Assistant
                     if(!material){slots.Add(MaterialFacts(null,family));continue;}
                     if(!cache.TryGetValue(material,out var facts)){facts=MaterialFacts(material,family);cache.Add(material,facts);}slots.Add(facts.DeepClone());
                 }
-                int definite=slots.Count(m=>(bool?)m["compatibility"]?["definitePipelineMismatch"]==true||(bool?)m["compatibility"]?["errorShader"]==true||(string)m["compatibility"]?["status"]=="shader_not_supported");
-                details.Add(new JObject{["target"]=ProjectContextIndex.StableTarget(renderer.gameObject),["name"]=Short(renderer.name,80),["enabled"]=renderer.enabled,["activeInHierarchy"]=renderer.gameObject.activeInHierarchy,["materialSlotCount"]=materials.Length,["materialSlotsTruncated"]=materials.Length>4,["definiteObservedProblems"]=definite,["materials"]=slots});
+                int materialProblems=slots.Count(m=>(bool?)m["compatibility"]?["definitePipelineMismatch"]==true||(bool?)m["compatibility"]?["errorShader"]==true||(string)m["compatibility"]?["status"]=="shader_not_supported");
+                bool active=renderer.enabled&&renderer.gameObject.activeInHierarchy;
+                details.Add(new JObject{["target"]=ProjectContextIndex.StableTarget(renderer.gameObject),["name"]=Short(renderer.name,80),["enabled"]=renderer.enabled,["activeInHierarchy"]=renderer.gameObject.activeInHierarchy,["participatesInCurrentRendering"]=active,["materialSlotCount"]=materials.Length,["materialSlotsTruncated"]=materials.Length>4,["definiteObservedProblems"]=active?materialProblems:0,["inactiveOnlyMaterialProblems"]=active?0:materialProblems,["materials"]=slots});
             }
-            var chosen=new JArray();int budget=0;foreach(var item in details.OrderByDescending(d=>(int)d["definiteObservedProblems"]).ThenByDescending(d=>(bool)d["enabled"]&&(bool)d["activeInHierarchy"]).Take(8))
+            var chosen=new JArray();int budget=0;foreach(var item in details.OrderByDescending(d=>(bool)d["participatesInCurrentRendering"]).ThenByDescending(d=>(int)d["definiteObservedProblems"]).Take(8))
             {int length=item.ToString(Formatting.None).Length;if(budget+length+chosen.Count+2>16000)break;budget+=length;chosen.Add(item);}
-            return new JObject{["readOnly"]=true,["actualPixelsInspected"]=false,["pipeline"]=pipeline,["inspectedRendererCount"]=details.Count,["inputScopeTruncated"]=source.Length>2048||renderers.Length>256,["rendererDetailsLimit"]=8,["rendererDetailsCharacterLimit"]=16000,["detailsTruncated"]=chosen.Count<details.Count,["renderersWithDefiniteObservedProblems"]=details.Count(d=>(int)d["definiteObservedProblems"]>0),["renderers"]=chosen,["observedShaderAlternatives"]=Alternatives(family),["alternativesMeaning"]="These Shader.Find results are availability/support observations, not automatic replacements or proof of final appearance. Custom pipelines receive no universal alternative list.",["verificationNote"]="Mesh geometry, collider tests, shader existence and Shader.isSupported do not prove visual correctness. Check active-pipeline compatibility and capture/inspect actual rendering after material changes."};
+            return new JObject{["readOnly"]=true,["actualPixelsInspected"]=false,["pipeline"]=pipeline,["inspectedRendererCount"]=details.Count,["inputScopeTruncated"]=source.Length>2048||renderers.Length>256,["rendererDetailsLimit"]=8,["rendererDetailsCharacterLimit"]=16000,["detailsTruncated"]=chosen.Count<details.Count,["renderersWithDefiniteObservedProblems"]=details.Count(d=>(int)d["definiteObservedProblems"]>0),["inactiveRenderersWithCompatibilityWarnings"]=details.Count(d=>(int)d["inactiveOnlyMaterialProblems"]>0),["renderers"]=chosen,["observedShaderAlternatives"]=Alternatives(family),["alternativesMeaning"]="These Shader.Find results are availability/support observations, not automatic replacements or proof of final appearance. Custom pipelines receive no universal alternative list.",["verificationNote"]="Inactive or disabled renderer material warnings are reported separately and do not establish a current rendering problem. Global diagnostics are observations, not additional user requirements. Mesh geometry, collider tests, shader existence and Shader.isSupported do not prove visual correctness. Check active-pipeline compatibility and capture/inspect actual rendering after material changes."};
         }
     }
 }
