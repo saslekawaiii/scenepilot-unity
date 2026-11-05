@@ -53,11 +53,20 @@ namespace WorldWeaver.Editor.Assistant
             if(!source)source=ProjectContextIndex.Objects().Select(go=>go.GetComponent<Camera>()).FirstOrDefault(c=>c&&c.enabled);
             if(!source&&SceneView.lastActiveSceneView)source=SceneView.lastActiveSceneView.camera;
             if(!source&&view!="overview")throw new ArgumentException("No scene/game camera available for capture.");
-            var holder=new GameObject("WorldWeaver capture camera"){hideFlags=HideFlags.HideAndDontSave};
-            var rt=RenderTexture.GetTemporary(width,height,24,RenderTextureFormat.ARGB32);
+            // URP's ForwardLights calls GetUniversalAdditionalLightData while rendering,
+            // which adds a serialized component to lights that did not have one. A
+            // read-only screenshot must not change the scene sealed by a checkpoint.
+            // Only this known Unity side effect is reverted; existing data and any
+            // unrelated callback changes remain observable by the conflict guard.
+            var lightDataType=Type.GetType("UnityEngine.Rendering.Universal.UniversalAdditionalLightData, Unity.RenderPipelines.Universal.Runtime");
+            var lightsWithoutData=lightDataType==null?Array.Empty<GameObject>():ProjectContextIndex.Objects(true)
+                .Where(go=>go.GetComponent<Light>()&&!go.GetComponent(lightDataType)).ToArray();
+            GameObject holder=null;RenderTexture rt=null;
             var previous=RenderTexture.active;Texture2D texture=null;bool fog=RenderSettings.fog;
             try
             {
+                holder=new GameObject("WorldWeaver capture camera"){hideFlags=HideFlags.HideAndDontSave};
+                rt=RenderTexture.GetTemporary(width,height,24,RenderTextureFormat.ARGB32);
                 var camera=holder.AddComponent<Camera>();if(source){camera.CopyFrom(source);holder.transform.SetPositionAndRotation(source.transform.position,source.transform.rotation);}
                 if(view=="overview")
                 {
@@ -67,7 +76,19 @@ namespace WorldWeaver.Editor.Assistant
                 RenderTexture.active=rt;texture=new Texture2D(width,height,TextureFormat.RGB24,false);texture.ReadPixels(new Rect(0,0,width,height),0,0);texture.Apply();
                 return Save(texture.EncodeToPNG(),"Сцена "+DateTime.Now.ToString("HH:mm:ss"));
             }
-            finally{RenderSettings.fog=fog;RenderTexture.active=previous;if(texture)Object.DestroyImmediate(texture);RenderTexture.ReleaseTemporary(rt);Object.DestroyImmediate(holder);}
+            finally
+            {
+                try
+                {
+                    RenderSettings.fog=fog;RenderTexture.active=previous;
+                    if(texture)Object.DestroyImmediate(texture);if(rt)RenderTexture.ReleaseTemporary(rt);if(holder)Object.DestroyImmediate(holder);
+                }
+                finally
+                {
+                    foreach(var light in lightsWithoutData)
+                        if(light&&light.GetComponent(lightDataType) is Component added)Object.DestroyImmediate(added);
+                }
+            }
         }
         public static Bounds OverviewBounds()
         {
