@@ -374,12 +374,23 @@ namespace WorldWeaver.Tests
             Assert.That(answer.Task.MutationAuthorized, Is.False); Assert.That(answer.Steps, Is.Empty); Assert.That(answer.PendingPlan, Is.Null);
             Assert.That(answer.Task.CheckpointId, Is.Null.Or.Empty); Assert.That(scene.rootCount, Is.Zero);
         }
-        [UnityTest] public IEnumerator AskKeepsLiteralRequirementsWithoutClaimingTheyWereChecked()
+        [UnityTest] public IEnumerator AskKeepsLiteralQuestionScopeWithoutInferringAuthoringRequirements()
         {
-            var controller = Controller(EmptyProvider(), AssistantMode.Ask);
-            yield return Finish(controller.SendAsync("Как создать 3 дерева?"));
-            var answer = controller.Current.Messages.Last(); Assert.That(answer.Task.Requirements.Count, Is.EqualTo(1));
-            Assert.That(answer.Task.Checks, Is.Empty); Assert.That(answer.Status, Is.EqualTo("Готово")); Assert.That(scene.rootCount, Is.Zero);
+            const string question="Как создать 3 дерева?";CompletionRequest observed=null;
+            var provider=new Provider{Answer=(request,token)=>{observed=request;return Task.FromResult(Result());}};
+            var controller=Controller(provider,AssistantMode.Ask);
+            yield return Finish(controller.SendAsync(question));
+            var answer=controller.Current.Messages.Last();
+            // The count is scope for the requested explanation, not a criterion
+            // requiring three real scene objects. Retain the complete question
+            // in inference and persisted intent instead of adding authoring goals.
+            Assert.That(observed,Is.Not.Null);Assert.That(observed.Messages.Any(m=>m.Role=="user"&&m.Content.Contains(question)),Is.True);
+            Assert.That(answer.Task.OriginalRequest,Is.EqualTo(question));
+            var restored=JsonConvert.DeserializeObject<AgentTaskState>(JsonConvert.SerializeObject(answer.Task));
+            Assert.That(restored.OriginalRequest,Is.EqualTo(question));Assert.That(restored.Purpose,Is.EqualTo("explanation"));
+            Assert.That(answer.Task.MutationAuthorized,Is.False);Assert.That(answer.Task.Requirements,Is.Empty);Assert.That(answer.Task.Checks,Is.Empty);
+            Assert.That(answer.IsError,Is.False,answer.Text);Assert.That(answer.Status,Is.EqualTo("Готово"));Assert.That(ChatTaskPresentation.From(answer).Visible,Is.False);
+            Assert.That(answer.Steps,Is.Empty);Assert.That(answer.PendingPlan,Is.Null);Assert.That(answer.Task.CheckpointId,Is.Null.Or.Empty);Assert.That(scene.rootCount,Is.Zero);
         }
         [UnityTest] public IEnumerator PlanDefersMutationAndApplyingItKeepsOriginalCriteria()
         {
