@@ -37,10 +37,35 @@ namespace WorldWeaver.Editor.Assistant
             if(!mesh&&colliders.Length==0)return null;
             var measuredMesh=mesh?mesh:colliders.Length>0?colliders[0].sharedMesh:null;
             return new JObject { ["visualMesh"]=MeshIdentity(mesh),["meshColliderCount"]=colliders.Length,["worldScale"]=Vec(go.transform.lossyScale),
-                ["orientation"]=CompactOrientation(measuredMesh,go.transform),["orientationMeshSource"]=mesh?"visual":"collider",["physicalCoverageProvenByOrientation"]=false,
+                ["storedVertexNormals"]=StoredVertexNormals(measuredMesh),["orientation"]=CompactOrientation(measuredMesh,go.transform),["orientationMeshSource"]=mesh?"visual":"collider",["physicalCoverageProvenByOrientation"]=false,
                 ["detailTool"]="inspect_component: MeshFilter, MeshCollider or SkinnedMeshRenderer; geometryDiagnostics contains measured topology, face orientation and physical ray coverage. No automatic repair." };
         }
 
+        static JObject SummarizeStoredNormals(int vertexCount,Vector3[] normals)
+        {
+            const double nearZeroLength=1e-6,unitTolerance=.01;
+            int nonFinite=0,nearZero=0,nonUnit=0;double min=double.PositiveInfinity,max=double.NegativeInfinity;
+            foreach(var normal in normals)
+            {
+                if(!Finite(normal)){nonFinite++;continue;}
+                // Double intermediates avoid overflowing for finite Float32 data.
+                double length=Math.Sqrt((double)normal.x*normal.x+(double)normal.y*normal.y+(double)normal.z*normal.z);
+                min=Math.Min(min,length);max=Math.Max(max,length);if(length<=nearZeroLength)nearZero++;if(Math.Abs(length-1)>unitTolerance)nonUnit++;
+            }
+            var result=new JObject{["available"]=true,["readOnly"]=true,["coordinateSpace"]="stored mesh-local vertex normals, not geometric face normals",["vertexCount"]=vertexCount,["count"]=normals.Length,["matchesVertexCount"]=normals.Length==vertexCount,["nonFiniteCount"]=nonFinite,["nearZeroCount"]=nearZero,["nonUnitFiniteCount"]=nonUnit,["nearZeroLengthThreshold"]=nearZeroLength,["unitLengthTolerance"]=unitTolerance,["minFiniteLength"]=double.IsPositiveInfinity(min)?JValue.CreateNull():(JToken)min,["maxFiniteLength"]=double.IsNegativeInfinity(max)?JValue.CreateNull():(JToken)max,["finiteLengthIncludesZero"]=true,["renderingDefectProven"]=false};
+            if(normals.Length!=vertexCount||nonFinite>0||nearZero>0||nonUnit>0)
+                result["warning"]="Stored vertex normals are missing, non-finite, near zero or non-unit; see actual counts. Ordinary lit shaders can shade differently from the geometric face orientation. This may be intentional for unlit/custom shaders; compare the intended material and actual rendered result. No normals were recalculated or repaired.";
+            return result;
+        }
+        static JObject StoredVertexNormals(Mesh mesh)
+        {
+            var unavailable=new JObject{["available"]=false,["readOnly"]=true,["vertexLimit"]=MaximumVertices};
+            if(!mesh){unavailable["reason"]="No mesh assigned.";return unavailable;}
+            unavailable["vertexCount"]=mesh.vertexCount;
+            if(!mesh.isReadable){unavailable["reason"]="CPU mesh data is not readable; stored normals were not accessed.";return unavailable;}
+            if(mesh.vertexCount>MaximumVertices){unavailable["reason"]="Mesh exceeds the bounded stored-normal inspection size; no normal array was allocated.";return unavailable;}
+            var result=SummarizeStoredNormals(mesh.vertexCount,mesh.normals);result["vertexLimit"]=MaximumVertices;return result;
+        }
         static bool SmallReadableTriangles(Mesh mesh,out ulong indexCount)
         {
             indexCount=0;if(!mesh||!mesh.isReadable||mesh.vertexCount>4096||mesh.subMeshCount>64)return false;
@@ -94,7 +119,7 @@ namespace WorldWeaver.Editor.Assistant
                 if(!SmallReadableTriangles(mesh,out _))continue;candidates.Add((go,component,Summary(go)));
             }
             var result=new JArray();int budget=0;
-            foreach(var candidate in candidates.OrderByDescending(c=>c.Summary["orientation"]?["warning"]!=null).ThenByDescending(c=>(bool)c.Go.GetComponent<MeshCollider>()).Take(4))
+            foreach(var candidate in candidates.OrderByDescending(c=>c.Summary["orientation"]?["warning"]!=null||c.Summary["storedVertexNormals"]?["warning"]!=null).ThenByDescending(c=>(bool)c.Go.GetComponent<MeshCollider>()).Take(4))
             {
                 var detail=Inspect(candidate.Component);detail.Remove("triangleSamples");detail.Remove("coverageMeaning");
                 if(detail["meshColliders"] is JArray colliders)
@@ -116,6 +141,8 @@ namespace WorldWeaver.Editor.Assistant
             if(!(component is MeshFilter)&&!(component is MeshCollider)&&!(component is SkinnedMeshRenderer))return null;
             var go=component.gameObject;var warnings=new JArray();var result=new JObject { ["mesh"]=MeshIdentity(mesh),["visualMesh"]=MeshIdentity(VisualMesh(go)),["worldScale"]=Vec(go.transform.lossyScale),["transformDeterminant"]=go.transform.localToWorldMatrix.determinant,["readOnly"]=true,["warnings"]=warnings };
             if(!mesh){warnings.Add("Component has no mesh.");return result;}
+            result["storedVertexNormals"]=StoredVertexNormals(mesh);
+            if(result["storedVertexNormals"]?["warning"]?.Type==JTokenType.String)warnings.Add((string)result["storedVertexNormals"]["warning"]);
             result["queriesHitBackfaces"]=Physics.queriesHitBackfaces;
             result["queriesDoNotAdvanceSimulation"]=true;
             result["skinnedMeshPose"] = component is SkinnedMeshRenderer ? "Reference mesh only; current deformed skin pose is not baked by this read-only inspection." : null;

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -14,7 +16,12 @@ namespace WorldWeaver.Editor.Assistant
     {
         const string AdditionalType="UnityEngine.Rendering.Universal.UniversalAdditionalLightData, Unity.RenderPipelines.Universal.Runtime";
         static IEnumerable<Light> Lights()=>ProjectContextIndex.Objects(true).SelectMany(go=>go.GetComponents<Light>()).Where(light=>light);
-        internal static Dictionary<int,string> Capture()=>Lights().ToDictionary(light=>light.GetInstanceID(),light=>EditorJsonUtility.ToJson(light));
+        static string Signature(Light light)
+        {
+            var transform=light.transform;var position=transform.position;var rotation=transform.rotation;var scale=transform.lossyScale;
+            return new JObject{["componentSerialized"]=EditorJsonUtility.ToJson(light),["worldPosition"]=new JArray(position.x,position.y,position.z),["worldRotation"]=new JArray(rotation.x,rotation.y,rotation.z,rotation.w),["worldScale"]=new JArray(scale.x,scale.y,scale.z),["activeInHierarchy"]=light.gameObject.activeInHierarchy,["layer"]=light.gameObject.layer}.ToString(Formatting.None);
+        }
+        internal static Dictionary<int,string> Capture()=>Lights().ToDictionary(light=>light.GetInstanceID(),Signature);
         internal static bool ActiveUrp()
         {
             // Match the configuration that the next render will use, including a
@@ -33,7 +40,7 @@ namespace WorldWeaver.Editor.Assistant
             if(dataType==null||!typeof(Component).IsAssignableFrom(dataType))throw new NotSupportedException("The active URP additional-light-data component type could not be loaded.");
             foreach(var light in Lights())
             {
-                if(before.TryGetValue(light.GetInstanceID(),out string old)&&old==EditorJsonUtility.ToJson(light))continue;
+                if(before.TryGetValue(light.GetInstanceID(),out string old)&&old==Signature(light))continue;
                 if(light.GetComponent(dataType))continue;
                 if(!Undo.AddComponent(light.gameObject,dataType))throw new InvalidOperationException("Could not initialize rendering data for an admitted light mutation.");
             }

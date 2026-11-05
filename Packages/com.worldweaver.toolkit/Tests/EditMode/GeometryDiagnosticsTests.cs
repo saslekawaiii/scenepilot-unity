@@ -157,5 +157,51 @@ namespace WorldWeaver.Tests
             var go=Object(Plane());var summary=Snapshot(go);
             Assert.That((int)summary["visualMesh"]["vertices"],Is.EqualTo(4));Assert.That(summary["triangleSamples"],Is.Null);StringAssert.Contains("inspect_component",(string)summary["detailTool"]);
         }
+        [Test] public void OppositeSharedTrianglesExposeCancelledStoredNormalsWithoutRepair()
+        {
+            var mesh=Plane();mesh.triangles=new[]{0,1,2,0,2,3,0,2,1,0,3,2};mesh.RecalculateNormals();
+            var beforeNormals=mesh.normals.ToArray();var beforeIndices=mesh.triangles.ToArray();var go=Object(mesh,false);
+            var normals=Snapshot(go)["storedVertexNormals"];
+            Assert.IsTrue((bool)normals["available"]);Assert.AreEqual(4,(int)normals["count"]);Assert.IsTrue((bool)normals["matchesVertexCount"]);
+            Assert.AreEqual(4,(int)normals["nearZeroCount"]);Assert.AreEqual(4,(int)normals["nonUnitFiniteCount"]);Assert.AreEqual(0,(int)normals["nonFiniteCount"]);
+            Assert.AreEqual(0,(double)normals["minFiniteLength"],1e-7);Assert.AreEqual(0,(double)normals["maxFiniteLength"],1e-7);
+            StringAssert.Contains("unlit/custom",(string)normals["warning"]);Assert.IsFalse((bool)normals["renderingDefectProven"]);
+            Assert.AreEqual(4,(int)Inspect(go.GetComponent<MeshFilter>())["storedVertexNormals"]["nearZeroCount"]);
+            CollectionAssert.AreEqual(beforeNormals,mesh.normals);CollectionAssert.AreEqual(beforeIndices,mesh.triangles);
+        }
+        [Test] public void ValidStoredNormalsAreMeasuredSeparatelyFromGeometricOrientation()
+        {
+            var mesh=Plane();var go=Object(mesh,false);var facts=Snapshot(go)["storedVertexNormals"];
+            Assert.AreEqual(4,(int)facts["count"]);Assert.IsTrue((bool)facts["matchesVertexCount"]);Assert.AreEqual(0,(int)facts["nearZeroCount"]);
+            Assert.AreEqual(0,(int)facts["nonFiniteCount"]);Assert.AreEqual(0,(int)facts["nonUnitFiniteCount"]);Assert.AreEqual(1,(double)facts["minFiniteLength"],1e-6);Assert.AreEqual(1,(double)facts["maxFiniteLength"],1e-6);Assert.IsNull(facts["warning"]);
+        }
+        [Test] public void MissingStoredNormalsRemainAnObservationNotAnAutomaticLightingRepair()
+        {
+            var mesh=Plane();mesh.normals=Array.Empty<Vector3>();var go=Object(mesh,false);var facts=Snapshot(go)["storedVertexNormals"];
+            Assert.IsTrue((bool)facts["available"]);Assert.AreEqual(0,(int)facts["count"]);Assert.IsFalse((bool)facts["matchesVertexCount"]);
+            Assert.AreEqual(JTokenType.Null,facts["minFiniteLength"].Type);Assert.AreEqual(JTokenType.Null,facts["maxFiniteLength"].Type);
+            StringAssert.Contains("may be intentional",(string)facts["warning"]);Assert.IsFalse((bool)facts["renderingDefectProven"]);Assert.IsEmpty(mesh.normals);
+        }
+        [Test] public void StoredNormalStatisticsSeparateNonFiniteZeroAndFiniteNonUnitValues()
+        {
+            var implementation=typeof(SceneToolExecutor).Assembly.GetType("WorldWeaver.Editor.Assistant.GeometryDiagnostics",true);
+            var values=new[]{Vector3.zero,Vector3.up*2,new Vector3(float.NaN,0,0),Vector3.up};
+            var facts=(JObject)implementation.GetMethod("SummarizeStoredNormals",BindingFlags.Static|BindingFlags.NonPublic).Invoke(null,new object[]{4,values});
+            Assert.AreEqual(1,(int)facts["nonFiniteCount"]);Assert.AreEqual(1,(int)facts["nearZeroCount"]);Assert.AreEqual(2,(int)facts["nonUnitFiniteCount"]);
+            Assert.AreEqual(0,(double)facts["minFiniteLength"]);Assert.AreEqual(2,(double)facts["maxFiniteLength"]);Assert.DoesNotThrow(()=>facts.ToString(Newtonsoft.Json.Formatting.None));Assert.IsTrue(float.IsNaN(values[2].x));
+        }
+        [Test] public void UnreadableAndOversizedMeshesDoNotReadStoredNormalArrays()
+        {
+            var unreadable=Plane();var go=Object(unreadable,false);unreadable.UploadMeshData(true);var facts=Snapshot(go)["storedVertexNormals"];
+            Assert.IsFalse((bool)facts["available"]);Assert.IsNull(facts["count"]);StringAssert.Contains("not readable",(string)facts["reason"]);
+            var large=new Mesh{indexFormat=UnityEngine.Rendering.IndexFormat.UInt32};meshes.Add(large);large.vertices=new Vector3[65537];go=Object(large,false);facts=Snapshot(go)["storedVertexNormals"];
+            Assert.IsFalse((bool)facts["available"]);Assert.IsNull(facts["count"]);StringAssert.Contains("bounded",(string)facts["reason"]);
+        }
+        [Test] public void ReviewReceivesCancelledStoredNormalsAsNeutralMeasuredEvidence()
+        {
+            var mesh=Plane();mesh.normals=new Vector3[mesh.vertexCount];var go=Object(mesh,false);var result=Review(new[]{go});
+            Assert.AreEqual(1,result.Count);Assert.AreEqual(4,(int)result[0]["summary"]["storedVertexNormals"]["nearZeroCount"]);
+            Assert.AreEqual(4,(int)result[0]["measuredDiagnostics"]["storedVertexNormals"]["nearZeroCount"]);Assert.IsFalse((bool)result[0]["summary"]["storedVertexNormals"]["renderingDefectProven"]);
+        }
     }
 }

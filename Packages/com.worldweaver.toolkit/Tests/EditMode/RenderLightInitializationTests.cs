@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using NUnit.Framework;
+using Newtonsoft.Json.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -17,7 +18,7 @@ namespace WorldWeaver.Tests
 {
     public sealed class RenderLightInitializationTests
     {
-        string checkpoint;readonly List<Material> materials=new List<Material>();
+        string checkpoint,fixtureFolder;readonly List<Material> materials=new List<Material>();
         SceneSetup[] previousScenes;bool fixtureActive;
         static object Call(string method,params object[] args)
         {
@@ -32,7 +33,7 @@ namespace WorldWeaver.Tests
         static Light Light(string name,bool enabled=true){var light=new GameObject(name).AddComponent<Light>();light.type=LightType.Directional;light.enabled=enabled;return light;}
         [SetUp] public void Setup()
         {
-            fixtureActive=false;previousScenes=null;checkpoint=null;
+            fixtureActive=false;previousScenes=null;checkpoint=null;fixtureFolder=null;
             var existing=Enumerable.Range(0,SceneManager.sceneCount).Select(SceneManager.GetSceneAt).ToArray();
             if(!Application.isBatchMode&&existing.Any(scene=>scene.isDirty||string.IsNullOrEmpty(scene.path)))Assert.Ignore("Use an isolated consumer or save open scenes before light/checkpoint tests.");
             previousScenes=existing.All(scene=>!string.IsNullOrEmpty(scene.path)&&!scene.isDirty)?EditorSceneManager.GetSceneManagerSetup():null;
@@ -43,7 +44,7 @@ namespace WorldWeaver.Tests
             if(!fixtureActive)return;
             try
             {
-                EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);foreach(var material in materials)if(material)Object.DestroyImmediate(material);materials.Clear();
+                EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Single);if(!string.IsNullOrEmpty(fixtureFolder))AssetDatabase.DeleteAsset(fixtureFolder);foreach(var material in materials)if(material)Object.DestroyImmediate(material);materials.Clear();
                 if(checkpoint!=null){string folder=Path.Combine("UserSettings/WorldWeaverCheckpoints",checkpoint);if(Directory.Exists(folder))Directory.Delete(folder,true);checkpoint=null;}
             }
             finally
@@ -54,8 +55,10 @@ namespace WorldWeaver.Tests
         }
         [Test] public void CaptureIncludesAdditiveLoadedSceneLightsAndTheirActualSerializedValues()
         {
-            var first=Light("Active scene light");var additive=EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Additive);UnityEngine.SceneManagement.SceneManager.SetActiveScene(additive);var second=Light("Additive light");var before=Capture();
-            Assert.That(before.ContainsKey(first.GetInstanceID()),Is.True);Assert.That(before.ContainsKey(second.GetInstanceID()),Is.True);Assert.That(before[first.GetInstanceID()],Is.EqualTo(EditorJsonUtility.ToJson(first)));
+            var first=Light("Active scene light");fixtureFolder="Assets/RenderLightInitialization-"+Guid.NewGuid().ToString("N");AssetDatabase.CreateFolder("Assets",Path.GetFileName(fixtureFolder));
+            Assert.That(EditorSceneManager.SaveScene(SceneManager.GetActiveScene(),fixtureFolder+"/Initial.unity"),Is.True,"Additive Editor scenes require a saved initial scene.");
+            var additive=EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,NewSceneMode.Additive);SceneManager.SetActiveScene(additive);var second=Light("Additive light");var before=Capture();
+            Assert.That(before.ContainsKey(first.GetInstanceID()),Is.True);Assert.That(before.ContainsKey(second.GetInstanceID()),Is.True);Assert.That((string)JObject.Parse(before[first.GetInstanceID()])["componentSerialized"],Is.EqualTo(EditorJsonUtility.ToJson(first)));
             second.intensity+=3;Assert.That(Capture()[second.GetInstanceID()],Is.Not.EqualTo(before[second.GetInstanceID()]));Assert.That(additive.isLoaded,Is.True);
         }
         [Test] public void OnlyNewOrChangedLightsAreInitializedAndExistingDataRemainsUntouched()
@@ -68,7 +71,15 @@ namespace WorldWeaver.Tests
         }
         [Test] public void UnchangedExistingLightWithoutPipelineDataIsNotAnAuthorizedInitialization()
         {
-            RequireUrp();var light=Light("Existing untouched light");var before=Capture();Assert.That((bool)light.GetComponent(DataType()),Is.False);Initialize(before);Assert.That((bool)light.GetComponent(DataType()),Is.False);Assert.That(EditorJsonUtility.ToJson(light),Is.EqualTo(before[light.GetInstanceID()]));
+            RequireUrp();var light=Light("Existing untouched light");var before=Capture();Assert.That((bool)light.GetComponent(DataType()),Is.False);Initialize(before);Assert.That((bool)light.GetComponent(DataType()),Is.False);Assert.That(Capture()[light.GetInstanceID()],Is.EqualTo(before[light.GetInstanceID()]));
+        }
+        [Test] public void AdmittedTransformVisibilityAndLayerEditsInitializeWithoutLightPropertyChanges()
+        {
+            RequireUrp();var moved=Light("Transform-only moved light");var rotated=Light("Transform-only rotated light");var scaled=Light("Transform-only scaled light");var deactivated=Light("Activation-only light");var layered=Light("Layer-only light");var child=Light("Parent-transform light");var parent=new GameObject("Admitted light parent");child.transform.SetParent(parent.transform,false);
+            var lights=new[]{moved,rotated,scaled,deactivated,layered,child};var untouched=Light("Unchanged outside admitted edits");var values=lights.ToDictionary(l=>l.GetInstanceID(),l=>EditorJsonUtility.ToJson(l));var before=Capture();
+            moved.transform.position=Vector3.right*3;rotated.transform.rotation=Quaternion.Euler(20,40,0);scaled.transform.localScale=Vector3.one*2;deactivated.gameObject.SetActive(false);layered.gameObject.layer=2;parent.transform.position=Vector3.up*4;
+            foreach(var light in lights){Assert.That(EditorJsonUtility.ToJson(light),Is.EqualTo(values[light.GetInstanceID()]),light.name+" component properties should be unchanged");Assert.That(Capture()[light.GetInstanceID()],Is.Not.EqualTo(before[light.GetInstanceID()]),light.name+" observed lighting signature must change");}
+            Initialize(before);foreach(var light in lights)Assert.That((bool)light.GetComponent(DataType()),Is.True,light.name);Assert.That((bool)untouched.GetComponent(DataType()),Is.False);
         }
         [Test] public void AdmittedLightInitializationKeepsCheckpointValidAcrossActualCameraRender()
         {
