@@ -33,8 +33,21 @@ namespace WorldWeaver.Tests
         Behaviour Module(EventSystem events,bool assignDefaults=true)
         {
             var type=AppDomain.CurrentDomain.GetAssemblies().Select(a=>a.GetType("UnityEngine.InputSystem.UI.InputSystemUIInputModule")).FirstOrDefault(t=>t!=null)??Assembly.Load("Unity.InputSystem").GetType("UnityEngine.InputSystem.UI.InputSystemUIInputModule",true);
+            if(!assignDefaults)Assert.That(events.gameObject.activeInHierarchy,Is.False,"Unassigned configuration fixture must remain inactive before component creation.");
             var module=(Behaviour)events.gameObject.AddComponent(type);
-            type.GetMethod(assignDefaults?"AssignDefaultActions":"UnassignActions",BindingFlags.Public|BindingFlags.Instance).Invoke(module,null);return module;
+            if(assignDefaults)type.GetMethod("AssignDefaultActions",BindingFlags.Public|BindingFlags.Instance).Invoke(module,null);
+            else
+            {
+                module.enabled=false;
+                // UnassignActions disposes shared generated defaults using runtime
+                // Object.Destroy. Build only this inactive fixture's serialized
+                // unassigned configuration; never dispose shared Editor assets.
+                var serialized=new SerializedObject(module);
+                foreach(string field in new[]{"m_ActionsAsset","m_PointAction","m_MoveAction","m_SubmitAction","m_CancelAction","m_LeftClickAction","m_MiddleClickAction","m_RightClickAction","m_ScrollWheelAction","m_TrackedDevicePositionAction","m_TrackedDeviceOrientationAction"})
+                {var reference=serialized.FindProperty(field);Assert.That(reference,Is.Not.Null,field);reference.objectReferenceValue=null;}
+                serialized.ApplyModifiedPropertiesWithoutUndo();
+            }
+            return module;
         }
         static bool HasWarning(JObject result,string code)=>((JArray)result["warnings"]).Any(w=>(string)w["code"]==code);
 
@@ -65,8 +78,8 @@ namespace WorldWeaver.Tests
         }
         [Test] public void UnassignedActionsAreReportedWithoutAssigningDefaultsDuringInspection()
         {
-            Button(Canvas());var events=Object("Event System",typeof(EventSystem)).GetComponent<EventSystem>();var module=Module(events,false);string before=EditorJsonUtility.ToJson(module);var result=Review(objects);
-            Assert.That((bool)result["eventSystems"][0]["modules"][0]["point"]["referencePresent"],Is.False);Assert.That(HasWarning(result,"POINTER_ACTION_REFERENCES_ABSENT"),Is.True);Assert.That(EditorJsonUtility.ToJson(module),Is.EqualTo(before));
+            Button(Canvas());var eventObject=Object("Inactive Event System");eventObject.SetActive(false);var events=eventObject.AddComponent<EventSystem>();var module=Module(events,false);string before=EditorJsonUtility.ToJson(module);var result=Review(objects);var facts=result["eventSystems"][0]["modules"][0];
+            Assert.That((bool)facts["point"]["referencePresent"],Is.False);Assert.That((bool)facts["leftClick"]["referencePresent"],Is.False);Assert.That((bool)facts["activeAndEnabled"],Is.False);Assert.That(HasWarning(result,"POINTER_ACTION_REFERENCES_ABSENT"),Is.False,"An inactive unassigned module is configuration data, not a failed active pointer route.");Assert.That(EditorJsonUtility.ToJson(module),Is.EqualTo(before));
         }
         [Test] public void DisabledModuleCannotCountAsAnEnabledStructuralRoute()
         {
