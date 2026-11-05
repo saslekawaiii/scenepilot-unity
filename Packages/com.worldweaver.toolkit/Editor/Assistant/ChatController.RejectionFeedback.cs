@@ -23,7 +23,13 @@ namespace WorldWeaver.Editor.Assistant
                 if(message.Role!="system"||!(message.Content??"").StartsWith(HostWireContractPrefix,StringComparison.Ordinal))continue;
                 request.Messages[i]=new ChatMessage("system",contract);found=true;
             }
-            if(!found)request.Messages.Add(new ChatMessage("system",contract));
+            if(!found)
+            {
+                // Keep the latest user/readback turn last. Host wire guidance
+                // belongs with initial system instructions, not after tool data.
+                int firstTurn=request.Messages.FindIndex(m=>m.Role!="system");
+                request.Messages.Insert(firstTurn<0?request.Messages.Count:firstTurn,new ChatMessage("system",contract));
+            }
         }
         static string BoundedRejectionData(string value,int limit=2400)
         {
@@ -82,6 +88,7 @@ namespace WorldWeaver.Editor.Assistant
             string contract=nativeWire
                 ? "The previous native step was rejected before any action from that response executed. Continue with native function calls using FLAT parameters from the CURRENT advertised schemas, without an args wrapper. Do not output a textual JSON plan. Reuse the measured observations below; do not rerun the rejected operation or count another read as implementation. Choose a different justified diagnostic or repair. finish_task reports a truthful completed/partial/blocked outcome; completion still requires actual evidence."
                 : "The previous plan was rejected before any action from it executed. Return ONLY an EditorPlan JSON instance, not a schema: {\"reply\":\"text\",\"complete\":false,\"actions\":[...]}. Use the current action schemas and actual observations to correct the next justified step. Do not repeat rejected or completed operations. Use actions:[] and complete:true only when the original request is actually satisfied or its unresolved outcome is disclosed.";
+            contract="План отклонён. "+contract;
             if(readOnlyRequest)contract+=nativeWire
                 ? " This is a read-only request: use advertised read-only observations or finish_task with the supported explanation. Do not modify scenes, source or permissions."
                 : " This is a read-only request: do not modify scenes or source; use actions:[] and complete:true for a supported explanation.";

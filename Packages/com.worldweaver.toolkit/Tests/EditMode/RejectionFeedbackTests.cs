@@ -23,6 +23,25 @@ namespace WorldWeaver.Tests
             const string marker="\nHOST REJECTION DATA:\n";
             return JObject.Parse(content.Substring(content.IndexOf(marker,System.StringComparison.Ordinal)+marker.Length));
         }
+        [TestCase(false)]
+        [TestCase(true)]
+        public void MissingWireContractIsInsertedBeforeTurnsAndPreservesLatestReadback(bool nativeWire)
+        {
+            var request=Request("inspect_object");
+            request.Messages.Add(new ChatMessage("system","Initial host policy"));
+            request.Messages.Add(new ChatMessage("user","Actual original task"));
+            request.Messages.Add(new ChatMessage("assistant","Previous proposed operation"));
+            request.Messages.Add(new ChatMessage("tool","Actual measured tool data"));
+            var latest=new ChatMessage("user","Latest actual readback and CURRENT USER TASK");request.Messages.Add(latest);
+            var original=request.Messages.ToArray();
+            Call("ApplyActiveWireContract",request,nativeWire);
+            Assert.AreSame(latest,request.Messages.Last(),"Adding wire guidance must not replace the last actual readback with a system message");
+            Assert.AreEqual("system",request.Messages[1].Role);Assert.That(request.Messages[1].Content,Does.StartWith("SCENEPILOT HOST RESPONSE CONTRACT: "));
+            CollectionAssert.AreEqual(original,request.Messages.Where((_,i)=>i!=1).ToArray(),"Existing user, tool and host messages keep their order and identity");
+            Call("ApplyActiveWireContract",request,!nativeWire);Assert.AreSame(latest,request.Messages.Last());
+            Assert.AreEqual(original.Length+1,request.Messages.Count,"Switching active wire must replace the owned contract without adding another turn");
+            CollectionAssert.AreEqual(original,request.Messages.Where((_,i)=>i!=1).ToArray());
+        }
         [Test] public void NativeSemanticRepairKeepsNativeWireAndOnlyCurrentlyAdvertisedFunctions()
         {
             var request=Request("reflect_api");string schema=request.Schema.ToString();string content=Apply(request,true);var data=Data(content);
@@ -35,7 +54,7 @@ namespace WorldWeaver.Tests
         [Test] public void TextRecoveryUsesEditorPlanWhenTheActiveWireActuallyHasNoFunctions()
         {
             var request=Request("reflect_api");request.UseToolCalls=true;string content=Apply(request,false);var data=Data(content);
-            Assert.IsFalse(request.UseToolCalls);Assert.That(content,Does.Contain("EditorPlan JSON instance").And.Contain("\"actions\""));
+            Assert.IsFalse(request.UseToolCalls);Assert.That(content,Does.Contain("План отклонён").And.Contain("EditorPlan JSON instance").And.Contain("\"actions\""));
             Assert.IsTrue(request.Messages.Any(m=>m.Role=="system"&&m.Content.Contains("Native function calls are disabled for this response")));
             Assert.AreEqual("EditorPlan_JSON",(string)data["activeWireContract"]);CollectionAssert.AreEqual(new[]{"reflect_api"},data["advertisedTools"].Values<string>());
         }

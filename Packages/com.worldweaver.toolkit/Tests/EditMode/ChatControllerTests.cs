@@ -406,7 +406,9 @@ namespace WorldWeaver.Tests
                 if (round == 1)
                 {
                     StringAssert.Contains("План отклонён", request.Messages.Last().Content);
-                    Assert.That(request.Messages.Last().Content,Does.EndWith("CURRENT USER TASK: Создай RepairPrefixCube"),"A repair must end with this user task, not an older code-writing task.");
+                    const string rejectionMarker="\nHOST REJECTION DATA:\n";string feedback=request.Messages.Last().Content;
+                    var rejection=JObject.Parse(feedback.Substring(feedback.IndexOf(rejectionMarker,StringComparison.Ordinal)+rejectionMarker.Length));
+                    Assert.That((string)rejection["originalUserRequest"],Is.EqualTo("Создай RepairPrefixCube"),"A repair must retain this exact user task, not an older code-writing task.");
                     Assert.That(Find("RepairPrefixCube"), Is.Null);
                     return Task.FromResult(Reply(true, Create("RepairPrefixCube")));
                 }

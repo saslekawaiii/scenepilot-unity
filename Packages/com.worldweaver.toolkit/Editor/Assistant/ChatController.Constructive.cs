@@ -99,9 +99,16 @@ namespace WorldWeaver.Editor.Assistant
             return boundary;
         }
         internal static int ObservationsSinceProgress(AssistantMessage answer)=>Math.Max(0,(answer?.Steps?.Count??0)-ProgressBoundary(answer));
+        internal static bool IsEditorCompilationFailure(EditorCommandResult step)
+        {
+            if(step.Tool!="execute_editor_code")return false;
+            try{return (bool?)JObject.Parse(step.Summary??"")["compiled"]==false;}catch(JsonException){return false;}
+        }
         internal static int LatestFailedEditorCode(IReadOnlyList<EditorCommandResult> steps)
         {
-            for(int i=steps.Count-1;i>=0;i--)if(steps[i].Tool=="execute_editor_code"&&!steps[i].Success)return i;
+            // Overall failure can mean execution/verification or batch rollback.
+            // Only a measured compiled:false receipt is a compiler failure.
+            for(int i=steps.Count-1;i>=0;i--)if(IsEditorCompilationFailure(steps[i]))return i;
             return -1;
         }
         internal static JArray ObservationLedger(IReadOnlyList<EditorCommandResult> steps)
@@ -229,15 +236,16 @@ namespace WorldWeaver.Editor.Assistant
                 {
                     var full=JObject.Parse(text);var rows=(full["sceneReadback"] as JArray??new JArray()).OfType<JObject>().ToArray();
                     var selected=rows.OrderByDescending(r=>(r["joints"] as JArray)?.Count??0).ThenByDescending(r=>r["body"]!=null).Take(8);
-                    if(!step.Success)
+                    if((bool?)full["compiled"]==false)
                     {
                         var diagnostics=full["diagnostics"];string diagnosticText=diagnostics?.ToString(Formatting.None)??"";
                         text=new JObject{["compiled"]=full["compiled"],["executed"]=full["executed"],["sourceHash"]=full["sourceHash"],
                             ["diagnosticSourceExcerpts"]=full["diagnosticSourceExcerpts"]?.DeepClone(),
                             ["diagnostics"]=diagnosticText.Length<=4000?diagnostics?.DeepClone():new JValue(diagnosticText.Substring(0,600)+" [bounded diagnostics]"),
-                            ["error"]=BoundedRejectionData(step.Error,120),["failureScope"]="This Editor snippet failed; it is not project compilation status."}.ToString(Formatting.None);
+                            ["batchRollback"]=full["batchRollback"]?.DeepClone(),["error"]=BoundedRejectionData(step.Error,120),["failureScope"]="This Editor snippet failed; it is not project compilation status."}.ToString(Formatting.None);
                     }
                     else text=new JObject{["compiled"]=full["compiled"],["executed"]=full["executed"],["sceneChanged"]=full["sceneChanged"],["projectChanged"]=full["projectChanged"],["diagnostics"]=full["diagnostics"],
+                        ["sourceHash"]=full["sourceHash"],["batchRollback"]=full["batchRollback"]?.DeepClone(),["error"]=BoundedRejectionData(step.Error,120),
                         ["sceneReadback"]=new JArray(selected.Select(r=>r.DeepClone())),["readbackOmittedRows"]=Math.Max(0,rows.Length-8),
                         ["returnedData"]=((string)full["result"]??"").Substring(0,Math.Min(3000,((string)full["result"]??"").Length)),["verification"]=full["verification"]}.ToString(Formatting.None);
                 }
