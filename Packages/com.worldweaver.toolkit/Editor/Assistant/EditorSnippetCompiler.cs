@@ -251,7 +251,9 @@ namespace WorldWeaver.Editor.Assistant
                             string msg = (string)msgProp.Invoke(diag, new object[] { null });
 
                             int userLine = Math.Max(1, line + 1 - 6);
-                            errors.Add($"Line {userLine}: {msg}");
+                            var characterProp = startPos.GetType().GetProperty("Character");
+                            int column = (int)characterProp.GetValue(startPos) + 1;
+                            errors.Add($"Line {userLine}, column {column} (generated line {line + 1}): {msg}");
                         }
                         return null;
                     }

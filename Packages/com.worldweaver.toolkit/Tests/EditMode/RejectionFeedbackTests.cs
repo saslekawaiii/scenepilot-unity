@@ -65,6 +65,17 @@ namespace WorldWeaver.Tests
             Assert.That(content,Does.Not.Contain("PRIVATE_AUDIT_RESPONSE").And.Not.Contain("PRIVATE_PROVIDER_INTERNALS"));
             Assert.AreEqual(3,answer.Steps.Count);Assert.AreEqual("PRIVATE_AUDIT_RESPONSE",answer.Attempts[0].RawResponse,"Feedback must not alter the audit trail");
         }
+        [Test] public void AggregateBatchFailureDoesNotHideTheActualFailedCompilerSourceWindow()
+        {
+            var excerpts=new JObject{["sourceHash"]="actual-source-hash",["windows"]=new JArray(new JObject{["compilerReportedLine"]=31,["generatedDiagnosticLine"]=37,["lines"]=new JArray(new JObject{["line"]=37,["text"]="int value = input / ?? 0;",["isDiagnosticLine"]=true})}),["truncated"]=false};
+            var answer=new AssistantMessage();
+            answer.Steps.Add(new EditorCommandResult{Tool="execute_editor_code",Success=false,Error="Line 31: Invalid expression term",Summary=new JObject{["compiled"]=false,["diagnostics"]="Line 31: Invalid expression term",["sourceHash"]="actual-source-hash",["diagnosticSourceExcerpts"]=excerpts}.ToString()});
+            answer.Steps.Add(new EditorCommandResult{Tool="batch",Success=false,Summary="No changes from batch"});
+            string content=Apply(Request("execute_editor_code","reflect_api"),true,false,answer);
+            var rows=(JArray)Data(content)["relevantActualObservations"];var failed=rows.OfType<JObject>().Single(r=>(string)r["tool"]=="execute_editor_code");
+            Assert.IsTrue(JToken.DeepEquals(excerpts,failed["observation"]["diagnosticSourceExcerpts"]));
+            Assert.IsTrue(rows.OfType<JObject>().Any(r=>(string)r["tool"]=="batch"));
+        }
         [Test] public void RealConstructiveRequestSwitchesFallbackWireWithoutChangingOtherHostOrToolData()
         {
             string folder=Path.Combine(Path.GetTempPath(),"ScenePilot-feedback-"+Guid.NewGuid().ToString("N"));

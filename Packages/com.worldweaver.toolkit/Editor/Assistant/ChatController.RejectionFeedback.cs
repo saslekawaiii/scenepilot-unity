@@ -42,12 +42,13 @@ namespace WorldWeaver.Editor.Assistant
             var indices=new List<int>();
             foreach(Match match in Regex.Matches(error??"",@"durable (?:task )?step ([0-9]{1,6})",RegexOptions.CultureInvariant))
                 if(int.TryParse(match.Groups[1].Value,out int index)&&index>=0&&index<steps.Count)indices.Add(index);
+            int failedEditor=LatestFailedEditorCode(steps);if(failedEditor>=0)indices.Add(failedEditor);
             int failed=steps.FindLastIndex(s=>!s.Success);if(failed>=0)indices.Add(failed);
             int changed=LastBehaviorChange(steps);if(changed>=0)indices.Add(changed);
             indices.Add(steps.Count-1);
-            foreach(int index in indices.Distinct().Take(4))
+            foreach(int index in indices.Distinct().Take(5))
             {
-                var step=steps[index];var row=new JObject{["index"]=index,["tool"]=step.Tool,["success"]=step.Success,["changesApplied"]=step.ChangesApplied,["target"]=step.Target,["error"]=BoundedRejectionData(step.Error)};
+                var step=steps[index];var row=new JObject{["index"]=index,["tool"]=step.Tool,["success"]=step.Success,["changesApplied"]=step.ChangesApplied,["target"]=step.Target,["historicalBeforeLastChange"]=index<changed,["error"]=BoundedRejectionData(step.Error)};
                 if(step.Tool=="execute_editor_code")
                 {
                     try
@@ -59,7 +60,9 @@ namespace WorldWeaver.Editor.Assistant
                         row["observation"]=new JObject{["compiled"]=measured["compiled"],["executed"]=measured["executed"],
                             ["sceneChanged"]=measured["sceneChanged"],["projectChanged"]=measured["projectChanged"],
                             ["returnedData"]=BoundedRejectionData((string)measured["result"]),["sourceHash"]=measured["sourceHash"],
-                            ["diagnostics"]=BoundedRejectionData(measured["diagnostics"]?.ToString(Formatting.None))};
+                            ["diagnostics"]=BoundedRejectionData(measured["diagnostics"]?.ToString(Formatting.None)),
+                            ["diagnosticSourceExcerpts"]=measured["diagnosticSourceExcerpts"]?.DeepClone(),
+                            ["failureScope"]=step.Success?null:"This failed Editor snippet only; it is not current project compilation status."};
                     }
                     catch(JsonException){row["observation"]=BoundedRejectionData(step.Summary);}
                 }

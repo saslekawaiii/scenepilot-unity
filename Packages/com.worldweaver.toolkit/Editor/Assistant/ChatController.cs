@@ -163,7 +163,7 @@ namespace WorldWeaver.Editor.Assistant
             executingMessage=answer;
             staleReadCommands.Clear();
             expandToolSelection=false;
-            requireImplementationStep=ObservationsSinceImplementation(answer.Steps)>=6;
+            requireImplementationStep=ObservationsSinceProgress(answer)>=6;
             Busy = true; userCancelled = false; operation = new CancellationTokenSource();
             bool extendedWorkflow=AgentCapabilities.NeedsExtendedWorkflow(text)&&!SimpleAnimatedPlayerRequest(text);
             long executionLimitMs=(readOnlyRequest?300L:Settings.Power==AssistantPower.Fast?900L:Settings.Power==AssistantPower.Deep?3600L:1800L)*1000;
@@ -200,6 +200,7 @@ namespace WorldWeaver.Editor.Assistant
                         }
                     }
                     if(finalReviewOnly){answer.Task.ContinueAfterReload=false;answer.Task.Status="partial";answer.IsError=true;answer.Status="Нужна проверка";answer.Text="Завершённая проверка учтена, но цель пока не подтверждена. Предел новых продолжений задачи исчерпан: "+ContinuationLimit;Phase=answer.Text;Save();return;}
+                    requireImplementationStep=ObservationsSinceProgress(answer)>=6;
                     var request = BuildRequest(session, text);
                     int rounds = Settings.Power == AssistantPower.Fast ? 1 : Settings.Power == AssistantPower.Deep ? 6 : 3;
                     int maximumRounds = Settings.UseNativeFunctions?(Settings.Power == AssistantPower.Fast ? 16 : Settings.Power == AssistantPower.Deep ? 64 : 32):(Settings.Power == AssistantPower.Fast ? 6 : Settings.Power == AssistantPower.Deep ? 16 : 8);
@@ -213,7 +214,7 @@ namespace WorldWeaver.Editor.Assistant
                     int transientInferenceRepairs=0, protocolInferenceRepairs=0, consecutiveWireShapeFailures=0, consecutiveProviderShapeFailures=0, consecutiveProviderAvailabilityFailures=0;
                     string textRecoveryKind=answer.Attempts.LastOrDefault(a=>a.RepairKind=="native-empty-to-json-contract"||a.RepairKind=="native-stall-to-json-contract"||a.RepairKind=="native-protocol-to-json-contract")?.RepairKind;
                     bool textToolRecovery=textRecoveryKind!=null;
-                    int observationRounds=ObservationsSinceImplementation(answer.Steps);
+                    int observationRounds=ObservationsSinceProgress(answer);
                     string lastAppliedConfiguration=null;
                     bool unresolvedFailure = false;
                     for (int round = 0; round < rounds; round++)
@@ -487,7 +488,7 @@ namespace WorldWeaver.Editor.Assistant
                         // notice that the goal is already met. Periodic independent
                         // observation prevents long runs of needless further edits.
                         if(batch.Results.Any(IsImplementationProgress))observationRounds=0;
-                        else observationRounds=ObservationsSinceImplementation(answer.Steps);
+                        else observationRounds=ObservationsSinceProgress(answer);
                         bool stalledObservations=Settings.AllowAutonomousScripts&&!readOnlyRequest&&Settings.Mode==AssistantMode.Execute&&observationRounds>=6;
                         // A proposed plan and the review-call cap cannot exempt a
                         // task from the bounded observation phase. Real verification,
@@ -500,7 +501,7 @@ namespace WorldWeaver.Editor.Assistant
                         {
                             int stage=Settings.AllowAutonomousScripts&&answer.Task?.Approach.Count>0&&answer.Task.ActiveApproachStage<answer.Task.Approach.Count?answer.Task.ActiveApproachStage:-1;
                             var progress=await ReviewEditorResultAsync(answer,provider,operation.Token,stage);
-                            observationRounds=ObservationsSinceImplementation(answer.Steps);var progressChecks=VerifyTask(answer);
+                            observationRounds=ObservationsSinceProgress(answer);var progressChecks=VerifyTask(answer);
                             if((stalledObservations||stageCheckpoint)&&!progress.Passed)requireImplementationStep=true;
                             // Repeated valid observations are a planning problem,
                             // not evidence that native function encoding is broken.
@@ -515,10 +516,14 @@ namespace WorldWeaver.Editor.Assistant
                                 answer.IsError=false;answer.Status="Проверки пройдены";answer.Text="Изменения применены. "+ChatHistoryStore.Redact(progress.Evidence);answer.Task.ContinueAfterReload=false;Save();break;
                             }
                         }
+                        // An accepted stage transition may have occurred in the review
+                        // above. Its durable boundary starts the next stage's budget.
+                        observationRounds=ObservationsSinceProgress(answer);
+                        stalledObservations=Settings.AllowAutonomousScripts&&!readOnlyRequest&&Settings.Mode==AssistantMode.Execute&&observationRounds>=6;
                         if(stalledObservations&&!WaitingForEditor(answer)&&(HasUnresolvedBehaviorFailure(answer.Steps)||answer.EditorReviews.LastOrDefault(r=>r.Error==null)?.Passed==false))
                         {
-                            int changed=LastBehaviorChange(answer.Steps);
-                            var epoch=answer.Attempts.LastOrDefault(a=>a.RepairKind=="native-stall-replan"&&a.FirstResultIndex>changed);
+                            int boundary=ProgressBoundary(answer);
+                            var epoch=answer.Attempts.LastOrDefault(a=>a.RepairKind=="native-stall-replan"&&a.FirstResultIndex>=boundary);
                             if(epoch==null){attempt.RepairKind="native-stall-replan";Save();}
                             else if(answer.Steps.Count-(epoch.FirstResultIndex+epoch.ResultCount)>=6)
                             {

@@ -85,14 +85,35 @@ namespace WorldWeaver.Editor.Assistant
         {
             int count=0;for(int i=steps.Count-1;i>=0;i--){if(IsImplementationProgress(steps[i]))break;count++;}return count;
         }
+        internal static int ProgressBoundary(AssistantMessage answer)
+        {
+            if(answer?.Steps==null)return 0;
+            int boundary=LastBehaviorChange(answer.Steps)+1;
+            // StepCount is exclusive. Only a successfully reviewed stage that the
+            // host has ALREADY advanced past is progress; proposed/review-requested,
+            // failed/global/future reviews never grant a fresh observation budget.
+            int active=answer.Task?.ActiveApproachStage??0,count=answer.Task?.Approach?.Count??0;
+            foreach(var review in answer.EditorReviews)
+                if(review.Passed&&review.Error==null&&review.ApproachStage>=0&&review.ApproachStage<active&&review.ApproachStage<count&&review.StepCount>=0&&review.StepCount<=answer.Steps.Count)
+                    boundary=Math.Max(boundary,review.StepCount);
+            return boundary;
+        }
+        internal static int ObservationsSinceProgress(AssistantMessage answer)=>Math.Max(0,(answer?.Steps?.Count??0)-ProgressBoundary(answer));
+        internal static int LatestFailedEditorCode(IReadOnlyList<EditorCommandResult> steps)
+        {
+            for(int i=steps.Count-1;i>=0;i--)if(steps[i].Tool=="execute_editor_code"&&!steps[i].Success)return i;
+            return -1;
+        }
         internal static JArray ObservationLedger(IReadOnlyList<EditorCommandResult> steps)
         {
             var rows=new JArray();var seen=new HashSet<string>(StringComparer.Ordinal);int budget=32000;
             int changed=-1;for(int i=steps.Count-1;i>=0;i--)if(IsImplementationProgress(steps[i])){changed=i;break;}
-            foreach(int i in Enumerable.Range(0,steps.Count).OrderByDescending(n=>steps[n].Tool=="job_result").ThenByDescending(n=>n))
+            int failedEditor=LatestFailedEditorCode(steps);
+            foreach(int i in Enumerable.Range(0,steps.Count).OrderByDescending(n=>n==failedEditor?2:steps[n].Tool=="job_result"?1:0).ThenByDescending(n=>n))
             {
                 if(rows.Count>=18)break;
-                var step=steps[i];if(!step.Success&&step.Tool!="job_result"||(!SceneToolExecutor.IsReadOnlyTool(step.Tool)&&!IsProvenEditorObservation(step))||WebResearchTools.Handles(step.Tool)||new[]{"plan_task","review_stage","discover_tools","read_skill","list_skills"}.Contains(step.Tool))continue;
+                var step=steps[i];bool compilerFailure=i==failedEditor;
+                if(!step.Success&&step.Tool!="job_result"&&!compilerFailure||(!SceneToolExecutor.IsReadOnlyTool(step.Tool)&&!IsProvenEditorObservation(step)&&!compilerFailure)||WebResearchTools.Handles(step.Tool)||new[]{"plan_task","review_stage","discover_tools","read_skill","list_skills"}.Contains(step.Tool))continue;
                 JObject data=null;try{data=JObject.Parse(step.Summary??"");}catch(JsonException){}
                 var discriminator=data?["path"]??data?["component"]??data?["type"]??data?["Id"]??data?["query"];
                 if(step.Tool=="execute_editor_code")discriminator=data?["commandFingerprint"]??data?["sourceHash"]??new JValue(i);
@@ -103,10 +124,12 @@ namespace WorldWeaver.Editor.Assistant
                 string observationTarget=step.Target;
                 if(step.Tool=="job_result"){observationTarget=(string)data?["StableTarget"]??(string)data?["Filter"]??"";discriminator=data?["Kind"];}
                 string key=step.Tool+":"+observationTarget+":"+(discriminator?.ToString(Formatting.None)??"")+":"+(data?["offset"]?.ToString(Formatting.None)??"");if(!seen.Add(key))continue;
-                string value=ToolEvidenceForModel(step);int cap=step.Tool=="read_script"||step.Tool=="read_task_step"?20000:step.Tool=="list_scene_objects"?13000:7000;cap=Math.Min(cap,budget-350);if(cap<400)break;
+                string value=ToolEvidenceForModel(step);int cap=compilerFailure?12000:step.Tool=="read_script"||step.Tool=="read_task_step"?20000:step.Tool=="list_scene_objects"?13000:7000;cap=Math.Min(cap,budget-350);if(cap<400)break;
                 if(value.Length>cap)value=value.Substring(0,cap)+" [bounded actual observation; retrieve persisted step "+i+" for omitted detail]";
                 JToken observation;try{observation=JToken.Parse(value);}catch(JsonException){observation=new JValue(value);}
-                var row=new JObject{["index"]=i,["tool"]=step.Tool,["target"]=observationTarget,["historicalBeforeLastChange"]=i<changed,["data"]=observation};int cost=row.ToString(Formatting.None).Length;if(cost>budget)continue;budget-=cost;rows.Add(row);
+                var row=new JObject{["index"]=i,["tool"]=step.Tool,["target"]=observationTarget,["historicalBeforeLastChange"]=i<changed,["data"]=observation};
+                if(compilerFailure)row["failureScope"]="This failed Editor snippet only; not a claim that project scripts are currently broken. Later implementation changes make this diagnostic historical.";
+                int cost=row.ToString(Formatting.None).Length;if(cost>budget)continue;budget-=cost;rows.Add(row);
             }
             return rows;
         }
@@ -206,7 +229,15 @@ namespace WorldWeaver.Editor.Assistant
                 {
                     var full=JObject.Parse(text);var rows=(full["sceneReadback"] as JArray??new JArray()).OfType<JObject>().ToArray();
                     var selected=rows.OrderByDescending(r=>(r["joints"] as JArray)?.Count??0).ThenByDescending(r=>r["body"]!=null).Take(8);
-                    text=new JObject{["compiled"]=full["compiled"],["executed"]=full["executed"],["sceneChanged"]=full["sceneChanged"],["projectChanged"]=full["projectChanged"],["diagnostics"]=full["diagnostics"],
+                    if(!step.Success)
+                    {
+                        var diagnostics=full["diagnostics"];string diagnosticText=diagnostics?.ToString(Formatting.None)??"";
+                        text=new JObject{["compiled"]=full["compiled"],["executed"]=full["executed"],["sourceHash"]=full["sourceHash"],
+                            ["diagnosticSourceExcerpts"]=full["diagnosticSourceExcerpts"]?.DeepClone(),
+                            ["diagnostics"]=diagnosticText.Length<=4000?diagnostics?.DeepClone():new JValue(diagnosticText.Substring(0,600)+" [bounded diagnostics]"),
+                            ["error"]=BoundedRejectionData(step.Error,120),["failureScope"]="This Editor snippet failed; it is not project compilation status."}.ToString(Formatting.None);
+                    }
+                    else text=new JObject{["compiled"]=full["compiled"],["executed"]=full["executed"],["sceneChanged"]=full["sceneChanged"],["projectChanged"]=full["projectChanged"],["diagnostics"]=full["diagnostics"],
                         ["sceneReadback"]=new JArray(selected.Select(r=>r.DeepClone())),["readbackOmittedRows"]=Math.Max(0,rows.Length-8),
                         ["returnedData"]=((string)full["result"]??"").Substring(0,Math.Min(3000,((string)full["result"]??"").Length)),["verification"]=full["verification"]}.ToString(Formatting.None);
                 }
