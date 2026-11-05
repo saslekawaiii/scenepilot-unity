@@ -503,10 +503,29 @@ read_script: target empty; args {path:Assets/.../Name.cs or installed Packages/.
             {
                 string rollbackError=null;
                 try{if(undo>=0)Undo.RevertAllDownToGroup(undo);tx.RollbackAssets();if(overwrittenScenePath!=null&&overwrittenSceneBytes!=null){File.WriteAllBytes(overwrittenScenePath,overwrittenSceneBytes);AssetDatabase.ImportAsset(overwrittenScenePath,ImportAssetOptions.ForceUpdate);}}catch(Exception rollback){rollbackError=rollback.Message;}
-                result.Success=false;result.UndoGroup=-1;result.Error=error.Message+(rollbackError==null?"":"; rollback error: "+rollbackError);result.Summary="Пакет не применён; изменения отменены.";
-                foreach(var step in result.Results){step.Success=false;step.Summary="Отменено вместе с пакетом: "+step.Summary;}
-                result.Results.Add(new EditorCommandResult{Success=false,Tool="batch",Error=result.Error,Summary=result.Summary});return result;
+                result.Success=false;result.UndoGroup=-1;result.Error=error.Message+(rollbackError==null?"":"; rollback error: "+rollbackError);
+                result.Summary=rollbackError==null?"Пакет не применён; изменения отменены.":"Пакет завершился с ошибкой; полный откат изменений не подтверждён.";
+                foreach(var step in result.Results)MarkBatchRollback(step,rollbackError);
+                var batchFailure=new EditorCommandResult{Success=false,Tool="batch",Error=result.Error,Summary=result.Summary};MarkBatchRollback(batchFailure,rollbackError);
+                result.Results.Add(batchFailure);return result;
             }
+        }
+        internal static void MarkBatchRollback(EditorCommandResult step,string rollbackError)
+        {
+            // Receipt fields are observations made BEFORE the rollback. Keep them
+            // parseable (in particular compiler diagnostics/source windows), rather
+            // than corrupting JSON by adding a human-language string prefix.
+            JObject receipt;
+            try{receipt=JObject.Parse(step.Summary??"");}
+            catch(Newtonsoft.Json.JsonException){receipt=new JObject{["originalSummary"]=step.Summary};}
+            var rollback=new JObject{["completed"]=rollbackError==null,["error"]=rollbackError,
+                ["observationScope"]="before_rollback",["successBeforeRollback"]=step.Success,
+                ["note"]="Original fields describe the tool result before batch rollback, not a post-rollback state readback. Batch changes were not committed; an error means restoration may be incomplete."};
+            // A tool's existing payload must remain intact even if it happens to
+            // use the host metadata name. Repeated annotation remains historical.
+            string key="batchRollback";while(receipt.Property(key)!=null)key="_"+key;receipt[key]=rollback;
+            step.Success=false;step.ChangesApplied=rollbackError==null?(bool?)false:null;
+            step.Summary=receipt.ToString(Newtonsoft.Json.Formatting.None);
         }
         private static void InitializeNpcContexts(IEnumerable<IntelligentNPC> createdNpcs)
         {
