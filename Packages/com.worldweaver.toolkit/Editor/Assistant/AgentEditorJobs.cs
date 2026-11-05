@@ -24,6 +24,7 @@ namespace WorldWeaver.Editor.Assistant
         public float LastRotationX,LastRotationY,LastRotationZ,LastRotationW;
         public string ProbeCode, ProbeSourceHash;
         public JObject ProbeObservations=new JObject();
+        public JObject ProbeInputEvidence=new JObject();
         public JArray ProbeAssertions=new JArray();
         public int Samples;
         public bool MeasurementStarted;

@@ -21,9 +21,33 @@ namespace WorldWeaver.Editor.Assistant
         public readonly JArray Assertions=new JArray();
 #if ENABLE_INPUT_SYSTEM
         Keyboard keyboard;Mouse mouse;
+        int keyboardStateEvents,mouseStateEvents;
+        readonly System.Collections.Generic.Dictionary<string,int> inputUpdates=new System.Collections.Generic.Dictionary<string,int>();
+        void ObserveInput(InputEventPtr inputEvent,InputDevice device)
+        {
+            if(!inputEvent.IsA<StateEvent>()&&!inputEvent.IsA<DeltaStateEvent>())return;
+            if(device!=keyboard&&device!=mouse)return;
+            if(device==keyboard)keyboardStateEvents++;if(device==mouse)mouseStateEvents++;
+            string update=InputState.currentUpdateType.ToString();inputUpdates.TryGetValue(update,out int count);inputUpdates[update]=count+1;
+        }
+
         public Keyboard Keyboard { get { if(keyboard==null){keyboard=InputSystem.AddDevice<Keyboard>("WorldWeaverRuntimeProbeKeyboard");keyboard.MakeCurrent();SessionState.SetInt("WorldWeaver.Probe.Keyboard",keyboard.deviceId);}return keyboard;} }
         public Mouse Mouse { get { if(mouse==null){mouse=InputSystem.AddDevice<Mouse>("WorldWeaverRuntimeProbeMouse");mouse.MakeCurrent();SessionState.SetInt("WorldWeaver.Probe.Mouse",mouse.deviceId);}return mouse;} }
 #endif
+        public RuntimeProbeContext()
+        {
+#if ENABLE_INPUT_SYSTEM
+            InputSystem.onEvent+=ObserveInput;
+#endif
+        }
+        internal JObject InputEvidence()
+        {
+#if ENABLE_INPUT_SYSTEM
+            return new JObject{["inputSystemAvailable"]=true,["keyboardStateEvents"]=keyboardStateEvents,["mouseStateEvents"]=mouseStateEvents,["receivedUpdateTypes"]=JObject.FromObject(inputUpdates),["scope"]="Only events received for this probe's virtual devices; counts alone do not prove target delivery or gameplay behavior."};
+#else
+            return new JObject{["inputSystemAvailable"]=false,["scope"]="Virtual-device delivery was not measured on this backend."};
+#endif
+        }
         static JToken Value(object value)
         {
             // Unity vectors expose normalized/other computed vectors. Default
@@ -48,6 +72,7 @@ namespace WorldWeaver.Editor.Assistant
         public void Dispose()
         {
 #if ENABLE_INPUT_SYSTEM
+            InputSystem.onEvent-=ObserveInput;
             if(keyboard!=null&&keyboard.added)InputSystem.RemoveDevice(keyboard);if(mouse!=null&&mouse.added)InputSystem.RemoveDevice(mouse);
 #endif
         }
@@ -55,7 +80,7 @@ namespace WorldWeaver.Editor.Assistant
     public static partial class AgentEditorJobs
     {
         internal const float RuntimeProbeMaximumSeconds=120;
-        internal const string RuntimeProbeReference=@"run_runtime_probe: empty target; args {code:string,seconds?:0.25..120}. Standalone actual Play Mode job. Frame counts are NOT elapsed physical time: an uncapped Editor may yield hundreds of frames in a fraction of a second. Record actual elapsed game time for falling, movement and timing assertions; do not infer one second from 60 yields. Use bounded Time.timeAsDouble loops. Use probe.Check(actualCondition,name,observed) for actual game mechanics, UI, physics, triggers, counters and references. Requires autonomous Editor C# permission, with the same full-trust boundary as execute_editor_code. code is an IEnumerator METHOD BODY up to 16000 characters, not a class; optional leading using directives are supported: yield return null between frames; no other yield instructions. Usings System, Collections, Generic, Linq, UnityEngine, UnityEngine.UI, UnityEngine.EventSystems, WorldWeaver and Newtonsoft.Json.Linq are supplied; InputSystem/LowLevel when its backend is enabled. Object and Random default to UnityEngine aliases unless explicitly overridden by a leading using alias. Parameter probe offers Record(name, measuredPrimitiveObject), Check(actualCondition,name,observedValue), and automatically installed and cleaned-up virtual probe.Keyboard/probe.Mouse (also available as Keyboard.current/Mouse.current, even in headless Editors). Use STATIC InputSystem.QueueStateEvent(probe.Keyboard, new KeyboardState(Key.A)); release with new KeyboardState(). KeyboardState and MouseState are in UnityEngine.InputSystem.LowLevel, not UnityEngine.InputSystem. QueueStateEvent is not an instance method on Keyboard. Yield null, then measure actual game state. Use bounded elapsed Time.timeAsDouble/Time.fixedTimeAsDouble loops or wait for an actual predicate with a game-time deadline; wait for Awake/Start (first frame is supplied).  At least one real Check is required; any false check/exception/timeout fails. A host wall limit bounds yielded execution; C# must never block, spin, sleep, access network/files/secrets, save assets/scenes or alter Editor settings. Test arrangements inside Play Mode are temporary, not implementation. The job exits Play Mode and restores the original scene before completion; poll_job/job_result carries source hash, exact checks and measured data. Agent-authored checks only prove the behavior actually exercised, not unrelated criteria. Example: var light=UnityEngine.Object.FindFirstObjectByType<Light>(); probe.Check(light!=null,""light exists""); if(light!=null){float before=light.intensity; yield return null; probe.Record(""intensity"",new{before,after=light.intensity});} Never mark Check(true) as gameplay verification.";
+        internal const string RuntimeProbeReference=@"run_runtime_probe: empty target; args {code:string,seconds?:0.25..120}. Standalone actual Play Mode job. Frame counts are NOT elapsed physical time: an uncapped Editor may yield hundreds of frames in a fraction of a second. Record actual elapsed game time for falling, movement and timing assertions; do not infer one second from 60 yields. Use bounded Time.timeAsDouble loops. Use probe.Check(actualCondition,name,observed) for actual game mechanics, UI, physics, triggers, counters and references. Requires autonomous Editor C# permission, with the same full-trust boundary as execute_editor_code. code is an IEnumerator METHOD BODY up to 16000 characters, not a class; optional leading using directives are supported: yield return null between frames; no other yield instructions. Usings System, Collections, Generic, Linq, UnityEngine, UnityEngine.UI, UnityEngine.EventSystems, WorldWeaver and Newtonsoft.Json.Linq are supplied; InputSystem/LowLevel when its backend is enabled. Object and Random default to UnityEngine aliases unless explicitly overridden by a leading using alias. Parameter probe offers Record(name, measuredPrimitiveObject), Check(actualCondition,name,observedValue), and automatically installed and cleaned-up virtual probe.Keyboard/probe.Mouse (also available as Keyboard.current/Mouse.current, even in headless Editors). Use STATIC InputSystem.QueueStateEvent(probe.Keyboard, new KeyboardState(Key.A)); release with new KeyboardState(). KeyboardState and MouseState are in UnityEngine.InputSystem.LowLevel, not UnityEngine.InputSystem. QueueStateEvent is not an instance method on Keyboard. Yield null, then measure actual game state. Use bounded elapsed Time.timeAsDouble/Time.fixedTimeAsDouble loops or wait for an actual predicate with a game-time deadline; wait for Awake/Start (first frame is supplied).  At least one real Check is required; any false check/exception/timeout fails. A host wall limit bounds yielded execution; C# must never block, spin, sleep, access network/files/secrets, save assets/scenes or alter Editor settings. Test arrangements inside Play Mode are temporary, not implementation. The job exits Play Mode and restores the original scene before completion; poll_job/job_result carries source hash, exact checks and measured data. Agent-authored checks only prove the behavior actually exercised, not unrelated criteria. Calling Button.onClick.Invoke or a game handler tests callback logic only, not actual pointer/keyboard delivery. For interaction claims queue real probe device events and measure resulting game state; do not add, rewire or replace the game input components inside a probe. ProbeInputEvidence contains host-measured virtual-device event counts; zero events cannot verify real device interaction. Example: var light=UnityEngine.Object.FindFirstObjectByType<Light>(); probe.Check(light!=null,""light exists""); if(light!=null){float before=light.intensity; yield return null; probe.Record(""intensity"",new{before,after=light.intensity});} Never mark Check(true) as gameplay verification.";
         static IEnumerator runtimeProbe;
         static RuntimeProbeContext runtimeContext;
         static int runtimeFrame,runtimeSamples;
@@ -110,6 +135,7 @@ namespace WorldWeaver.Editor.Assistant
                 SessionState.SetBool("WorldWeaver.Probe.InputConfigured",true);
                 InputSystem.settings.backgroundBehavior=InputSettings.BackgroundBehavior.IgnoreFocus;InputSystem.settings.editorInputBehaviorInPlayMode=InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
 #endif
+                SessionState.SetBool("WorldWeaver.Probe.PreviousRunInBackground",Application.runInBackground);SessionState.SetBool("WorldWeaver.Probe.BackgroundConfigured",true);Application.runInBackground=true;
                 runtimeContext=new RuntimeProbeContext();
 #if ENABLE_INPUT_SYSTEM
                 // Standard InputSystem client code must have devices in headless Editors too.
@@ -133,6 +159,7 @@ namespace WorldWeaver.Editor.Assistant
             if(!EditorApplication.isPlaying)return;
             if(runtimeProbe==null){EndRuntimeProbe(job,"Runtime domain reloaded during measurement; no replay or success inferred.");return;}
             if(EditorApplication.timeSinceStartup>runtimeDeadline){EndRuntimeProbe(job,"Runtime probe exceeded its yielded wall-time budget.");return;}
+            EditorApplication.QueuePlayerLoopUpdate();
             if(runtimeFrame==Time.frameCount)return;runtimeFrame=Time.frameCount;job.Samples=++runtimeSamples;
             try
             {
@@ -144,7 +171,7 @@ namespace WorldWeaver.Editor.Assistant
         static void EndRuntimeProbe(AgentEditorJob job,string error)
         {
             job.Samples=runtimeSamples;
-            if(runtimeContext!=null){job.ProbeObservations=(JObject)runtimeContext.Measurements.DeepClone();job.ProbeAssertions=(JArray)runtimeContext.Assertions.DeepClone();}
+            if(runtimeContext!=null){job.ProbeObservations=(JObject)runtimeContext.Measurements.DeepClone();job.ProbeAssertions=(JArray)runtimeContext.Assertions.DeepClone();job.ProbeInputEvidence=runtimeContext.InputEvidence();}
             job.Passed=job.ProbeAssertions.Count(a=>(bool)a["passed"]);job.Failed=job.ProbeAssertions.Count-job.Passed;
             job.Success=error==null&&job.Passed>0&&job.Failed==0;job.Error=ChatHistoryStore.Redact(error??(job.ProbeAssertions.Count==0?"No runtime assertion executed.":job.Failed>0?"One or more actual runtime assertions failed.":null));
             job.ActualSeconds=EditorApplication.isPlaying?Math.Max(0,Time.timeAsDouble-job.StartedGameTime):0;
@@ -155,6 +182,7 @@ namespace WorldWeaver.Editor.Assistant
         {
             try{(runtimeProbe as IDisposable)?.Dispose();}catch(Exception){}runtimeProbe=null;
             runtimeContext?.Dispose();runtimeContext=null;
+            if(SessionState.GetBool("WorldWeaver.Probe.BackgroundConfigured",false)){Application.runInBackground=SessionState.GetBool("WorldWeaver.Probe.PreviousRunInBackground",false);SessionState.EraseBool("WorldWeaver.Probe.BackgroundConfigured");SessionState.EraseBool("WorldWeaver.Probe.PreviousRunInBackground");}
 #if ENABLE_INPUT_SYSTEM
             foreach(string key in new[]{"WorldWeaver.Probe.Keyboard","WorldWeaver.Probe.Mouse"}){int id=SessionState.GetInt(key,-1);var device=InputSystem.devices.FirstOrDefault(d=>d.deviceId==id);if(device!=null)InputSystem.RemoveDevice(device);SessionState.EraseInt(key);}
             foreach(string key in new[]{"WorldWeaver.Probe.PreviousKeyboard","WorldWeaver.Probe.PreviousMouse"}){int id=SessionState.GetInt(key,-1);var device=InputSystem.devices.FirstOrDefault(d=>d.deviceId==id);if(device!=null)device.MakeCurrent();SessionState.EraseInt(key);}

@@ -32,7 +32,7 @@ create_camera: name; target optional owned parent. args {position?:[x,y,z],rotat
 update_npc: target IntelligentNPC; args {role?,personality?,biography?,goals?,constraints?,knowledge?:text|strings,inventory?:object,autonomous?:bool}. Knowledge replacement creates a new scoped asset, leaving any old/shared asset intact. A goal-only change does not require attach_behavior; add physical movement only when the user asks for it.
 attach_behavior: target; args {behavior:rotate|bob|patrol|followplayer,speed?:.01..360,amplitude?:0..10,frequency?:.01..10,axis?:[x,y,z],points?:array of2..32 world vectors,follow_target?:target,stopping_distance?:0..20}. Patrol requires points,followplayer requires explicit follow_target. Real runtime preset components, no arbitrary type names. One SceneBehavior per object; replaces its settings.
 delete_object: target owned object; args {}. Cannot delete unrelated or foreign descendants.
-save_scene: target empty; args {path?:Assets/WorldWeaverGenerated/.../Name.unity}. Must be the LAST action. Always a unique destination, never overwrites a scene. Does not touch build settings.
+save_scene: target empty; args {path?:Assets/WorldWeaverGenerated/.../Name.unity}. Must be the LAST action. First save or a different explicit path uses a unique destination and preserves unrelated files. Repeating this task's previously requested or returned actual path reuses it ONLY while that saved scene is still active. With no path, save the current generated scene in place; an unsaved or outside-generated scene gets a unique generated default. Returns observed requestedPath and actualPath; saving alone is not implementation or behavior verification. Does not touch build settings.
 inspect_object: target; args {}. Read-back of transform,components,TerrainSpec,NPC and inventory.
 search_project: target empty; args {query:text,limit?:1..40}. Read-only asset search under Assets/Packages. Returns query and typed asset records; use t:Prefab, t:Material or t:Script when appropriate. A matching icon is not a playable prefab. Search never creates a proposed asset.
 read_script: target empty; args {path:Assets/.../Name.cs or installed Packages/.../Name.cs}. Read-only maximum64KiB, no traversal. Returns exists and actual source/hash. A missing permitted path returns exists:false and available source paths; a planned class name is not an existing file. Package scripts remain read-only. draft_script is handled by the controller separately.";
@@ -164,6 +164,30 @@ read_script: target empty; args {path:Assets/.../Name.cs or installed Packages/.
             if(!File.Exists(physical))return physical;
             if(!AssetDatabase.LoadAssetAtPath<MonoScript>(path))throw new ArgumentException("Path is not a registered C# script asset; use an actual source path.");
             if(new FileInfo(physical).Length>65536)throw new ArgumentException("Script larger than 64KiB.");return physical;
+        }
+        static bool IsGeneratedScenePath(string path)
+        {
+            if(string.IsNullOrEmpty(path))return false;
+            try{AssetPath(new JObject{["path"]=path},"path",".unity",true);return true;}
+            catch(ArgumentException){return false;}
+        }
+        static bool SavedSceneBelongsToTask(string requestedPath,string activePath,AgentExecutionContext context)
+        {
+            // The durable host receipts are authoritative. No static alias cache can
+            // accidentally carry ownership into a different task or scene.
+            foreach(var step in context?.Message?.Steps??new List<EditorCommandResult>())
+            {
+                if(!step.Success||step.Tool!="save_scene")continue;
+                try
+                {
+                    var receipt=JObject.Parse(step.Summary??"");if(receipt["actualPath"]?.Type!=JTokenType.String)continue;string actual=(string)receipt["actualPath"];
+                    string original=receipt["requestedPath"]?.Type==JTokenType.String?(string)receipt["requestedPath"]:null;
+                    if(IsGeneratedScenePath(actual)&&actual==activePath&&
+                        (original==requestedPath||actual==requestedPath))return true;
+                }
+                catch(Newtonsoft.Json.JsonException){ }
+            }
+            return false;
         }
         static JObject ReadScriptObservation(string path)
         {
@@ -358,6 +382,7 @@ read_script: target empty; args {path:Assets/.../Name.cs or installed Packages/.
         public static EditorBatchResult Execute(EditorPlan plan,OrchestratorProfile routes=null,AgentExecutionContext executionContext=null)
         {
             var result=new EditorBatchResult();var tx=new SceneBuildTransaction();int undo=-1;
+            string overwrittenScenePath=null;byte[] overwrittenSceneBytes=null;
             try
             {
                 plan=SceneCreationDefaults.Resolve(plan);
@@ -403,7 +428,7 @@ read_script: target empty; args {path:Assets/.../Name.cs or installed Packages/.
                         if(command.tool=="create_village"||command.tool=="instantiate_prefab")gameplayParent=string.IsNullOrEmpty(command.target)?getGroup().transform:resolve(command.target).transform;
                         var outcome=WorldGameplayTools.Execute(command,tx,gameplayParent,resolve,routes);go=outcome.Target;summary=outcome.Summary;
                         if(go&&(command.tool=="create_village"||command.tool=="instantiate_prefab")){aliases["@"+command.name]=go;aliases[command.name]=go;}
-                        result.Results.Add(new EditorCommandResult{Success=true,Tool=command.tool,Target=go?Id(go):command.target,Summary=summary,CreatedAssets=tx.Assets.Skip(assetStart).ToList()});continue;
+                        result.Results.Add(new EditorCommandResult{Success=true,ChangesApplied=command.tool=="save_scene"?(bool?)false:null,Tool=command.tool,Target=go?Id(go):command.target,Summary=summary,CreatedAssets=tx.Assets.Skip(assetStart).ToList()});continue;
                     }
                     Transform parent=null;
                     if(new[]{"create_npc","create_object","create_camera"}.Contains(command.tool))parent=string.IsNullOrEmpty(command.target)?getGroup().transform:resolve(command.target).transform;
@@ -448,9 +473,16 @@ read_script: target empty; args {path:Assets/.../Name.cs or installed Packages/.
                             go=resolve(command.target);var behavior=go.GetComponent<SceneBehavior>();if(!behavior)behavior=Undo.AddComponent<SceneBehavior>(go);Undo.RecordObject(behavior,"Assistant behavior");string mode=(string)a["behavior"];behavior.Mode=mode=="rotate"?SceneBehaviorKind.Rotate:mode=="bob"?SceneBehaviorKind.Bob:mode=="patrol"?SceneBehaviorKind.Patrol:SceneBehaviorKind.FollowPlayer;behavior.Speed=(float?)a["speed"]??(mode=="rotate"?30:2);behavior.Amplitude=(float?)a["amplitude"]??.4f;behavior.Frequency=(float?)a["frequency"]??1;behavior.Axis=a["axis"]!=null?Vector(a["axis"],"axis"):Vector3.up;behavior.Waypoints=a["points"] is JArray points?points.Select(p=>Vector(p,"point")).ToArray():Array.Empty<Vector3>();behavior.FollowTarget=a["follow_target"]!=null?resolve((string)a["follow_target"]).transform:null;behavior.StoppingDistance=(float?)a["stopping_distance"]??2;summary="Подключено поведение "+mode+".";break;
                         case "delete_object":go=resolve(command.target);string deleted=go.name;Undo.DestroyObjectImmediate(go);go=null;summary="Удалён собственный объект "+deleted+".";break;
                         case "save_scene":
-                            string path=(string)a["path"]??"Assets/WorldWeaverGenerated/Scenes/World.unity";EnsureFolders(path,tx);path=AssetDatabase.GenerateUniqueAssetPath(path);tx.Assets.Add(path);
+                            var activeScene=SceneManager.GetActiveScene();string requestedPath=(string)a["path"];
+                            bool reuseCurrent=requestedPath==null?IsGeneratedScenePath(activeScene.path):SavedSceneBelongsToTask(requestedPath,activeScene.path,executionContext);
+                            string path=reuseCurrent?activeScene.path:requestedPath??"Assets/WorldWeaverGenerated/Scenes/World.unity";
+                            EnsureFolders(path,tx);if(!reuseCurrent)path=AssetDatabase.GenerateUniqueAssetPath(path);
+                            if(!reuseCurrent&&File.Exists(path))throw new IOException("Unique scene destination already exists; refusing to overwrite.");
+                            bool newSceneAsset=!File.Exists(path);if(newSceneAsset)tx.Assets.Add(path);
                             InitializeNpcContexts(createdNpcs);ValidateNpcDependencies(changedNpcs);SaveNewAssets(tx);
-                            if(!EditorSceneManager.SaveScene(SceneManager.GetActiveScene(),path)||!File.Exists(path)||!AssetDatabase.LoadAssetAtPath<SceneAsset>(path))throw new IOException("Scene save/read-back failed.");summary="Сцена сохранена: "+path;break;
+                            if(!newSceneAsset){overwrittenScenePath=path;overwrittenSceneBytes=File.ReadAllBytes(path);}
+                            if(!EditorSceneManager.SaveScene(activeScene,path)||!File.Exists(path)||!AssetDatabase.LoadAssetAtPath<SceneAsset>(path)||activeScene.path!=path||activeScene.isDirty)throw new IOException("Scene save/read-back failed.");
+                            summary=new JObject{["saved"]=true,["requestedPath"]=requestedPath==null?JValue.CreateNull():new JValue(requestedPath),["actualPath"]=path,["path"]=path,["reusedCurrentScene"]=reuseCurrent,["newSceneAsset"]=newSceneAsset,["dirty"]=activeScene.isDirty,["implementationProgress"]=false,["note"]="Scene persistence only; no gameplay or behavior verification."}.ToString(Newtonsoft.Json.Formatting.None);break;
                         case "inspect_object":go=resolve(command.target);summary=Inspect(go).ToString(Newtonsoft.Json.Formatting.None);break;
                         case "search_project":summary=SearchProjectObservation(a).ToString(Newtonsoft.Json.Formatting.None);break;
                         case "read_script":
@@ -459,7 +491,7 @@ read_script: target empty; args {path:Assets/.../Name.cs or installed Packages/.
                     if(go&&new[]{"create_world","create_npc","create_object","scatter_objects","create_camera","set_lighting"}.Contains(command.tool))
                     {aliases["@"+command.name]=go;aliases[command.name]=go;}
                     if(go&&go.scene!=SceneManager.GetActiveScene())throw new InvalidOperationException("Created/edited object escaped active scene.");
-                    result.Results.Add(new EditorCommandResult{Success=true,Tool=command.tool,Target=go?Id(go):command.target,Summary=summary,CreatedAssets=tx.Assets.Skip(assetStart).ToList()});
+                    result.Results.Add(new EditorCommandResult{Success=true,ChangesApplied=command.tool=="save_scene"?(bool?)false:null,Tool=command.tool,Target=go?Id(go):command.target,Summary=summary,CreatedAssets=tx.Assets.Skip(assetStart).ToList()});
                 }
                 if(!plan.actions.Any(a=>a.tool=="save_scene")){InitializeNpcContexts(createdNpcs);ValidateNpcDependencies(changedNpcs);SaveNewAssets(tx);}
                 foreach(var obj in tx.Objects.Where(o=>o))if(!obj.GetComponent<GeneratedSceneObject>())throw new InvalidOperationException("Ownership read-back failed.");
@@ -469,7 +501,7 @@ read_script: target empty; args {path:Assets/.../Name.cs or installed Packages/.
             catch(Exception error)
             {
                 string rollbackError=null;
-                try{if(undo>=0)Undo.RevertAllDownToGroup(undo);tx.RollbackAssets();}catch(Exception rollback){rollbackError=rollback.Message;}
+                try{if(undo>=0)Undo.RevertAllDownToGroup(undo);tx.RollbackAssets();if(overwrittenScenePath!=null&&overwrittenSceneBytes!=null){File.WriteAllBytes(overwrittenScenePath,overwrittenSceneBytes);AssetDatabase.ImportAsset(overwrittenScenePath,ImportAssetOptions.ForceUpdate);}}catch(Exception rollback){rollbackError=rollback.Message;}
                 result.Success=false;result.UndoGroup=-1;result.Error=error.Message+(rollbackError==null?"":"; rollback error: "+rollbackError);result.Summary="Пакет не применён; изменения отменены.";
                 foreach(var step in result.Results){step.Success=false;step.Summary="Отменено вместе с пакетом: "+step.Summary;}
                 result.Results.Add(new EditorCommandResult{Success=false,Tool="batch",Error=result.Error,Summary=result.Summary});return result;

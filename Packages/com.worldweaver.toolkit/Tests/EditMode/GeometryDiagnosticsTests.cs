@@ -16,6 +16,11 @@ namespace WorldWeaver.Tests
             var implementation=typeof(SceneToolExecutor).Assembly.GetType("WorldWeaver.Editor.Assistant."+type,true);
             return (JObject)implementation.GetMethod(method,BindingFlags.Static|BindingFlags.NonPublic).Invoke(null,new[]{value});
         }
+        static JArray Review(IEnumerable<GameObject> sceneObjects)
+        {
+            var implementation=typeof(SceneToolExecutor).Assembly.GetType("WorldWeaver.Editor.Assistant.GeometryDiagnostics",true);
+            return (JArray)implementation.GetMethod("ReviewSceneEvidence",BindingFlags.Static|BindingFlags.NonPublic).Invoke(null,new object[]{sceneObjects});
+        }
         static JObject Inspect(Component component)=>Call("GeometryDiagnostics","Inspect",component);
         static JObject Snapshot(GameObject go)=>Call("GeometryDiagnostics","Summary",go);
         static JObject InspectComponent(Component component)=>Call("AgentProjectTools","InspectComponent",component);
@@ -29,6 +34,12 @@ namespace WorldWeaver.Tests
             var mesh=new Mesh{name="Diagnostic plane"};meshes.Add(mesh);
             mesh.vertices=new[]{new Vector3(-1,0,-1),new Vector3(-1,0,1),new Vector3(1,0,1),new Vector3(1,0,-1)};
             mesh.triangles=down?new[]{0,2,1,0,3,2}:new[]{0,1,2,0,2,3};mesh.RecalculateNormals();mesh.RecalculateBounds();return mesh;
+        }
+        Mesh Tetrahedron(bool inward=false)
+        {
+            var mesh=new Mesh{name="Closed diagnostic shell"};meshes.Add(mesh);mesh.vertices=new[]{Vector3.zero,Vector3.right,Vector3.up,Vector3.forward};
+            var triangles=new[]{0,2,1,0,1,3,0,3,2,1,2,3};if(inward)for(int i=0;i<triangles.Length;i+=3){int b=triangles[i+1];triangles[i+1]=triangles[i+2];triangles[i+2]=b;}
+            mesh.triangles=triangles;mesh.RecalculateNormals();mesh.RecalculateBounds();return mesh;
         }
         GameObject Object(Mesh mesh,bool collision=true)
         {
@@ -100,7 +111,48 @@ namespace WorldWeaver.Tests
             var go=new GameObject("Skin without filter");objects.Add(go);go.AddComponent<SkinnedMeshRenderer>().sharedMesh=Plane();
             var summary=Snapshot(go);Assert.That((int)summary["visualMesh"]["vertices"],Is.EqualTo(4));
         }
-        [Test] public void CompactSnapshotDoesNotPerformTriangleAnalysis()
+        [TestCase(false,"outward")]
+        [TestCase(true,"inward")]
+        public void CompactSnapshotMeasuresClosedCoherentShellFacingWithoutRepair(bool inward,string expected)
+        {
+            var mesh=Tetrahedron(inward);var before=mesh.triangles.ToArray();var go=Object(mesh,false);var pose=go.transform.localToWorldMatrix;
+            var orientation=Snapshot(go)["orientation"];
+            Assert.That((string)orientation["classification"],Is.EqualTo("closed_coherent_shell"));Assert.That((bool)orientation["closedByIndices"],Is.True);Assert.That((bool)orientation["coherentlyWound"],Is.True);
+            Assert.That((string)orientation["localGeometricFacing"],Is.EqualTo(expected));Assert.That((string)orientation["worldGeometricFacing"],Is.EqualTo(expected));Assert.That((double)orientation["signedVolumeLocal"],Is.EqualTo((inward?-1d:1d)/6).Within(1e-6));
+            CollectionAssert.AreEqual(before,mesh.triangles);Assert.That(go.transform.localToWorldMatrix,Is.EqualTo(pose));Assert.That((bool)orientation["facingIsIntentDependent"],Is.True);
+            if(inward)StringAssert.Contains("farther front face",(string)orientation["warning"]);
+        }
+        [Test] public void OpenSurfaceFacingRemainsAmbiguousRegardlessOfVolumeSign()
+        {
+            var go=Object(Plane(),false);var orientation=Snapshot(go)["orientation"];
+            Assert.That((string)orientation["classification"],Is.EqualTo("ambiguous"));Assert.That((string)orientation["localGeometricFacing"],Is.EqualTo("ambiguous"));Assert.That((bool)orientation["closedByIndices"],Is.False);Assert.That((int)orientation["boundaryEdges"],Is.EqualTo(4));
+        }
+        [Test] public void MirroredShellSeparatesLocalAndWorldGeometricFacing()
+        {
+            var go=Object(Tetrahedron(),false);go.transform.localScale=new Vector3(-1,1,1);var orientation=Snapshot(go)["orientation"];
+            Assert.That((string)orientation["localGeometricFacing"],Is.EqualTo("outward"));Assert.That((string)orientation["worldGeometricFacing"],Is.EqualTo("inward"));Assert.That((bool)orientation["mirroredTransform"],Is.True);Assert.That(go.transform.localScale,Is.EqualTo(new Vector3(-1,1,1)));
+        }
+        [Test] public void InconsistentClosedIndicesCannotBeClassifiedFromAggregateVolume()
+        {
+            var mesh=Tetrahedron();var triangles=mesh.triangles;int second=triangles[1];triangles[1]=triangles[2];triangles[2]=second;mesh.triangles=triangles;var go=Object(mesh,false);var orientation=Snapshot(go)["orientation"];
+            Assert.That((bool)orientation["closedByIndices"],Is.True);Assert.That((bool)orientation["coherentlyWound"],Is.False);Assert.That((int)orientation["inconsistentEdges"],Is.EqualTo(3));Assert.That((string)orientation["localGeometricFacing"],Is.EqualTo("ambiguous"));
+        }
+        [Test] public void ReviewerGetsMeasuredCoverageWithoutOptionalInspectorCalls()
+        {
+            var go=Object(Tetrahedron(true));var before=go.GetComponent<MeshFilter>().sharedMesh.triangles.ToArray();var evidence=Review(new[]{go});
+            Assert.That(evidence.Count,Is.EqualTo(1));Assert.That((string)evidence[0]["summary"]["orientation"]["localGeometricFacing"],Is.EqualTo("inward"));Assert.That(evidence[0]["measuredDiagnostics"]["triangleSamples"],Is.Null);
+            Assert.That((int)evidence[0]["measuredDiagnostics"]["meshColliders"][0]["directionalCoverage"]["rays"],Is.EqualTo(54));StringAssert.Contains("far-side hit",(string)evidence[0]["physicalCoverageNote"]);CollectionAssert.AreEqual(before,go.GetComponent<MeshFilter>().sharedMesh.triangles);
+        }
+        [Test] public void ReviewerEvidenceHasBothObjectAndTextBudgets()
+        {
+            for(int i=0;i<8;i++){var go=Object(Plane());go.transform.position=Vector3.right*i*4;}
+            var evidence=Review(objects);Assert.That(evidence.Count,Is.InRange(1,4));Assert.That(evidence.ToString(Newtonsoft.Json.Formatting.None).Length,Is.LessThanOrEqualTo(18000));
+        }
+        [Test] public void CompactSnapshotNeverReadsUploadedUnreadableMeshData()
+        {
+            var mesh=Tetrahedron();var go=Object(mesh,false);mesh.UploadMeshData(true);var summary=Snapshot(go);Assert.That((bool)summary["orientation"]["available"],Is.False);Assert.That(summary["orientation"]["signedVolumeLocal"],Is.Null);
+        }
+        [Test] public void CompactSnapshotKeepsDetailedRayArraysOutOfContext()
         {
             var go=Object(Plane());var summary=Snapshot(go);
             Assert.That((int)summary["visualMesh"]["vertices"],Is.EqualTo(4));Assert.That(summary["triangleSamples"],Is.Null);StringAssert.Contains("inspect_component",(string)summary["detailTool"]);
