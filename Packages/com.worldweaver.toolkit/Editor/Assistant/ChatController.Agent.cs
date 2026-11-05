@@ -110,7 +110,7 @@ namespace WorldWeaver.Editor.Assistant
                     latest[key]=step;
                 }
             }
-            if(answer.Task.CompilationRequired&&!latest.Keys.Any(k=>k.StartsWith("compile:",StringComparison.Ordinal))&&!answer.Steps.Any(s=>s.Tool=="execute_editor_code"&&s.Success))
+            if(answer.Task.CompilationRequired&&!AgentTaskVerifier.IsReadOnlyExplanation(answer.Task)&&!latest.Keys.Any(k=>k.StartsWith("compile:",StringComparison.Ordinal))&&!answer.Steps.Any(s=>s.Tool=="execute_editor_code"&&s.Success))
             {
                 // Unity cannot run actual Play frames with outstanding compiler
                 // errors. Reusing unchanged game code needs this current evidence,

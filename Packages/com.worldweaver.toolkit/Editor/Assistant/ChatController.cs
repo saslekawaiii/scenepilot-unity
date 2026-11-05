@@ -125,7 +125,8 @@ namespace WorldWeaver.Editor.Assistant
             session.Messages.Add(user);
             if (session.Messages.Count == 1) session.Title = text.Replace('\n', ' ').Substring(0, Math.Min(48, text.Length));
             var answer = new AssistantMessage { Status = "Думаю", Model = models.FirstOrDefault(m => m.Key == Settings.ModelKey)?.Name ?? Settings.ModelKey };
-            answer.Task=AgentTaskVerifier.Create(text,Settings.Mode==AssistantMode.Execute&&!ExplicitReadOnlyRequest(text));
+            bool readOnlyExplanation=Settings.Mode==AssistantMode.Ask||ExplicitReadOnlyRequest(text);
+            answer.Task=AgentTaskVerifier.Create(text,Settings.Mode==AssistantMode.Execute&&!readOnlyExplanation,readOnlyExplanation);
             if(System.Text.RegularExpressions.Regex.IsMatch(text,@"(?i)(всегда|не меняй|стиль|ограничени|always|style|preserve)"))AgentDesignMemory.Remember(session,"Требование "+user.Id,text,user.Id,"constraint");
             session.Messages.Add(answer); Save();
             await RunTaskAsync(session,answer,text);
@@ -159,7 +160,7 @@ namespace WorldWeaver.Editor.Assistant
 
         private async Task RunTaskAsync(ChatSession session,AssistantMessage answer,string text,bool finalReviewOnly=false)
         {
-            bool readOnlyRequest=Settings.Mode==AssistantMode.Ask||ExplicitReadOnlyRequest(text)||answer.Task?.MutationAuthorized==false&&Settings.Mode!=AssistantMode.Plan;
+            bool readOnlyRequest=AgentTaskVerifier.IsReadOnlyExplanation(answer.Task)||Settings.Mode==AssistantMode.Ask||ExplicitReadOnlyRequest(text)||answer.Task?.MutationAuthorized==false&&Settings.Mode!=AssistantMode.Plan;
             executingMessage=answer;
             staleReadCommands.Clear();
             expandToolSelection=false;
@@ -632,7 +633,7 @@ namespace WorldWeaver.Editor.Assistant
         }
 
         private static bool SceneSaveRequested(string input) => System.Text.RegularExpressions.Regex.IsMatch(input ?? "", @"(?is)(сохран\w*|запиш\w*).{0,40}сцен|сцен.{0,40}(сохран\w*|запиш\w*)|\bsave\s+(the\s+)?scene\b|(?:собери|сборк\w*|\bbuild\b).{0,60}(?:проект|игр|прототип|player|project|game|prototype)");
-        private static bool ExplicitReadOnlyRequest(string input)
+        internal static bool ExplicitReadOnlyRequest(string input)
         {
             // This deliberately recognizes explicit instructions, not general questions or
             // negative code-import instructions. Quoted names/examples are only data.

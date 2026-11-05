@@ -33,6 +33,9 @@ namespace WorldWeaver.Editor.Assistant
     [Serializable] public sealed class AgentTaskState
     {
         public string Id = Guid.NewGuid().ToString("N"), OriginalRequest, Status = "planned", ScopeTarget, CheckpointId, PendingJobId;
+        // Permission can be false while an implementation plan awaits approval.
+        // Missing purpose identifies older persisted tasks, not an Ask request.
+        public string Purpose;
         public int ResumeAttempts;
         public string CreatedUtc = DateTime.UtcNow.ToString("o");
         public string InitialSceneFacts;
@@ -68,10 +71,15 @@ namespace WorldWeaver.Editor.Assistant
             if (go.GetComponent<GeneratedTerrain>()) return "terrain";
             return go.GetComponent<GeneratedSceneObject>()?.Kind ?? "";
         }
-        public static AgentTaskState Create(string input, bool mutationAuthorized)
+        internal static bool IsReadOnlyExplanation(AgentTaskState task) => task != null &&
+            (task.Purpose == "explanation" || string.IsNullOrEmpty(task.Purpose) && !task.MutationAuthorized && ChatController.ExplicitReadOnlyRequest(task.OriginalRequest));
+        public static AgentTaskState Create(string input, bool mutationAuthorized, bool readOnlyExplanation = false)
         {
-            var task = new AgentTaskState { OriginalRequest=input,MutationAuthorized=mutationAuthorized };
+            var task = new AgentTaskState { OriginalRequest=input,MutationAuthorized=mutationAuthorized,Purpose=readOnlyExplanation?"explanation":"implementation" };
             task.InitialObjectTargets=ProjectContextIndex.Objects().Select(ProjectContextIndex.StableTarget).ToList();
+            // A description can mention code, players and object counts, including
+            // explicit prohibitions. None of those authorize an authoring criterion.
+            if(readOnlyExplanation)return task;
             input=input??"";
             var ambiguousKinds=new HashSet<string>();
             var number = @"(?:\d{1,6}|один|одна|одно|два|две|три|четыре|пять|шесть|семь|восемь|девять|десять|one|two|three|four|five|six|seven|eight|nine|ten)";
