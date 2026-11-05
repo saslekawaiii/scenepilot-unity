@@ -81,6 +81,24 @@ namespace WorldWeaver.Editor.Assistant
             }
             return false;
         }
+        internal static bool RecoveredReadOnlyDiscovery(AssistantMessage answer,EditorPlan terminal)
+        {
+            if(!AgentTaskVerifier.IsReadOnlyExplanation(answer?.Task)||answer.Task.MutationAuthorized||
+                terminal?.complete!=true||terminal.actions.Count!=0||string.IsNullOrWhiteSpace(terminal.reply)||answer.Task.Checks.Any(c=>!c.Passed))return false;
+            // Search/discovery is an optional route to information. Failures of
+            // concrete reads, required assertions, compilation or mutations are
+            // deliberately NOT covered by this recovery policy.
+            var discovery=new HashSet<string>(new[]{"web_search","web_research","search_project","catalog_assets","model_search","find_scene_objects","find_unity_recipes","reflect_api"},StringComparer.Ordinal);
+            var failures=Enumerable.Range(0,answer.Steps.Count).Where(i=>!answer.Steps[i].Success).ToArray();
+            if(failures.Length==0||failures.Any(i=>!discovery.Contains(answer.Steps[i].Tool))||answer.Steps.Any(s=>!SceneToolExecutor.IsReadOnlyTool(s.Tool)))return false;
+            int lastFailure=failures.Max();
+            // Use persisted result ranges, not the current mode or an ephemeral
+            // success flag. A later read in the SAME failed batch is insufficient.
+            return answer.Attempts.Any(a=>a.Accepted&&a.FirstResultIndex>lastFailure&&a.ResultCount>0&&a.FirstResultIndex+a.ResultCount<=answer.Steps.Count&&
+                answer.Steps.Skip(a.FirstResultIndex).Take(a.ResultCount).All(s=>s.Success&&SceneToolExecutor.IsReadOnlyTool(s.Tool))&&
+                answer.Steps.Skip(a.FirstResultIndex).Take(a.ResultCount).Any(s=>!string.IsNullOrWhiteSpace(s.Summary)&&
+                    !new[]{"plan_task","review_stage","discover_tools","list_skills","read_skill","read_task_step","poll_job","job_result","verify_scene"}.Contains(s.Tool)));
+        }
         internal static int ObservationsSinceImplementation(IReadOnlyList<EditorCommandResult> steps)
         {
             int count=0;for(int i=steps.Count-1;i>=0;i--){if(IsImplementationProgress(steps[i]))break;count++;}return count;

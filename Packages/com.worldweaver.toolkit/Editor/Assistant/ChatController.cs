@@ -442,6 +442,15 @@ namespace WorldWeaver.Editor.Assistant
                                     if(round+1<rounds&&!(answer.Task.Requirements.All(r=>r.Kind=="task_change")&&answer.Steps.Any(s=>!s.Success))){request=BuildRequest(session,text);request.Messages.Add(new ChatMessage("user","Независимые проверки не пройдены. complete:true не подтверждает выполнение. Исправь только эти нарушения: "+JsonConvert.SerializeObject(checks)));continue;}
                                 }
                             }
+                            if(readOnlyRequest&&AgentTaskVerifier.IsReadOnlyExplanation(answer.Task))
+                            {
+                                // A failed search remains in the audit trail, but
+                                // need not condemn an explanation grounded by a
+                                // later clean observation. Required failures stay.
+                                if(answer.Steps.Any(s=>!s.Success))unresolvedFailure=!RecoveredReadOnlyDiscovery(answer,plan);
+                                if(answer.Task.Checks.Any(c=>!c.Passed))unresolvedFailure=true;
+                                if(!unresolvedFailure&&plan.complete&&!string.IsNullOrWhiteSpace(plan.reply))answer.Task.Status="explanation_complete";
+                            }
                             answer.IsError = unresolvedFailure;
                             answer.Status = unresolvedFailure ? "Проверки не пройдены" : plan.complete ? answer.Task?.Checks.Count>0&&answer.Task.Checks.All(c=>c.Passed)&&answer.Task.Requirements.Any(r=>r.Kind!="task_change")?"Проверки пройдены":answer.Steps.Any(IsImplementationProgress)?"Изменения применены":"Готово" : "Нужно уточнение";
                             if(answer.Task!=null)answer.Task.ContinueAfterReload=false;

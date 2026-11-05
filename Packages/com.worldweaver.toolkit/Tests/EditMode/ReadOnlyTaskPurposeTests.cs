@@ -203,6 +203,51 @@ namespace WorldWeaver.Tests
             }
         }
 
+        [UnityTest] public IEnumerator FailedOptionalDiscoveryCanRecoverWithActualSourceReadAndFinalExplanation()
+        {
+            string oldPython=Environment.GetEnvironmentVariable("WORLDWEAVER_WEB_PYTHON");
+            try
+            {
+                // Exercise the real failed search admission and subsequent real
+                // package-source read without network access or fake tool receipts.
+                Environment.SetEnvironmentVariable("WORLDWEAVER_WEB_PYTHON",Path.Combine(folder,"missing-python"));
+                const string path="Packages/com.worldweaver.toolkit/Runtime/NPC/NpcUtterance.cs";
+                var provider=new Provider{Reply=round=>round==0?Plan(new EditorCommand{tool="web_search",args=new JObject{["query"]="optional reference for the local NPC utterance source"}}):round==1?Plan(new EditorCommand{tool="read_script",args=new JObject{["path"]=path}}):Plan()};
+                var controller=Controller(provider,AssistantMode.Ask);
+                yield return Finish(controller.SendAsync("Only explain the NPC utterance script. Try an optional internet search, then read the local package source; do not edit anything."));
+                var answer=controller.Current.Messages.Last();
+                Assert.That(provider.Calls,Is.EqualTo(3));Assert.That(answer.Steps.Count,Is.EqualTo(2));Assert.That(answer.Steps[0].Tool,Is.EqualTo("web_search"));Assert.That(answer.Steps[0].Success,Is.False);Assert.That(answer.Steps[0].Error,Is.Not.Empty);
+                var source=JObject.Parse(answer.Steps[1].Summary);Assert.That(answer.Steps[1].Success,Is.True);Assert.That((string)source["source"],Does.Contain("NpcUtterance"));
+                Assert.That(answer.IsError,Is.False,answer.Text);Assert.That(answer.Status,Is.EqualTo("Готово"));Assert.That(answer.Task.Status,Is.EqualTo("explanation_complete"));Assert.That(answer.Task.Checks,Is.Empty);Assert.That(scene.rootCount,Is.Zero);
+            }
+            finally{Environment.SetEnvironmentVariable("WORLDWEAVER_WEB_PYTHON",oldPython);}
+        }
+        [UnityTest] public IEnumerator FailedLatestDiscoveryStillMakesANonemptyFinalReplyIncomplete()
+        {
+            string oldPython=Environment.GetEnvironmentVariable("WORLDWEAVER_WEB_PYTHON");
+            try
+            {
+                Environment.SetEnvironmentVariable("WORLDWEAVER_WEB_PYTHON",Path.Combine(folder,"missing-python"));
+                var provider=new Provider{Reply=round=>round==0?Plan(new EditorCommand{tool="web_search",args=new JObject{["query"]="optional discovery without a later recovered observation"}}):Plan()};
+                var controller=Controller(provider,AssistantMode.Ask);
+                yield return Finish(controller.SendAsync("Only explain a script using an internet search. Do not edit the project."));
+                var answer=controller.Current.Messages.Last();Assert.That(answer.IsError,Is.True);Assert.That(answer.Status,Is.EqualTo("Проверки не пройдены"));Assert.That(answer.Steps.Single().Success,Is.False);Assert.That(answer.Task.Status,Is.Not.EqualTo("explanation_complete"));Assert.That(scene.rootCount,Is.Zero);
+            }
+            finally{Environment.SetEnvironmentVariable("WORLDWEAVER_WEB_PYTHON",oldPython);}
+        }
+        [UnityTest] public IEnumerator AFinalProviderExceptionIsNotHiddenByEarlierDiscoveryRecovery()
+        {
+            string oldPython=Environment.GetEnvironmentVariable("WORLDWEAVER_WEB_PYTHON");
+            try
+            {
+                Environment.SetEnvironmentVariable("WORLDWEAVER_WEB_PYTHON",Path.Combine(folder,"missing-python"));
+                var provider=new Provider{Reply=round=>round==0?Plan(new EditorCommand{tool="web_search",args=new JObject{["query"]="optional local source lookup"}}):round==1?Plan(new EditorCommand{tool="read_script",args=new JObject{["path"]="Packages/com.worldweaver.toolkit/Runtime/NPC/NpcUtterance.cs"}}):throw new InvalidOperationException("Actual provider exception fixture")};
+                var controller=Controller(provider,AssistantMode.Ask);
+                yield return Finish(controller.SendAsync("Only explain the NPC utterance script using an optional internet search and then local package source. Do not modify the project."));
+                var answer=controller.Current.Messages.Last();Assert.That(answer.IsError,Is.True);Assert.That(answer.Text,Does.Contain("Actual provider exception fixture"));Assert.That(answer.Task.Status,Is.EqualTo("failed"));Assert.That(answer.Steps[0].Success,Is.False);Assert.That(scene.rootCount,Is.Zero);
+            }
+            finally{Environment.SetEnvironmentVariable("WORLDWEAVER_WEB_PYTHON",oldPython);}
+        }
         [UnityTest] public IEnumerator PlanApprovalRetainsPlayerAndCompilationRequirements()
         {
             var provider = new Provider { Reply = _ => new EditorPlan { complete = true, reply = "A partial plan for review.", actions = new List<EditorCommand> { new EditorCommand { tool = "create_node", name = "ApprovedPartialNode", args = new JObject() } } } };
