@@ -132,7 +132,7 @@ namespace WorldWeaver.Tests
                     Reviews++;bool exists=UnityEngine.GameObject.Find("ObservedGoal");return System.Threading.Tasks.Task.FromResult(new CompletionResult{Text=new JObject{["passed"]=exists,["issues"]=exists?new JArray():new JArray("The requested node has not been created; observations alone are insufficient."),["evidence"]=exists?"Actual node exists":"Actual node is absent"}.ToString()});
                 }
                 var plan=new EditorPlan{complete=false};bool feedback=request.Messages.Any(m=>m.Content.Contains("LATEST INDEPENDENT REVIEW")&&m.Content.Contains("requested node"));FeedbackSeen|=feedback;
-                if(feedback){JsonRecoverySeen|=!request.UseToolCalls;var available=((JArray)request.Schema["properties"]["actions"]["items"]["anyOf"]).OfType<JObject>().Select(EditorToolSchema.ToolName).ToArray();ImplementationPhaseSeen|=available.Contains("create_node")&&available.Contains("discover_tools")&&!available.Contains("inspect_object");}
+                if(feedback){JsonRecoverySeen|=!request.UseToolCalls;var available=((JArray)request.Schema["properties"]["actions"]["items"]["anyOf"]).OfType<JObject>().Select(EditorToolSchema.ToolName).ToArray();ImplementationPhaseSeen|=available.Contains("create_node")&&available.Contains("discover_tools")&&available.Contains("inspect_object");}
                 if(!feedback){Reads++;plan.actions.Add(new EditorCommand{tool="find_scene_objects",args=new JObject{["query"]="missing_observation_fixture"}});}
                 else if(!UnityEngine.GameObject.Find("ObservedGoal"))plan.actions.Add(new EditorCommand{tool="create_node",name="ObservedGoal"});
                 else{plan.complete=true;plan.reply="Готово";}
@@ -252,9 +252,9 @@ namespace WorldWeaver.Tests
                 CompletionRequest Filter()=>(CompletionRequest)typeof(ChatController).GetMethod("RequireImplementation",flags).Invoke(controller,new object[]{Build()});
                 Assert.That(AgentFunctionProtocol.Definitions(Filter().Schema).Select(t=>(string)t["function"]["name"]),Does.Contain("inspect_object"),"Discovery before another independent read must still take effect");
                 answer.Steps.Add(new EditorCommandResult{Success=true,Tool="inspect_object",Summary="{}"});answer.Attempts.Add(new EditorPlanAttempt{Accepted=true,FirstResultIndex=2,ResultCount=1});
-                Assert.That(AgentFunctionProtocol.Definitions(Filter().Schema).Select(t=>(string)t["function"]["name"]),Does.Not.Contain("inspect_object"),"The targeted prerequisite read expires after its observation turn");
+                Assert.That(AgentFunctionProtocol.Definitions(Filter().Schema).Select(t=>(string)t["function"]["name"]),Does.Contain("inspect_object"),"Targeted diagnosis must remain available; only proven duplicate observations are bounded");
                 answer.Task=new AgentTaskState{Approach=new System.Collections.Generic.List<string>{"Implement a general stage"}};
-                Assert.That(AgentFunctionProtocol.Definitions(Filter().Schema).Select(t=>(string)t["function"]["name"]),Does.Not.Contain("inspect_object"),"Adding a proposed stage cannot bypass a stalled observation phase");
+                Assert.That(AgentFunctionProtocol.Definitions(Filter().Schema).Select(t=>(string)t["function"]["name"]),Does.Contain("inspect_object"),"A proposed stage must not hide needed diagnostics");
                 answer.Steps.Add(new EditorCommandResult{Success=true,Tool="discover_tools",Summary="{\"enabledTools\":[\"inspect_object\"]}"});answer.Attempts.Add(new EditorPlanAttempt{Accepted=true,FirstResultIndex=3,ResultCount=1});
                 Assert.That(AgentFunctionProtocol.Definitions(Filter().Schema).Select(t=>(string)t["function"]["name"]),Does.Contain("inspect_object"),"A planned stage can still discover a specific missing prerequisite and read it on the following turn");
             }

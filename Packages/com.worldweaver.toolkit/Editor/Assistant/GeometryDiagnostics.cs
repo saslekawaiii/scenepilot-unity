@@ -18,11 +18,19 @@ namespace WorldWeaver.Editor.Assistant
         struct GeometricRay { internal Ray Ray; internal float Length, Near, FrontNear; internal string FromDirection; }
         static JArray Vec(Vector3 value) => new JArray(value.x, value.y, value.z);
         static bool Finite(Vector3 v) => !(float.IsNaN(v.x)||float.IsNaN(v.y)||float.IsNaN(v.z)||float.IsInfinity(v.x)||float.IsInfinity(v.y)||float.IsInfinity(v.z));
-        static Mesh VisualMesh(GameObject go) => go.GetComponent<MeshFilter>()?.sharedMesh ?? go.GetComponent<SkinnedMeshRenderer>()?.sharedMesh;
+        static Mesh VisualMesh(GameObject go)
+        {
+            if(!go)return null;
+            var filter=go.GetComponent<MeshFilter>();
+            if(filter&&filter.sharedMesh)return filter.sharedMesh;
+            var skin=go.GetComponent<SkinnedMeshRenderer>();
+            return skin?skin.sharedMesh:null;
+        }
         static JObject MeshIdentity(Mesh mesh) => mesh ? new JObject { ["name"]=mesh.name,["asset"]=AssetDatabase.GetAssetPath(mesh),["vertices"]=mesh.vertexCount,["readable"]=mesh.isReadable,["subMeshes"]=mesh.subMeshCount } : null;
 
         internal static JObject Summary(GameObject go)
         {
+            if(!go)return null;
             var mesh=VisualMesh(go);var colliders=go.GetComponents<MeshCollider>();
             if(!mesh&&colliders.Length==0)return null;
             return new JObject { ["visualMesh"]=MeshIdentity(mesh),["meshColliderCount"]=colliders.Length,["worldScale"]=Vec(go.transform.lossyScale),
@@ -31,6 +39,7 @@ namespace WorldWeaver.Editor.Assistant
 
         internal static JObject Inspect(Component component)
         {
+            if(!component)return null;
             Mesh mesh=component is MeshFilter filter ? filter.sharedMesh : component is MeshCollider collider ? collider.sharedMesh : component is SkinnedMeshRenderer skin ? skin.sharedMesh : null;
             if(!(component is MeshFilter)&&!(component is MeshCollider)&&!(component is SkinnedMeshRenderer))return null;
             var go=component.gameObject;var warnings=new JArray();var result=new JObject { ["mesh"]=MeshIdentity(mesh),["visualMesh"]=MeshIdentity(VisualMesh(go)),["worldScale"]=Vec(go.transform.lossyScale),["transformDeterminant"]=go.transform.localToWorldMatrix.determinant,["readOnly"]=true,["warnings"]=warnings };

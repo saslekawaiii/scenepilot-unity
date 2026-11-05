@@ -85,6 +85,21 @@ namespace WorldWeaver.Tests
             var go=Object(Plane());var mesh=InspectComponent(go.GetComponent<MeshFilter>());var transform=InspectComponent(go.transform);
             Assert.That(mesh["geometryDiagnostics"]["analysisAvailable"].Value<bool>(),Is.True);Assert.That(transform["geometryDiagnostics"],Is.Null);Assert.That(mesh["fields"],Is.Not.Null);
         }
+        [TestCase("plain")]
+        [TestCase("light")]
+        [TestCase("npc-style")]
+        public void NonMeshObjectsHaveNoGeometrySummaryAndNeverDereferenceMissingComponents(string kind)
+        {
+            var go=new GameObject("Non-mesh "+kind);objects.Add(go);
+            if(kind=="light")go.AddComponent<Light>();
+            if(kind=="npc-style"){go.AddComponent<CharacterController>();go.AddComponent<Inventory>();}
+            Assert.DoesNotThrow(()=>Assert.That(Snapshot(go),Is.Null));
+        }
+        [Test] public void SkinnedMeshWithoutMeshFilterIsStillReported()
+        {
+            var go=new GameObject("Skin without filter");objects.Add(go);go.AddComponent<SkinnedMeshRenderer>().sharedMesh=Plane();
+            var summary=Snapshot(go);Assert.That((int)summary["visualMesh"]["vertices"],Is.EqualTo(4));
+        }
         [Test] public void CompactSnapshotDoesNotPerformTriangleAnalysis()
         {
             var go=Object(Plane());var summary=Snapshot(go);

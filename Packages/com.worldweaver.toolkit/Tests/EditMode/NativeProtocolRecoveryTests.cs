@@ -194,8 +194,8 @@ namespace WorldWeaver.Tests
                 else if(Calls==7)
                 {
                     var tools=AgentFunctionProtocol.Definitions(request.Schema).Select(d=>(string)d["function"]["name"]).ToArray();
-                    Narrowed=!tools.Contains("list_scene_objects")&&tools.Contains("discover_tools")&&tools.Contains("finish_task");
-                    Assert.IsTrue(Narrowed,"A planned task must leave repeated general inspection after six observation rounds");
+                    Narrowed=tools.Contains("list_scene_objects")&&tools.Contains("discover_tools")&&tools.Contains("finish_task")&&request.Messages.Any(m=>m.Content.Contains("Repeated observations have not resolved"));
+                    Assert.IsTrue(Narrowed,"A planned task must receive recovery guidance while retaining targeted diagnosis");
                     plan.actions.Add(new EditorCommand{tool="create_node",name="PlannedReadLoopGoal"});
                 }
                 return Task.FromResult(new CompletionResult{Text=JsonConvert.SerializeObject(plan)});
