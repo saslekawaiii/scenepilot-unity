@@ -59,6 +59,18 @@ namespace WorldWeaver.Tests
             Assert.IsTrue(JToken.DeepEquals(excerpts,failed["data"]["diagnosticSourceExcerpts"]));Assert.AreEqual("actual-generated-source",(string)failed["data"]["sourceHash"]);Assert.That((string)failed["failureScope"],Does.Contain("not a claim that project scripts are currently broken"));
             answer.Steps.Add(new EditorCommandResult{Tool="set_transform",Success=true});ledger=(JArray)Call("ObservationLedger",answer.Steps);failed=ledger.OfType<JObject>().Single(r=>(string)r["tool"]=="execute_editor_code");Assert.IsTrue((bool)failed["historicalBeforeLastChange"]);
         }
+        [Test] public void CompiledRuntimeFailureRetainsGeometryAndDoesNotReplaceTheLatestCompilerDiagnostic()
+        {
+            var failedCompilation=new EditorCommandResult{Tool="execute_editor_code",Success=false,Summary="{\"compiled\":false,\"sourceHash\":\"actual-compile-failure\",\"diagnostics\":[\"Actual diagnostic\"]}"};
+            var rollback=new JObject{["completed"]=true,["observationScope"]="before_rollback"};
+            var runtime=new EditorCommandResult{Tool="execute_editor_code",Success=false,Summary=new JObject{["compiled"]=true,["executed"]=true,["sceneChanged"]=false,["projectChanged"]=false,["sourceHash"]="actual-runtime-observation",["result"]="observed runtime facts",["sceneReadback"]=new JArray(new JObject{["joints"]=new JArray(new JObject{["geometryWarning"]="ACTUAL_GEOMETRY_DISCREPANCY"})}),["batchRollback"]=rollback}.ToString()};
+            var data=JObject.Parse((string)Call("ToolEvidenceForModel",runtime));
+            Assert.That(data.ToString(),Does.Contain("ACTUAL_GEOMETRY_DISCREPANCY").And.Contain("observed runtime facts"));Assert.IsTrue(JToken.DeepEquals(rollback,data["batchRollback"]));
+            Assert.IsFalse((bool)Call("IsEditorCompilationFailure",runtime));Assert.IsTrue((bool)Call("IsEditorCompilationFailure",failedCompilation));
+            var steps=new List<EditorCommandResult>{failedCompilation,runtime,new EditorCommandResult{Tool="batch",Success=false}};
+            Assert.AreEqual(0,Call("LatestFailedEditorCode",steps),"A later compiled execution failure is not a replacement compiler diagnostic");
+            var ledger=(JArray)Call("ObservationLedger",steps);Assert.That(ledger.ToString(),Does.Contain("actual-compile-failure"));
+        }
         [Test] public void FailedCompilerSourceSurvivesTheRealFreshConstructiveRequest()
         {
             string folder=Path.Combine(Path.GetTempPath(),"ScenePilot-stage-budget-"+Guid.NewGuid().ToString("N"));
