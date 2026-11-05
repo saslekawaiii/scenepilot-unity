@@ -221,12 +221,12 @@ namespace WorldWeaver.Editor.Assistant
                         operation.Token.ThrowIfCancellationRequested();
                         Phase = round == 0 ? "Изучаю запрос и сцену…" : "Проверяю результат · шаг " + (round + 1) + " из " + rounds;
                         answer.Status = "Думаю";
+                        ApplyActiveWireContract(request,Settings.UseNativeFunctions&&!textToolRecovery);
                         var attempt = new EditorPlanAttempt { Round = answer.Attempts.Count + 1, Model = profile.Model,
                             SchemaHash = TextChunker.Digest(request.Schema.ToString(Formatting.None)),
                             Messages = request.Messages.Select(m => new ChatMessage(m.Role, ChatHistoryStore.Redact(m.Content)){ToolCallId=m.ToolCallId,ToolName=m.ToolName,ToolCalls=m.ToolCalls==null?null:JArray.Parse(ChatHistoryStore.Redact(m.ToolCalls.ToString(Formatting.None)))}).ToList() };
                         answer.Attempts.Add(attempt); Save();
                         string streamBuffer="";
-                        request.UseToolCalls=Settings.UseNativeFunctions&&!textToolRecovery;
                         if(textToolRecovery){request.EnableThinking=false;attempt.RepairKind=textRecoveryKind;}
                         long lastActivityAt=-1000;
                         request.OnActivity=activity=>{if(operation==null||operation.IsCancellationRequested||disposed||clock.ElapsedMilliseconds-lastActivityAt<1000)return;lastActivityAt=clock.ElapsedMilliseconds;Phase=ChatHistoryStore.Redact(activity);Notify();};
@@ -361,12 +361,11 @@ namespace WorldWeaver.Editor.Assistant
                                 actionSchema["minItems"] = 1; actionSchema["maxItems"] = 1;
                                 request.Schema["properties"]["complete"]["enum"] = new JArray(false);
                             }
-                            if (phaseRepair.Length > 0) request.Messages.Add(new ChatMessage("system", phaseRepair));
-                            string proposal = ""; // Invalid plans remain in the audit only; never anchor a fresh attempt to the rejected payload.
-                            request.Messages.Add(new ChatMessage("user", "План отклонён, ничего из него не исполнено. Исправь контракт и параметры: " + attempt.Error + proposal +
-                                "\nВерни экземпляр EditorPlan, а не JSON Schema. Формат: {\"reply\":\"текст\",\"complete\":true,\"actions\":[]}. Если исходная задача ещё не выполнена, actions должны содержать нужные инструменты. Сверь актуальную сцену и уже выполненные шаги; не повторяй их." +
-                                (readOnlyRequest ? "\nПользователь просит только объяснение. Не изменяй сцену и не подготавливай новый код. Для готового объяснения используй actions:[] и complete:true." : "") +
-                                "\nCURRENT USER TASK: " + text));
+                            bool nativeRepairWire=Settings.UseNativeFunctions&&!textToolRecovery;
+                            if(phaseRepair.Length>0)request.Messages.Add(new ChatMessage("system",nativeRepairWire?NativePhaseRecoveryGuidance(request):phaseRepair));
+                            // Repair the actual wire contract. Native calls must not be
+                            // contradicted by legacy EditorPlan/actions instructions.
+                            AddRejectedStepFeedback(request,answer,attempt.Error,text,readOnlyRequest,nativeRepairWire);
                             continue;
                         }
                         request.Messages.Add(new ChatMessage("assistant", ChatHistoryStore.Redact(parsedResponse)));
